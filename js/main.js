@@ -613,6 +613,69 @@ function txIconSvg(isDebet) {
     : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--neg)" stroke-width="2.3"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
 }
 
+function toTitleCase(str) {
+  if (!str) return "";
+
+  // Cukup daftarkan kata pendek yang PUNYA VOKAL tapi tetap harus UPPERCASE (sangat sedikit)
+  const specialUpper = new Set([
+    "CAI",
+    "PLN",
+    "OVO",
+    "ATM",
+    "EDC",
+    "BCA",
+    "BNI",
+    "BRI",
+    "BSI",
+  ]);
+
+  // Kata hubung kecil bahasa Indonesia yang sebaiknya tetap lowercase (huruf kecil)
+  const lowerWords = new Set([
+    "dan",
+    "ke",
+    "di",
+    "dari",
+    "yang",
+    "untuk",
+    "pada",
+    "atau",
+    "via",
+    "by",
+  ]);
+
+  return str
+    .split(" ")
+    .map((word, index) => {
+      const upperWord = word.toUpperCase();
+      const cleanUpper = upperWord.replace(/[^A-Z0-9]/g, "");
+
+      // 1. Cek whitelist ringkas
+      if (specialUpper.has(cleanUpper)) return upperWord;
+
+      // 2. OTOMATIS UPPERCASE jika:
+      //    - Panjangnya 2-4 huruf DAN tidak ada huruf vokal A, E, I, O, U (Contoh: PPH, PPN, BKM, MT, KTP, ADM, DP)
+      //    - ATAU input aslinya memang sudah KAPITAL SEMUA dan panjangnya <= 3 huruf
+      const hasNoVowels = !/[AEIOUaeiou]/.test(cleanUpper);
+      if (
+        cleanUpper.length >= 2 &&
+        cleanUpper.length <= 4 &&
+        (hasNoVowels || word === upperWord)
+      ) {
+        return upperWord;
+      }
+
+      // 3. Kata hubung kecil tetap lowercase (kecuali di awal kalimat)
+      const lowerWord = word.toLowerCase();
+      if (index > 0 && lowerWords.has(lowerWord)) {
+        return lowerWord;
+      }
+
+      // 4. Sisanya Title Case biasa (Huruf pertama kapital)
+      return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
+    })
+    .join(" ");
+}
+
 // Setiap kartu transaksi kini hanya menampilkan info (tanpa tombol icon
 // edit/hapus inline). Saat mode admin aktif, seluruh kartu bisa diketuk
 // (tx-card-clickable) untuk membuka menu aksi (lihat txActionOverlay di
@@ -661,8 +724,8 @@ function renderTxList(rows, containerId, emptyId, opts) {
   }>
     <div class="tx-icon" style="background:${iconBg}">${icon}</div>
     <div class="flex-1 min-w-0">
-      <p class="tx-title">${escapeHtml(t.account)}</p>
-      <p class="tx-sub">${escapeHtml(t.keterangan)}</p>
+      <p class="tx-title">${escapeHtml(toTitleCase(t.keterangan))}</p>
+      <p class="tx-sub">${escapeHtml(toTitleCase(t.account))}</p>
       <p class="tx-meta">${fmtDateShort(t.tanggal)}${t.createdBy ? " · " + escapeHtml(t.createdBy) : ""}</p>
     </div>
     <div class="text-right flex-shrink-0">
