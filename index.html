@@ -1,0 +1,2447 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0B0E14" />
+
+    <!-- Favicon Inline SVG (Kas/Keuangan) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%236366F1'/><stop offset='100%25' stop-color='%234F46E5'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%230B0E14'/><rect x='20' y='30' width='60' height='44' rx='10' fill='url(%23g)'/><path d='M20 42h60' stroke='%230B0E14' stroke-width='4'/><circle cx='62' cy='54' r='4' fill='%23F59E0B'/></svg>"
+    />
+
+    <title>Kas · Kelompok Latukan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f4f6f4;
+        --app-bg: #ffffff;
+        --surface: #ffffff;
+        --surface-alt: #f2f5f2;
+        --ink: #171b17;
+        --ink-soft: #6d7770;
+        --ink-faint: #a3aca4;
+        --line: #edf1ed;
+        --brand: #6cc06a;
+        --brand-dark: #4f9e51;
+        --brand-soft: #e9f6e8;
+        --gold: #c79a44;
+        --gold-soft: #faf1de;
+        --pos: #46ab53;
+        --pos-soft: #eaf7ea;
+        --neg: #e2585c;
+        --neg-soft: #fbeaea;
+        --shadow: 0 16px 36px -18px rgba(23, 27, 23, 0.14);
+      }
+      html[data-theme="light"] {
+        --bg: #f4f6f4;
+        --app-bg: #ffffff;
+        --surface: #ffffff;
+        --surface-alt: #f2f5f2;
+        --ink: #171b17;
+        --ink-soft: #6d7770;
+        --ink-faint: #a3aca4;
+        --line: #edf1ed;
+        --brand: #6cc06a;
+        --brand-dark: #4f9e51;
+        --brand-soft: #e9f6e8;
+        --gold: #c79a44;
+        --gold-soft: #faf1de;
+        --pos: #46ab53;
+        --pos-soft: #eaf7ea;
+        --neg: #e2585c;
+        --neg-soft: #fbeaea;
+        --shadow: 0 16px 36px -18px rgba(23, 27, 23, 0.14);
+      }
+      html[data-theme="dark"] {
+        --bg: #0d100e;
+        --app-bg: #121712;
+        --surface: #171c17;
+        --surface-alt: #1c221b;
+        --ink: #eef3ee;
+        --ink-soft: #93a190;
+        --ink-faint: #576053;
+        --line: #232a22;
+        --brand: #74d977;
+        --brand-dark: #52b855;
+        --brand-soft: #17281a;
+        --gold: #e3b24c;
+        --gold-soft: #2b2313;
+        --pos: #57cf67;
+        --pos-soft: #142a17;
+        --neg: #ff6b6b;
+        --neg-soft: #2c1417;
+        --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55);
+      }
+      html,
+      body {
+        background: var(--bg);
+        font-family:
+          "Plus Jakarta Sans",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+      }
+      * {
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .font-display {
+        font-family:
+          "Plus Jakarta Sans",
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      .mono {
+        font-family:
+          "Plus Jakarta Sans",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+      }
+      .no-scrollbar {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      body,
+      #shell,
+      .card,
+      .stat-chip,
+      .month-chip,
+      .hero-card,
+      .tx-card,
+      .sheet,
+      #bottomnav,
+      #topbar,
+      .icon-btn,
+      .field-input {
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      /* ---------- Auth gate ---------- */
+      #authScreen {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: var(--bg);
+      }
+      #authCard {
+        width: 100%;
+        max-width: 360px;
+        background: var(--app-bg);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        padding: 32px 26px;
+      }
+
+      /* ---------- Phone shell ---------- */
+      #shell {
+        max-width: 460px;
+        margin: 0 auto;
+        min-height: 100dvh;
+        background: var(--app-bg);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      @media (min-width: 500px) {
+        body {
+          padding: 28px 0;
+        }
+        #shell {
+          min-height: calc(100dvh - 56px);
+          border-radius: 30px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+          border: 1px solid var(--line);
+        }
+      }
+
+      /* ---------- Top bar ---------- */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: var(--app-bg);
+        padding-top: env(safe-area-inset-top);
+      }
+      .app-icon-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: var(--brand-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+        transition: transform 0.12s ease;
+        flex-shrink: 0;
+      }
+      .icon-btn:active {
+        transform: scale(0.93);
+      }
+      .icon-btn.spin svg {
+        animation: spin 0.7s linear;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ---------- Hero / receipt card ---------- */
+      .hero-card {
+        background: linear-gradient(
+          155deg,
+          var(--brand) 0%,
+          var(--brand-dark) 100%
+        );
+        border-radius: 28px 28px 0 0;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+      }
+      html[data-theme="dark"] .hero-card {
+        color: #06120d;
+      }
+      html[data-theme="dark"] .hero-card .white-text {
+        color: #06120d;
+      }
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle at 88% -10%,
+          rgba(255, 255, 255, 0.18),
+          transparent 55%
+        );
+        pointer-events: none;
+      }
+      .receipt-edge {
+        height: 15px;
+        margin-top: -1px;
+        background: var(--brand-dark);
+        -webkit-mask-image: radial-gradient(
+          circle at 10px 0,
+          transparent 9px,
+          #000 9.5px
+        );
+        mask-image: radial-gradient(
+          circle at 10px 0,
+          transparent 9px,
+          #000 9.5px
+        );
+        -webkit-mask-size: 20px 15px;
+        mask-size: 20px 15px;
+        -webkit-mask-repeat: repeat-x;
+        mask-repeat: repeat-x;
+        border-radius: 0 0 20px 20px;
+      }
+
+      /* ---------- Cards & chips ---------- */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+      }
+      .stat-chip {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+      .eyebrow {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-faint);
+      }
+      .month-chip {
+        white-space: nowrap;
+        padding: 9px 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink-soft);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition:
+          background-color 0.12s ease,
+          color 0.12s ease,
+          border-color 0.12s ease;
+      }
+      .month-chip.active {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: #06120d;
+      }
+      .month-chip:active {
+        transform: scale(0.97);
+      }
+
+      /* ---------- Transaction row card ---------- */
+      .tx-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 4px;
+        border-bottom: 1px solid var(--line);
+      }
+      .tx-card:last-child {
+        border-bottom: none;
+      }
+      .tx-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tx-title {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+      .tx-sub {
+        font-size: 12px;
+        color: var(--ink-soft);
+        margin-top: 1px;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .tx-meta {
+        font-size: 10.5px;
+        color: var(--ink-faint);
+        margin-top: 3px;
+      }
+      .tx-amount {
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      /* ---------- Bottom nav ---------- */
+      #bottomnav {
+        position: sticky;
+        bottom: 0;
+        z-index: 30;
+        background: var(--surface);
+        border-top: 1px solid var(--line);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 0 9px;
+        color: var(--ink-faint);
+      }
+      .nav-btn .nav-pill {
+        width: 42px;
+        height: 26px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .nav-btn.active {
+        color: var(--brand);
+      }
+      .nav-btn.active .nav-pill {
+        background: var(--brand-soft);
+      }
+      .nav-btn span {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 10.5px;
+        font-weight: 700;
+      }
+
+      /* ---------- FAB ---------- */
+      #fabAdd {
+        position: absolute;
+        right: 18px;
+        bottom: 82px;
+        z-index: 25;
+        width: 56px;
+        height: 56px;
+        border-radius: 20px;
+        background: var(--gold);
+        color: #1a1204;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 22px -6px rgba(180, 130, 30, 0.5);
+        transition: transform 0.12s ease;
+      }
+      #fabAdd:active {
+        transform: scale(0.93);
+      }
+
+      /* ---------- Sheets ---------- */
+      .sheet-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(4, 8, 7, 0.55);
+        z-index: 50;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .sheet {
+        width: 100%;
+        max-height: 90%;
+        background: var(--app-bg);
+        border-radius: 28px 28px 0 0;
+        overflow-y: auto;
+        padding: 14px 22px calc(22px + env(safe-area-inset-bottom));
+        animation: sheetUp 0.24s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        border-top: 1px solid var(--line);
+      }
+      @keyframes sheetUp {
+        from {
+          transform: translateY(24px);
+          opacity: 0.4;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .sheet-handle {
+        width: 38px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--line);
+        margin: 6px auto 14px;
+      }
+      .field-input {
+        width: 100%;
+        margin-top: 6px;
+        padding: 13px 16px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--surface-alt);
+        color: var(--ink);
+        font-size: 14px;
+        outline: none;
+      }
+      .field-input:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-soft);
+      }
+      .field-label {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--ink-soft);
+      }
+      .seg-toggle,
+      .opt-toggle {
+        display: flex;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-top: 6px;
+      }
+      .seg-btn,
+      .opt-btn {
+        flex: 1;
+        padding: 10px 0;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+        background: var(--surface-alt);
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .seg-btn.active-debet {
+        background: var(--pos-soft);
+        color: var(--pos);
+      }
+      .seg-btn.active-kredit {
+        background: var(--neg-soft);
+        color: var(--neg);
+      }
+      .opt-btn.active {
+        background: var(--brand);
+        color: #06120d;
+      }
+      .btn-primary {
+        background: var(--brand);
+        color: #06120d;
+        border-radius: 14px;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 700;
+        font-size: 14.5px;
+        padding: 14px 0;
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+      .btn-ghost {
+        background: var(--surface-alt);
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+        border-radius: 14px;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 600;
+        font-size: 14.5px;
+        padding: 14px 0;
+      }
+
+      /* ---------- Screens ---------- */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
+
+      /* ---------- Toast ---------- */
+      #toast {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 88px;
+        z-index: 60;
+        padding: 12px 16px;
+        border-radius: 14px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.4);
+      }
+
+      /* ---------- Print ---------- */
+      #printArea {
+        display: none;
+      }
+      @media print {
+        body {
+          background: #fff !important;
+          padding: 0 !important;
+        }
+        #shell {
+          display: none !important;
+        }
+        #printArea {
+          display: block !important;
+        }
+        #printArea table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 10.5px;
+        }
+        #printArea th,
+        #printArea td {
+          border-bottom: 1px solid #cbd5e1;
+          padding: 5px 6px;
+          text-align: left;
+        }
+        #printArea th {
+          background: #f1f5f9;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        @page {
+          size: A4;
+          margin: 12mm;
+        }
+      }
+
+      /* =========================================================
+   CLEAN FINANCE / STOCKBIT-INSPIRED UI OVERRIDES
+   Style only — layout, spacing, typography, surfaces.
+   Functionality and markup remain unchanged.
+   ========================================================= */
+
+      :root {
+        --bg: #f5f6f7;
+        --app-bg: #ffffff;
+        --surface: #ffffff;
+        --surface-alt: #f7f8f9;
+        --ink: #17191c;
+        --ink-soft: #6b7178;
+        --ink-faint: #9aa1a8;
+        --line: #e7e9ec;
+        --brand: #16a34a;
+        --brand-dark: #12833d;
+        --brand-soft: #eaf7ef;
+        --gold: #e6a72e;
+        --gold-soft: #fff7e6;
+        --pos: #16a34a;
+        --pos-soft: #eaf7ef;
+        --neg: #e05252;
+        --neg-soft: #fceded;
+        --shadow: 0 2px 10px rgba(18, 24, 31, 0.045);
+      }
+
+      html[data-theme="light"] {
+        --bg: #f5f6f7;
+        --app-bg: #ffffff;
+        --surface: #ffffff;
+        --surface-alt: #f7f8f9;
+        --ink: #17191c;
+        --ink-soft: #6b7178;
+        --ink-faint: #9aa1a8;
+        --line: #e7e9ec;
+        --brand: #16a34a;
+        --brand-dark: #12833d;
+        --brand-soft: #eaf7ef;
+        --gold: #e6a72e;
+        --gold-soft: #fff7e6;
+        --pos: #16a34a;
+        --pos-soft: #eaf7ef;
+        --neg: #e05252;
+        --neg-soft: #fceded;
+        --shadow: 0 2px 10px rgba(18, 24, 31, 0.045);
+      }
+
+      html[data-theme="dark"] {
+        --bg: #0f1114;
+        --app-bg: #15171a;
+        --surface: #191c20;
+        --surface-alt: #20242a;
+        --ink: #f1f3f5;
+        --ink-soft: #9aa1aa;
+        --ink-faint: #69717b;
+        --line: #2a2e34;
+        --brand: #28c76f;
+        --brand-dark: #20a85c;
+        --brand-soft: #162b20;
+        --gold: #e9ad38;
+        --gold-soft: #302612;
+        --pos: #28c76f;
+        --pos-soft: #162b20;
+        --neg: #ff6666;
+        --neg-soft: #321b1d;
+        --shadow: 0 2px 12px rgba(0, 0, 0, 0.16);
+      }
+
+      html,
+      body {
+        background: var(--bg);
+        font-size: 14px;
+        letter-spacing: -0.012em;
+      }
+
+      body {
+        line-height: 1.45;
+      }
+
+      #shell {
+        max-width: 480px;
+      }
+
+      @media (min-width: 500px) {
+        body {
+          padding: 18px 0;
+        }
+
+        #shell {
+          min-height: calc(100dvh - 36px);
+          border-radius: 16px;
+          box-shadow: var(--shadow);
+        }
+      }
+
+      /* Top bar */
+      #topbar {
+        padding: calc(12px + env(safe-area-inset-top)) 16px 10px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .app-icon-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: var(--brand-soft);
+      }
+
+      .app-icon-badge svg {
+        stroke: var(--brand) !important;
+      }
+
+      .icon-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: transparent;
+        border: 1px solid transparent;
+        box-shadow: none;
+      }
+
+      .icon-btn:hover {
+        background: var(--surface-alt);
+        border-color: var(--line);
+      }
+
+      /* Main content */
+      #shell main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 16px;
+        padding-bottom: 84px;
+        gap: 16px;
+      }
+
+      .screen {
+        gap: 16px;
+      }
+
+      /* Remove decorative receipt treatment */
+      .hero-card {
+        background: var(--brand) !important;
+        border-radius: 10px;
+        padding: 18px !important;
+        box-shadow: none;
+      }
+
+      .hero-card::before,
+      .receipt-edge {
+        display: none;
+      }
+
+      html[data-theme="dark"] .hero-card {
+        color: #ffffff;
+      }
+
+      html[data-theme="dark"] .hero-card .white-text {
+        color: #ffffff;
+      }
+
+      .hero-card .eyebrow {
+        color: rgba(255, 255, 255, 0.72) !important;
+      }
+
+      .hero-card .mono {
+        font-size: 26px !important;
+        letter-spacing: -0.035em;
+      }
+
+      /* Generic cards */
+      .card,
+      .stat-chip {
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        box-shadow: none;
+      }
+
+      .card {
+        padding: 16px !important;
+      }
+
+      .stat-chip {
+        padding: 13px !important;
+      }
+
+      /* Typography */
+      .font-display {
+        letter-spacing: -0.02em;
+      }
+
+      .eyebrow {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.045em;
+      }
+
+      h1,
+      h2,
+      h3 {
+        letter-spacing: -0.025em;
+      }
+
+      .tx-title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .tx-sub {
+        font-size: 11.5px;
+      }
+
+      .tx-meta {
+        font-size: 10px;
+      }
+
+      .tx-amount {
+        font-size: 12.5px;
+        font-weight: 600;
+      }
+
+      /* Month filters */
+      .month-chip {
+        padding: 7px 12px;
+        border-radius: 7px;
+        font-size: 11.5px;
+        font-weight: 600;
+        background: var(--surface);
+      }
+
+      .month-chip.active {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: #fff;
+      }
+
+      /* Transaction list */
+      .tx-card {
+        gap: 10px;
+        padding: 12px 2px;
+      }
+
+      .tx-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+      }
+
+      /* Search / inputs */
+      .field-input {
+        margin-top: 5px;
+        padding: 11px 13px;
+        border-radius: 8px;
+        font-size: 13px;
+        background: var(--surface);
+      }
+
+      .field-input:focus {
+        box-shadow: 0 0 0 2px var(--brand-soft);
+      }
+
+      .field-label {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+      }
+
+      /* Bottom navigation */
+      #bottomnav {
+        background: var(--surface);
+        border-top: 1px solid var(--line);
+      }
+
+      .nav-btn {
+        gap: 2px;
+        padding: 8px 0 7px;
+        font-size: 10px;
+      }
+
+      .nav-btn .nav-pill {
+        width: 32px;
+        height: 24px;
+        border-radius: 7px;
+      }
+
+      .nav-btn.active .nav-pill {
+        background: transparent;
+      }
+
+      .nav-btn.active {
+        color: var(--brand);
+      }
+
+      .nav-btn span:last-child {
+        font-size: 9.5px;
+        font-weight: 600;
+      }
+
+      /* FAB — simple, compact, no ornament */
+      #fabAdd {
+        right: 16px;
+        bottom: 70px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
+      }
+
+      /* Sheets / modal */
+      .sheet-overlay {
+        background: rgba(0, 0, 0, 0.42);
+      }
+
+      .sheet {
+        border-radius: 16px 16px 0 0;
+        padding: 12px 16px calc(18px + env(safe-area-inset-bottom));
+      }
+
+      .sheet-handle {
+        width: 30px;
+        height: 3px;
+        margin: 4px auto 12px;
+      }
+
+      .seg-toggle,
+      .opt-toggle {
+        border-radius: 8px;
+      }
+
+      .seg-btn,
+      .opt-btn {
+        padding: 9px 0;
+        font-size: 12px;
+      }
+
+      .btn-primary,
+      .btn-ghost {
+        border-radius: 8px;
+        font-size: 13px;
+        padding: 11px 0;
+      }
+
+      .btn-primary {
+        background: var(--brand);
+        color: #fff;
+      }
+
+      /* Login */
+      #authScreen {
+        padding: 16px;
+      }
+
+      #authCard {
+        max-width: 350px;
+        border-radius: 14px;
+        box-shadow: none;
+        padding: 24px 20px;
+      }
+
+      /* Reduce spacing in common Tailwind utility areas */
+      #screen-home,
+      #screen-history,
+      #screen-profile {
+        gap: 16px;
+      }
+
+      /* Remove unnecessary decorative avatar/card emphasis */
+      #profileAvatar {
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 9px !important;
+      }
+
+      /* Toast */
+      #toast {
+        left: 12px;
+        right: 12px;
+        bottom: 74px;
+        padding: 10px 13px;
+        border-radius: 8px;
+        font-size: 12px;
+      }
+
+      /* Mobile density */
+      @media (max-width: 380px) {
+        #shell main {
+          padding-left: 13px;
+          padding-right: 13px;
+        }
+
+        #topbar {
+          padding-left: 13px;
+          padding-right: 13px;
+        }
+
+        .hero-card .mono {
+          font-size: 24px !important;
+        }
+
+        .card {
+          padding: 14px !important;
+        }
+      }
+
+      /* =========================================================
+   AUTHENTICATION GATE — EXPLICIT VISIBILITY STATES
+   Login and dashboard are mutually exclusive.
+   ========================================================= */
+
+      #authScreen {
+        display: flex;
+      }
+
+      #authScreen.hidden {
+        display: none !important;
+      }
+
+      #shell.hidden {
+        display: none !important;
+      }
+
+      #shell:not(.hidden) {
+        display: flex;
+      }
+
+      /* Prevent the dashboard from occupying/rendering layout space
+   before authentication has completed. */
+      html.auth-locked #shell {
+        display: none !important;
+      }
+
+      html.authenticated #authScreen {
+        display: none !important;
+      }
+
+      html.authenticated #shell {
+        display: flex !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===================== AUTH GATE ===================== -->
+    <div id="authScreen">
+      <div id="authCard">
+        <div
+          class="app-icon-badge"
+          style="
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            margin: 0 auto 18px;
+          "
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1fd8a4"
+            stroke-width="2"
+          >
+            <path
+              d="M3 10h18M3 6h18M5 14h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 1 2-2z"
+            />
+          </svg>
+        </div>
+        <h1 class="font-display font-extrabold text-[19px] text-center">
+          Kas Kelompok Latukan
+        </h1>
+        <p
+          class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5 mb-6"
+        >
+          Masuk dengan akun pengurus untuk membuka aplikasi.
+        </p>
+        <form id="authForm" class="space-y-3">
+          <div>
+            <label class="field-label">Username</label>
+            <input
+              required
+              id="authUsername"
+              type="text"
+              autocomplete="username"
+              placeholder="Masukkan username"
+              class="field-input"
+            />
+          </div>
+          <div>
+            <label class="field-label">Password</label>
+            <input
+              required
+              id="authPassword"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Masukkan password"
+              class="field-input"
+            />
+          </div>
+          <p
+            id="authError"
+            class="hidden text-xs rounded-xl px-3 py-2.5"
+            style="color: var(--neg); background: var(--neg-soft)"
+          ></p>
+          <button
+            type="submit"
+            id="btnAuthSubmit"
+            class="btn-primary w-full mt-1"
+          >
+            Masuk
+          </button>
+        </form>
+        <p class="text-[11px] text-[color:var(--ink-faint)] text-center mt-6">
+          Khusus pengurus kas. Hubungi admin bila belum memiliki akun.
+        </p>
+      </div>
+    </div>
+
+    <div id="shell" class="hidden">
+      <!-- ===================== TOP BAR ===================== -->
+      <div
+        id="topbar"
+        class="px-5 pt-4 pb-3 flex items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="app-icon-badge">
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1fd8a4"
+              stroke-width="2"
+            >
+              <path
+                d="M3 10h18M3 6h18M5 14h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 1 2-2z"
+              />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <h1
+              id="screenTitle"
+              class="font-display font-extrabold text-[15px] leading-tight"
+            >
+              Beranda
+            </h1>
+            <p
+              class="text-[10.5px] mono text-[color:var(--ink-faint)] truncate"
+              id="lastSync"
+            >
+              menyambungkan…
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnTheme" class="icon-btn"></button>
+          <button id="btnRefresh" class="icon-btn">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12a9 9 0 1 1-2.6-6.4M21 4v6h-6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================== CONTENT ===================== -->
+      <main class="flex-1 overflow-y-auto pb-28 px-5 space-y-5">
+        <!-- CONFIG WARNING -->
+        <div
+          id="configWarning"
+          class="hidden fade-in border border-amber-300/60 bg-[color:var(--gold-soft)] text-[color:var(--gold)] text-xs rounded-2xl px-4 py-3"
+        >
+          <b>Belum terhubung.</b> Isi
+          <span class="mono bg-black/10 px-1 rounded">WEB_APP_URL</span>
+          di bagian atas kode JavaScript, lalu muat ulang halaman.
+        </div>
+
+        <!-- ============ SCREEN: BERANDA ============ -->
+        <section id="screen-home" class="screen active space-y-5">
+          <div>
+            <p class="eyebrow px-1 mb-2">Periode</p>
+            <div
+              id="homeMonthChips"
+              class="flex gap-2 overflow-x-auto no-scrollbar"
+            ></div>
+          </div>
+
+          <div class="hero-card px-6 pt-6 pb-5">
+            <p
+              class="eyebrow white-text"
+              style="color: rgba(255, 255, 255, 0.75)"
+            >
+              Saldo Kas
+            </p>
+            <p
+              class="mono font-display text-[30px] font-extrabold mt-1.5 leading-none"
+              id="homeSaldoAkhir"
+            >
+              Rp 0
+            </p>
+            <p
+              class="text-[11px] mt-2 white-text"
+              style="color: rgba(255, 255, 255, 0.75)"
+              id="homeTxCount"
+            >
+              Semua Periode · 0 transaksi
+            </p>
+          </div>
+          <div class="receipt-edge -mt-4"></div>
+
+          <div class="grid grid-cols-2 gap-3 -mt-1">
+            <div class="stat-chip p-4">
+              <p class="eyebrow" style="color: var(--pos)">Pemasukan</p>
+              <p
+                class="mono text-base font-extrabold mt-1"
+                style="color: var(--pos)"
+                id="homeDebet"
+              >
+                Rp 0
+              </p>
+            </div>
+            <div class="stat-chip p-4">
+              <p class="eyebrow" style="color: var(--neg)">Pengeluaran</p>
+              <p
+                class="mono text-base font-extrabold mt-1"
+                style="color: var(--neg)"
+                id="homeKredit"
+              >
+                Rp 0
+              </p>
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="font-display text-[13px] font-extrabold">
+                Tren Saldo Bulanan
+              </h2>
+              <span
+                class="text-[10px] mono text-[color:var(--ink-faint)]"
+                id="chartScopeLabel"
+                >seluruh periode</span
+              >
+            </div>
+            <div class="h-40">
+              <canvas id="saldoChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="font-display text-[13px] font-extrabold">
+                Transaksi Terbaru
+              </h2>
+              <button
+                id="btnSeeAll"
+                class="font-display text-[11px] font-bold"
+                style="color: var(--brand)"
+              >
+                Lihat semua
+              </button>
+            </div>
+            <div id="homeRecentList"></div>
+          </div>
+        </section>
+
+        <!-- ============ SCREEN: RIWAYAT ============ -->
+        <section id="screen-history" class="screen space-y-5">
+          <div class="relative">
+            <svg
+              class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--ink-faint)]"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Cari tanggal, kategori, keterangan…"
+              class="field-input mt-0 pl-9"
+            />
+          </div>
+
+          <div
+            id="monthChips"
+            class="flex gap-2 overflow-x-auto no-scrollbar"
+          ></div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="stat-chip p-4">
+              <p class="eyebrow">Saldo Awal</p>
+              <p class="mono text-sm font-extrabold mt-1" id="rySaldoAwal">
+                Rp 0
+              </p>
+            </div>
+            <div
+              class="stat-chip p-4"
+              style="
+                background: var(--brand-dark);
+                border-color: var(--brand-dark);
+              "
+            >
+              <p class="eyebrow" style="color: rgba(255, 255, 255, 0.7)">
+                Saldo Akhir
+              </p>
+              <p
+                class="mono text-sm font-extrabold mt-1"
+                style="color: #06120d"
+                id="rySaldoAkhir"
+              >
+                Rp 0
+              </p>
+            </div>
+          </div>
+          <p
+            class="text-[11px] text-[color:var(--ink-faint)] -mt-2"
+            id="periodHint"
+          ></p>
+
+          <div class="card p-5">
+            <div id="txList"></div>
+            <div
+              id="txEmpty"
+              class="hidden text-center py-10 text-[color:var(--ink-faint)] text-xs"
+            >
+              Tidak ada transaksi pada periode/pencarian ini.
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SCREEN: REKAP ============ -->
+        <section id="screen-recap" class="screen space-y-4">
+          <p class="text-[11.5px] text-[color:var(--ink-soft)] px-1">
+            Ketuk salah satu bulan untuk membuka riwayat lengkapnya.
+          </p>
+          <div id="recapList" class="space-y-2.5"></div>
+        </section>
+
+        <!-- ============ SCREEN: PROFIL ============ -->
+        <section id="screen-profile" class="screen space-y-5">
+          <div class="card p-5 flex items-center gap-4">
+            <div
+              id="profileAvatar"
+              class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style="background: var(--brand-soft)"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--brand)"
+                stroke-width="2"
+              >
+                <path d="M20 21a8 8 0 1 0-16 0" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p
+                class="font-display font-extrabold text-[15px]"
+                id="profileName"
+              >
+                Pengurus
+              </p>
+              <p
+                class="text-[11.5px] text-[color:var(--ink-soft)]"
+                id="profileStatus"
+              >
+                Mode lihat saja
+              </p>
+            </div>
+          </div>
+
+          <button
+            id="btnLogout"
+            class="btn-ghost w-full"
+            style="color: var(--neg); border-color: var(--neg-soft)"
+          >
+            Keluar
+          </button>
+
+          <div class="card p-5">
+            <p class="eyebrow mb-3">Tampilan</p>
+            <div class="opt-toggle">
+              <button type="button" id="themeLightBtn" class="opt-btn">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.3"
+                >
+                  <circle cx="12" cy="12" r="4.2" />
+                  <path
+                    d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"
+                  />
+                </svg>
+                Terang
+              </button>
+              <button type="button" id="themeDarkBtn" class="opt-btn">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.3"
+                >
+                  <path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11Z" />
+                </svg>
+                Gelap
+              </button>
+            </div>
+          </div>
+
+          <div class="card p-1 divide-y divide-[color:var(--line)]">
+            <button
+              id="btnPrint"
+              class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+            >
+              <span class="icon-btn" style="pointer-events: none">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"
+                  />
+                </svg>
+              </span>
+              <span class="font-display text-[13.5px] font-bold flex-1"
+                >Cetak / Ekspor PDF</span
+              >
+            </button>
+          </div>
+
+          <div class="card p-5">
+            <p class="eyebrow mb-1.5">Sinkronisasi</p>
+            <p class="text-[12.5px] text-[color:var(--ink-soft)]">
+              Data tersambung otomatis dari Google Spreadsheet setiap 20 detik.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <!-- ===================== FAB ===================== -->
+      <button id="fabAdd" class="hidden">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#1a1204"
+          stroke-width="2.4"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
+
+      <!-- ===================== BOTTOM NAV ===================== -->
+      <nav id="bottomnav" class="flex">
+        <button class="nav-btn active" data-tab="home">
+          <span class="nav-pill">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+            >
+              <path d="M3 11.5 12 4l9 7.5" />
+              <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
+            </svg>
+          </span>
+          <span>Beranda</span>
+        </button>
+        <button class="nav-btn" data-tab="history">
+          <span class="nav-pill">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+            >
+              <path d="M3 12a9 9 0 1 0 3-6.7M3 5v5h5" />
+              <path d="M12 8v4l3 2" />
+            </svg>
+          </span>
+          <span>Riwayat</span>
+        </button>
+        <button class="nav-btn" data-tab="recap">
+          <span class="nav-pill">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+            >
+              <rect x="3.5" y="4.5" width="17" height="16" rx="2.5" />
+              <path d="M3.5 9.5h17M8 3v3M16 3v3" />
+            </svg>
+          </span>
+          <span>Rekap</span>
+        </button>
+        <button class="nav-btn" data-tab="profile">
+          <span class="nav-pill">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+            >
+              <path d="M20 21a8 8 0 1 0-16 0" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <span>Profil</span>
+        </button>
+      </nav>
+
+      <!-- ===================== ADD TRANSACTION SHEET ===================== -->
+      <div id="txOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3 class="font-display text-[16px] font-extrabold">
+            Tambah Transaksi
+          </h3>
+          <p class="text-[12.5px] text-[color:var(--ink-soft)] mt-1 mb-4">
+            Saldo akan dihitung otomatis dari saldo berjalan.
+          </p>
+          <form id="txForm" class="space-y-3">
+            <div>
+              <label class="field-label">Jenis Transaksi</label>
+              <div class="seg-toggle">
+                <button
+                  type="button"
+                  id="segDebet"
+                  class="seg-btn active-debet"
+                >
+                  Pemasukan
+                </button>
+                <button type="button" id="segKredit" class="seg-btn">
+                  Pengeluaran
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Tanggal</label>
+              <input required id="txTanggal" type="date" class="field-input" />
+            </div>
+            <div>
+              <label class="field-label">Account (Kategori)</label>
+              <input
+                required
+                id="txAccount"
+                type="text"
+                list="accountCategories"
+                placeholder="Pilih atau ketik kategori…"
+                class="field-input"
+              />
+              <datalist id="accountCategories">
+                <option value="SALDO AWAL"></option>
+                <option value="PEMASUKAN INFAK SAMBUNG"></option>
+                <option value="INFAK IR"></option>
+                <option value="PEMASUKAN UANG SAMBUNG"></option>
+                <option value="PEMASUKAN INFAK JUMAT"></option>
+                <option value="JIMPITAN"></option>
+                <option value="SIAR-SIAR"></option>
+                <option value="KAFAN"></option>
+                <option value="INFAK SERIBUAN"></option>
+                <option value="PEMASUKAN UKHRO MT"></option>
+                <option value="SETOR INFAK SAMBUNG"></option>
+                <option value="SETOR 2/3 INFAK JUMAT"></option>
+                <option value="INFAQ SAMBUNG DESA"></option>
+                <option value="INFAQ SAMBUNG DAERAH"></option>
+                <option value="UKHRO MT"></option>
+                <option value="BEBAN OPERASIONAL BULAN BERJALAN"></option>
+                <option value="BEBAN PENGELUARAN LAIN-LAIN"></option>
+                <option value="PEMASUKAN LAIN-LAIN"></option>
+              </datalist>
+            </div>
+            <div>
+              <label class="field-label">Keterangan</label>
+              <textarea
+                required
+                id="txKeterangan"
+                rows="2"
+                placeholder="Deskripsi rinci transaksi"
+                class="field-input"
+              ></textarea>
+            </div>
+            <div>
+              <label class="field-label">Jumlah Nominal (Rp)</label>
+              <input
+                required
+                id="txJumlah"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="0"
+                class="field-input mono"
+              />
+            </div>
+            <p
+              id="txError"
+              class="hidden text-xs rounded-xl px-3 py-2.5"
+              style="color: var(--neg); background: var(--neg-soft)"
+            ></p>
+            <div class="flex gap-2.5 pt-1">
+              <button type="button" id="btnCancelTx" class="btn-ghost flex-1">
+                Batal
+              </button>
+              <button type="submit" id="btnSubmitTx" class="btn-primary flex-1">
+                Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div id="toast" class="hidden"></div>
+    </div>
+
+    <!-- ===================== PRINT-ONLY REPORT ===================== -->
+    <div id="printArea">
+      <h1 style="font-size: 18px; font-weight: 800">
+        Laporan Saldo Kas Kelompok Latukan
+      </h1>
+      <p style="font-size: 11px; color: #475569">
+        Periode: <span id="printPeriod"></span> · Dicetak pada
+        <span id="printDate"></span>
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Account (Kategori)</th>
+            <th>Keterangan</th>
+            <th>Debet</th>
+            <th>Kredit</th>
+            <th>Saldo</th>
+          </tr>
+        </thead>
+        <tbody id="printTableBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      /* Explicit authentication gate state.
+   This supplements the existing class-based gate without changing
+   the authentication/API logic. */
+      (function () {
+        const authScreen = document.getElementById("authScreen");
+        const shell = document.getElementById("shell");
+
+        function applyAuthState() {
+          const raw = sessionStorage.getItem("kas_user");
+          const authenticated = !!raw;
+
+          document.documentElement.classList.toggle(
+            "authenticated",
+            authenticated,
+          );
+          document.documentElement.classList.toggle(
+            "auth-locked",
+            !authenticated,
+          );
+
+          if (authScreen) {
+            authScreen.classList.toggle("hidden", authenticated);
+          }
+
+          if (shell) {
+            shell.classList.toggle("hidden", !authenticated);
+          }
+        }
+
+        applyAuthState();
+
+        window.addEventListener("storage", applyAuthState);
+
+        window.__refreshAuthGate = applyAuthState;
+      })();
+    </script>
+
+    <script>
+      /* =========================================================================
+   KONFIGURASI — GANTI URL INI DENGAN URL WEB APP APPS SCRIPT ANDA
+   Contoh: https://script.google.com/macros/s/AKfycb.../exec
+   ========================================================================= */
+      const CONFIG = {
+        WEB_APP_URL:
+          "https://script.google.com/macros/s/AKfycbwqCvr9HQvij6g1q3r0tlxfCu3Slb8xhTCdIZ80jYNXdJIVTOtHHSwmEauU3CLt-yd2/exec",
+        POLL_INTERVAL_MS: 20000,
+      };
+
+      // ---------- STATE ----------
+      let state = {
+        saldoAwal: 0,
+        totalDebet: 0,
+        totalKredit: 0,
+        saldoAkhir: 0,
+        transactions: [], // diasumsikan sudah terurut kronologis (No menaik) — sesuai urutan penyimpanan backend
+        isAdmin: false,
+        adminName: "",
+        chart: null,
+        selectedMonth: "all",
+        activeTab: "home",
+        txJenis: "debet",
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const fmtRp = (n) =>
+        "Rp " + Math.round(Number(n) || 0).toLocaleString("id-ID");
+      const getMonthKey = (tanggal) => (tanggal || "").slice(0, 7); // 'YYYY-MM'
+      const getMonthLabel = (key) => {
+        if (key === "all") return "Semua Periode";
+        const [y, m] = key.split("-");
+        return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(
+          "id-ID",
+          {
+            month: "long",
+            year: "numeric",
+          },
+        );
+      };
+      const getMonthChipLabel = (key) => {
+        if (key === "all") return "Semua";
+        const [y, m] = key.split("-");
+        return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(
+          "id-ID",
+          {
+            month: "short",
+            year: "2-digit",
+          },
+        );
+      };
+      const getMonthShortLabel = (key) => {
+        const [y, m] = key.split("-");
+        return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(
+          "id-ID",
+          {
+            month: "short",
+            year: "numeric",
+          },
+        );
+      };
+      const fmtDateShort = (tanggal) => {
+        if (!tanggal) return "-";
+        const d = new Date(tanggal);
+        if (isNaN(d.getTime())) return tanggal;
+        return d.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      };
+      // Baris berkategori "SALDO AWAL" adalah saldo bawaan/carry-over, BUKAN transaksi
+      // pemasukan/pengeluaran baru — dikecualikan dari Total Pemasukan/Pengeluaran,
+      // meskipun tetap ikut dihitung dalam Saldo berjalan (kolom saldo dari backend).
+      const isSaldoAwalRow = (t) =>
+        (t.account || "").trim().toUpperCase() === "SALDO AWAL";
+
+      // ---------- SESSION (login sederhana, hanya untuk sesi browser saat ini) ----------
+      function saveSession(username, password, nama, role) {
+        sessionStorage.setItem(
+          "kas_user",
+          JSON.stringify({ username, password, nama, role }),
+        );
+      }
+      function getSession() {
+        const raw = sessionStorage.getItem("kas_user");
+        return raw ? JSON.parse(raw) : null;
+      }
+      function clearSession() {
+        sessionStorage.removeItem("kas_user");
+      }
+
+      // ---------- THEME ----------
+      const ICON_SUN =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>';
+      const ICON_MOON =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11Z"/></svg>';
+
+      function applyTheme(mode) {
+        document.documentElement.setAttribute("data-theme", mode);
+        try {
+          localStorage.setItem("kas_theme", mode);
+        } catch (e) {}
+        $("btnTheme").innerHTML = mode === "dark" ? ICON_SUN : ICON_MOON;
+        $("themeLightBtn").classList.toggle("active", mode === "light");
+        $("themeDarkBtn").classList.toggle("active", mode === "dark");
+        if (state.chart) renderChart();
+      }
+
+      function currentTheme() {
+        return document.documentElement.getAttribute("data-theme") || "dark";
+      }
+
+      function initTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem("kas_theme");
+        } catch (e) {}
+        if (!saved) {
+          saved =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark";
+        }
+        applyTheme(saved);
+      }
+
+      $("btnTheme").addEventListener("click", () =>
+        applyTheme(currentTheme() === "dark" ? "light" : "dark"),
+      );
+      $("themeLightBtn").addEventListener("click", () => applyTheme("light"));
+      $("themeDarkBtn").addEventListener("click", () => applyTheme("dark"));
+
+      // ---------- API ----------
+      async function apiGet() {
+        const res = await fetch(`${CONFIG.WEB_APP_URL}?action=getData`);
+        if (!res.ok)
+          throw new Error("Gagal mengambil data (" + res.status + ")");
+        return res.json();
+      }
+
+      async function apiPost(payload) {
+        const res = await fetch(CONFIG.WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, // hindari CORS preflight
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok)
+          throw new Error("Gagal mengirim data (" + res.status + ")");
+        return res.json();
+      }
+
+      // ---------- LOAD DATA ----------
+      async function loadData() {
+        try {
+          if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
+            $("configWarning").classList.remove("hidden");
+            renderTxList([], "txList", "txEmpty");
+            return;
+          }
+          const data = await apiGet();
+          if (!data.success)
+            throw new Error(data.message || "Gagal memuat data");
+
+          state.saldoAwal = data.saldoAwal;
+          state.totalDebet = data.totalDebet;
+          state.totalKredit = data.totalKredit;
+          state.saldoAkhir = data.saldoAkhir;
+          state.transactions = data.transactions || [];
+
+          renderAllMonthChipRows();
+          renderRecapList();
+          refreshScopedUI();
+          $("lastSync").textContent =
+            "tersinkron " + new Date().toLocaleTimeString("id-ID");
+          $("configWarning").classList.add("hidden");
+        } catch (err) {
+          console.error(err);
+          showToast("Gagal memuat data: " + err.message, "error");
+        }
+      }
+
+      // ---------- BULAN (chips, dipakai Beranda & Riwayat) ----------
+      function getMonthsDesc() {
+        return [
+          ...new Set(state.transactions.map((t) => getMonthKey(t.tanggal))),
+        ]
+          .filter(Boolean)
+          .sort()
+          .reverse();
+      }
+
+      function renderAllMonthChipRows() {
+        const months = getMonthsDesc();
+        if (
+          !months.includes(state.selectedMonth) &&
+          state.selectedMonth !== "all"
+        ) {
+          state.selectedMonth = "all";
+        }
+        const chips = ["all", ...months];
+        const html = chips
+          .map(
+            (m) =>
+              `<button class="month-chip ${m === state.selectedMonth ? "active" : ""}" data-month="${m}">${getMonthChipLabel(m)}</button>`,
+          )
+          .join("");
+
+        ["homeMonthChips", "monthChips"].forEach((id) => {
+          const el = $(id);
+          el.innerHTML = html;
+          el.querySelectorAll(".month-chip").forEach((chip) => {
+            chip.addEventListener("click", () => {
+              state.selectedMonth = chip.dataset.month;
+              renderAllMonthChipRows();
+              refreshScopedUI();
+            });
+          });
+        });
+      }
+
+      function refreshScopedUI() {
+        renderHome();
+        applyFilters();
+      }
+
+      // Hitung ringkasan (saldo awal/pemasukan/pengeluaran/saldo akhir) untuk satu bulan
+      // atau untuk seluruh periode jika monthKey === 'all'.
+      function computeScope(monthKey) {
+        if (monthKey === "all") {
+          return {
+            awal: state.saldoAwal,
+            debet: state.totalDebet,
+            kredit: state.totalKredit,
+            akhir: state.saldoAkhir,
+            list: state.transactions,
+          };
+        }
+        const all = state.transactions;
+        const monthTx = all.filter((t) => getMonthKey(t.tanggal) === monthKey);
+        const before = all.filter((t) => getMonthKey(t.tanggal) < monthKey);
+        const awal = before.length
+          ? before[before.length - 1].saldo
+          : state.saldoAwal;
+        const debet = monthTx
+          .filter((t) => !isSaldoAwalRow(t))
+          .reduce((s, t) => s + t.debet, 0);
+        const kredit = monthTx
+          .filter((t) => !isSaldoAwalRow(t))
+          .reduce((s, t) => s + t.kredit, 0);
+        const akhir = monthTx.length ? monthTx[monthTx.length - 1].saldo : awal;
+        return { awal, debet, kredit, akhir, list: monthTx };
+      }
+
+      // Rangkuman saldo AKHIR setiap bulan, satu titik data per bulan — dipakai
+      // oleh chart "Tren Saldo Berjalan" supaya sumbu-X selalu per bulan, bukan
+      // per transaksi (yang jumlahnya bisa ratusan dan membuat chart penuh sesak).
+      function computeMonthlySeries() {
+        const months = [
+          ...new Set(state.transactions.map((t) => getMonthKey(t.tanggal))),
+        ]
+          .filter(Boolean)
+          .sort(); // kronologis, lama ke baru
+
+        const labels = [];
+        const data = [];
+        months.forEach((m) => {
+          const monthTx = state.transactions.filter(
+            (t) => getMonthKey(t.tanggal) === m,
+          );
+          if (!monthTx.length) return;
+          labels.push(getMonthShortLabel(m));
+          data.push(monthTx[monthTx.length - 1].saldo); // saldo akhir bulan tsb
+        });
+        return { labels, data };
+      }
+
+      // ---------- REKAP (kartu bulan) ----------
+      function renderRecapList() {
+        const months = getMonthsDesc();
+        const wrap = $("recapList");
+        if (!months.length) {
+          wrap.innerHTML =
+            '<div class="card p-6 text-center text-[color:var(--ink-faint)] text-xs">Belum ada transaksi.</div>';
+          return;
+        }
+        wrap.innerHTML = months
+          .map((m) => {
+            const s = computeScope(m);
+            return `
+      <button class="card w-full text-left p-4 recap-card" data-month="${m}">
+        <div class="flex items-center justify-between">
+          <p class="font-display font-extrabold text-[13.5px]">${getMonthLabel(m)}</p>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-3">
+          <div>
+            <p class="eyebrow" style="font-size:9.5px">Masuk</p>
+            <p class="mono text-[11.5px] font-bold mt-0.5" style="color:var(--pos)">${fmtRp(s.debet)}</p>
+          </div>
+          <div>
+            <p class="eyebrow" style="font-size:9.5px">Keluar</p>
+            <p class="mono text-[11.5px] font-bold mt-0.5" style="color:var(--neg)">${fmtRp(s.kredit)}</p>
+          </div>
+          <div>
+            <p class="eyebrow" style="font-size:9.5px">Akhir</p>
+            <p class="mono text-[11.5px] font-bold mt-0.5">${fmtRp(s.akhir)}</p>
+          </div>
+        </div>
+      </button>`;
+          })
+          .join("");
+
+        wrap.querySelectorAll(".recap-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            state.selectedMonth = card.dataset.month;
+            renderAllMonthChipRows();
+            refreshScopedUI();
+            switchTab("history");
+          });
+        });
+      }
+
+      // ---------- HOME ----------
+      function renderHome() {
+        const scope = computeScope(state.selectedMonth);
+        $("homeSaldoAkhir").textContent = fmtRp(scope.akhir);
+        $("homeTxCount").textContent =
+          getMonthLabel(state.selectedMonth) +
+          " · " +
+          scope.list.length +
+          " transaksi";
+        $("homeDebet").textContent = fmtRp(scope.debet);
+        $("homeKredit").textContent = fmtRp(scope.kredit);
+
+        const recent = scope.list.slice(-5).reverse();
+        renderTxList(recent, "homeRecentList", null, { compact: true });
+        renderChart();
+      }
+
+      function renderChart() {
+        const ctx = document.getElementById("saldoChart");
+        const { labels, data } = computeMonthlySeries();
+
+        if (!labels.length) {
+          labels.push(getMonthShortLabel(new Date().toISOString().slice(0, 7)));
+          data.push(state.saldoAwal);
+        }
+
+        $("chartScopeLabel").textContent = labels.length + " bulan tercatat";
+
+        const dark = currentTheme() === "dark";
+        const lineColor = dark ? "#1fd8a4" : "#0e9f6e";
+        const fillColor = dark
+          ? "rgba(31,216,164,0.14)"
+          : "rgba(14,159,110,0.10)";
+        const tickColor = dark ? "#8b94a3" : "#626c7a";
+
+        if (state.chart) state.chart.destroy();
+        state.chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Saldo Akhir Bulan",
+                data,
+                borderColor: lineColor,
+                backgroundColor: fillColor,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 2.5,
+                pointHoverRadius: 5,
+                pointBackgroundColor: lineColor,
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (c) => fmtRp(c.parsed.y) } },
+            },
+            scales: {
+              x: {
+                ticks: {
+                  autoSkip: true,
+                  maxRotation: 0,
+                  font: { size: 9 },
+                  color: tickColor,
+                },
+                grid: { display: false },
+              },
+              y: { display: false },
+            },
+          },
+        });
+      }
+
+      // ---------- RIWAYAT ----------
+      function renderSummaryHistory(scope, monthKey) {
+        $("rySaldoAwal").textContent = fmtRp(scope.awal);
+        $("rySaldoAkhir").textContent = fmtRp(scope.akhir);
+        $("periodHint").textContent =
+          "Menampilkan: " +
+          getMonthLabel(monthKey) +
+          " · " +
+          scope.list.length +
+          " transaksi";
+      }
+
+      function txIconSvg(isDebet) {
+        return isDebet
+          ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--pos)" stroke-width="2.3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'
+          : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--neg)" stroke-width="2.3"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
+      }
+
+      function renderTxList(rows, containerId, emptyId, opts) {
+        opts = opts || {};
+        const body = $(containerId);
+        if (!rows.length) {
+          body.innerHTML = opts.compact
+            ? '<p class="text-center py-6 text-[color:var(--ink-faint)] text-xs">Belum ada transaksi.</p>'
+            : "";
+          if (emptyId) $(emptyId).classList.remove("hidden");
+          return;
+        }
+        if (emptyId) $(emptyId).classList.add("hidden");
+
+        body.innerHTML = rows
+          .map((t) => {
+            const isAwal = isSaldoAwalRow(t);
+            const isDebet = Number(t.debet) > 0;
+            const amount = isDebet ? t.debet : t.kredit;
+            const amountColor = isAwal
+              ? "var(--ink-soft)"
+              : isDebet
+                ? "var(--pos)"
+                : "var(--neg)";
+            const amountPrefix = isAwal ? "" : isDebet ? "+" : "-";
+            const iconBg = isAwal
+              ? "var(--gold-soft)"
+              : isDebet
+                ? "var(--pos-soft)"
+                : "var(--neg-soft)";
+            const icon = isAwal
+              ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.3"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>'
+              : txIconSvg(isDebet);
+            return `
+    <div class="tx-card">
+      <div class="tx-icon" style="background:${iconBg}">${icon}</div>
+      <div class="flex-1 min-w-0">
+        <p class="tx-title">${escapeHtml(t.account)}</p>
+        <p class="tx-sub">${escapeHtml(t.keterangan)}</p>
+        <p class="tx-meta">${fmtDateShort(t.tanggal)}${t.createdBy ? " · " + escapeHtml(t.createdBy) : ""}</p>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <p class="tx-amount mono" style="color:${amountColor}">${amountPrefix}${fmtRp(amount)}</p>
+        <p class="text-[9.5px] mono text-[color:var(--ink-faint)] mt-0.5">${fmtRp(t.saldo)}</p>
+      </div>
+    </div>`;
+          })
+          .join("");
+      }
+
+      function buildPrintTable(rows) {
+        $("printTableBody").innerHTML = rows
+          .map(
+            (t) => `
+      <tr>
+        <td>${t.no}</td>
+        <td>${t.tanggal}</td>
+        <td>${escapeHtml(t.account)}</td>
+        <td>${escapeHtml(t.keterangan)}</td>
+        <td>${t.debet ? fmtRp(t.debet) : "-"}</td>
+        <td>${t.kredit ? fmtRp(t.kredit) : "-"}</td>
+        <td>${fmtRp(t.saldo)}</td>
+      </tr>`,
+          )
+          .join("");
+      }
+
+      function escapeHtml(str) {
+        return String(str ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+
+      // ---------- FILTER / SEARCH ----------
+      function applyFilters() {
+        const monthKey = state.selectedMonth;
+        const scope = computeScope(monthKey);
+        renderSummaryHistory(scope, monthKey);
+
+        const q = $("searchInput").value.trim().toLowerCase();
+        const filtered = q
+          ? scope.list.filter((t) =>
+              `${t.tanggal} ${t.account} ${t.keterangan}`
+                .toLowerCase()
+                .includes(q),
+            )
+          : scope.list;
+
+        renderTxList([...filtered].reverse(), "txList", "txEmpty");
+        buildPrintTable(filtered);
+      }
+
+      // ---------- TABS ----------
+      const TAB_TITLES = {
+        home: "Beranda",
+        history: "Riwayat",
+        recap: "Rekap Bulanan",
+        profile: "Profil",
+      };
+      function switchTab(tab) {
+        state.activeTab = tab;
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        $("screen-" + tab).classList.add("active");
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+        $("screenTitle").textContent = TAB_TITLES[tab];
+        updateFabVisibility();
+        document.querySelector("main").scrollTo({ top: 0 });
+      }
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+      $("btnSeeAll").addEventListener("click", () => switchTab("history"));
+
+      function updateFabVisibility() {
+        const show =
+          state.isAdmin &&
+          (state.activeTab === "home" || state.activeTab === "history");
+        $("fabAdd").classList.toggle("hidden", !show);
+      }
+
+      // ---------- AUTH UI ----------
+      function setAdminUI(isAdmin, nama) {
+        state.isAdmin = isAdmin;
+        state.adminName = nama || "";
+        $("profileName").textContent = nama || (isAdmin ? "Admin" : "Pengurus");
+        $("profileStatus").textContent = isAdmin
+          ? "Admin · dapat menambah transaksi"
+          : "Pengurus · mode lihat saja";
+        updateFabVisibility();
+      }
+
+      // (restore session dilakukan langsung di blok INIT di bawah)
+
+      // ---------- TOAST ----------
+      let toastTimer;
+      function showToast(msg, type = "success") {
+        const el = $("toast");
+        el.textContent = msg;
+        el.style.background =
+          type === "error" ? "var(--neg)" : "var(--brand-dark)";
+        el.classList.remove("hidden");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.add("hidden"), 3200);
+      }
+
+      // ---------- EVENTS ----------
+      $("btnRefresh").addEventListener("click", () => {
+        $("btnRefresh").classList.add("spin");
+        loadData().finally(() =>
+          setTimeout(() => $("btnRefresh").classList.remove("spin"), 400),
+        );
+      });
+      $("searchInput").addEventListener("input", applyFilters);
+
+      $("btnPrint").addEventListener("click", () => {
+        $("printDate").textContent = new Date().toLocaleString("id-ID");
+        $("printPeriod").textContent = getMonthLabel(state.selectedMonth);
+        window.print();
+      });
+
+      $("btnLogout").addEventListener("click", () => {
+        clearSession();
+        document.documentElement.classList.remove("authenticated");
+        document.documentElement.classList.add("auth-locked");
+        $("shell").classList.add("hidden");
+        $("authScreen").classList.remove("hidden");
+        $("authForm").reset();
+        showToast("Berhasil keluar.");
+      });
+
+      // ---- Tambah transaksi: toggle jenis ----
+      function setTxJenis(jenis) {
+        state.txJenis = jenis;
+        $("segDebet").classList.toggle("active-debet", jenis === "debet");
+        $("segKredit").classList.toggle("active-kredit", jenis === "kredit");
+      }
+      $("segDebet").addEventListener("click", () => setTxJenis("debet"));
+      $("segKredit").addEventListener("click", () => setTxJenis("kredit"));
+
+      $("fabAdd").addEventListener("click", () => {
+        $("txError").classList.add("hidden");
+        $("txForm").reset();
+        setTxJenis("debet");
+        $("txTanggal").valueAsDate = new Date();
+        $("txOverlay").classList.remove("hidden");
+      });
+      $("btnCancelTx").addEventListener("click", () =>
+        $("txOverlay").classList.add("hidden"),
+      );
+      $("txOverlay").addEventListener("click", (e) => {
+        if (e.target === $("txOverlay")) $("txOverlay").classList.add("hidden");
+      });
+
+      $("txForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const jumlah = Number($("txJumlah").value);
+        if (!jumlah || jumlah <= 0) {
+          $("txError").textContent = "Jumlah nominal harus lebih dari 0.";
+          $("txError").classList.remove("hidden");
+          return;
+        }
+        const session = getSession();
+        if (!session) {
+          showToast("Sesi admin berakhir, silakan login ulang.", "error");
+          $("txOverlay").classList.add("hidden");
+          setAdminUI(false);
+          return;
+        }
+
+        $("btnSubmitTx").disabled = true;
+        $("btnSubmitTx").textContent = "Menyimpan…";
+        try {
+          const payload = {
+            action: "addTransaction",
+            username: session.username,
+            password: session.password,
+            tanggal: $("txTanggal").value,
+            account: $("txAccount").value.trim(),
+            keterangan: $("txKeterangan").value.trim(),
+            jenis: state.txJenis,
+            jumlah,
+          };
+          const res = await apiPost(payload);
+          if (!res.success) {
+            $("txError").textContent =
+              res.message || "Gagal menyimpan transaksi.";
+            $("txError").classList.remove("hidden");
+            return;
+          }
+          $("txOverlay").classList.add("hidden");
+          showToast("Transaksi berhasil ditambahkan.");
+          await loadData();
+        } catch (err) {
+          $("txError").textContent =
+            "Tidak dapat menghubungi server: " + err.message;
+          $("txError").classList.remove("hidden");
+        } finally {
+          $("btnSubmitTx").disabled = false;
+          $("btnSubmitTx").textContent = "Simpan";
+        }
+      });
+
+      // ---------- AUTH GATE (login pengurus) ----------
+      function enterApp() {
+        document.documentElement.classList.add("authenticated");
+        document.documentElement.classList.remove("auth-locked");
+        $("authScreen").classList.add("hidden");
+        $("shell").classList.remove("hidden");
+        loadData();
+        setInterval(() => loadData(), CONFIG.POLL_INTERVAL_MS);
+      }
+
+      $("authForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = $("authUsername").value.trim();
+        const password = $("authPassword").value;
+        $("btnAuthSubmit").disabled = true;
+        $("btnAuthSubmit").textContent = "Memeriksa…";
+        try {
+          const res = await apiPost({ action: "login", username, password });
+          if (!res.success) {
+            $("authError").textContent =
+              res.message || "Username atau password salah.";
+            $("authError").classList.remove("hidden");
+            return;
+          }
+          // Peran ditentukan dari backend (res.role) bila tersedia; jika tidak,
+          // username "admin" mendapat hak input, selain itu hanya lihat (pengurus).
+          const role =
+            res.role ||
+            (username.toLowerCase() === "admin" ? "admin" : "pengurus");
+          saveSession(username, password, res.nama || username, role);
+          setAdminUI(role === "admin", res.nama || username);
+          $("authError").classList.add("hidden");
+          $("authForm").reset();
+          enterApp();
+        } catch (err) {
+          $("authError").textContent =
+            "Tidak dapat menghubungi server: " + err.message;
+          $("authError").classList.remove("hidden");
+        } finally {
+          $("btnAuthSubmit").disabled = false;
+          $("btnAuthSubmit").textContent = "Masuk";
+        }
+      });
+
+      // ---------- INIT ----------
+      initTheme();
+      {
+        const existing = getSession();
+        if (existing) {
+          setAdminUI(existing.role === "admin", existing.nama);
+          enterApp();
+        }
+      }
+    </script>
+  </body>
+</html>
