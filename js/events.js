@@ -63,6 +63,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- LOGOUT ----------
   if ($("btnLogout")) {
     $("btnLogout").addEventListener("click", () => {
+      const session = getSession();
+      // Cabut token di server dulu (best-effort) supaya token lama itu
+      // langsung tidak bisa dipakai lagi, baru bersihkan sesi lokal.
+      if (session && session.token) {
+        apiPost({ action: "logout", token: session.token }).catch(() => {});
+      }
       clearSession();
       document.documentElement.classList.remove("authenticated");
       document.documentElement.classList.add("auth-locked");
@@ -132,8 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const payload = {
           action: isEditing ? "editTransaction" : "addTransaction",
-          username: session.username,
-          password: session.password,
+          token: session.token,
           tanggal: $("txTanggal").value,
           account: $("txAccount").value.trim(),
           keterangan: $("txKeterangan").value.trim(),
@@ -285,8 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       apiPost({
         action: "deleteTransaction",
-        username: session.username,
-        password: session.password,
+        token: session.token,
         no,
       })
         .then((res) => {
@@ -327,8 +331,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         // Peran ditentukan dari backend (res.role) bila tersedia; jika tidak,
         // username "admin" mendapat hak input, selain itu hanya lihat (pengurus).
+        // Password TIDAK disimpan — hanya token sesi yang diterbitkan backend.
         const role = String(res.role || "pengurus").toLowerCase();
-        saveSession(username, password, res.nama || username, role);
+        saveSession(res.token, res.nama || username, role, res.expiresAt);
         setAdminUI(role === "admin", res.nama || username);
         $("authError").classList.add("hidden");
         $("authForm").reset();

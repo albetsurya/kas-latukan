@@ -149,20 +149,19 @@ function escapeHtml(str) {
 
 // ---------- SESSION (login pengurus, bertahan 30 hari meski tab/browser ditutup) ----------
 // Menggunakan localStorage (bukan sessionStorage) agar sesi tidak hilang saat
-// tab/browser ditutup. Sesi hanya dihapus lewat logout eksplisit atau otomatis
-// setelah 30 hari (SESSION_TTL_MS) sejak login.
+// tab/browser ditutup. Sesi HANYA menyimpan token (bukan username/password) —
+// backend yang menentukan kapan token itu kedaluwarsa (lihat expiresAt yang
+// dikirim balik saat login) dan bisa mencabutnya lewat logout.
 const SESSION_KEY = "kas_user";
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari
 
-function saveSession(username, password, nama, role) {
+function saveSession(token, nama, role, expiresAt) {
   localStorage.setItem(
     SESSION_KEY,
     JSON.stringify({
-      username,
-      password,
+      token,
       nama,
       role,
-      expiresAt: Date.now() + SESSION_TTL_MS,
+      expiresAt,
     }),
   );
 }
@@ -171,7 +170,7 @@ function getSession() {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
-    if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
+    if (!parsed.token || !parsed.expiresAt || Date.now() > parsed.expiresAt) {
       localStorage.removeItem(SESSION_KEY);
       return null;
     }
@@ -616,7 +615,6 @@ function txIconSvg(isDebet) {
 function toTitleCase(str) {
   if (!str) return "";
 
-  // Cukup daftarkan kata pendek yang PUNYA VOKAL tapi tetap harus UPPERCASE (sangat sedikit)
   const specialUpper = new Set([
     "CAI",
     "PLN",
@@ -629,7 +627,6 @@ function toTitleCase(str) {
     "BSI",
   ]);
 
-  // Kata hubung kecil bahasa Indonesia yang sebaiknya tetap lowercase (huruf kecil)
   const lowerWords = new Set([
     "dan",
     "ke",
@@ -641,45 +638,34 @@ function toTitleCase(str) {
     "atau",
     "via",
     "by",
+    "dengan",
+    "dalam",
   ]);
 
   return str
-    .split(" ")
+    .trim()
+    .split(/\s+/)
     .map((word, index) => {
       const upperWord = word.toUpperCase();
       const cleanUpper = upperWord.replace(/[^A-Z0-9]/g, "");
 
-      // 1. Cek whitelist ringkas
       if (specialUpper.has(cleanUpper)) return upperWord;
 
-      // 2. OTOMATIS UPPERCASE jika:
-      //    - Panjangnya 2-4 huruf DAN tidak ada huruf vokal A, E, I, O, U (Contoh: PPH, PPN, BKM, MT, KTP, ADM, DP)
-      //    - ATAU input aslinya memang sudah KAPITAL SEMUA dan panjangnya <= 3 huruf
-      const hasNoVowels = !/[AEIOUaeiou]/.test(cleanUpper);
-      if (
-        cleanUpper.length >= 2 &&
-        cleanUpper.length <= 4 &&
-        (hasNoVowels || word === upperWord)
-      ) {
+      const hasNoVowels = !/[AEIOU]/.test(cleanUpper);
+      if (cleanUpper.length >= 2 && cleanUpper.length <= 4 && hasNoVowels) {
         return upperWord;
       }
 
-      // 3. Kata hubung kecil tetap lowercase (kecuali di awal kalimat)
       const lowerWord = word.toLowerCase();
       if (index > 0 && lowerWords.has(lowerWord)) {
         return lowerWord;
       }
 
-      // 4. Sisanya Title Case biasa (Huruf pertama kapital)
       return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
     })
     .join(" ");
 }
 
-// Setiap kartu transaksi kini hanya menampilkan info (tanpa tombol icon
-// edit/hapus inline). Saat mode admin aktif, seluruh kartu bisa diketuk
-// (tx-card-clickable) untuk membuka menu aksi (lihat txActionOverlay di
-// events.js) berisi pilihan "Edit Transaksi" / "Hapus Transaksi".
 function renderTxList(rows, containerId, emptyId, opts) {
   opts = opts || {};
   const body = $(containerId);
