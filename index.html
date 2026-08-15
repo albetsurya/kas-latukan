@@ -609,6 +609,18 @@
           margin: 12mm;
         }
       }
+      :root {
+        --print-scale: 1;
+      }
+      #printArea {
+        transform-origin: top left;
+      }
+      @media print {
+        #printArea {
+          transform: scale(var(--print-scale, 1));
+          width: calc(100% / var(--print-scale, 1));
+        }
+      }
 
       /* =========================================================
    CLEAN FINANCE / STOCKBIT-INSPIRED UI OVERRIDES
@@ -1459,6 +1471,47 @@
       html.authenticated #shell {
         display: flex !important;
       }
+
+      /* ---------- Print report ---------- */
+      #printArea .print-header {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      #printArea .print-header h1 {
+        font-size: 15px;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: 0.01em;
+      }
+      #printArea .print-header h2 {
+        font-size: 13px;
+        font-weight: 800;
+        margin: 1px 0 0;
+        letter-spacing: 0.01em;
+      }
+      #printArea .print-header p {
+        font-size: 11px;
+        font-weight: 700;
+        margin: 3px 0 0;
+        color: #334155;
+      }
+      #printArea table td.num,
+      #printArea table th.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      #printArea tfoot td {
+        font-weight: 800;
+        background: #16a34a !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid #16a34a;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      #printArea tfoot tr.print-total-saldo td {
+        background: #12833d !important;
+        color: #ffffff !important;
+      }
     </style>
   </head>
   <body>
@@ -1677,6 +1730,26 @@
             >
               Semua Periode · 0 transaksi
             </p>
+            <div
+              class="flex items-center gap-1.5 mt-2 pt-2"
+              style="border-top: 1px solid rgba(255, 255, 255, 0.22)"
+            >
+              <span
+                class="text-[10.5px] white-text"
+                style="color: rgba(255, 255, 255, 0.7)"
+                >Saldo Awal</span
+              >
+              <span
+                class="text-[10.5px] white-text"
+                style="color: rgba(255, 255, 255, 0.45)"
+                >·</span
+              >
+              <span
+                class="mono text-[11.5px] font-bold white-text"
+                id="homeSaldoAwal"
+                >Rp 0</span
+              >
+            </div>
           </div>
           <div class="receipt-edge -mt-4"></div>
 
@@ -1700,6 +1773,21 @@
               >
                 Rp 0
               </p>
+            </div>
+          </div>
+
+          <div class="stat-chip p-4 flex items-center justify-between">
+            <div>
+              <p class="eyebrow" id="homeSurplusLabel">Surplus Periode Ini</p>
+              <p class="mono text-base font-extrabold mt-1" id="homeSurplus">
+                Rp 0
+              </p>
+            </div>
+            <div
+              id="homeSurplusBadge"
+              class="text-[10.5px] font-display font-bold px-2.5 py-1 rounded-full"
+            >
+              Surplus
             </div>
           </div>
 
@@ -2167,26 +2255,44 @@
 
     <!-- ===================== PRINT-ONLY REPORT ===================== -->
     <div id="printArea">
-      <h1 style="font-size: 18px; font-weight: 800">
-        Laporan Saldo Kas Kelompok Latukan
-      </h1>
-      <p style="font-size: 11px; color: #475569">
-        Periode: <span id="printPeriod"></span> · Dicetak pada
-        <span id="printDate"></span>
-      </p>
+      <div class="print-header">
+        <h1>REKAP LAPORAN KEUANGAN OPERASIONAL</h1>
+        <h2>KELOMPOK LATUKAN</h2>
+        <p id="printPeriod"></p>
+      </div>
       <table>
         <thead>
           <tr>
             <th>No</th>
             <th>Tanggal</th>
-            <th>Account (Kategori)</th>
+            <th>Account</th>
             <th>Keterangan</th>
-            <th>Debet</th>
-            <th>Kredit</th>
-            <th>Saldo</th>
+            <th class="num">Debet</th>
+            <th class="num">Kredit</th>
+            <th class="num">Saldo</th>
           </tr>
         </thead>
         <tbody id="printTableBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">TOTAL PEMASUKAN</td>
+            <td class="num" id="printTotalDebet">Rp 0</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td colspan="4">TOTAL PENGELUARAN</td>
+            <td class="num">—</td>
+            <td class="num" id="printTotalKredit">Rp 0</td>
+            <td class="num">—</td>
+          </tr>
+          <tr class="print-total-saldo">
+            <td colspan="4">SALDO AKHIR</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="num" id="printTotalSaldo">Rp 0</td>
+          </tr>
+        </tfoot>
       </table>
     </div>
 
@@ -2197,10 +2303,27 @@
       (function () {
         const authScreen = document.getElementById("authScreen");
         const shell = document.getElementById("shell");
+        const SESSION_KEY = "kas_user";
+        const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari
+
+        function readValidSession() {
+          const raw = localStorage.getItem(SESSION_KEY);
+          if (!raw) return null;
+          try {
+            const parsed = JSON.parse(raw);
+            if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
+              localStorage.removeItem(SESSION_KEY);
+              return null;
+            }
+            return parsed;
+          } catch (e) {
+            localStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+        }
 
         function applyAuthState() {
-          const raw = sessionStorage.getItem("kas_user");
-          const authenticated = !!raw;
+          const authenticated = !!readValidSession();
 
           document.documentElement.classList.toggle(
             "authenticated",
@@ -2306,19 +2429,42 @@
       const isSaldoAwalRow = (t) =>
         (t.account || "").trim().toUpperCase() === "SALDO AWAL";
 
-      // ---------- SESSION (login sederhana, hanya untuk sesi browser saat ini) ----------
+      // ---------- SESSION (login pengurus, bertahan 30 hari meski tab/browser ditutup) ----------
+      // Menggunakan localStorage (bukan sessionStorage) agar sesi tidak hilang saat
+      // tab/browser ditutup. Sesi hanya dihapus lewat logout eksplisit atau otomatis
+      // setelah 30 hari (SESSION_TTL_MS) sejak login.
+      const SESSION_KEY = "kas_user";
+      const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari
+
       function saveSession(username, password, nama, role) {
-        sessionStorage.setItem(
-          "kas_user",
-          JSON.stringify({ username, password, nama, role }),
+        localStorage.setItem(
+          SESSION_KEY,
+          JSON.stringify({
+            username,
+            password,
+            nama,
+            role,
+            expiresAt: Date.now() + SESSION_TTL_MS,
+          }),
         );
       }
       function getSession() {
-        const raw = sessionStorage.getItem("kas_user");
-        return raw ? JSON.parse(raw) : null;
+        const raw = localStorage.getItem(SESSION_KEY);
+        if (!raw) return null;
+        try {
+          const parsed = JSON.parse(raw);
+          if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
+            localStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+          return parsed;
+        } catch (e) {
+          localStorage.removeItem(SESSION_KEY);
+          return null;
+        }
       }
       function clearSession() {
-        sessionStorage.removeItem("kas_user");
+        localStorage.removeItem(SESSION_KEY);
       }
 
       // ---------- THEME ----------
@@ -2619,8 +2765,39 @@
           " · " +
           scope.list.length +
           " transaksi";
+        $("homeSaldoAwal").textContent = fmtRp(scope.awal);
         $("homeDebet").textContent = fmtRp(scope.debet);
         $("homeKredit").textContent = fmtRp(scope.kredit);
+
+        // Surplus/defisit = selisih pemasukan dan pengeluaran pada periode terpilih.
+        // Istilah kas: "Surplus" bila pemasukan > pengeluaran, "Defisit" bila
+        // sebaliknya, dan "Impas" bila persis sama.
+        const selisih = scope.debet - scope.kredit;
+        const surplusEl = $("homeSurplus");
+        const badgeEl = $("homeSurplusBadge");
+        const labelEl = $("homeSurplusLabel");
+        if (selisih > 0) {
+          labelEl.textContent = "Surplus Periode Ini";
+          surplusEl.textContent = "+" + fmtRp(selisih);
+          surplusEl.style.color = "var(--pos)";
+          badgeEl.textContent = "Surplus";
+          badgeEl.style.background = "var(--pos-soft)";
+          badgeEl.style.color = "var(--pos)";
+        } else if (selisih < 0) {
+          labelEl.textContent = "Defisit Periode Ini";
+          surplusEl.textContent = "-" + fmtRp(Math.abs(selisih));
+          surplusEl.style.color = "var(--neg)";
+          badgeEl.textContent = "Defisit";
+          badgeEl.style.background = "var(--neg-soft)";
+          badgeEl.style.color = "var(--neg)";
+        } else {
+          labelEl.textContent = "Selisih Periode Ini";
+          surplusEl.textContent = fmtRp(0);
+          surplusEl.style.color = "var(--ink-soft)";
+          badgeEl.textContent = "Impas";
+          badgeEl.style.background = "var(--surface-alt)";
+          badgeEl.style.color = "var(--ink-soft)";
+        }
 
         const recent = scope.list.slice(-5).reverse();
         renderTxList(recent, "homeRecentList", null, { compact: true });
@@ -2755,20 +2932,60 @@
       }
 
       function buildPrintTable(rows) {
+        // Nomor urut tabel cetak selalu dimulai dari 1 dan berurutan,
+        // terlepas dari nomor baris asli di database/backend.
         $("printTableBody").innerHTML = rows
           .map(
-            (t) => `
+            (t, idx) => `
       <tr>
-        <td>${t.no}</td>
+        <td>${idx + 1}</td>
         <td>${t.tanggal}</td>
         <td>${escapeHtml(t.account)}</td>
         <td>${escapeHtml(t.keterangan)}</td>
-        <td>${t.debet ? fmtRp(t.debet) : "-"}</td>
-        <td>${t.kredit ? fmtRp(t.kredit) : "-"}</td>
-        <td>${fmtRp(t.saldo)}</td>
+        <td class="num">${t.debet ? fmtRp(t.debet) : "-"}</td>
+        <td class="num">${t.kredit ? fmtRp(t.kredit) : "-"}</td>
+        <td class="num">${fmtRp(t.saldo)}</td>
       </tr>`,
           )
           .join("");
+      }
+
+      // Menyesuaikan skala tabel cetak (via CSS transform) agar seluruh baris
+      // transaksi pada bulan terpilih selalu muat dalam 1 halaman A4, berapa
+      // pun jumlah transaksinya.
+      function fitPrintToOnePage() {
+        const area = $("printArea");
+        const prevDisplay = area.style.display;
+        const prevPosition = area.style.position;
+        const prevLeft = area.style.left;
+        const prevTop = area.style.top;
+        const prevWidth = area.style.width;
+        const prevTransform = area.style.transform;
+
+        document.documentElement.style.setProperty("--print-scale", "1");
+        area.style.transform = "none";
+        area.style.display = "block";
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        area.style.top = "0";
+        area.style.width = "186mm"; // lebar A4 dikurangi margin kiri+kanan 12mm
+
+        const mmToPx = 96 / 25.4;
+        const availableHeightPx = (297 - 24) * mmToPx; // tinggi A4 dikurangi margin atas+bawah 12mm
+        const contentHeightPx = area.scrollHeight;
+
+        let scale = 1;
+        if (contentHeightPx > availableHeightPx) {
+          scale = Math.max(0.35, availableHeightPx / contentHeightPx);
+        }
+        document.documentElement.style.setProperty("--print-scale", scale);
+
+        area.style.display = prevDisplay;
+        area.style.position = prevPosition;
+        area.style.left = prevLeft;
+        area.style.top = prevTop;
+        area.style.width = prevWidth;
+        area.style.transform = prevTransform;
       }
 
       function escapeHtml(str) {
@@ -2801,7 +3018,6 @@
           : scope.list;
 
         renderTxList([...filtered].reverse(), "txList", "txEmpty");
-        buildPrintTable(filtered);
       }
 
       // ---------- TABS ----------
@@ -2882,10 +3098,26 @@
       });
       $("searchInput").addEventListener("input", applyFilters);
 
+      // Cetak / ekspor PDF: selalu mencetak data RIWAYAT untuk bulan yang sedang
+      // dipilih di dropdown periode (state.selectedMonth), lengkap dengan judul
+      // laporan dan ringkasan total di bagian bawah tabel.
       $("btnPrint").addEventListener("click", () => {
-        $("printDate").textContent = new Date().toLocaleString("id-ID");
-        $("printPeriod").textContent = getMonthLabel(state.selectedMonth);
+        const monthKey = state.selectedMonth;
+        const scope = computeScope(monthKey);
+
+        $("printPeriod").textContent = "Periode: " + getMonthLabel(monthKey);
+        buildPrintTable(scope.list);
+
+        $("printTotalDebet").textContent = fmtRp(scope.debet);
+        $("printTotalKredit").textContent = fmtRp(scope.kredit);
+        $("printTotalSaldo").textContent = fmtRp(scope.akhir);
+
+        fitPrintToOnePage();
         window.print();
+      });
+
+      window.addEventListener("afterprint", () => {
+        document.documentElement.style.setProperty("--print-scale", "1");
       });
 
       $("btnLogout").addEventListener("click", () => {
