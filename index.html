@@ -416,14 +416,20 @@
         border-radius: 20px;
         background: var(--gold);
         color: #1a1204;
-        display: flex;
+        display: flex; /* <-- Properti ini yang menimpa .hidden */
         align-items: center;
         justify-content: center;
         box-shadow: 0 10px 22px -6px rgba(180, 130, 30, 0.5);
         transition: transform 0.12s ease;
       }
+
       #fabAdd:active {
         transform: scale(0.93);
+      }
+
+      /* Tambahkan rule ini untuk memastikan class hidden mengalahkan #fabAdd */
+      #fabAdd.hidden {
+        display: none !important;
       }
 
       /* ---------- Sheets ---------- */
@@ -825,6 +831,223 @@
         font-weight: 600;
       }
 
+      /* ---------- Home month dropdown ---------- */
+      .home-period-filter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 38px;
+      }
+
+      .home-period-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--ink-soft);
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.035em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .home-period-label-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-soft);
+      }
+
+      .month-dropdown {
+        position: relative;
+        width: 178px;
+        z-index: 20;
+      }
+
+      .month-dropdown-trigger {
+        width: 100%;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 1px 2px rgba(18, 24, 31, 0.025);
+        transition:
+          background-color 0.16s ease,
+          border-color 0.16s ease,
+          color 0.16s ease,
+          box-shadow 0.16s ease,
+          transform 0.12s ease;
+      }
+
+      .month-dropdown-trigger:hover {
+        background: var(--surface-alt);
+        border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+      }
+
+      .month-dropdown-trigger:active {
+        transform: scale(0.985);
+      }
+
+      .month-dropdown.open .month-dropdown-trigger {
+        background: var(--brand-soft);
+        border-color: var(--brand);
+        color: var(--brand);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 11%, transparent);
+      }
+
+      .month-dropdown-calendar {
+        width: 24px;
+        height: 24px;
+        flex: 0 0 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: var(--surface-alt);
+        color: var(--ink-soft);
+        transition:
+          background-color 0.16s ease,
+          color 0.16s ease;
+      }
+
+      .month-dropdown.open .month-dropdown-calendar {
+        background: var(--brand);
+        color: #fff;
+      }
+
+      .month-dropdown-value {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: left;
+      }
+
+      .month-dropdown-chevron {
+        flex: 0 0 auto;
+        color: var(--ink-faint);
+        transition:
+          transform 0.18s ease,
+          color 0.18s ease;
+      }
+
+      .month-dropdown.open .month-dropdown-chevron {
+        transform: rotate(180deg);
+        color: var(--brand);
+      }
+
+      .month-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        width: 100%;
+        max-height: 270px;
+        overflow-y: auto;
+        padding: 5px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        box-shadow: 0 12px 28px rgba(18, 24, 31, 0.13);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-5px) scale(0.985);
+        transform-origin: top right;
+        transition:
+          opacity 0.14s ease,
+          visibility 0.14s ease,
+          transform 0.14s ease;
+      }
+
+      .month-dropdown.open .month-dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+      }
+
+      .month-dropdown-option {
+        width: 100%;
+        min-height: 34px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 8px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 11.5px;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        transition:
+          background-color 0.13s ease,
+          color 0.13s ease;
+      }
+
+      .month-dropdown-option:hover {
+        background: var(--surface-alt);
+        color: var(--ink);
+      }
+
+      .month-dropdown-option.active {
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-weight: 800;
+      }
+
+      .month-dropdown-option:active {
+        background: color-mix(in srgb, var(--brand-soft) 75%, var(--surface));
+      }
+
+      .month-dropdown-check {
+        width: 15px;
+        flex: 0 0 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand);
+        opacity: 0;
+      }
+
+      .month-dropdown-option.active .month-dropdown-check {
+        opacity: 1;
+      }
+
+      .month-dropdown-menu::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .month-dropdown-menu::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 999px;
+      }
+
+      html[data-theme="dark"] .month-dropdown-menu {
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.34);
+      }
+
+      @media (max-width: 380px) {
+        .month-dropdown {
+          width: 165px;
+        }
+      }
+
       /* Month filters */
       .month-chip {
         padding: 7px 12px;
@@ -1010,6 +1233,198 @@
         }
       }
 
+      /* ---------- Create form controls ---------- */
+      .create-form .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .create-form .field-label {
+        display: block;
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.045em;
+        text-transform: uppercase;
+      }
+
+      .create-form .field-input,
+      .create-form select.field-input,
+      .create-form textarea.field-input {
+        width: 100%;
+        min-height: 42px;
+        margin-top: 0;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 12.5px;
+        font-weight: 500;
+        line-height: 1.45;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        transition:
+          border-color 0.16s ease,
+          background-color 0.16s ease,
+          color 0.16s ease,
+          box-shadow 0.16s ease;
+      }
+
+      .create-form textarea.field-input {
+        min-height: 82px;
+        resize: vertical;
+      }
+
+      .create-form .field-input::placeholder {
+        color: var(--ink-faint);
+        opacity: 1;
+      }
+
+      .create-form .field-input:hover {
+        border-color: color-mix(in srgb, var(--brand) 28%, var(--line));
+        background: var(--surface-alt);
+      }
+
+      .create-form .field-input:focus {
+        border-color: var(--brand);
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: 0 0 0 3px var(--brand-soft);
+      }
+
+      .create-form .field-input:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .create-form input[type="date"] {
+        color-scheme: light;
+      }
+
+      html[data-theme="dark"] .create-form input[type="date"] {
+        color-scheme: dark;
+      }
+
+      .create-form input[type="number"] {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .create-form .account-input-wrap,
+      .create-form .select-wrap {
+        position: relative;
+      }
+
+      .create-form .select-wrap::after {
+        content: "";
+        position: absolute;
+        right: 13px;
+        top: 50%;
+        width: 7px;
+        height: 7px;
+        border-right: 1.5px solid var(--ink-soft);
+        border-bottom: 1.5px solid var(--ink-soft);
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+      }
+
+      .create-form select.field-input {
+        padding-right: 36px;
+        cursor: pointer;
+      }
+
+      .create-form option {
+        background: var(--surface);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      .create-form .seg-toggle {
+        margin-top: 0;
+        padding: 3px;
+        gap: 3px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface-alt);
+      }
+
+      .create-form .seg-btn {
+        min-height: 36px;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-size: 11.5px;
+        font-weight: 700;
+        transition:
+          background-color 0.16s ease,
+          color 0.16s ease,
+          box-shadow 0.16s ease;
+      }
+
+      .create-form .seg-btn:hover {
+        color: var(--ink);
+        background: var(--surface);
+      }
+
+      .create-form .seg-btn.active-debet {
+        background: var(--pos-soft);
+        color: var(--pos);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+
+      .create-form .seg-btn.active-kredit {
+        background: var(--neg-soft);
+        color: var(--neg);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+
+      .create-form .btn-primary,
+      .create-form .btn-ghost {
+        min-height: 40px;
+        border-radius: 9px;
+        font-size: 12.5px;
+        font-weight: 700;
+      }
+
+      .create-form .btn-primary {
+        background: var(--brand);
+        color: #fff;
+        box-shadow: 0 3px 10px color-mix(in srgb, var(--brand) 22%, transparent);
+      }
+
+      .create-form .btn-primary:hover {
+        background: var(--brand-dark);
+      }
+
+      .create-form .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .create-form .btn-ghost {
+        background: var(--surface-alt);
+        color: var(--ink-soft);
+        border: 1px solid var(--line);
+      }
+
+      .create-form .btn-ghost:hover {
+        background: var(--surface);
+        color: var(--ink);
+        border-color: color-mix(in srgb, var(--brand) 25%, var(--line));
+      }
+
+      .create-form .form-error {
+        margin-top: 2px;
+        border: 1px solid var(--neg-soft);
+        border-radius: 8px;
+      }
+
       /* =========================================================
    AUTHENTICATION GATE — EXPLICIT VISIBILITY STATES
    Login and dashboard are mutually exclusive.
@@ -1189,12 +1604,57 @@
 
         <!-- ============ SCREEN: BERANDA ============ -->
         <section id="screen-home" class="screen active space-y-5">
-          <div>
-            <p class="eyebrow px-1 mb-2">Periode</p>
-            <div
-              id="homeMonthChips"
-              class="flex gap-2 overflow-x-auto no-scrollbar"
-            ></div>
+          <div class="home-period-filter">
+            <div class="home-period-label">
+              <span class="home-period-label-dot"></span>
+              <span>Periode</span>
+            </div>
+
+            <div class="month-dropdown" id="homeMonthDropdown">
+              <button
+                type="button"
+                id="homeMonthDropdownTrigger"
+                class="month-dropdown-trigger"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+              >
+                <span class="month-dropdown-calendar" aria-hidden="true">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect>
+                    <path d="M8 2.5v4M16 2.5v4M3 9h18"></path>
+                  </svg>
+                </span>
+                <span id="homeMonthDropdownValue" class="month-dropdown-value"
+                  >Semua Periode</span
+                >
+                <svg
+                  class="month-dropdown-chevron"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </button>
+
+              <div
+                id="homeMonthDropdownMenu"
+                class="month-dropdown-menu"
+                role="listbox"
+                aria-label="Pilih periode"
+              ></div>
+            </div>
           </div>
 
           <div class="hero-card px-6 pt-6 pb-5">
@@ -1299,10 +1759,57 @@
             />
           </div>
 
-          <div
-            id="monthChips"
-            class="flex gap-2 overflow-x-auto no-scrollbar"
-          ></div>
+          <div class="home-period-filter">
+            <div class="home-period-label">
+              <span class="home-period-label-dot"></span>
+              <span>Periode</span>
+            </div>
+            <div class="month-dropdown" id="historyMonthDropdown">
+              <button
+                type="button"
+                id="historyMonthDropdownTrigger"
+                class="month-dropdown-trigger"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+              >
+                <span class="month-dropdown-calendar" aria-hidden="true">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect>
+                    <path d="M8 2.5v4M16 2.5v4M3 9h18"></path>
+                  </svg>
+                </span>
+                <span
+                  id="historyMonthDropdownValue"
+                  class="month-dropdown-value"
+                  >Semua Periode</span
+                >
+                <svg
+                  class="month-dropdown-chevron"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </button>
+              <div
+                id="historyMonthDropdownMenu"
+                class="month-dropdown-menu"
+                role="listbox"
+                aria-label="Pilih periode"
+              ></div>
+            </div>
+          </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div class="stat-chip p-4">
@@ -1468,7 +1975,12 @@
       </main>
 
       <!-- ===================== FAB ===================== -->
-      <button id="fabAdd" class="hidden">
+      <button
+        id="fabAdd"
+        class="hidden"
+        data-action="create"
+        aria-label="Tambah transaksi"
+      >
         <svg
           width="22"
           height="22"
@@ -1559,8 +2071,8 @@
           <p class="text-[12.5px] text-[color:var(--ink-soft)] mt-1 mb-4">
             Saldo akan dihitung otomatis dari saldo berjalan.
           </p>
-          <form id="txForm" class="space-y-3">
-            <div>
+          <form id="txForm" class="space-y-3 create-form">
+            <div class="field-group">
               <label class="field-label">Jenis Transaksi</label>
               <div class="seg-toggle">
                 <button
@@ -1575,11 +2087,11 @@
                 </button>
               </div>
             </div>
-            <div>
+            <div class="field-group">
               <label class="field-label">Tanggal</label>
               <input required id="txTanggal" type="date" class="field-input" />
             </div>
-            <div>
+            <div class="field-group">
               <label class="field-label">Account (Kategori)</label>
               <input
                 required
@@ -1610,7 +2122,7 @@
                 <option value="PEMASUKAN LAIN-LAIN"></option>
               </datalist>
             </div>
-            <div>
+            <div class="field-group">
               <label class="field-label">Keterangan</label>
               <textarea
                 required
@@ -1620,7 +2132,7 @@
                 class="field-input"
               ></textarea>
             </div>
-            <div>
+            <div class="field-group">
               <label class="field-label">Jumlah Nominal (Rp)</label>
               <input
                 required
@@ -1634,7 +2146,7 @@
             </div>
             <p
               id="txError"
-              class="hidden text-xs rounded-xl px-3 py-2.5"
+              class="hidden text-xs px-3 py-2.5 form-error"
               style="color: var(--neg); background: var(--neg-soft)"
             ></p>
             <div class="flex gap-2.5 pt-1">
@@ -1900,7 +2412,8 @@
         }
       }
 
-      // ---------- BULAN (chips, dipakai Beranda & Riwayat) ----------
+      // ---------- BULAN ----------
+      // Semua halaman menggunakan dropdown periode yang sama agar konsisten.
       function getMonthsDesc() {
         return [
           ...new Set(state.transactions.map((t) => getMonthKey(t.tanggal))),
@@ -1910,7 +2423,75 @@
           .reverse();
       }
 
-      function renderAllMonthChipRows() {
+      function getMonthDropdownRefs(prefix) {
+        return {
+          dropdown: $(`${prefix}MonthDropdown`),
+          trigger: $(`${prefix}MonthDropdownTrigger`),
+          value: $(`${prefix}MonthDropdownValue`),
+          menu: $(`${prefix}MonthDropdownMenu`),
+        };
+      }
+
+      function closeMonthDropdown(prefix) {
+        const { dropdown, trigger } = getMonthDropdownRefs(prefix);
+        if (!dropdown) return;
+        dropdown.classList.remove("open");
+        trigger?.setAttribute("aria-expanded", "false");
+      }
+
+      function closeAllMonthDropdowns() {
+        closeMonthDropdown("home");
+        closeMonthDropdown("history");
+      }
+
+      function toggleMonthDropdown(prefix) {
+        const { dropdown, trigger } = getMonthDropdownRefs(prefix);
+        if (!dropdown) return;
+        const willOpen = !dropdown.classList.contains("open");
+        closeAllMonthDropdowns();
+        dropdown.classList.toggle("open", willOpen);
+        trigger?.setAttribute("aria-expanded", String(willOpen));
+      }
+
+      function renderMonthDropdown(prefix, months) {
+        const { trigger, value, menu } = getMonthDropdownRefs(prefix);
+        if (!trigger || !value || !menu) return;
+
+        value.textContent = getMonthLabel(state.selectedMonth);
+        menu.innerHTML = ["all", ...months]
+          .map(
+            (m) => `
+            <button type="button"
+              class="month-dropdown-option ${m === state.selectedMonth ? "active" : ""}"
+              data-month="${m}" role="option"
+              aria-selected="${m === state.selectedMonth}">
+              <span class="month-dropdown-check" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="m5 12 4 4L19 6"></path>
+                </svg>
+              </span>
+              <span>${getMonthLabel(m)}</span>
+            </button>`,
+          )
+          .join("");
+
+        trigger.onclick = (event) => {
+          event.stopPropagation();
+          toggleMonthDropdown(prefix);
+        };
+
+        menu.querySelectorAll(".month-dropdown-option").forEach((option) => {
+          option.onclick = (event) => {
+            event.stopPropagation();
+            state.selectedMonth = option.dataset.month;
+            closeAllMonthDropdowns();
+            renderAllMonthDropdowns();
+            refreshScopedUI();
+          };
+        });
+      }
+
+      function renderAllMonthDropdowns() {
         const months = getMonthsDesc();
         if (
           !months.includes(state.selectedMonth) &&
@@ -1918,25 +2499,13 @@
         ) {
           state.selectedMonth = "all";
         }
-        const chips = ["all", ...months];
-        const html = chips
-          .map(
-            (m) =>
-              `<button class="month-chip ${m === state.selectedMonth ? "active" : ""}" data-month="${m}">${getMonthChipLabel(m)}</button>`,
-          )
-          .join("");
+        renderMonthDropdown("home", months);
+        renderMonthDropdown("history", months);
+      }
 
-        ["homeMonthChips", "monthChips"].forEach((id) => {
-          const el = $(id);
-          el.innerHTML = html;
-          el.querySelectorAll(".month-chip").forEach((chip) => {
-            chip.addEventListener("click", () => {
-              state.selectedMonth = chip.dataset.month;
-              renderAllMonthChipRows();
-              refreshScopedUI();
-            });
-          });
-        });
+      // Alias untuk pemanggilan lama.
+      function renderAllMonthChipRows() {
+        renderAllMonthDropdowns();
       }
 
       function refreshScopedUI() {
@@ -2261,10 +2830,21 @@
       $("btnSeeAll").addEventListener("click", () => switchTab("history"));
 
       function updateFabVisibility() {
-        const show =
-          state.isAdmin &&
-          (state.activeTab === "home" || state.activeTab === "history");
-        $("fabAdd").classList.toggle("hidden", !show);
+        const fab = $("fabAdd");
+        if (!fab) return;
+
+        // 1. Cek apakah user BENAR-BENAR admin (harus boolean true)
+        const isAdmin = state.isAdmin === true || state.isAdmin === "true";
+
+        // 2. Cek apakah di tab yang diperbolehkan
+        const isAllowedTab =
+          state.activeTab === "home" || state.activeTab === "history";
+
+        // FAB hanya tampil jika KEDUA kondisi terpenuhi
+        const shouldShow = isAdmin && isAllowedTab;
+
+        // Toggle class 'hidden'
+        fab.classList.toggle("hidden", !shouldShow);
       }
 
       // ---------- AUTH UI ----------
@@ -2276,6 +2856,7 @@
           ? "Admin · dapat menambah transaksi"
           : "Pengurus · mode lihat saja";
         updateFabVisibility();
+        applyRoleBasedCreateVisibility();
       }
 
       // (restore session dilakukan langsung di blok INIT di bawah)
@@ -2327,6 +2908,7 @@
       $("segKredit").addEventListener("click", () => setTxJenis("kredit"));
 
       $("fabAdd").addEventListener("click", () => {
+        if (state.isAdmin !== true) return;
         $("txError").classList.add("hidden");
         $("txForm").reset();
         setTxJenis("debet");
@@ -2348,6 +2930,13 @@
           $("txError").classList.remove("hidden");
           return;
         }
+        if (state.isAdmin !== true) {
+          $("txError").textContent =
+            "Hanya admin yang dapat menambah transaksi.";
+          $("txError").classList.remove("hidden");
+          return;
+        }
+
         const session = getSession();
         if (!session) {
           showToast("Sesi admin berakhir, silakan login ulang.", "error");
@@ -2415,9 +3004,7 @@
           }
           // Peran ditentukan dari backend (res.role) bila tersedia; jika tidak,
           // username "admin" mendapat hak input, selain itu hanya lihat (pengurus).
-          const role =
-            res.role ||
-            (username.toLowerCase() === "admin" ? "admin" : "pengurus");
+          const role = String(res.role || "pengurus").toLowerCase();
           saveSession(username, password, res.nama || username, role);
           setAdminUI(role === "admin", res.nama || username);
           $("authError").classList.add("hidden");
@@ -2433,15 +3020,62 @@
         }
       });
 
+      // Tutup dropdown ketika klik di luar area selector atau menekan Escape.
+      document.addEventListener("click", (event) => {
+        const homeDropdown = $("homeMonthDropdown");
+        const historyDropdown = $("historyMonthDropdown");
+        if (
+          (!homeDropdown || !homeDropdown.contains(event.target)) &&
+          (!historyDropdown || !historyDropdown.contains(event.target))
+        ) {
+          closeAllMonthDropdowns();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeAllMonthDropdowns();
+      });
+
       // ---------- INIT ----------
       initTheme();
       {
         const existing = getSession();
         if (existing) {
-          setAdminUI(existing.role === "admin", existing.nama);
+          setAdminUI(
+            String(existing.role || "").toLowerCase() === "admin",
+            existing.nama,
+          );
           enterApp();
         }
       }
+    </script>
+
+    <script>
+      // ---------- ROLE BASED CREATE VISIBILITY ----------
+      // Sumber hak akses hanya dari role yang sudah diverifikasi backend.
+      function applyRoleBasedCreateVisibility() {
+        const isAdmin = state.isAdmin === true;
+
+        document.documentElement.classList.toggle("role-admin", isAdmin);
+        document.documentElement.classList.toggle("role-non-admin", !isAdmin);
+
+        document
+          .querySelectorAll(
+            '[data-action="create"], [data-role-action="create"], .create-action, #createTransactionBtn',
+          )
+          .forEach((el) => {
+            el.classList.toggle("hidden", !isAdmin);
+            el.setAttribute("aria-hidden", String(!isAdmin));
+          });
+
+        // Jika role berubah menjadi non-admin saat form terbuka,
+        // tutup form dan cegah aksi create.
+        if (!isAdmin) {
+          $("txOverlay")?.classList.add("hidden");
+        }
+      }
+
+      window.applyRoleBasedCreateVisibility = applyRoleBasedCreateVisibility;
     </script>
   </body>
 </html>
