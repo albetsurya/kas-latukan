@@ -665,6 +665,119 @@
             </p>
           </div>
         </section>
+
+        <!-- ============ SCREEN: SHODAQOH IR ============ -->
+        <section id="screen-shodaqoh" class="screen space-y-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="eyebrow">Shodaqoh IR</p>
+              <h2 class="font-display text-xl font-extrabold">
+                Monitoring & Pembayaran
+              </h2>
+              <p
+                class="text-xs text-[color:var(--ink-soft)]"
+                id="shodMonthLabel"
+              >
+                Bulan berjalan
+              </p>
+            </div>
+            <button type="button" id="btnShodAddPayment" class="btn-primary">
+              + Pembayaran
+            </button>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="stat-chip p-4">
+              <p class="eyebrow">Target</p>
+              <p id="shodTarget" class="mono text-sm font-extrabold mt-1">
+                Rp 0
+              </p>
+            </div>
+            <div class="stat-chip p-4">
+              <p class="eyebrow">Pembayaran</p>
+              <p id="shodReceived" class="mono text-sm font-extrabold mt-1">
+                Rp 0
+              </p>
+            </div>
+            <div class="stat-chip p-4">
+              <p class="eyebrow">Lunas</p>
+              <p id="shodPaidCount" class="mono text-sm font-extrabold mt-1">
+                0
+              </p>
+            </div>
+            <div class="stat-chip p-4">
+              <p class="eyebrow">Belum</p>
+              <p id="shodUnpaidCount" class="mono text-sm font-extrabold mt-1">
+                0
+              </p>
+            </div>
+          </div>
+          <div class="card p-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <select id="shodFilterYear" class="field-input">
+                <option value="">Tahun</option>
+              </select>
+              <select id="shodFilterMonth" class="field-input">
+                <option value="">Bulan</option>
+                <option value="01">Januari</option>
+                <option value="02">Februari</option>
+                <option value="03">Maret</option>
+                <option value="04">April</option>
+                <option value="05">Mei</option>
+                <option value="06">Juni</option>
+                <option value="07">Juli</option>
+                <option value="08">Agustus</option>
+                <option value="09">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+              <select id="shodFilterMember" class="field-input">
+                <option value="">Semua anggota</option>
+              </select>
+              <select id="shodFilterStatus" class="field-input">
+                <option value="ALL">Semua status</option>
+                <option value="LUNAS">Lunas</option>
+                <option value="BELUM">Belum</option>
+              </select>
+            </div>
+          </div>
+          <div class="card p-4 overflow-x-auto">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="font-display text-[13px] font-extrabold">
+                Monitoring Bulanan
+              </h2>
+              <span
+                class="text-xs text-[color:var(--ink-faint)]"
+                id="shodMemberCount"
+                >0</span
+              >
+            </div>
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr>
+                  <th class="py-2 pr-3">Anggota</th>
+                  <th class="py-2 pr-3">Target</th>
+                  <th class="py-2 pr-3">Status</th>
+                  <th class="py-2 pr-3">Payment</th>
+                  <th class="py-2">Tanggal</th>
+                </tr>
+              </thead>
+              <tbody id="shodMonitoringBody"></tbody>
+            </table>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-display text-[13px] font-extrabold mb-3">
+              Daftar Anggota
+            </h2>
+            <div id="shodMembersList" class="space-y-2"></div>
+          </div>
+          <div class="card p-4">
+            <h2 class="font-display text-[13px] font-extrabold mb-3">
+              Riwayat Pembayaran
+            </h2>
+            <div id="shodPaymentsList" class="space-y-2"></div>
+          </div>
+        </section>
       </main>
 
       <!-- ===================== FAB ===================== -->
@@ -752,6 +865,23 @@
           </span>
           <span>Profil</span>
         </button>
+        <button class="nav-btn" data-tab="shodaqoh">
+          <span class="nav-pill">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+            >
+              <path
+                d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0L12 5.35l-.77-.77a5.4 5.4 0 0 0-7.65 7.65L12 20.36l8.42-8.13a5.4 5.4 0 0 0 0-7.65z"
+              />
+            </svg>
+          </span>
+          <span>Shodaqoh IR</span>
+        </button>
       </nav>
 
       <!-- ===================== ADD TRANSACTION SHEET ===================== -->
@@ -813,6 +943,17 @@
                 <option value="BEBAN OPERASIONAL BULAN BERJALAN"></option>
                 <option value="BEBAN PENGELUARAN LAIN-LAIN"></option>
                 <option value="PEMASUKAN LAIN-LAIN"></option>
+                <!-- Kategori persis sama dengan SHODAQOH_CATEGORY_MAP di backend,
+                     supaya transaksi manual & hasil posting Shodaqoh IR konsisten
+                     satu kategori (huruf besar/kecil ikut disamakan). -->
+                <option value="Infak IR"></option>
+                <option value="Pemasukan Uang Sambung"></option>
+                <option value="Pemasukan Jimpitan"></option>
+                <option value="Pemasukan Siar-siar"></option>
+                <option value="Pemasukan Seribuan"></option>
+                <option value="Pemasukan Kafan"></option>
+                <option value="Pemasukan Ukhro MT"></option>
+                <option value="Pemasukan Dana Kesehatan"></option>
               </datalist>
             </div>
             <div class="field-group">
@@ -1028,6 +1169,256 @@
               class="btn-primary"
             >
               Lanjutkan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== SHODAQOH IR: PAYMENT FORM ===================== -->
+      <div id="shodaqohPaymentOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3 class="font-display text-[16px] font-extrabold">
+            Pembayaran Shodaqoh IR
+          </h3>
+          <p class="text-xs text-[color:var(--ink-soft)] mt-1 mb-4">
+            Total alokasi harus sama dengan total pembayaran.
+          </p>
+          <form id="shodaqohPaymentForm" class="space-y-3 create-form">
+            <!-- Anggota -->
+            <div class="field-group">
+              <label class="field-label">Nama anggota</label>
+              <select id="shodPaymentMember" required class="field-input">
+                <option value="">Pilih anggota</option>
+              </select>
+            </div>
+
+            <!-- Tanggal & Total -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="field-group">
+                <label class="field-label">Tanggal</label>
+                <input
+                  id="shodPaymentDate"
+                  type="date"
+                  required
+                  class="field-input"
+                />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Total Pembayaran</label>
+                <input
+                  id="shodPaymentAmount"
+                  type="number"
+                  min="1"
+                  step="1"
+                  required
+                  class="field-input mono"
+                  placeholder="500000"
+                />
+              </div>
+            </div>
+
+            <!-- ALOKASI 7 POS -->
+            <div class="field-group">
+              <label class="field-label font-bold">Alokasi Pembayaran</label>
+              <div class="space-y-2">
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Susulan IR bulan</span>
+                  <input
+                    id="shod_susulan_ir"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+                <div
+                  id="shodSusulanBulan"
+                  class="space-y-1 max-h-40 overflow-y-auto p-2 bg-[color:var(--surface-2)] rounded-lg"
+                ></div>
+
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Uang</span>
+                  <input
+                    id="shod_uang"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Jimpitan</span>
+                  <input
+                    id="shod_jimpitan"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Siar-siar Sambung</span>
+                  <input
+                    id="shod_siar_siar"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Seribuan</span>
+                  <input
+                    id="shod_seribuan"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Kafan</span>
+                  <input
+                    id="shod_kafan"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="grid grid-cols-3 gap-2 items-center">
+                  <span class="text-xs">Ukhro MT</span>
+                  <input
+                    id="shod_ukhro_mt"
+                    type="number"
+                    min="0"
+                    step="1"
+                    class="field-input mono col-span-2"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Status Alokasi -->
+            <div
+              class="flex items-center justify-between p-3 bg-[color:var(--surface-2)] rounded-xl"
+            >
+              <span class="text-xs font-bold">Status Alokasi</span>
+              <span id="shodAllocationStatus" class="text-xs font-bold"
+                >❌ BELUM SEIMBANG</span
+              >
+            </div>
+
+            <!-- Keterangan -->
+            <div class="field-group">
+              <label class="field-label">Keterangan</label>
+              <textarea
+                id="shodPaymentNote"
+                rows="2"
+                class="field-input"
+                placeholder="Opsional"
+              ></textarea>
+            </div>
+
+            <div class="flex gap-2.5 pt-1">
+              <button
+                type="button"
+                id="btnCancelShodaqohPayment"
+                class="btn-ghost flex-1"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                id="btnSubmitShodaqohPayment"
+                class="btn-primary flex-1"
+                disabled
+              >
+                Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Detail Anggota -->
+      <div id="shodMemberDetailOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3
+            id="shodMemberDetailTitle"
+            class="font-display text-[16px] font-extrabold"
+          >
+            Detail Anggota
+          </h3>
+          <p
+            id="shodMemberDetailMeta"
+            class="text-xs text-[color:var(--ink-soft)] mt-1 mb-4"
+          ></p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+              <thead>
+                <tr>
+                  <th class="py-2 text-left">Periode</th>
+                  <th class="py-2 text-left">Target</th>
+                  <th class="py-2 text-left">Status</th>
+                  <th class="py-2 text-left">Payment</th>
+                  <th class="py-2 text-left">Tanggal</th>
+                </tr>
+              </thead>
+              <tbody id="shodMemberDetailBody"></tbody>
+            </table>
+          </div>
+          <button
+            type="button"
+            id="btnCloseShodMemberDetail"
+            class="btn-ghost w-full mt-4"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+
+      <!-- Detail Payment -->
+      <div id="shodPaymentDetailOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3
+            id="shodPaymentDetailTitle"
+            class="font-display text-[16px] font-extrabold"
+          >
+            Detail Pembayaran
+          </h3>
+          <p
+            id="shodPaymentDetailMeta"
+            class="text-xs text-[color:var(--ink-soft)] mt-1 mb-4"
+          ></p>
+          <div id="shodPaymentDetailBody" class="space-y-2"></div>
+          <div class="grid grid-cols-3 gap-2 mt-4">
+            <button
+              type="button"
+              id="btnCloseShodPaymentDetail"
+              class="btn-ghost"
+            >
+              Tutup
+            </button>
+            <button type="button" id="btnShodEditPayment" class="btn-ghost">
+              Edit
+            </button>
+            <button
+              type="button"
+              id="btnShodReversePayment"
+              class="btn-primary"
+            >
+              Reversal
             </button>
           </div>
         </div>
