@@ -1026,6 +1026,7 @@ function enterApp() {
   document.documentElement.classList.remove("auth-locked");
   if ($("authScreen")) $("authScreen").classList.add("hidden");
   if ($("shell")) $("shell").classList.remove("hidden");
+  switchTab("home");
   loadData();
   setInterval(() => loadData(), CONFIG.POLL_INTERVAL_MS);
 }

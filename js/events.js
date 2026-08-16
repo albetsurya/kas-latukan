@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
 
-  // ---------- THEME ----------
+  // Theme
   if ($("btnTheme")) {
     $("btnTheme").addEventListener("click", () =>
       applyTheme(currentTheme() === "dark" ? "light" : "dark"),
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if ($("themeDarkBtn"))
     $("themeDarkBtn").addEventListener("click", () => applyTheme("dark"));
 
-  // ---------- REFRESH ----------
+  // Refresh
   if ($("btnRefresh")) {
     $("btnRefresh").addEventListener("click", () => {
       $("btnRefresh").classList.add("spin");
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- SEARCH / TABS ----------
+  // Search / Tabs
   if ($("searchInput"))
     $("searchInput").addEventListener("input", applyFilters);
   if ($("btnSeeAll"))
@@ -31,11 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
 
-  // ---------- CETAK / EKSPOR PDF ----------
-  // Selalu mencetak data RIWAYAT untuk bulan yang sedang dipilih di dropdown
-  // periode (state.selectedMonth), lengkap dengan judul laporan, penomoran
-  // ulang 1..n, dan ringkasan total di bagian bawah tabel — diskalakan
-  // otomatis supaya selalu muat dalam 1 halaman A4.
+  // Cetak / Ekspor PDF
   if ($("btnPrint")) {
     $("btnPrint").addEventListener("click", () => {
       const monthKey = state.selectedMonth;
@@ -60,12 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.style.setProperty("--print-scale", "1");
   });
 
-  // ---------- LOGOUT ----------
+  // Logout
   if ($("btnLogout")) {
     $("btnLogout").addEventListener("click", () => {
       const session = getSession();
-      // Cabut token di server dulu (best-effort) supaya token lama itu
-      // langsung tidak bisa dipakai lagi, baru bersihkan sesi lokal.
       if (session && session.token) {
         apiPost({ action: "logout", token: session.token }).catch(() => {});
       }
@@ -79,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- TAMBAH TRANSAKSI ----------
+  // Tambah / Edit Transaksi
   if ($("segDebet"))
     $("segDebet").addEventListener("click", () => setTxJenis("debet"));
   if ($("segKredit"))
@@ -173,10 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- KARTU TRANSAKSI: ketuk untuk membuka menu aksi (Edit/Hapus) ----------
-  // Menggantikan tombol icon edit/hapus inline yang sebelumnya menempel di
-  // setiap baris. Sekarang seluruh kartu (mode admin) bisa diketuk, lalu
-  // muncul action sheet berisi dua pilihan.
+  // Action Sheet Transaksi
   function openTxActionSheet(no) {
     const tx = state.transactions.find((t) => String(t.no) === String(no));
     if (!tx) return;
@@ -233,48 +224,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- DUPLIKASI TRANSAKSI ----------
+  // Duplikasi Transaksi
   if ($("btnActionDuplicate")) {
     $("btnActionDuplicate").addEventListener("click", () => {
       const no = state.actionNo;
-
       const tx = state.transactions.find((t) => String(t.no) === String(no));
-
       closeTxActionSheet();
-
       if (!tx) return;
 
-      // null = transaksi baru, bukan edit
       state.editingNo = null;
-
-      if ($("txSheetTitle")) {
+      if ($("txSheetTitle"))
         $("txSheetTitle").textContent = "Duplikasi Transaksi";
-      }
-
-      if ($("btnSubmitTx")) {
-        $("btnSubmitTx").textContent = "Simpan";
-      }
-
+      if ($("btnSubmitTx")) $("btnSubmitTx").textContent = "Simpan";
       $("txError")?.classList.add("hidden");
 
-      // Salin data transaksi
       $("txTanggal").value = tx.tanggal;
-
       $("txAccount").value = tx.account;
-
       $("txKeterangan").value = tx.keterangan;
-
       $("txJumlah").value = tx.debet > 0 ? tx.debet : tx.kredit;
-
       setTxJenis(tx.debet > 0 ? "debet" : "kredit");
-
       $("txOverlay")?.classList.remove("hidden");
     });
   }
 
+  // Carry Forward Saldo
   function closeCarryForwardConfirm() {
     $("carryForwardOverlay")?.classList.add("hidden");
-
     state.carryForwardMonth = null;
     state.carryForwardNextMonth = null;
   }
@@ -296,57 +271,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if ($("btnCarryForwardConfirm")) {
     $("btnCarryForwardConfirm").addEventListener("click", async () => {
-      if (!state.carryForwardMonth) {
-        return;
-      }
+      if (!state.carryForwardMonth) return;
 
       const session = getSession();
-
       if (!session) {
         showToast("Sesi admin berakhir, silakan login ulang.", "error");
-
         closeCarryForwardConfirm();
-
         return;
       }
 
       const monthKey = state.carryForwardMonth;
-
       $("btnCarryForwardConfirm").disabled = true;
-
       $("btnCarryForwardConfirm").textContent = "Memproses…";
 
       try {
         const res = await apiPost({
           action: "carryForwardSaldo",
-
           token: session.token,
-
           monthKey: monthKey,
         });
 
         if (!res.success) {
           showToast(res.message || "Gagal membuat saldo awal.", "error");
-
           return;
         }
 
         showToast(res.message || "Saldo awal berhasil dibuat.");
-
         closeCarryForwardConfirm();
-
         await loadData();
       } catch (err) {
         showToast("Tidak dapat menghubungi server: " + err.message, "error");
       } finally {
         $("btnCarryForwardConfirm").disabled = false;
-
         $("btnCarryForwardConfirm").textContent = "Lanjutkan";
       }
     });
   }
 
-  // ---------- MODAL KONFIRMASI HAPUS ----------
+  // Konfirmasi Hapus
   function openDeleteConfirm() {
     const tx = state.transactions.find(
       (t) => String(t.no) === String(state.actionNo),
@@ -426,7 +388,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- AUTH GATE (login pengurus) ----------
+  // Auth Gate & Toggle Password
+  if ($("btnTogglePassword")) {
+    $("btnTogglePassword").addEventListener("click", () => {
+      const pwdInput = $("authPassword");
+      const iconEye = $("iconEye");
+      const iconEyeOff = $("iconEyeOff");
+      const isPassword = pwdInput.type === "password";
+
+      pwdInput.type = isPassword ? "text" : "password";
+      iconEye?.classList.toggle("hidden", !isPassword);
+      iconEyeOff?.classList.toggle("hidden", isPassword);
+    });
+  }
+
   if ($("authForm")) {
     $("authForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -442,14 +417,17 @@ document.addEventListener("DOMContentLoaded", () => {
           $("authError").classList.remove("hidden");
           return;
         }
-        // Peran ditentukan dari backend (res.role) bila tersedia; jika tidak,
-        // username "admin" mendapat hak input, selain itu hanya lihat (pengurus).
-        // Password TIDAK disimpan — hanya token sesi yang diterbitkan backend.
+
         const role = String(res.role || "pengurus").toLowerCase();
         saveSession(res.token, res.nama || username, role, res.expiresAt);
         setAdminUI(role === "admin", res.nama || username);
         $("authError").classList.add("hidden");
+
         $("authForm").reset();
+        if ($("authPassword")) $("authPassword").type = "password";
+        $("iconEye")?.classList.add("hidden");
+        $("iconEyeOff")?.classList.remove("hidden");
+
         enterApp();
       } catch (err) {
         $("authError").textContent =
@@ -462,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- DROPDOWN PERIODE / OVERLAY: tutup saat klik di luar / tekan Escape ----------
+  // Global Keydown & Outside Click Handlers
   document.addEventListener("click", (event) => {
     const homeDropdown = $("homeMonthDropdown");
     const historyDropdown = $("historyMonthDropdown");
@@ -482,15 +460,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---------- INIT: pulihkan sesi bila masih berlaku (maks. 30 hari) ----------
+  // Init Session
   const existing = getSession();
-
   if (existing) {
     setAdminUI(
       String(existing.role || "").toLowerCase() === "admin",
       existing.nama,
     );
-
     enterApp();
   }
 });
