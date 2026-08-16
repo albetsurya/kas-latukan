@@ -233,14 +233,127 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ---------- DUPLIKASI TRANSAKSI ----------
+  if ($("btnActionDuplicate")) {
+    $("btnActionDuplicate").addEventListener("click", () => {
+      const no = state.actionNo;
+
+      const tx = state.transactions.find((t) => String(t.no) === String(no));
+
+      closeTxActionSheet();
+
+      if (!tx) return;
+
+      // null = transaksi baru, bukan edit
+      state.editingNo = null;
+
+      if ($("txSheetTitle")) {
+        $("txSheetTitle").textContent = "Duplikasi Transaksi";
+      }
+
+      if ($("btnSubmitTx")) {
+        $("btnSubmitTx").textContent = "Simpan";
+      }
+
+      $("txError")?.classList.add("hidden");
+
+      // Salin data transaksi
+      $("txTanggal").value = tx.tanggal;
+
+      $("txAccount").value = tx.account;
+
+      $("txKeterangan").value = tx.keterangan;
+
+      $("txJumlah").value = tx.debet > 0 ? tx.debet : tx.kredit;
+
+      setTxJenis(tx.debet > 0 ? "debet" : "kredit");
+
+      $("txOverlay")?.classList.remove("hidden");
+    });
+  }
+
+  function closeCarryForwardConfirm() {
+    $("carryForwardOverlay")?.classList.add("hidden");
+
+    state.carryForwardMonth = null;
+    state.carryForwardNextMonth = null;
+  }
+
+  if ($("btnCarryForwardCancel")) {
+    $("btnCarryForwardCancel").addEventListener(
+      "click",
+      closeCarryForwardConfirm,
+    );
+  }
+
+  if ($("carryForwardOverlay")) {
+    $("carryForwardOverlay").addEventListener("click", (event) => {
+      if (event.target === $("carryForwardOverlay")) {
+        closeCarryForwardConfirm();
+      }
+    });
+  }
+
+  if ($("btnCarryForwardConfirm")) {
+    $("btnCarryForwardConfirm").addEventListener("click", async () => {
+      if (!state.carryForwardMonth) {
+        return;
+      }
+
+      const session = getSession();
+
+      if (!session) {
+        showToast("Sesi admin berakhir, silakan login ulang.", "error");
+
+        closeCarryForwardConfirm();
+
+        return;
+      }
+
+      const monthKey = state.carryForwardMonth;
+
+      $("btnCarryForwardConfirm").disabled = true;
+
+      $("btnCarryForwardConfirm").textContent = "Memproses…";
+
+      try {
+        const res = await apiPost({
+          action: "carryForwardSaldo",
+
+          token: session.token,
+
+          monthKey: monthKey,
+        });
+
+        if (!res.success) {
+          showToast(res.message || "Gagal membuat saldo awal.", "error");
+
+          return;
+        }
+
+        showToast(res.message || "Saldo awal berhasil dibuat.");
+
+        closeCarryForwardConfirm();
+
+        await loadData();
+      } catch (err) {
+        showToast("Tidak dapat menghubungi server: " + err.message, "error");
+      } finally {
+        $("btnCarryForwardConfirm").disabled = false;
+
+        $("btnCarryForwardConfirm").textContent = "Lanjutkan";
+      }
+    });
+  }
+
   // ---------- MODAL KONFIRMASI HAPUS ----------
   function openDeleteConfirm() {
     const tx = state.transactions.find(
       (t) => String(t.no) === String(state.actionNo),
     );
     if ($("deleteConfirmDesc")) {
-      $("deleteConfirmDesc").textContent = tx
-        ? `"${tx.account}" · ${fmtDateShort(tx.tanggal)} akan dihapus permanen dan tidak bisa dibatalkan.`
+      $("deleteConfirmDesc").innerHTML = tx
+        ? `<b>${tx.account}</b> · ${fmtDateShort(tx.tanggal)} akan dihapus permanen dan tidak bisa dibatalkan.`
         : "Tindakan ini tidak bisa dibatalkan.";
     }
     $("deleteConfirmOverlay")?.classList.remove("hidden");
@@ -371,11 +484,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- INIT: pulihkan sesi bila masih berlaku (maks. 30 hari) ----------
   const existing = getSession();
+
   if (existing) {
     setAdminUI(
       String(existing.role || "").toLowerCase() === "admin",
       existing.nama,
     );
+
     enterApp();
   }
 });

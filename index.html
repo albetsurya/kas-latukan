@@ -850,6 +850,31 @@
             </button>
             <button
               type="button"
+              id="btnActionDuplicate"
+              class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+            >
+              <span class="icon-btn" style="pointer-events: none">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="8" y="8" width="12" height="12" rx="2" />
+                  <path
+                    d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
+                  />
+                </svg>
+              </span>
+
+              <span class="font-display text-[13.5px] font-bold flex-1">
+                Duplikasi Transaksi
+              </span>
+            </button>
+            <button
+              type="button"
               id="btnActionDelete"
               class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
               style="color: var(--neg)"
@@ -928,6 +953,37 @@
               style="background: var(--neg)"
             >
               Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== CARRY FORWARD CONFIRM ===================== -->
+
+      <div id="carryForwardOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+
+          <h3 class="font-display text-[16px] font-extrabold">
+            Jadikan Saldo Awal
+          </h3>
+
+          <p
+            id="carryForwardDesc"
+            class="text-[12.5px] text-[color:var(--ink-soft)] mt-2 mb-5"
+          ></p>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btnCarryForwardCancel" class="btn-ghost">
+              Batal
+            </button>
+
+            <button
+              type="button"
+              id="btnCarryForwardConfirm"
+              class="btn-primary"
+            >
+              Lanjutkan
             </button>
           </div>
         </div>

@@ -23,6 +23,8 @@ let state = {
   txJenis: "debet",
   editingNo: null,
   actionNo: null,
+  carryForwardMonth: null,
+  carryForwardNextMonth: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -111,7 +113,7 @@ const fmtDateShort = (tanggal) => {
   if (isNaN(d.getTime())) return tanggal;
   return d.toLocaleDateString("id-ID", {
     day: "2-digit",
-    month: "short",
+    month: "long",
     year: "numeric",
   });
 };
@@ -433,47 +435,213 @@ function computeMonthlySeries() {
 function renderRecapList() {
   const months = getMonthsDesc();
   const wrap = $("recapList");
+
   if (!wrap) return;
+
   if (!months.length) {
     wrap.innerHTML =
       '<div class="card p-6 text-center text-[color:var(--ink-faint)] text-xs">Belum ada transaksi.</div>';
     return;
   }
+
   wrap.innerHTML = months
     .map((m) => {
       const s = computeScope(m);
+
+      const [year, month] = m.split("-");
+
+      const nextMonthDate = new Date(Number(year), Number(month), 1);
+
+      // PENTING: jangan pakai toISOString() di sini — itu mengonversi ke UTC,
+      // dan untuk zona waktu di depan UTC (misalnya WIB/UTC+7), tanggal 1
+      // tengah malam lokal akan mundur ke bulan sebelumnya saat dikonversi
+      // ke UTC. Akibatnya label tombol "Jadikan Saldo Awal ..." menunjukkan
+      // bulan yang salah (bulan yang sama, bukan bulan berikutnya).
+      // Gunakan komponen tanggal lokal saja.
+      const nextMonthKey =
+        nextMonthDate.getFullYear() +
+        "-" +
+        String(nextMonthDate.getMonth() + 1).padStart(2, "0");
+
       return `
-    <button class="card w-full text-left p-4 recap-card" data-month="${m}">
-      <div class="flex items-center justify-between">
-        <p class="font-display font-extrabold text-[13.5px]">${getMonthLabel(m)}</p>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>
-      </div>
-      <div class="grid grid-cols-3 gap-2 mt-3">
-        <div>
-          <p class="eyebrow" style="font-size:9.5px">Masuk</p>
-          <p class="mono text-[11.5px] font-bold mt-0.5" style="color:var(--pos)">${fmtRp(s.debet)}</p>
+        <div
+          class="card p-4 recap-card"
+          data-month="${m}"
+        >
+
+          <!-- HEADER BULAN -->
+          <button
+            type="button"
+            class="w-full text-left recap-open-history"
+            data-month="${m}"
+          >
+            <div class="flex items-center justify-between">
+              <p
+                class="font-display font-extrabold text-[13.5px]"
+              >
+                ${getMonthLabel(m)}
+              </p>
+
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--ink-faint)"
+                stroke-width="2"
+              >
+                <path d="m9 6 6 6-6 6" />
+              </svg>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mt-3">
+
+              <div>
+                <p
+                  class="eyebrow"
+                  style="font-size:9.5px"
+                >
+                  Masuk
+                </p>
+
+                <p
+                  class="mono text-[11.5px] font-bold mt-0.5"
+                  style="color:var(--pos)"
+                >
+                  ${fmtRp(s.debet)}
+                </p>
+              </div>
+
+              <div>
+                <p
+                  class="eyebrow"
+                  style="font-size:9.5px"
+                >
+                  Keluar
+                </p>
+
+                <p
+                  class="mono text-[11.5px] font-bold mt-0.5"
+                  style="color:var(--neg)"
+                >
+                  ${fmtRp(s.kredit)}
+                </p>
+              </div>
+
+              <div>
+                <p
+                  class="eyebrow"
+                  style="font-size:9.5px"
+                >
+                  Akhir
+                </p>
+
+                <p
+                  class="mono text-[11.5px] font-bold mt-0.5"
+                >
+                  ${fmtRp(s.akhir)}
+                </p>
+              </div>
+
+            </div>
+          </button>
+
+
+          <!-- AKSI CARRY FORWARD -->
+          ${
+            state.isAdmin
+              ? `
+                <div
+                  class="mt-3 pt-3"
+                  style="
+                    border-top:1px solid var(--line);
+                  "
+                >
+
+                  <button
+                    type="button"
+                    class="btn-carry-forward w-full flex items-center justify-center gap-2"
+                    data-month="${m}"
+                    data-next-month="${nextMonthKey}"
+                  >
+
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M5 12h14"
+                      />
+                      <path
+                        d="m13 6 6 6-6 6"
+                      />
+                    </svg>
+
+                    <span>
+                      Jadikan Saldo Awal ${getMonthLabel(nextMonthKey)}
+                    </span>
+
+                  </button>
+
+                </div>
+              `
+              : ""
+          }
+
         </div>
-        <div>
-          <p class="eyebrow" style="font-size:9.5px">Keluar</p>
-          <p class="mono text-[11.5px] font-bold mt-0.5" style="color:var(--neg)">${fmtRp(s.kredit)}</p>
-        </div>
-        <div>
-          <p class="eyebrow" style="font-size:9.5px">Akhir</p>
-          <p class="mono text-[11.5px] font-bold mt-0.5">${fmtRp(s.akhir)}</p>
-        </div>
-      </div>
-    </button>`;
+      `;
     })
     .join("");
 
-  wrap.querySelectorAll(".recap-card").forEach((card) => {
-    card.addEventListener("click", () => {
-      state.selectedMonth = card.dataset.month;
+  // ----------------------------------------------------------
+  // BUKA RIWAYAT BULAN
+  // ----------------------------------------------------------
+
+  wrap.querySelectorAll(".recap-open-history").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedMonth = button.dataset.month;
+
       renderAllMonthChipRows();
       refreshScopedUI();
       switchTab("history");
     });
   });
+
+  // ----------------------------------------------------------
+  // CARRY FORWARD
+  // ----------------------------------------------------------
+
+  wrap.querySelectorAll(".btn-carry-forward").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      openCarryForwardConfirm(button.dataset.month, button.dataset.nextMonth);
+    });
+  });
+}
+
+// ---------- CARRY FORWARD SALDO (Saldo Akhir -> Saldo Awal Bulan Berikutnya) ----------
+// Dipanggil dari tombol "Jadikan Saldo Awal ..." pada kartu Rekap Bulanan.
+// Menyiapkan state lalu menampilkan modal konfirmasi (lihat events.js untuk
+// handler tombol Batal/Lanjutkan yang memanggil action "carryForwardSaldo").
+function openCarryForwardConfirm(monthKey, nextMonthKey) {
+  if (!monthKey || !nextMonthKey) return;
+
+  const scope = computeScope(monthKey);
+
+  state.carryForwardMonth = monthKey;
+  state.carryForwardNextMonth = nextMonthKey;
+
+  if ($("carryForwardDesc")) {
+    $("carryForwardDesc").textContent =
+      `Saldo akhir ${getMonthLabel(monthKey)} sebesar ${fmtRp(scope.akhir)} akan dijadikan Saldo Awal ${getMonthLabel(nextMonthKey)}. Lanjutkan?`;
+  }
+
+  $("carryForwardOverlay")?.classList.remove("hidden");
 }
 
 // ---------- HOME ----------
@@ -537,7 +705,10 @@ function renderChart() {
   const { labels, data } = computeMonthlySeries();
 
   if (!labels.length) {
-    labels.push(getMonthShortLabel(new Date().toISOString().slice(0, 7)));
+    const now = new Date();
+    const currentMonthKey =
+      now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
+    labels.push(getMonthShortLabel(currentMonthKey));
     data.push(state.saldoAwal);
   }
 
