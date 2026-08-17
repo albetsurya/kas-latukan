@@ -407,7 +407,7 @@ html[data-theme="dark"] .hero-card .white-text {
   width: 46px;
   height: 46px;
   right: max(18px, calc((100vw - 480px) / 2 + 18px));
-  bottom: calc(76px + env(safe-area-inset-bottom));
+  bottom: calc(85px + env(safe-area-inset-bottom));
   z-index: 40;
 
   border-radius: 50%;
@@ -428,6 +428,28 @@ html[data-theme="dark"] .hero-card .white-text {
 
 #fabAdd.hidden {
   display: none !important;
+}
+
+#fabPostToKas {
+  right: 16px;
+  bottom: 130px;
+}
+
+#fabPostToKas:active {
+  transform: scale(0.93);
+}
+
+#fabPostToKas.hidden {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  #fabPostToKas {
+    right: 14px;
+    bottom: 120px;
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* ---------- Sheets ---------- */
@@ -1164,34 +1186,6 @@ html[data-theme="dark"] .month-dropdown-menu {
 }
 
 /* FAB — simple, compact, no ornament */
-#fabAdd {
-  right: 16px;
-  bottom: 70px;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
-}
-
-#fabPostToKas {
-  right: 16px;
-  bottom: 130px;
-}
-
-#fabPostToKas:active {
-  transform: scale(0.93);
-}
-
-@media (max-width: 480px) {
-  #fabPostToKas {
-    right: 14px;
-    bottom: 120px;
-    width: 44px;
-    height: 44px;
-  }
-}
 
 /* Sheets / modal */
 .sheet-overlay {
