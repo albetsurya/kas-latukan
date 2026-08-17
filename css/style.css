@@ -1175,6 +1175,24 @@ html[data-theme="dark"] .month-dropdown-menu {
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
 }
 
+#fabPostToKas {
+  right: 16px;
+  bottom: 130px;
+}
+
+#fabPostToKas:active {
+  transform: scale(0.93);
+}
+
+@media (max-width: 480px) {
+  #fabPostToKas {
+    right: 14px;
+    bottom: 120px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
 /* Sheets / modal */
 .sheet-overlay {
   background: rgba(0, 0, 0, 0.42);
@@ -1570,14 +1588,11 @@ html.authenticated #shell {
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(2px);
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-.animate-spin {
-  animation: spin 0.8s linear infinite;
 }
 
 .modal-overlay {
@@ -1803,4 +1818,934 @@ html[data-theme="dark"] .filter-dropdown-menu {
   .filter-label {
     font-size: 8px;
   }
+}
+
+/* ============================================================
+   SHODAQOH PAYMENT FORM — KONSISTEN DENGAN TRANSACTION SHEETS
+   ============================================================ */
+
+/* Method toggle di payment form — menggunakan seg-toggle yang sama */
+#shodaqohPaymentOverlay .seg-toggle {
+  margin-top: 0;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-alt);
+}
+
+#shodaqohPaymentOverlay .seg-btn {
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  font-weight: 700;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+#shodaqohPaymentOverlay .seg-btn:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+#shodaqohPaymentOverlay .seg-btn.active-debet {
+  background: var(--pos-soft);
+  color: var(--pos);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Field group di payment form — KONSISTEN SPACING */
+#shodaqohPaymentOverlay .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#shodaqohPaymentOverlay .field-label {
+  display: block;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+/* Grid untuk member & date — konsisten dengan spacing */
+#shodaqohPaymentOverlay .grid-cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+/* Setiap input di dalam grid-cols-2 */
+#shodaqohPaymentOverlay .grid-cols-2 .field-group {
+  gap: 6px;
+}
+
+/* Field input — KONSISTEN DENGAN TRANSACTION SHEETS */
+#shodaqohPaymentOverlay .field-input,
+#shodaqohPaymentOverlay select.field-input,
+#shodaqohPaymentOverlay textarea.field-input {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+#shodaqohPaymentOverlay textarea.field-input {
+  min-height: 82px;
+  resize: vertical;
+}
+
+#shodaqohPaymentOverlay .field-input::placeholder {
+  color: var(--ink-faint);
+  opacity: 1;
+}
+
+#shodaqohPaymentOverlay .field-input:hover {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--line));
+  background: var(--surface-alt);
+}
+
+#shodaqohPaymentOverlay .field-input:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+/* Select dropdown */
+#shodaqohPaymentOverlay select.field-input {
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+#shodaqohPaymentOverlay .select-wrap {
+  position: relative;
+}
+
+#shodaqohPaymentOverlay .select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--ink-soft);
+  border-bottom: 1.5px solid var(--ink-soft);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
+
+#shodaqohPaymentOverlay option {
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Buttons di payment form — KONSISTEN DENGAN TRANSACTION SHEETS */
+#shodaqohPaymentOverlay .btn-primary,
+#shodaqohPaymentOverlay .btn-ghost {
+  min-height: 40px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+#shodaqohPaymentOverlay .btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
+#shodaqohPaymentOverlay .btn-primary:hover {
+  background: var(--brand-dark);
+}
+
+#shodaqohPaymentOverlay .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+#shodaqohPaymentOverlay .btn-ghost {
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+#shodaqohPaymentOverlay .btn-ghost:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--brand) 25%, var(--line));
+}
+
+/* ===== SPACING UNTUK FORM ===== */
+/* Jarak antar elemen form — konsisten dengan transaction sheets */
+#shodaqohPaymentOverlay form.space-y-3 > * + * {
+  margin-top: 16px;
+}
+
+/* Allocation status di payment form — KONSISTEN SPACING */
+#shodaqohPaymentOverlay .allocation-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  margin-top: 4px;
+}
+
+#shodaqohPaymentOverlay .allocation-status .status-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  color: var(--ink-soft);
+}
+
+#shodaqohPaymentOverlay .allocation-status .status-value {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Alokasi payment items — KONSISTEN SPACING */
+#shodaqohPaymentOverlay .allocation-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+#shodaqohPaymentOverlay .allocation-grid .allocation-label {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+#shodaqohPaymentOverlay .allocation-grid .allocation-input {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+#shodaqohPaymentOverlay .allocation-grid .allocation-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+#shodaqohPaymentOverlay .allocation-grid .allocation-input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* Susulan bulan container */
+#shodSusulanBulan {
+  background: var(--surface-alt);
+  border-radius: 9px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  margin: 4px 0 8px 0;
+}
+
+/* Wrapper untuk allocation items — spacing antar item */
+#shodaqohPaymentOverlay .allocation-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Upload section — KONSISTEN SPACING */
+#shodUploadSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+#shodUploadSection .field-group {
+  margin-bottom: 0;
+}
+
+#shodUploadSection .upload-preview {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+#shodUploadSection .upload-preview img {
+  display: block;
+  width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+  background: var(--surface-alt);
+}
+
+/* OCR result */
+#shodOcrResult .ocr-data {
+  font-size: 11px;
+  color: var(--ink-soft);
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  line-height: 1.6;
+}
+
+/* Button group di form */
+#shodaqohPaymentOverlay .form-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+#shodaqohPaymentOverlay .form-actions .btn-primary,
+#shodaqohPaymentOverlay .form-actions .btn-ghost {
+  flex: 1;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 480px) {
+  #shodaqohPaymentOverlay .grid-cols-2 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  #shodaqohPaymentOverlay .allocation-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  #shodaqohPaymentOverlay .allocation-grid .allocation-label {
+    font-size: 10px;
+  }
+
+  #shodaqohPaymentOverlay .allocation-grid .allocation-input {
+    min-height: 30px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  #shodaqohPaymentOverlay .field-input {
+    min-height: 36px;
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  #shodaqohPaymentOverlay .seg-btn {
+    min-height: 30px;
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  #shodaqohPaymentOverlay form.space-y-3 > * + * {
+    margin-top: 12px;
+  }
+}
+
+/* Dark mode adjustments */
+html[data-theme="dark"] #shodaqohPaymentOverlay .field-input {
+  background: var(--surface);
+}
+
+html[data-theme="dark"] #shodaqohPaymentOverlay .allocation-status {
+  background: var(--surface-alt);
+}
+
+html[data-theme="dark"] #shodSusulanBulan {
+  background: var(--surface-alt);
+}
+
+#shodPaymentMemberDropdown .filter-dropdown-menu {
+  min-width: 200px;
+  max-width: 320px;
+  left: 0;
+  right: auto;
+}
+
+#shodDateDropdown .filter-dropdown-menu {
+  min-width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 480px) {
+  #shodPaymentMemberDropdown .filter-dropdown-menu {
+    min-width: 180px;
+    max-width: 260px;
+    left: 0;
+    right: auto;
+  }
+}
+/* ============================================================
+   DATE PICKER STYLE — DENGAN INPUT MANUAL
+   ============================================================ */
+
+/* Container date picker */
+#shodDateDropdown .filter-dropdown-menu {
+  min-width: 220px;
+  max-width: 260px;
+  padding: 10px;
+  right: 0;
+  left: auto;
+  transform: none;
+}
+
+#shodDateDropdown.open .filter-dropdown-menu {
+  transform: translateY(0) scale(1);
+}
+
+/* Input manual wrapper */
+.date-picker-input-wrap {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.date-picker-manual-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 9px;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  outline: none;
+  transition: border-color 0.15s ease;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.date-picker-manual-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+.date-picker-manual-input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.date-picker-apply {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: var(--brand);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.date-picker-apply:hover {
+  background: var(--brand-dark);
+}
+
+.date-picker-apply:active {
+  transform: scale(0.92);
+}
+
+/* Divider */
+.date-picker-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 6px 0;
+}
+
+/* Header date picker */
+.date-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 6px 0;
+  margin-bottom: 6px;
+}
+
+.date-picker-nav {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.date-picker-nav:hover {
+  background: var(--surface-alt);
+}
+
+.date-picker-month-year {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Weekdays */
+.date-picker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  margin-bottom: 4px;
+}
+
+.date-picker-weekdays span {
+  font-size: 7px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 0;
+}
+
+/* Days grid */
+.date-picker-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.date-picker-day {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.date-picker-day:hover:not(.other-month) {
+  background: var(--surface-alt);
+}
+
+.date-picker-day.other-month {
+  color: var(--ink-faint);
+  opacity: 0.3;
+}
+
+.date-picker-day.today {
+  color: var(--brand);
+  font-weight: 800;
+  position: relative;
+}
+
+.date-picker-day.today::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.date-picker-day.selected {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 800;
+  font-size: 9px;
+}
+
+.date-picker-day.selected:hover {
+  background: var(--brand-dark);
+}
+
+.date-picker-day:active {
+  transform: scale(0.92);
+}
+
+/* Footer */
+.date-picker-footer {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.date-picker-footer button {
+  flex: 1;
+  padding: 4px 0;
+  border: none;
+  border-radius: 4px;
+  font-size: 8px;
+  font-weight: 700;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.date-picker-today {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.date-picker-today:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.date-picker-clear {
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+}
+
+.date-picker-clear:hover {
+  background: var(--neg-soft);
+  color: var(--neg);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  #shodDateDropdown .filter-dropdown-menu {
+    min-width: 200px;
+    max-width: 240px;
+    padding: 8px;
+    right: 0;
+    left: auto;
+  }
+
+  .date-picker-day {
+    font-size: 8px;
+  }
+
+  .date-picker-month-year {
+    font-size: 9px;
+  }
+
+  .date-picker-weekdays span {
+    font-size: 6px;
+  }
+
+  .date-picker-nav {
+    width: 20px;
+    height: 20px;
+  }
+
+  .date-picker-nav svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .date-picker-manual-input {
+    font-size: 8px;
+    padding: 3px 6px;
+  }
+
+  .date-picker-apply {
+    width: 22px;
+    height: 22px;
+  }
+
+  .date-picker-apply svg {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Dark mode adjustments */
+html[data-theme="dark"] .date-picker-day.selected {
+  color: #06120d;
+}
+
+html[data-theme="dark"] .date-picker-day.today::after {
+  background: var(--brand);
+}
+
+html[data-theme="dark"] .date-picker-today {
+  color: var(--brand);
+}
+
+html[data-theme="dark"] .date-picker-today:hover {
+  color: #06120d;
+}
+
+html[data-theme="dark"] .date-picker-manual-input {
+  background: var(--surface-alt);
+}
+
+/* Backdrop untuk mobile */
+#datePickerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Pastikan date picker di atas backdrop */
+#shodDateDropdown.open {
+  z-index: 20;
+}
+
+/* ============================================================
+   FILTER DROPDOWN — PERBAIKAN Tumpukan
+   ============================================================ */
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.filter-dropdown {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+/* Saat dropdown terbuka, naikkan z-index */
+.filter-dropdown.open {
+  z-index: 50;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(18, 24, 31, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.985);
+  transform-origin: top left;
+  transition:
+    opacity 0.14s ease,
+    visibility 0.14s ease,
+    transform 0.14s ease;
+  z-index: 100; /* Pastikan di atas semua */
+}
+
+/* Khusus untuk dropdown anggota di filter */
+#shodMemberDropdown .filter-dropdown-menu {
+  min-width: 200px;
+  max-width: 320px;
+  left: 0;
+  right: auto;
+}
+
+/* ============================================================
+   SHODAQOH PAYMENT MEMBER DROPDOWN
+   ============================================================ */
+
+#shodPaymentMemberDropdown .filter-dropdown-menu {
+  min-width: 200px;
+  max-width: 320px;
+  left: 0;
+  right: auto;
+  z-index: 200; /* Lebih tinggi dari filter */
+}
+
+/* ============================================================
+   DATE PICKER STYLE
+   ============================================================ */
+
+/* Container date picker */
+#shodDateDropdown {
+  position: relative;
+  z-index: 10;
+}
+
+#shodDateDropdown.open {
+  z-index: 60;
+}
+
+#shodDateDropdown .filter-dropdown-menu {
+  min-width: 220px;
+  max-width: 260px;
+  padding: 10px;
+  right: 0;
+  left: auto;
+  transform: none;
+  z-index: 200;
+}
+
+/* Pastikan backdrop menutupi semua */
+#datePickerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+/* Pastikan date picker di atas backdrop */
+#shodDateDropdown.open {
+  z-index: 200;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  #shodMemberDropdown .filter-dropdown-menu {
+    min-width: 180px;
+    max-width: 260px;
+    left: 0;
+    right: auto;
+  }
+
+  #shodPaymentMemberDropdown .filter-dropdown-menu {
+    min-width: 180px;
+    max-width: 260px;
+    left: 0;
+    right: auto;
+  }
+
+  #shodDateDropdown .filter-dropdown-menu {
+    min-width: 200px;
+    max-width: 240px;
+    padding: 8px;
+    right: 0;
+    left: auto;
+  }
+}
+
+/* ============================================================
+   FIX UNTUK OVERFLOW — Pastikan container tidak memotong
+   ============================================================ */
+
+/* Card container untuk filter */
+#screen-shodaqoh .card {
+  overflow: visible !important;
+}
+
+/* Main content harus overflow visible */
+#shell main {
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+/* Pastikan semua dropdown di halaman shodaqoh tidak terpotong */
+#screen-shodaqoh {
+  overflow: visible !important;
+  padding-bottom: 100px; /* Beri ruang ekstra di bawah */
+}
+
+/* ============================================================
+   PERBAIKAN UNTUK DROPDOWN YANG BERTUMPUK
+   ============================================================ */
+
+/* Semua dropdown di halaman shodaqoh */
+#screen-shodaqoh .filter-dropdown {
+  position: relative;
+  z-index: 1;
+}
+
+#screen-shodaqoh .filter-dropdown.open {
+  z-index: 100;
+}
+
+/* Dropdown menu harus di atas semua */
+#screen-shodaqoh .filter-dropdown-menu {
+  z-index: 200;
+}
+
+/* Khusus untuk card filter di shodaqoh */
+#screen-shodaqoh .card .grid {
+  position: relative;
+  z-index: 1;
+}
+
+#screen-shodaqoh .card .filter-group {
+  position: relative;
+  z-index: 1;
+}
+
+/* Saat dropdown terbuka, naikkan z-index group-nya */
+#screen-shodaqoh .filter-group:has(.filter-dropdown.open) {
+  z-index: 50;
+}
+
+/* Pastikan form payment di atas filter */
+#shodaqohPaymentOverlay {
+  z-index: 300;
+}
+
+#shodaqohPaymentOverlay .sheet {
+  z-index: 301;
 }
