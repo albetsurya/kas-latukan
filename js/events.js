@@ -359,28 +359,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================================
 
   if ($("shodFilterYear"))
-    $("shodFilterYear").addEventListener("change", () => {
-      state.shodaqoh.filters.year = $("shodFilterYear").value;
+    $("shodFilterYear").addEventListener("change", function () {
+      state.shodaqoh.filters.year = this.value;
       renderPaymentHistory();
     });
 
   if ($("shodFilterMonth"))
-    $("shodFilterMonth").addEventListener("change", () => {
-      state.shodaqoh.filters.month = $("shodFilterMonth").value;
-      const p = `${state.shodaqoh.filters.year}-${state.shodaqoh.filters.month}`;
-      loadShodaqohData(p);
+    $("shodFilterMonth").addEventListener("change", function () {
+      state.shodaqoh.filters.month = this.value;
+      var p = state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month;
+      if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
+        loadShodaqohData(p);
+      }
     });
 
   if ($("shodFilterMember"))
-    $("shodFilterMember").addEventListener("change", () => {
-      state.shodaqoh.filters.memberId = $("shodFilterMember").value;
+    $("shodFilterMember").addEventListener("change", function () {
+      state.shodaqoh.filters.memberId = this.value;
       renderShodaqohMonitoring();
       renderPaymentHistory();
     });
 
   if ($("shodFilterStatus"))
-    $("shodFilterStatus").addEventListener("change", () => {
-      state.shodaqoh.filters.status = $("shodFilterStatus").value;
+    $("shodFilterStatus").addEventListener("change", function () {
+      state.shodaqoh.filters.status = this.value;
       renderShodaqohMonitoring();
     });
 
@@ -512,6 +514,449 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if ($("btnShodPostToKas")) {
+    $("btnShodPostToKas").addEventListener("click", async function () {
+      if (state.isAdmin !== true) {
+        showToast("Hanya admin yang dapat melakukan posting ke Kas.", "error");
+        return;
+      }
+
+      const monthKey = state.shodaqoh.selectedMonth;
+      if (!monthKey) {
+        showToast("Pilih bulan terlebih dahulu.", "error");
+        return;
+      }
+
+      const payments = state.shodaqoh.payments || [];
+      const alreadyPosted =
+        payments.length > 0 &&
+        payments.every(function (p) {
+          return String(p.kas_transaction_no || "").includes("POSTED");
+        });
+
+      if (alreadyPosted) {
+        showToast("Bulan ini sudah diposting ke Kas Utama.", "error");
+        return;
+      }
+
+      const totalPayments = payments.reduce(function (s, p) {
+        return s + (p.total || 0);
+      }, 0);
+
+      if (totalPayments === 0) {
+        showToast("Tidak ada pembayaran untuk bulan ini.", "error");
+        return;
+      }
+
+      // MODAL KONFIRMASI
+      const overlay = document.createElement("div");
+      overlay.className = "modal-overlay";
+      overlay.id = "postConfirmOverlay";
+      overlay.innerHTML = `
+        <div class="card modal-box p-5" style="max-width:400px;">
+          <div class="modal-icon" style="background:var(--gold-soft);color:var(--gold);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="9" y1="15" x2="21" y2="3" />
+            </svg>
+          </div>
+          <h3 class="font-display text-[16px] font-extrabold text-center mt-3">
+            Posting ke Kas Utama?
+          </h3>
+          <p class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5">
+            Semua pembayaran Shodaqoh IR bulan <b>${getMonthLabel(monthKey)}</b> akan diposting ke Kas Utama.
+          </p>
+          <div class="mt-3 p-3 bg-[color:var(--surface-alt)] rounded-lg">
+            <p class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase tracking-wide">Total yang akan diposting</p>
+            <p class="mono text-[17px] font-extrabold text-center">${fmtRp(totalPayments)}</p>
+          </div>
+          <p class="text-[10.5px] text-[color:var(--ink-faint)] text-center mt-2">
+            Transaksi akan dibuat per kategori alokasi.
+          </p>
+          <div class="flex gap-2.5 pt-4">
+            <button type="button" id="btnPostCancel" class="btn-ghost flex-1" style="padding:12px 0;">Batal</button>
+            <button type="button" id="btnPostConfirm" class="btn-primary flex-1" style="background:var(--gold);color:#fff;padding:12px 0;">Lanjutkan</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const closeModal = function () {
+        if (document.getElementById("postConfirmOverlay")) {
+          document.getElementById("postConfirmOverlay").remove();
+        }
+      };
+
+      document
+        .getElementById("btnPostCancel")
+        .addEventListener("click", closeModal);
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeModal();
+      });
+
+      document
+        .getElementById("btnPostConfirm")
+        .addEventListener("click", async function () {
+          closeModal();
+
+          const session = getSession();
+          if (!session) {
+            showToast("Sesi admin berakhir, silakan login ulang.", "error");
+            return;
+          }
+
+          const btn = $("btnShodPostToKas");
+          const originalText = btn.innerHTML;
+
+          btn.disabled = true;
+          btn.innerHTML = `<span class="inline-block animate-spin">⟳</span> Memproses…`;
+
+          try {
+            const res = await apiPost({
+              action: "postShodaqohToKas",
+              token: session.token,
+              monthKey: monthKey,
+            });
+
+            if (!res.success) throw new Error(res.message);
+
+            showToast(res.message);
+
+            if (res.details && res.details.length > 0) {
+              let detailRows = res.details
+                .map(function (d) {
+                  return `
+                  <div class="flex items-center justify-between py-2 border-b border-[color:var(--line)] last:border-0">
+                    <span class="text-xs font-medium">${d.account}</span>
+                    <span class="mono text-xs font-bold">${fmtRp(d.amount)}</span>
+                  </div>
+                `;
+                })
+                .join("");
+
+              const resultOverlay = document.createElement("div");
+              resultOverlay.className = "modal-overlay";
+              resultOverlay.id = "postResultOverlay";
+              resultOverlay.innerHTML = `
+              <div class="card modal-box p-5" style="max-width:400px;">
+                <div class="modal-icon" style="background:var(--pos-soft);color:var(--pos);">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <h3 class="font-display text-[16px] font-extrabold text-center mt-3">
+                  Posting Berhasil!
+                </h3>
+                <p class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5">
+                  Rincian transaksi yang dibuat di Kas Utama:
+                </p>
+                <div class="mt-3 p-3 bg-[color:var(--surface-alt)] rounded-lg max-h-48 overflow-y-auto">
+                  ${detailRows}
+                </div>
+                <div class="flex items-center justify-between mt-3 pt-2 border-t border-[color:var(--line)]">
+                  <span class="text-xs font-bold">TOTAL</span>
+                  <span class="mono text-sm font-extrabold">${fmtRp(res.total)}</span>
+                </div>
+                <button type="button" id="btnResultClose" class="btn-primary w-full mt-4" style="padding:12px 0;">Tutup</button>
+              </div>
+            `;
+              document.body.appendChild(resultOverlay);
+
+              document
+                .getElementById("btnResultClose")
+                .addEventListener("click", function () {
+                  if (document.getElementById("postResultOverlay")) {
+                    document.getElementById("postResultOverlay").remove();
+                  }
+                });
+
+              resultOverlay.addEventListener("click", function (e) {
+                if (e.target === resultOverlay) {
+                  if (document.getElementById("postResultOverlay")) {
+                    document.getElementById("postResultOverlay").remove();
+                  }
+                }
+              });
+            }
+
+            await loadData();
+            await loadShodaqohData(state.shodaqoh.selectedMonth);
+          } catch (err) {
+            showToast(err.message, "error");
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+          }
+        });
+    });
+  }
+
+  // ============================================================
+  // SHODAQOH MEMBER — ACTION SHEET EVENTS
+  // ============================================================
+
+  document.addEventListener("click", function (e) {
+    const memberBtn = e.target.closest("[data-shod-member]");
+    if (
+      memberBtn &&
+      !e.target.closest("button") &&
+      !e.target.closest(".tx-card-clickable")
+    ) {
+      if (state.isAdmin === true) {
+        if (typeof openShodMemberActionSheet === "function") {
+          openShodMemberActionSheet(memberBtn.dataset.shodMember);
+        }
+      } else {
+        if (typeof openShodaqohMemberDetail === "function") {
+          openShodaqohMemberDetail(memberBtn.dataset.shodMember);
+        }
+      }
+    }
+  });
+
+  if ($("btnMemberActionCancel")) {
+    $("btnMemberActionCancel").addEventListener("click", function () {
+      if (typeof closeShodMemberActionSheet === "function") {
+        closeShodMemberActionSheet();
+      }
+    });
+  }
+
+  if ($("shodMemberActionOverlay")) {
+    $("shodMemberActionOverlay").addEventListener("click", function (e) {
+      if (e.target === this) {
+        if (typeof closeShodMemberActionSheet === "function") {
+          closeShodMemberActionSheet();
+        }
+      }
+    });
+  }
+
+  if ($("btnMemberActionDetail")) {
+    $("btnMemberActionDetail").addEventListener("click", function () {
+      const memberId =
+        typeof shodMemberActionId !== "undefined" ? shodMemberActionId : null;
+      if (typeof closeShodMemberActionSheet === "function") {
+        closeShodMemberActionSheet();
+      }
+      if (memberId) {
+        setTimeout(function () {
+          if (typeof openShodaqohMemberDetail === "function") {
+            openShodaqohMemberDetail(memberId);
+          }
+        }, 200);
+      }
+    });
+  }
+
+  if ($("btnMemberActionEdit")) {
+    $("btnMemberActionEdit").addEventListener("click", function () {
+      const memberId =
+        typeof shodMemberActionId !== "undefined" ? shodMemberActionId : null;
+      if (typeof closeShodMemberActionSheet === "function") {
+        closeShodMemberActionSheet();
+      }
+      if (memberId) {
+        setTimeout(function () {
+          if (typeof openShodMemberForm === "function") {
+            openShodMemberForm(memberId);
+          }
+        }, 200);
+      }
+    });
+  }
+
+  if ($("btnMemberActionDelete")) {
+    $("btnMemberActionDelete").addEventListener("click", function () {
+      const memberId =
+        typeof shodMemberActionId !== "undefined" ? shodMemberActionId : null;
+      if (typeof closeShodMemberActionSheet === "function") {
+        closeShodMemberActionSheet();
+      }
+      if (memberId) {
+        setTimeout(function () {
+          if (typeof openShodMemberDeleteConfirm === "function") {
+            openShodMemberDeleteConfirm(memberId);
+          }
+        }, 200);
+      }
+    });
+  }
+
+  // ============================================================
+  // SHODAQOH MEMBER — FORM EVENTS
+  // ============================================================
+
+  if ($("btnAddMember")) {
+    $("btnAddMember").addEventListener("click", function () {
+      if (state.isAdmin !== true) {
+        showToast("Hanya admin yang dapat menambah anggota.", "error");
+        return;
+      }
+      if (typeof openShodMemberForm === "function") {
+        openShodMemberForm(null);
+      }
+    });
+  }
+
+  if ($("btnMemberFormCancel")) {
+    $("btnMemberFormCancel").addEventListener("click", function () {
+      if (typeof closeShodMemberForm === "function") {
+        closeShodMemberForm();
+      }
+    });
+  }
+
+  if ($("shodMemberFormOverlay")) {
+    $("shodMemberFormOverlay").addEventListener("click", function (e) {
+      if (e.target === this) {
+        if (typeof closeShodMemberForm === "function") {
+          closeShodMemberForm();
+        }
+      }
+    });
+  }
+
+  if ($("shodMemberForm")) {
+    $("shodMemberForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const memberId = this.dataset.memberId || null;
+      const nama = $("shodMemberFormName").value.trim();
+      const nominal = Number($("shodMemberFormNominal").value || 0);
+
+      const errorEl = $("shodMemberFormError");
+
+      if (!nama) {
+        errorEl.textContent = "Nama anggota wajib diisi.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+
+      if (nominal <= 0) {
+        errorEl.textContent = "Nominal bulanan harus lebih dari 0.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+
+      const session = getSession();
+      if (!session) {
+        showToast("Sesi admin berakhir, silakan login ulang.", "error");
+        return;
+      }
+
+      $("btnMemberFormSubmit").disabled = true;
+      $("btnMemberFormSubmit").textContent = "Menyimpan…";
+
+      try {
+        let res;
+        if (memberId) {
+          res = await apiPost({
+            action: "updateShodaqohMember",
+            token: session.token,
+            memberId: memberId,
+            nama: nama,
+            nominalBulanan: nominal,
+          });
+        } else {
+          res = await apiPost({
+            action: "addShodaqohMember",
+            token: session.token,
+            nama: nama,
+            nominalBulanan: nominal,
+          });
+        }
+
+        if (!res.success) throw new Error(res.message);
+
+        showToast(res.message);
+        if (typeof closeShodMemberForm === "function") {
+          closeShodMemberForm();
+        }
+        await loadShodaqohData(state.shodaqoh.selectedMonth);
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.remove("hidden");
+      } finally {
+        $("btnMemberFormSubmit").disabled = false;
+        $("btnMemberFormSubmit").textContent = "Simpan";
+      }
+    });
+  }
+
+  // ============================================================
+  // SHODAQOH MEMBER — DELETE CONFIRM
+  // ============================================================
+
+  if ($("btnDeleteMemberCancel")) {
+    $("btnDeleteMemberCancel").addEventListener("click", function () {
+      if (typeof closeShodMemberDeleteConfirm === "function") {
+        closeShodMemberDeleteConfirm();
+      }
+    });
+  }
+
+  if ($("deleteMemberConfirmOverlay")) {
+    $("deleteMemberConfirmOverlay").addEventListener("click", function (e) {
+      if (e.target === this) {
+        if (typeof closeShodMemberDeleteConfirm === "function") {
+          closeShodMemberDeleteConfirm();
+        }
+      }
+    });
+  }
+
+  if ($("btnDeleteMemberConfirm")) {
+    $("btnDeleteMemberConfirm").addEventListener("click", async function () {
+      const memberId =
+        typeof shodMemberActionId !== "undefined" ? shodMemberActionId : null;
+      if (!memberId) {
+        if (typeof closeShodMemberDeleteConfirm === "function") {
+          closeShodMemberDeleteConfirm();
+        }
+        return;
+      }
+
+      const session = getSession();
+      if (!session) {
+        showToast("Sesi admin berakhir, silakan login ulang.", "error");
+        if (typeof closeShodMemberDeleteConfirm === "function") {
+          closeShodMemberDeleteConfirm();
+        }
+        return;
+      }
+
+      $("btnDeleteMemberConfirm").disabled = true;
+      $("btnDeleteMemberConfirm").textContent = "Menghapus…";
+
+      try {
+        const res = await apiPost({
+          action: "deleteShodaqohMember",
+          token: session.token,
+          memberId: memberId,
+        });
+
+        if (!res.success) throw new Error(res.message);
+
+        showToast(res.message || "Anggota berhasil dihapus.");
+        if (typeof closeShodMemberDeleteConfirm === "function") {
+          closeShodMemberDeleteConfirm();
+        }
+        await loadShodaqohData(state.shodaqoh.selectedMonth);
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        $("btnDeleteMemberConfirm").disabled = false;
+        $("btnDeleteMemberConfirm").textContent = "Hapus";
+      }
+    });
+  }
+
+  // ============================================================
+  // DELETE TRANSACTION CONFIRM
+  // ============================================================
+
   function openDeleteConfirm() {
     const tx = state.transactions.find(
       (t) => String(t.no) === String(state.actionNo),
@@ -599,6 +1044,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ============================================================
+  // AUTH
+  // ============================================================
+
   if ($("btnTogglePassword")) {
     $("btnTogglePassword").addEventListener("click", () => {
       const pwdInput = $("authPassword");
@@ -660,6 +1109,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ============================================================
+  // GLOBAL EVENTS
+  // ============================================================
+
   document.addEventListener("click", (event) => {
     const homeDropdown = $("homeMonthDropdown");
     const historyDropdown = $("historyMonthDropdown");
@@ -683,10 +1136,23 @@ document.addEventListener("DOMContentLoaded", () => {
       $("shodaqohPaymentOverlay")?.classList.add("hidden");
       $("shodMemberDetailOverlay")?.classList.add("hidden");
       $("shodPaymentDetailOverlay")?.classList.add("hidden");
+      if (typeof closeShodMemberActionSheet === "function") {
+        closeShodMemberActionSheet();
+      }
+      if (typeof closeShodMemberDeleteConfirm === "function") {
+        closeShodMemberDeleteConfirm();
+      }
+      if (typeof closeShodMemberForm === "function") {
+        closeShodMemberForm();
+      }
       state.shodaqoh.actionNo = null;
       state.shodaqoh.editingNo = null;
     }
   });
+
+  // ============================================================
+  // INIT SESSION
+  // ============================================================
 
   const existing = getSession();
 

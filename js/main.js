@@ -1228,8 +1228,8 @@ const TAB_TITLES = {
   home: "Beranda",
   history: "Riwayat",
   recap: "Rekap Bulanan",
+  shodaqoh: "Shodaqoh Bulanan",
   profile: "Profil",
-  shodaqoh: "Shodaqoh IR",
 };
 
 function switchTab(tab) {
@@ -1371,6 +1371,7 @@ async function loadShodaqohData(monthKey) {
 
 function renderShodaqohScreen() {
   renderShodaqohDashboard();
+  renderShodaqohAllocation();
   renderShodaqohFilters();
   renderShodaqohMonitoring();
   renderShodaqohMembers();
@@ -1382,52 +1383,79 @@ function renderShodaqohDashboard() {
   const set = (id, v) => {
     if ($(id)) $(id).textContent = v;
   };
+
   set("shodTarget", fmtRp(d.target || 0));
   set("shodReceived", fmtRp(d.received || 0));
   set("shodPaidCount", String(d.paidCount || 0));
   set("shodUnpaidCount", String(d.unpaidCount || 0));
   set("shodMemberCount", String(d.memberCount || 0));
   set("shodMonthLabel", getMonthLabel(state.shodaqoh.selectedMonth));
+
+  // Warna merah jika >50% belum bayar
+  const unpaidEl = $("shodUnpaidCount");
+  const cardUnpaid = unpaidEl?.closest(".stat-chip");
+  if (cardUnpaid && d.unpaidCount > 0 && d.memberCount > 0) {
+    const percentage = (d.unpaidCount / d.memberCount) * 100;
+    if (percentage > 50) {
+      cardUnpaid.style.background = "var(--neg-soft)";
+      cardUnpaid.style.borderColor = "var(--neg)";
+      unpaidEl.style.color = "var(--neg)";
+    } else {
+      cardUnpaid.style.background = "";
+      cardUnpaid.style.borderColor = "";
+      unpaidEl.style.color = "";
+    }
+  }
+
+  // === INDIKATOR SUDAH DIPOST ===
+  const postStatus = $("shodPostStatus");
+  if (postStatus) {
+    const payments = state.shodaqoh.payments || [];
+    const allPosted =
+      payments.length > 0 &&
+      payments.every(function (p) {
+        return String(p.kas_transaction_no || "").includes("POSTED");
+      });
+    postStatus.classList.toggle("hidden", !allPosted);
+  }
 }
 
-function renderShodaqohFilters() {
-  const years = [
-    ...new Set(
-      state.shodaqoh.payments
-        .map((p) => String(p.tanggal).slice(0, 4))
-        .filter(Boolean)
-        .concat([String(state.shodaqoh.selectedMonth).slice(0, 4)]),
-    ),
-  ]
-    .sort()
-    .reverse();
+function renderShodaqohAllocation() {
+  const payments = state.shodaqoh.payments || [];
 
-  const yearSel = $("shodFilterYear");
-  const monthSel = $("shodFilterMonth");
-  const memberSel = $("shodFilterMember");
-  const statusSel = $("shodFilterStatus");
+  // Hitung total per pos
+  let totalSusulanIr = 0;
+  let totalUangSambung = 0;
+  let totalJimpitan = 0;
+  let totalSiarSiar = 0;
+  let totalSeribuan = 0;
+  let totalKafan = 0;
+  let totalUkhroMt = 0;
 
-  if (yearSel) {
-    yearSel.innerHTML = years
-      .map((y) => `<option value="${y}">${y}</option>`)
-      .join("");
-    yearSel.value = state.shodaqoh.filters.year;
-  }
-  if (monthSel) monthSel.value = state.shodaqoh.filters.month;
-  if (memberSel) {
-    memberSel.innerHTML =
-      '<option value="">Semua anggota</option>' +
-      state.shodaqoh.members
-        .map(
-          (m) =>
-            `<option value="${escapeHtml(m.member_id)}">${escapeHtml(
-              m.nama,
-            )}</option>`,
-        )
-        .join("");
-    memberSel.value = state.shodaqoh.filters.memberId || "";
-  }
-  if (statusSel) statusSel.value = state.shodaqoh.filters.status || "ALL";
+  payments.forEach(function (p) {
+    // Gunakan uang_sambung jika ada, fallback ke uang
+    const uangSambung = p.uang_sambung || p.uang || 0;
+    totalSusulanIr += Number(p.susulan_ir || 0);
+    totalUangSambung += Number(uangSambung);
+    totalJimpitan += Number(p.jimpitan || 0);
+    totalSiarSiar += Number(p.siar_siar || 0);
+    totalSeribuan += Number(p.seribuan || 0);
+    totalKafan += Number(p.kafan || 0);
+    totalUkhroMt += Number(p.ukhro_mt || 0);
+  });
+
+  const set = function (id, v) {
+    const el = $(id);
+    if (el) el.textContent = v;
+  };
+
+  set("shodTotalSusulanIr", fmtRp(totalSusulanIr));
+  set("shodTotalUangSambung", fmtRp(totalUangSambung));
+  set("shodTotalJimpitan", fmtRp(totalJimpitan));
+  set("shodTotalSiarSiar", fmtRp(totalSiarSiar));
+  set("shodTotalSeribuan", fmtRp(totalSeribuan));
+  set("shodTotalKafan", fmtRp(totalKafan));
+  set("shodTotalUkhroMt", fmtRp(totalUkhroMt));
 }
 
 function getFilteredMonitoringRows() {
@@ -1442,18 +1470,21 @@ function renderShodaqohMonitoring() {
   if (!body) return;
 
   const f = state.shodaqoh.filters;
+
+  // Filter data monitoring
   const rows = (state.shodaqoh.monitoring || []).filter(function (r) {
+    // Filter member: jika memberId kosong, tampilkan semua
     if (f.memberId && String(r.member_id) !== String(f.memberId)) return false;
+    // Filter status
     if (f.status !== "ALL" && r.status !== f.status) return false;
     return true;
   });
 
-  // Update count
   const countEl = $("shodMemberCount");
   if (countEl) countEl.textContent = rows.length + " anggota";
 
   if (rows.length === 0) {
-    body.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-xs text-[color:var(--ink-faint)]">
+    body.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-xs text-[color:var(--ink-faint)]">
       Tidak ada data sesuai filter.
     </td></tr>`;
     return;
@@ -1461,6 +1492,17 @@ function renderShodaqohMonitoring() {
 
   body.innerHTML = rows
     .map(function (r) {
+      let formattedDate = "—";
+      if (r.allocated_at) {
+        const d = new Date(r.allocated_at);
+        if (!isNaN(d.getTime())) {
+          const day = String(d.getDate()).padStart(2, "0");
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const year = d.getFullYear();
+          formattedDate = `${day}-${month}-${year}`;
+        }
+      }
+
       return `<tr class="border-t border-[color:var(--line)]">
         <td class="py-3 pr-3 font-semibold">${escapeHtml(r.nama)}</td>
         <td class="py-3 mono">${fmtRp(r.target)}</td>
@@ -1469,11 +1511,8 @@ function renderShodaqohMonitoring() {
             ${r.status}
           </span>
         </td>
-        <td class="py-3 mono text-xs">
-          ${r.payment_id ? escapeHtml(r.payment_id) : "—"}
-        </td>
         <td class="py-3 text-xs">
-          ${r.allocated_at || "—"}
+          ${formattedDate}
         </td>
       </tr>`;
     })
@@ -1483,22 +1522,18 @@ function renderShodaqohMonitoring() {
 function renderShodaqohMembers() {
   const body = $("shodMembersList");
   if (!body) return;
+
   body.innerHTML =
     (state.shodaqoh.members || [])
-      .map(
-        (m) =>
-          `<button type="button" class="tx-card w-full text-left" data-shod-member="${escapeHtml(
-            m.member_id,
-          )}">
-            <div class="flex-1">
-              <p class="tx-title">${escapeHtml(m.nama)}</p>
-              <p class="tx-meta">Nominal bulanan ${fmtRp(
-                m.nominal_bulanan,
-              )} · ${escapeHtml(m.status)}</p>
-            </div>
-            <span class="tx-chevron">›</span>
-          </button>`,
-      )
+      .map(function (m) {
+        return `<button type="button" class="tx-card w-full text-left ${state.isAdmin ? "tx-card-clickable" : ""}" data-shod-member="${escapeHtml(m.member_id)}">
+        <div class="flex-1">
+          <p class="tx-title">${escapeHtml(m.nama)}</p>
+          <p class="tx-meta">Nominal bulanan ${fmtRp(m.nominal_bulanan)} · ${escapeHtml(m.status)}</p>
+        </div>
+        <span class="tx-chevron">${state.isAdmin ? "›" : ""}</span>
+      </button>`;
+      })
       .join("") ||
     '<p class="text-xs text-[color:var(--ink-faint)]">Belum ada anggota.</p>';
 }
@@ -1537,6 +1572,82 @@ function renderPaymentHistory() {
     '<p class="py-6 text-center text-xs text-[color:var(--ink-faint)]">Belum ada pembayaran.</p>';
 }
 
+async function addShodaqohMember(nama, nominalBulanan = 200000) {
+  const session = getSession();
+  if (!session) {
+    showToast("Sesi admin berakhir, silakan login ulang.", "error");
+    return;
+  }
+
+  try {
+    const res = await apiPost({
+      action: "addShodaqohMember",
+      token: session.token,
+      nama: nama,
+      nominalBulanan: nominalBulanan,
+    });
+
+    if (!res.success) throw new Error(res.message);
+    showToast("Anggota berhasil ditambahkan.");
+    await loadShodaqohData(state.shodaqoh.selectedMonth);
+    return res;
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+// ============================================================
+// SHODAQOH MEMBER — API CALLS
+// ============================================================
+
+async function deleteShodaqohMember(memberId) {
+  const session = getSession();
+  if (!session) {
+    showToast("Sesi admin berakhir, silakan login ulang.", "error");
+    return;
+  }
+
+  try {
+    const res = await apiPost({
+      action: "deleteShodaqohMember",
+      token: session.token,
+      memberId: memberId,
+    });
+
+    if (!res.success) throw new Error(res.message);
+    showToast(res.message || "Anggota berhasil dihapus.");
+    await loadShodaqohData(state.shodaqoh.selectedMonth);
+    return res;
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function editShodaqohMember(memberId, nama, nominalBulanan) {
+  const session = getSession();
+  if (!session) {
+    showToast("Sesi admin berakhir, silakan login ulang.", "error");
+    return;
+  }
+
+  try {
+    const res = await apiPost({
+      action: "updateShodaqohMember",
+      token: session.token,
+      memberId: memberId,
+      nama: nama,
+      nominalBulanan: nominalBulanan,
+    });
+
+    if (!res.success) throw new Error(res.message);
+    showToast(res.message || "Anggota berhasil diperbarui.");
+    await loadShodaqohData(state.shodaqoh.selectedMonth);
+    return res;
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
 // ============================================================
 // SHODAQOH PAYMENT FORM — WATCHER
 // ============================================================
@@ -1565,15 +1676,29 @@ function setupShodaqohAllocationWatcher() {
       "shod_ukhro_mt",
     ].reduce((s, id) => s + Number($(id)?.value || 0), 0);
 
+    const selisih = total - alokasi;
+    const isBalanced = total > 0 && selisih === 0;
+
     const statusEl = $("shodAllocationStatus");
     if (statusEl) {
-      const isBalanced = total > 0 && alokasi === total;
-      statusEl.textContent = isBalanced ? "✅ SEIMBANG" : "❌ BELUM SEIMBANG";
-      statusEl.style.color = isBalanced ? "var(--pos)" : "var(--neg)";
+      if (total === 0) {
+        statusEl.textContent = "💡 Masukkan total pembayaran";
+        statusEl.style.color = "var(--ink-soft)";
+      } else if (isBalanced) {
+        statusEl.textContent = "✅ SEIMBANG (Rp0)";
+        statusEl.style.color = "var(--pos)";
+      } else if (selisih > 0) {
+        statusEl.textContent = "❌ Kurang Rp" + selisih.toLocaleString("id-ID");
+        statusEl.style.color = "var(--neg)";
+      } else {
+        statusEl.textContent =
+          "❌ Kelebihan Rp" + Math.abs(selisih).toLocaleString("id-ID");
+        statusEl.style.color = "var(--neg)";
+      }
     }
 
     const btn = $("btnSubmitShodaqohPayment");
-    if (btn) btn.disabled = !(total > 0 && alokasi === total);
+    if (btn) btn.disabled = !(total > 0 && isBalanced);
   };
 
   fields.forEach((id) => {
@@ -1670,6 +1795,115 @@ function openShodaqohPaymentForm(payment) {
 function closeShodaqohPaymentForm() {
   state.shodaqoh.selectedPaymentId = null;
   $("shodaqohPaymentOverlay")?.classList.add("hidden");
+}
+
+// main.js — TAMBAHKAN DI BAGIAN SHODAQOH (setelah closeShodaqohPaymentForm)
+
+// ============================================================
+// SHODAQOH MEMBER — ACTION SHEET
+// ============================================================
+
+let shodMemberActionId = null;
+
+function openShodMemberActionSheet(memberId) {
+  if (!state.shodaqoh.members) return;
+
+  const member = state.shodaqoh.members.find(function (m) {
+    return String(m.member_id) === String(memberId);
+  });
+  if (!member) return;
+
+  shodMemberActionId = memberId;
+
+  if ($("shodMemberActionTitle")) {
+    $("shodMemberActionTitle").textContent = member.nama;
+  }
+  if ($("shodMemberActionSubtitle")) {
+    $("shodMemberActionSubtitle").textContent =
+      "Nominal bulanan " + fmtRp(member.nominal_bulanan);
+  }
+
+  $("shodMemberActionOverlay")?.classList.remove("hidden");
+}
+
+function closeShodMemberActionSheet() {
+  $("shodMemberActionOverlay")?.classList.add("hidden");
+  shodMemberActionId = null;
+}
+
+// ============================================================
+// SHODAQOH MEMBER — ADD / EDIT FORM
+// ============================================================
+
+function openShodMemberForm(memberId) {
+  const isEdit = memberId !== null && memberId !== undefined;
+  const member =
+    isEdit && state.shodaqoh.members
+      ? state.shodaqoh.members.find(function (m) {
+          return String(m.member_id) === String(memberId);
+        })
+      : null;
+
+  if ($("shodMemberFormTitle")) {
+    $("shodMemberFormTitle").textContent = isEdit
+      ? "Edit Anggota"
+      : "Tambah Anggota";
+  }
+  if ($("shodMemberFormSubtitle")) {
+    $("shodMemberFormSubtitle").textContent = isEdit
+      ? "Ubah nominal bulanan anggota."
+      : "Masukkan data anggota baru.";
+  }
+
+  const nameInput = $("shodMemberFormName");
+  const nominalInput = $("shodMemberFormNominal");
+  const errorEl = $("shodMemberFormError");
+
+  if (nameInput) nameInput.value = isEdit ? member.nama : "";
+  if (nominalInput) nominalInput.value = isEdit ? member.nominal_bulanan : "";
+  if (errorEl) errorEl.classList.add("hidden");
+
+  const form = $("shodMemberForm");
+  if (form) form.dataset.memberId = isEdit ? memberId : "";
+
+  $("shodMemberFormOverlay")?.classList.remove("hidden");
+}
+
+function closeShodMemberForm() {
+  $("shodMemberFormOverlay")?.classList.add("hidden");
+  const form = $("shodMemberForm");
+  if (form) form.reset();
+  const errorEl = $("shodMemberFormError");
+  if (errorEl) errorEl.classList.add("hidden");
+}
+
+// ============================================================
+// SHODAQOH MEMBER — DELETE
+// ============================================================
+
+function openShodMemberDeleteConfirm(memberId) {
+  if (!state.shodaqoh.members) return;
+
+  const member = state.shodaqoh.members.find(function (m) {
+    return String(m.member_id) === String(memberId);
+  });
+  if (!member) return;
+
+  shodMemberActionId = memberId;
+
+  if ($("deleteMemberConfirmDesc")) {
+    $("deleteMemberConfirmDesc").innerHTML =
+      "Anggota <b>" +
+      escapeHtml(member.nama) +
+      "</b> akan dihapus permanen. Pembayaran yang sudah tercatat tetap tersimpan.";
+  }
+
+  $("deleteMemberConfirmOverlay")?.classList.remove("hidden");
+}
+
+function closeShodMemberDeleteConfirm() {
+  $("deleteMemberConfirmOverlay")?.classList.add("hidden");
+  shodMemberActionId = null;
 }
 
 // ============================================================
@@ -1792,3 +2026,181 @@ async function apiGetShodaqohPaymentDetail(paymentId) {
     paymentId: paymentId,
   });
 }
+
+function renderShodaqohFilters() {
+  const months = [
+    { value: "", label: "Semua" },
+    { value: "01", label: "Januari" },
+    { value: "02", label: "Februari" },
+    { value: "03", label: "Maret" },
+    { value: "04", label: "April" },
+    { value: "05", label: "Mei" },
+    { value: "06", label: "Juni" },
+    { value: "07", label: "Juli" },
+    { value: "08", label: "Agustus" },
+    { value: "09", label: "September" },
+    { value: "10", label: "Oktober" },
+    { value: "11", label: "November" },
+    { value: "12", label: "Desember" },
+  ];
+
+  const statuses = [
+    { value: "ALL", label: "Semua" },
+    { value: "LUNAS", label: "Lunas" },
+    { value: "BELUM", label: "Belum" },
+  ];
+
+  // Years
+  const years = [
+    ...new Set(
+      state.shodaqoh.payments
+        .map((p) => String(p.tanggal).slice(0, 4))
+        .filter(Boolean)
+        .concat([String(state.shodaqoh.selectedMonth).slice(0, 4)]),
+    ),
+  ]
+    .sort()
+    .reverse();
+
+  // Members — format untuk dropdown dengan nama panjang
+  const members = [
+    { value: "", label: "Semua" },
+    ...(state.shodaqoh.members || []).map(function (m) {
+      return { value: m.member_id, label: m.nama };
+    }),
+  ];
+
+  renderFilterDropdown("shodYear", years, state.shodaqoh.filters.year || "");
+  renderFilterDropdown("shodMonth", months, state.shodaqoh.filters.month || "");
+  renderFilterDropdown(
+    "shodMember",
+    members,
+    state.shodaqoh.filters.memberId || "",
+  );
+  renderFilterDropdown(
+    "shodStatus",
+    statuses,
+    state.shodaqoh.filters.status || "ALL",
+  );
+}
+
+function renderFilterDropdown(prefix, items, selectedValue) {
+  const menu = $(prefix + "DropdownMenu");
+  const value = $(prefix + "DropdownValue");
+  const trigger = $(prefix + "DropdownTrigger");
+
+  if (!menu || !value) return;
+
+  // Update value text
+  if (Array.isArray(items) && items.length > 0) {
+    const selectedItem = items.find(function (item) {
+      // Perbaiki: bandingkan dengan benar untuk nilai kosong
+      const itemVal = item.value !== undefined ? item.value : item;
+      return String(itemVal) === String(selectedValue);
+    });
+    if (selectedItem) {
+      value.textContent =
+        selectedItem.label || selectedItem.nama || selectedItem;
+    } else {
+      value.textContent = "Semua";
+    }
+  }
+
+  // Build menu
+  menu.innerHTML = items
+    .map(function (item) {
+      const val = item.value !== undefined ? item.value : item;
+      const label = item.label || item.nama || item;
+      const isSelected = String(val) === String(selectedValue);
+      return `<button type="button"
+        class="filter-dropdown-option ${isSelected ? "active" : ""}"
+        data-value="${val}"
+        role="option"
+        aria-selected="${isSelected}">
+        <span>${label}</span>
+      </button>`;
+    })
+    .join("");
+
+  // Event: toggle dropdown
+  trigger.onclick = function (event) {
+    event.stopPropagation();
+    const dropdown = $(prefix + "Dropdown");
+    const isOpen = dropdown.classList.contains("open");
+    document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
+      if (el.id !== dropdown.id) {
+        el.classList.remove("open");
+        el.querySelector(".filter-dropdown-trigger")?.setAttribute(
+          "aria-expanded",
+          "false",
+        );
+      }
+    });
+    dropdown.classList.toggle("open");
+    dropdown
+      .querySelector(".filter-dropdown-trigger")
+      ?.setAttribute("aria-expanded", String(!isOpen));
+  };
+
+  // Event: select option
+  menu.querySelectorAll(".filter-dropdown-option").forEach(function (option) {
+    option.onclick = function (event) {
+      event.stopPropagation();
+      const val = this.dataset.value;
+      const label = this.textContent.trim();
+      const dropdown = $(prefix + "Dropdown");
+      dropdown.classList.remove("open");
+      dropdown
+        .querySelector(".filter-dropdown-trigger")
+        ?.setAttribute("aria-expanded", "false");
+
+      // Update state berdasarkan prefix
+      const filterKey = prefix.replace("shod", "").toLowerCase();
+
+      if (filterKey === "year") {
+        state.shodaqoh.filters.year = val || "";
+        value.textContent = label || "Semua";
+        renderPaymentHistory();
+      } else if (filterKey === "month") {
+        state.shodaqoh.filters.month = val || "";
+        value.textContent = label || "Semua";
+        const p =
+          state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month;
+        if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
+          loadShodaqohData(p);
+        } else {
+          loadShodaqohData("");
+        }
+      } else if (filterKey === "member") {
+        // PERBAIKI: Simpan nilai kosong sebagai "" (bukan "Semua")
+        state.shodaqoh.filters.memberId = val || "";
+        value.textContent = label || "Semua";
+        // Refresh monitoring dan payment history
+        renderShodaqohMonitoring();
+        renderPaymentHistory();
+      } else if (filterKey === "status") {
+        state.shodaqoh.filters.status = val || "ALL";
+        value.textContent = label || "Semua";
+        renderShodaqohMonitoring();
+      }
+
+      // Update active state
+      menu.querySelectorAll(".filter-dropdown-option").forEach(function (el) {
+        el.classList.toggle("active", el.dataset.value === val);
+        el.setAttribute("aria-selected", el.dataset.value === val);
+      });
+    };
+  });
+}
+document.addEventListener("click", function (event) {
+  document
+    .querySelectorAll(".filter-dropdown.open")
+    .forEach(function (dropdown) {
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove("open");
+        dropdown
+          .querySelector(".filter-dropdown-trigger")
+          ?.setAttribute("aria-expanded", "false");
+      }
+    });
+});
