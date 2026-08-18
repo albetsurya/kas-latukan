@@ -534,14 +534,6 @@ document.addEventListener("DOMContentLoaded", () => {
     console.warn("5. ⚠️ setupShodUpload TIDAK ditemukan!");
   }
 
-  if ($("shodUploadExtract")) {
-    $("shodUploadExtract").addEventListener("click", function () {
-      if (typeof extractDataFromImage === "function") {
-        extractDataFromImage();
-      }
-    });
-  }
-
   if ($("shodUploadClear")) {
     $("shodUploadClear").addEventListener("click", function () {
       if (typeof clearShodUpload === "function") {

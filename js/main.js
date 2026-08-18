@@ -2452,45 +2452,89 @@ function setupShodUpload() {
   const clearBtn = document.getElementById("shodUploadClear");
   const extractBtn = document.getElementById("shodUploadExtract");
   const ocrResult = document.getElementById("shodOcrResult");
-  const ocrData = document.getElementById("shodOcrData");
 
   if (!uploadInput) return;
 
-  // Upload handler
-  uploadInput.addEventListener("change", function (e) {
-    const file = this.files[0];
-    if (!file) return;
-
-    // Tampilkan nama file
-    if (fileName) fileName.textContent = file.name;
-
-    // Tampilkan preview
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      if (previewImg) {
-        previewImg.src = event.target.result;
-        previewImg.style.display = "block";
-      }
-      if (previewDiv) previewDiv.classList.remove("hidden");
-      if (ocrResult) ocrResult.classList.add("hidden");
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // Clear handler
-  if (clearBtn) {
-    clearBtn.addEventListener("click", function () {
-      clearShodUpload();
-    });
+  // Jangan pasang event listener dua kali
+  if (uploadInput.dataset.shodUploadInitialized === "1") {
+    return;
   }
 
-  // Extract handler — ISI FORM OTOMATIS
-  if (extractBtn) {
-    extractBtn.addEventListener("click", function () {
-      if (typeof extractDataFromImage === "function") {
-        extractDataFromImage();
+  uploadInput.dataset.shodUploadInitialized = "1";
+
+  uploadInput.addEventListener("change", async function () {
+    const file = this.files?.[0];
+
+    if (!file) return;
+
+    // Validasi file
+    if (!file.type.startsWith("image/")) {
+      showToast("File yang dipilih bukan foto.", "error");
+      this.value = "";
+      return;
+    }
+
+    // Maksimal 12 MB
+    if (file.size > 12 * 1024 * 1024) {
+      showToast("Ukuran foto maksimal 12 MB.", "error");
+      this.value = "";
+      return;
+    }
+
+    try {
+      // Simpan file
+      window.shodUploadedImage = {
+        file: file,
+        dataUrl: "",
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      };
+
+      if (fileName) {
+        fileName.textContent = file.name;
       }
-    });
+
+      // Baca file untuk OCR
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        const dataUrl = event.target.result;
+
+        window.shodUploadedImage.dataUrl = dataUrl;
+
+        // Preview
+        if (previewImg) {
+          previewImg.src = dataUrl;
+          previewImg.style.display = "block";
+        }
+
+        if (previewDiv) {
+          previewDiv.classList.remove("hidden");
+        }
+
+        if (ocrResult) {
+          ocrResult.classList.add("hidden");
+        }
+      };
+
+      reader.onerror = function () {
+        showToast("Foto gagal dibaca.", "error");
+      };
+
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Upload foto gagal:", err);
+      showToast("Foto gagal diproses.", "error");
+    }
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", clearShodUpload);
+  }
+
+  if (extractBtn) {
+    extractBtn.addEventListener("click", extractDataFromImage);
   }
 }
 
@@ -2502,209 +2546,830 @@ function clearShodUpload() {
   const ocrResult = document.getElementById("shodOcrResult");
   const ocrData = document.getElementById("shodOcrData");
 
-  if (uploadInput) uploadInput.value = "";
-  if (fileName) fileName.textContent = "Pilih foto rekap";
-  if (previewDiv) previewDiv.classList.add("hidden");
-  if (previewImg) previewImg.src = "";
-  if (ocrResult) ocrResult.classList.add("hidden");
-  if (ocrData) ocrData.innerHTML = "";
+  // Hapus data foto
+  window.shodUploadedImage = null;
+
+  if (uploadInput) {
+    uploadInput.value = "";
+  }
+
+  if (fileName) {
+    fileName.textContent = "Pilih foto rekap";
+  }
+
+  if (previewDiv) {
+    previewDiv.classList.add("hidden");
+  }
+
+  if (previewImg) {
+    previewImg.removeAttribute("src");
+  }
+
+  if (ocrResult) {
+    ocrResult.classList.add("hidden");
+  }
+
+  if (ocrData) {
+    ocrData.innerHTML = "";
+  }
 
   // Reset form
   const form = document.getElementById("shodaqohPaymentForm");
-  if (form) form.reset();
 
-  // Reset alokasi status
+  if (form) {
+    form.reset();
+  }
+
+  // Reset status alokasi
   const statusText = document.getElementById("shodAllocationText");
   const statusIcon = document.getElementById("shodAllocationIcon");
-  if (statusText) statusText.textContent = "BELUM SEIMBANG";
+
+  if (statusText) {
+    statusText.textContent = "BELUM SEIMBANG";
+  }
+
   if (statusIcon) {
-    statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
+    statusIcon.innerHTML = `
+      <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />`;
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    `;
+
     statusIcon.style.color = "var(--ink-soft)";
   }
 
-  // Enable submit
   const submitBtn = document.getElementById("btnSubmitShodaqohPayment");
-  if (submitBtn) submitBtn.disabled = true;
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+  }
 }
 
-function extractDataFromImage() {
-  // ===== SIMULASI OCR — DI SINI NANTI DIHUBUNGKAN KE API OCR =====
+async function extractDataFromImage() {
   const ocrResult = document.getElementById("shodOcrResult");
   const ocrData = document.getElementById("shodOcrData");
 
-  // Tampilkan loading
+  if (!window.shodUploadedImage || !window.shodUploadedImage.dataUrl) {
+    showToast("Pilih foto rekap terlebih dahulu.", "error");
+    return;
+  }
+
+  const memberInput = document.getElementById("shodPaymentMember");
+
+  if (!memberInput || !memberInput.value) {
+    showToast("Pilih anggota terlebih dahulu.", "error");
+    return;
+  }
+
+  const dateInput = document.getElementById("shodPaymentDate");
+
+  if (!dateInput || !dateInput.value) {
+    showToast("Pilih tanggal pembayaran terlebih dahulu.", "error");
+    return;
+  }
+
+  if (ocrResult) {
+    ocrResult.classList.remove("hidden");
+    ocrResult.style.display = "";
+  }
+
   if (ocrData) {
     ocrData.innerHTML = `
-      <div class="flex items-center justify-center py-4">
-        <span style="display:inline-block;width:16px;height:16px;border:2px solid var(--brand);border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;"></span>
-        Menganalisis foto...
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          padding:18px 12px;
+          text-align:center;
+        "
+      >
+        <span
+          style="
+            display:inline-block;
+            width:16px;
+            height:16px;
+            border:2px solid var(--brand);
+            border-right-color:transparent;
+            border-radius:50%;
+            animation:spin .6s linear infinite;
+            flex:none;
+          "
+        ></span>
+
+        <span style="font-size:12px;">
+          Menganalisis foto dengan AI...
+        </span>
       </div>
     `;
   }
-  if (ocrResult) ocrResult.classList.remove("hidden");
 
-  // ===== SIMULASI DELAY OCR =====
-  setTimeout(function () {
-    // Data hasil OCR (simulasi)
-    const ocrDataResult = {
-      nama: "Bp. H. Budi dan Istri",
-      total: 400000,
-      susulan_ir: 210000,
-      uang_sambung: 115000,
-      jimpitan: 25000,
-      siar_siar: 15000,
-      seribuan: 10000,
-      kafan: 15000,
-      ukhro_mt: 10000,
-      susulan_bulan: ["2026-01", "2026-02"],
-      keterangan: "Pembayaran Jan-Feb 2026",
+  try {
+    const dataUrl = window.shodUploadedImage.dataUrl;
+
+    if (!dataUrl || typeof dataUrl !== "string") {
+      throw new Error("Data foto tidak valid.");
+    }
+
+    console.log("MENGIRIM FOTO KE GEMINI...");
+
+    const aiResult = await callShodaqohAI(dataUrl);
+
+    console.log("RESPONSE AI SHODAQOH:", aiResult);
+
+    if (!aiResult || aiResult.success !== true) {
+      throw new Error(aiResult?.message || "AI gagal membaca foto.");
+    }
+
+    const parsed =
+      aiResult.data && typeof aiResult.data === "object" ? aiResult.data : {};
+
+    console.log("DATA SHODAQOH AI:", parsed);
+
+    const aiData = {
+      total: Number(parsed.total) || 0,
+
+      susulan_ir: Number(parsed.susulan_ir) || 0,
+
+      susulan_bulan: Array.isArray(parsed.susulan_bulan)
+        ? parsed.susulan_bulan
+        : [],
+
+      uang_sambung: Number(parsed.uang_sambung) || 0,
+
+      jimpitan: Number(parsed.jimpitan) || 0,
+
+      siar_siar: Number(parsed.siar_siar) || 0,
+
+      seribuan: Number(parsed.seribuan) || 0,
+
+      kafan: Number(parsed.kafan) || 0,
+
+      ukhro_mt: Number(parsed.ukhro_mt) || 0,
+
+      keterangan: parsed.keterangan || "",
+
+      rawText: parsed.rawText || aiResult.rawText || "",
     };
 
-    // Tampilkan hasil OCR
+    window.shodAiExtractedData = aiData;
+
+    renderShodaqohAiSusulanBulan(aiData.susulan_bulan);
+
+    console.log("DATA AI DISIMPAN:", window.shodAiExtractedData);
+
+    const total = aiData.total;
+    const susulanIr = aiData.susulan_ir;
+    const uangSambung = aiData.uang_sambung;
+    const jimpitan = aiData.jimpitan;
+    const siarSiar = aiData.siar_siar;
+    const seribuan = aiData.seribuan;
+    const kafan = aiData.kafan;
+    const ukhroMt = aiData.ukhro_mt;
+    const text = aiData.rawText;
+
+    if (ocrResult) {
+      ocrResult.classList.remove("hidden");
+      ocrResult.style.display = "";
+    }
+
     if (ocrData) {
       ocrData.innerHTML = `
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Anggota</span>
-          <span class="text-[11px] font-medium">${escapeHtml(ocrDataResult.nama)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Total</span>
-          <span class="text-[11px] font-mono font-bold">${fmtRp(ocrDataResult.total)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Infak IR</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.susulan_ir)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Uang Sambung</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.uang_sambung)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Jimpitan</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.jimpitan)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Siar-siar</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.siar_siar)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Seribuan</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.seribuan)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Kafan</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.kafan)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Ukhro MT</span>
-          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.ukhro_mt)}</span>
-        </div>
-        <div class="flex items-center justify-between py-1.5">
-          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Status</span>
-          <span class="text-[11px] font-medium" style="color:var(--pos);">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:4px;">
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
-            Data siap diinput
-          </span>
+    <div
+      style="
+        display:flex;
+        flex-direction:column;
+        gap:0;
+      "
+    >
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:10px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span
+          style="
+            font-size:12px;
+            font-weight:600;
+          "
+        >
+          Total
+        </span>
+
+        <b
+          class="mono"
+          style="font-size:13px;"
+        >
+          ${fmtRp(total)}
+        </b>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span class="text-xs">
+          Infak IR / Persenan
+        </span>
+
+        <span class="mono">
+          ${fmtRp(susulanIr)}
+        </span>
+      </div>
+
+      ${
+        susulanIr > 0
+          ? `
+            <div
+              style="
+                margin:10px 0 4px;
+                padding:11px;
+                border:1px solid var(--border);
+                border-radius:9px;
+                background:var(--surface-2);
+              "
+            >
+              <div
+                style="
+                  display:flex;
+                  align-items:center;
+                  justify-content:space-between;
+                  gap:8px;
+                  margin-bottom:9px;
+                "
+              >
+                <span
+                  style="
+                    font-size:11px;
+                    font-weight:700;
+                    color:var(--ink);
+                  "
+                >
+                  Bulan Susulan IR
+                </span>
+
+                <span
+                  style="
+                    font-size:9px;
+                    color:var(--muted);
+                  "
+                >
+                  Pilih bulan
+                </span>
+              </div>
+
+              <div
+                id="shodAiSusulanBulan"
+                style="
+                  display:grid;
+                  grid-template-columns:repeat(3,minmax(0,1fr));
+                  gap:6px;
+                "
+              ></div>
+
+              <div
+                style="
+                  margin-top:7px;
+                  font-size:9px;
+                  line-height:1.4;
+                  color:var(--muted);
+                "
+              >
+                Pilih minimal satu bulan jika terdapat Infak IR / Persenan.
+              </div>
+            </div>
+          `
+          : ""
+      }
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span class="text-xs">
+          Uang Sambung
+        </span>
+
+        <span class="mono">
+          ${fmtRp(uangSambung)}
+        </span>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span class="text-xs">
+          Jimpitan
+        </span>
+
+        <span class="mono">
+          ${fmtRp(jimpitan)}
+        </span>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span class="text-xs">
+          Siar-Siar
+        </span>
+
+        <span class="mono">
+          ${fmtRp(siarSiar)}
+        </span>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span class="text-xs">
+          Seribuan
+        </span>
+
+        <span class="mono">
+          ${fmtRp(seribuan)}
+        </span>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+          border-bottom:1px solid var(--border);
+        "
+      >
+        <span class="text-xs">
+          Kafan
+        </span>
+
+        <span class="mono">
+          ${fmtRp(kafan)}
+        </span>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:9px 0;
+        "
+      >
+        <span class="text-xs">
+          Ukhro MT
+        </span>
+
+        <span class="mono">
+          ${fmtRp(ukhroMt)}
+        </span>
+      </div>
+
+    </div>
+
+    ${
+      text
+        ? `
+          <details
+            style="
+              margin-top:14px;
+            "
+          >
+            <summary
+              style="
+                font-size:11px;
+                cursor:pointer;
+                user-select:none;
+              "
+            >
+              Lihat hasil pembacaan AI
+            </summary>
+
+            <pre
+              style="
+                font-size:10px;
+                line-height:1.5;
+                white-space:pre-wrap;
+                word-break:break-word;
+                margin-top:8px;
+                padding:8px;
+                border-radius:8px;
+                background:var(--surface-2);
+                overflow:auto;
+                max-height:240px;
+              "
+            >${escapeHtml(text)}</pre>
+          </details>
+        `
+        : ""
+    }
+
+    <div
+      style="
+        margin-top:16px;
+        padding-top:12px;
+        border-top:1px solid var(--border);
+      "
+    >
+
+      <button
+        type="button"
+        id="btnSubmitShodaqohAI"
+        class="btn btn-primary w-full"
+        style="
+          min-height:40px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          font-size:12px;
+          font-weight:600;
+        "
+      >
+        Kirim Data Shodaqoh
+      </button>
+
+      <div
+        style="
+          margin-top:7px;
+          font-size:10px;
+          color:var(--muted);
+          text-align:center;
+          line-height:1.4;
+        "
+      >
+        Pastikan nama anggota, tanggal pembayaran, dan bulan Susulan IR sudah benar.
+      </div>
+
+    </div>
+  `;
+
+      ocrData.style.display = "";
+
+      if (susulanIr > 0) {
+        renderShodaqohAiSusulanBulan(
+          Array.isArray(aiData.susulan_bulan) ? aiData.susulan_bulan : [],
+        );
+      }
+
+      const submitAiBtn = document.getElementById("btnSubmitShodaqohAI");
+
+      if (submitAiBtn) {
+        submitAiBtn.addEventListener("click", submitShodaqohAI);
+      }
+    }
+
+    console.log("EKSTRAKSI SHODAQOH SELESAI:", aiData);
+
+    showToast(
+      "Data berhasil diekstrak. Periksa hasil sebelum mengirim.",
+      "success",
+    );
+  } catch (err) {
+    console.error("Ekstraksi AI gagal:", err);
+
+    window.shodAiExtractedData = null;
+
+    const rawError = err?.message || "";
+
+    let errorMessage = "Foto tidak dapat dibaca oleh AI.";
+
+    if (
+      rawError.includes("429") ||
+      rawError.toLowerCase().includes("rate limit") ||
+      rawError.toLowerCase().includes("quota")
+    ) {
+      errorMessage =
+        "AI sedang mencapai batas penggunaan. Silakan tunggu beberapa saat lalu coba lagi.";
+    } else if (rawError) {
+      errorMessage = rawError;
+    }
+
+    showToast(errorMessage, "error");
+
+    if (ocrResult) {
+      ocrResult.classList.remove("hidden");
+      ocrResult.style.display = "";
+    }
+
+    if (ocrData) {
+      ocrData.innerHTML = `
+        <div
+          style="
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            padding:18px 12px 16px;
+            text-align:center;
+          "
+        >
+
+          <div
+            style="
+              width:38px;
+              height:38px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              border-radius:50%;
+              background:rgba(234,179,8,.12);
+              color:var(--gold);
+              margin-bottom:10px;
+              font-size:19px;
+              font-weight:700;
+            "
+          >
+            ↻
+          </div>
+
+          <div
+            style="
+              font-size:13px;
+              font-weight:600;
+              line-height:1.4;
+              margin-bottom:5px;
+            "
+          >
+            Gagal membaca foto
+          </div>
+
+          <button
+            type="button"
+            id="btnRegenerateShodaqohAI"
+            class="btn w-full"
+            style="
+              width:100%;
+              min-height:40px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              gap:8px;
+              background:var(--gold);
+              color:#fff;
+              border:1px solid var(--gold);
+              border-radius:8px;
+              font-size:12px;
+              font-weight:600;
+              line-height:1;
+              cursor:pointer;
+              transition:
+                opacity .15s ease,
+                transform .15s ease,
+                filter .15s ease;
+            "
+          >
+            <span
+              style="
+                font-size:14px;
+                line-height:1;
+              "
+            >
+              ↻
+            </span>
+
+            <span>
+              Generate Ulang
+            </span>
+          </button>
+
         </div>
       `;
-    }
 
-    // ===== ISI FORM OTOMATIS =====
-    // 1. Pilih anggota berdasarkan nama (cocokkan dengan daftar anggota)
-    const members = state.shodaqoh.members || [];
-    let matchedMember = null;
-    for (let i = 0; i < members.length; i++) {
-      const m = members[i];
-      const namaLower = m.nama.toLowerCase();
-      const ocrNamaLower = ocrDataResult.nama.toLowerCase();
-      // Cek jika nama OCR mengandung sebagian dari nama anggota
-      if (
-        namaLower.includes(ocrNamaLower) ||
-        ocrNamaLower.includes(namaLower)
-      ) {
-        matchedMember = m;
-        break;
+      ocrData.style.display = "";
+
+      const regenerateBtn = document.getElementById("btnRegenerateShodaqohAI");
+
+      if (regenerateBtn) {
+        regenerateBtn.addEventListener("click", async function () {
+          if (regenerateBtn.disabled) {
+            return;
+          }
+
+          regenerateBtn.disabled = true;
+
+          regenerateBtn.style.opacity = "0.7";
+          regenerateBtn.style.cursor = "wait";
+
+          regenerateBtn.innerHTML = `
+              <span
+                style="
+                  display:inline-block;
+                  width:13px;
+                  height:13px;
+                  border:2px solid rgba(255,255,255,.45);
+                  border-top-color:#fff;
+                  border-radius:50%;
+                  animation:spin .6s linear infinite;
+                "
+              ></span>
+
+              <span>
+                Mencoba lagi...
+              </span>
+            `;
+
+          await extractDataFromImage();
+        });
       }
     }
+  }
+}
 
-    if (matchedMember) {
-      // Pilih anggota di dropdown
-      const memberValue = document.getElementById("shodPaymentMemberValue");
-      const memberHidden = document.getElementById("shodPaymentMember");
-      if (memberValue) memberValue.textContent = matchedMember.nama;
-      if (memberHidden) memberHidden.value = matchedMember.member_id;
+async function submitShodaqohAI() {
+  const data = window.shodAiExtractedData;
 
-      // Update tombol load last nominals
-      if (typeof updateLoadLastNominalsButton === "function") {
-        updateLoadLastNominalsButton();
-      }
+  if (!data) {
+    showToast("Belum ada hasil ekstraksi AI.", "error");
+    return;
+  }
+
+  const session = getSession();
+
+  if (!session) {
+    showToast("Sesi admin berakhir, silakan login ulang.", "error");
+    return;
+  }
+
+  const memberId = document.getElementById("shodPaymentMember")?.value || "";
+  const tanggal = document.getElementById("shodPaymentDate")?.value || "";
+
+  if (!memberId) {
+    showToast("Pilih anggota terlebih dahulu.", "error");
+    return;
+  }
+
+  if (!tanggal) {
+    showToast("Pilih tanggal pembayaran terlebih dahulu.", "error");
+    return;
+  }
+
+  const susulanBulan = [
+    ...document.querySelectorAll(
+      '#shodAiSusulanBulan input[type="checkbox"]:checked',
+    ),
+  ].map((el) => el.value);
+
+  console.log(susulanBulan, "susulanBulan");
+
+  if (Number(data.susulan_ir || 0) > 0 && susulanBulan.length === 0) {
+    showToast("Pilih minimal satu bulan untuk Susulan IR.", "error");
+    return;
+  }
+
+  const payload = {
+    action: state.shodaqoh.selectedPaymentId
+      ? "updateShodaqohPayment"
+      : "createShodaqohPayment",
+
+    token: session.token,
+
+    paymentId: state.shodaqoh.selectedPaymentId || "",
+
+    memberId: memberId,
+
+    tanggalPembayaran: tanggal,
+
+    total: Number(data.total) || 0,
+
+    susulan_ir: Number(data.susulan_ir) || 0,
+
+    susulan_bulan: susulanBulan,
+
+    uang_sambung: Number(data.uang_sambung) || 0,
+
+    jimpitan: Number(data.jimpitan) || 0,
+
+    siar_siar: Number(data.siar_siar) || 0,
+
+    seribuan: Number(data.seribuan) || 0,
+
+    kafan: Number(data.kafan) || 0,
+
+    ukhro_mt: Number(data.ukhro_mt) || 0,
+
+    keterangan:
+      data.keterangan ||
+      document.getElementById("shodPaymentNote")?.value ||
+      "",
+  };
+
+  console.log("SUBMIT SHODAQOH AI:", {
+    memberId,
+    tanggal,
+    data,
+  });
+
+  console.log("SUSULAN BULAN DARI FORM:", susulanBulan);
+
+  console.log("PAYLOAD SHODAQOH AI YANG DIKIRIM:", payload);
+
+  const btn = document.getElementById("btnSubmitShodaqohAI");
+
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = "0.7";
+    btn.style.cursor = "wait";
+
+    btn.innerHTML = `
+      <span
+        style="
+          display:inline-block;
+          width:13px;
+          height:13px;
+          border:2px solid rgba(255,255,255,.45);
+          border-top-color:#fff;
+          border-radius:50%;
+          animation:spin .6s linear infinite;
+        "
+      ></span>
+      <span>Mengirim...</span>
+    `;
+  }
+
+  try {
+    showToast("Mengirim data...", "info");
+
+    const r = await apiPost(payload);
+
+    console.log("RESPONSE SUBMIT SHODAQOH AI:", r);
+
+    if (!r || r.success !== true) {
+      throw new Error(r?.message || "Gagal menyimpan data shodaqoh.");
     }
 
-    // 2. Isi total pembayaran
-    const totalInput = document.getElementById("shodPaymentAmount");
-    if (totalInput) totalInput.value = ocrDataResult.total;
+    showToast(r.message || "Data shodaqoh berhasil dikirim.", "success");
 
-    // 3. Isi alokasi
-    const fieldMap = {
-      susulan_ir: "shod_susulan_ir",
-      uang_sambung: "shod_uang_sambung",
-      jimpitan: "shod_jimpitan",
-      siar_siar: "shod_siar_siar",
-      seribuan: "shod_seribuan",
-      kafan: "shod_kafan",
-      ukhro_mt: "shod_ukhro_mt",
-    };
+    window.shodAiExtractedData = null;
 
-    Object.keys(fieldMap).forEach(function (field) {
-      const inputId = fieldMap[field];
-      const input = document.getElementById(inputId);
-      const value = ocrDataResult[field] || 0;
-      if (input) {
-        input.value = value > 0 ? value : "";
-      }
-    });
+    if (typeof closeShodaqohPaymentForm === "function") {
+      closeShodaqohPaymentForm();
+    }
 
-    // 4. Isi susulan bulan (checkbox)
     if (
-      ocrDataResult.susulan_bulan &&
-      Array.isArray(ocrDataResult.susulan_bulan)
+      typeof loadShodaqohData === "function" &&
+      state?.shodaqoh?.selectedMonth
     ) {
-      const checkboxes = document.querySelectorAll(
-        'input[name="shodSusulanBulan"]',
-      );
-      checkboxes.forEach(function (cb) {
-        cb.checked = ocrDataResult.susulan_bulan.indexOf(cb.value) !== -1;
-      });
+      await loadShodaqohData(state.shodaqoh.selectedMonth);
     }
+  } catch (err) {
+    console.error("GAGAL SUBMIT SHODAQOH AI:", err);
 
-    // 5. Isi keterangan
-    const noteInput = document.getElementById("shodPaymentNote");
-    if (noteInput && ocrDataResult.keterangan) {
-      noteInput.value = ocrDataResult.keterangan;
+    showToast(err?.message || "Gagal mengirim data shodaqoh.", "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = "";
+      btn.style.cursor = "";
+
+      btn.innerHTML = `
+        Kirim Data Shodaqoh
+      `;
     }
-
-    // 6. Trigger allocation watcher untuk update status
-    setTimeout(function () {
-      const fields = Object.values(fieldMap);
-      fields.forEach(function (id) {
-        const el = document.getElementById(id);
-        if (el) el.dispatchEvent(new Event("input", { bubbles: true }));
-      });
-      const totalEl = document.getElementById("shodPaymentAmount");
-      if (totalEl) totalEl.dispatchEvent(new Event("input", { bubbles: true }));
-    }, 100);
-
-    // 7. Pindah ke tab Manual agar form terlihat
-    if (typeof toggleShodMethod === "function") {
-      toggleShodMethod("manual");
-    }
-
-    showToast("Data berhasil diekstrak dan form terisi!", "success");
-  }, 1200); // Simulasi delay OCR
+  }
 }
 
 // ============================================================
@@ -2854,6 +3519,99 @@ function closeShodaqohPaymentForm() {
 
   // Hapus backdrop date picker jika ada
   removeDatePickerBackdrop();
+}
+
+function renderShodaqohAiSusulanBulan(selectedMonths = []) {
+  const container = document.getElementById("shodAiSusulanBulan");
+
+  if (!container) return;
+
+  const months = [
+    ["01", "Januari"],
+    ["02", "Februari"],
+    ["03", "Maret"],
+    ["04", "April"],
+    ["05", "Mei"],
+    ["06", "Juni"],
+    ["07", "Juli"],
+    ["08", "Agustus"],
+    ["09", "September"],
+    ["10", "Oktober"],
+    ["11", "November"],
+    ["12", "Desember"],
+  ];
+
+  const selected = Array.isArray(selectedMonths)
+    ? selectedMonths.map(String)
+    : [];
+
+  container.innerHTML = months
+    .map(([value, label]) => {
+      const checked = selected.includes(value);
+
+      return `
+        <label
+          style="
+            display:flex;
+            align-items:center;
+            gap:6px;
+            min-height:34px;
+            padding:6px 7px;
+            border:1px solid ${checked ? "var(--brand)" : "var(--border)"};
+            border-radius:7px;
+            background:${checked ? "var(--brand-soft)" : "var(--surface)"};
+            cursor:pointer;
+            user-select:none;
+            transition:
+              background .15s ease,
+              border-color .15s ease;
+          "
+        >
+          <input
+            type="checkbox"
+            name="shodAiSusulanBulan"
+            value="${value}"
+            ${checked ? "checked" : ""}
+            style="
+              width:14px;
+              height:14px;
+              margin:0;
+              flex:none;
+              accent-color:var(--brand);
+            "
+          >
+
+          <span
+            style="
+              font-size:10px;
+              line-height:1.2;
+              color:var(--ink-soft);
+            "
+          >
+            ${label}
+          </span>
+        </label>
+      `;
+    })
+    .join("");
+
+  container
+    .querySelectorAll('input[name="shodAiSusulanBulan"]')
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+        const label = this.closest("label");
+
+        if (!label) return;
+
+        label.style.background = this.checked
+          ? "var(--brand-soft)"
+          : "var(--surface)";
+
+        label.style.borderColor = this.checked
+          ? "var(--brand)"
+          : "var(--border)";
+      });
+    });
 }
 
 // main.js — TAMBAHKAN DI BAGIAN SHODAQOH (setelah closeShodaqohPaymentForm)
@@ -3942,25 +4700,45 @@ function selectDate(date) {
   datePickerState.currentYear = date.getFullYear();
 
   const valueDisplay = document.getElementById("shodDateDropdownValue");
+
   const hiddenInput = document.getElementById("shodPaymentDate");
+
   const manualInput = document.getElementById("shodDateManualInput");
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  const formattedManualDate = `${day}-${month}-${year}`;
 
   if (valueDisplay) {
     valueDisplay.textContent = formatDateDisplay(date);
   }
+
   if (hiddenInput) {
     hiddenInput.value = formatDateInput(date);
   }
 
   if (manualInput) {
-    manualInput.value = formattedDate;
+    manualInput.value = formattedManualDate;
   }
 
   const dropdown = document.getElementById("shodDateDropdown");
+
   closeDatePicker(dropdown);
 
   if (hiddenInput) {
-    hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
+    hiddenInput.dispatchEvent(
+      new Event("input", {
+        bubbles: true,
+      }),
+    );
+
+    hiddenInput.dispatchEvent(
+      new Event("change", {
+        bubbles: true,
+      }),
+    );
   }
 }
 
@@ -4957,4 +5735,577 @@ function renderRecapSkeleton() {
         .join("")}
     `;
   }
+}
+
+function normalizeShodOcrText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[|]/g, "i")
+    .replace(/[“”"'`]/g, "")
+    .replace(/[^a-z0-9.,\-+ ]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeOcrWord(text) {
+  return String(text || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function shodMatchField(text) {
+  const n = normalizeShodOcrText(text);
+
+  // Persenan / Infak IR / Shodaqoh IR
+  if (
+    /\bpersenan\b/.test(n) ||
+    /\bpersen\b/.test(n) ||
+    /\b(infak|infaq)\s+ir\b/.test(n) ||
+    /\b(shodaqoh|shodagoh)\s+ir\b/.test(n)
+  ) {
+    return "susulan_ir";
+  }
+
+  // Sambung / Uang Sambung / Shodaqoh Sambung
+  if (
+    /\bsambung\b/.test(n) ||
+    /\buang\s+sambung\b/.test(n) ||
+    /\buang\s+sambung\b/.test(n) ||
+    /\b(shodaqoh|shodagoh)\s+sambung\b/.test(n)
+  ) {
+    return "uang_sambung";
+  }
+
+  // Jimpitan
+  if (/\bjimpitan\b/.test(n)) {
+    return "jimpitan";
+  }
+
+  // Siar-siar
+  if (/\bsiar[\s-]*siar\b/.test(n)) {
+    return "siar_siar";
+  }
+
+  // Seribuan
+  if (/\bseribuan\b/.test(n)) {
+    return "seribuan";
+  }
+
+  // Kafan / Kf
+  if (n === "kf" || n === "kaf" || /\bkafan\b/.test(n)) {
+    return "kafan";
+  }
+
+  // MT / Ukhro MT
+  if (
+    n === "mt" ||
+    /\bmt\b/.test(n) ||
+    /\bukhro\s*mt\b/.test(n) ||
+    /\bukro\s*mt\b/.test(n)
+  ) {
+    return "ukhro_mt";
+  }
+
+  return null;
+}
+
+function shodAmountFromText(value) {
+  let s = String(value || "").trim();
+
+  // Koreksi OCR yang umum pada angka tulisan tangan
+  s = s
+    .replace(/[oO]/g, "0")
+    .replace(/[lI|]/g, "1")
+    .replace(/[sS]/g, "5")
+    .replace(/[zZ]/g, "2")
+    .replace(/[bB]/g, "8");
+
+  const matches = s.match(/\d{1,3}(?:[.,\-\s]\d{3})+|\d{4,}/g);
+
+  if (!matches || !matches.length) {
+    return 0;
+  }
+
+  const values = matches
+    .map((m) => Number(String(m).replace(/[^\d]/g, "")))
+    .filter((n) => Number.isFinite(n) && n > 0);
+
+  return values.length ? Math.max(...values) : 0;
+}
+
+function shodParseTable(text) {
+  const result = {
+    total: 0,
+    susulan_ir: 0,
+    susulan_bulan: [],
+    uang_sambung: 0,
+    jimpitan: 0,
+    siar_siar: 0,
+    seribuan: 0,
+    kafan: 0,
+    ukhro_mt: 0,
+    keterangan: "",
+    rawText: String(text || ""),
+  };
+
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (const line of lines) {
+    const normalized = normalizeShodOcrText(line);
+
+    if (!normalized) continue;
+
+    // TOTAL
+    if (/\btotal\b/.test(normalized)) {
+      const total = shodAmountFromText(line);
+
+      if (total > 0) {
+        result.total = total;
+      }
+
+      continue;
+    }
+
+    // Cari jenis shodaqoh
+    const field = shodMatchField(normalized);
+
+    if (!field) {
+      continue;
+    }
+
+    // Cari nominal pada baris yang sama
+    const amount = shodAmountFromText(line);
+
+    if (amount > 0) {
+      result[field] = amount;
+    }
+  }
+
+  // Kalau TOTAL tidak terbaca OCR,
+  // hitung dari field yang dikenali.
+  if (!result.total) {
+    result.total =
+      Number(result.susulan_ir || 0) +
+      Number(result.uang_sambung || 0) +
+      Number(result.jimpitan || 0) +
+      Number(result.siar_siar || 0) +
+      Number(result.seribuan || 0) +
+      Number(result.kafan || 0) +
+      Number(result.ukhro_mt || 0);
+  }
+
+  return result;
+}
+
+async function prepareShodOcrImage(dataUrl, rotation = 0, threshold = false) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = function () {
+      const originalW = img.naturalWidth;
+      const originalH = img.naturalHeight;
+
+      // Batasi ukuran supaya OCR tidak terlalu berat
+      const maxSide = 3000;
+      const scale = Math.min(1, maxSide / Math.max(originalW, originalH));
+
+      const w = Math.round(originalW * scale);
+      const h = Math.round(originalH * scale);
+
+      const rotated = rotation === 90 || rotation === 270;
+
+      const canvas = document.createElement("canvas");
+
+      canvas.width = rotated ? h : w;
+      canvas.height = rotated ? w : h;
+
+      const ctx = canvas.getContext("2d", {
+        willReadFrequently: true,
+      });
+
+      ctx.save();
+
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+
+      ctx.rotate((rotation * Math.PI) / 180);
+
+      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+
+      ctx.restore();
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      const pixels = imageData.data;
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        let gray =
+          0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
+
+        // Contrast
+        gray = (gray - 128) * 1.35 + 128;
+
+        gray = Math.max(0, Math.min(255, gray));
+
+        if (threshold) {
+          gray = gray > 170 ? 255 : 0;
+        }
+
+        pixels[i] = gray;
+        pixels[i + 1] = gray;
+        pixels[i + 2] = gray;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+
+      resolve(canvas.toDataURL("image/jpeg", 0.95));
+    };
+
+    img.onerror = function () {
+      reject(new Error("Gagal memproses gambar untuk OCR."));
+    };
+
+    img.src = dataUrl;
+  });
+}
+
+function scoreShodOcrResult(text) {
+  const n = normalizeShodOcrText(text);
+
+  let score = 0;
+
+  const keywords = [
+    "persenan",
+    "persen",
+    "sambung",
+    "jimpitan",
+    "siar",
+    "seribuan",
+    "kafan",
+    "kf",
+    "mt",
+    "ukhro",
+    "total",
+    "jumlah",
+    "shodaqoh",
+    "shodagoh",
+    "infak",
+    "infaq",
+  ];
+
+  keywords.forEach((keyword) => {
+    if (n.includes(keyword)) {
+      score += 10;
+    }
+  });
+
+  // Beri nilai untuk nominal
+  const numbers = n.match(/\d{3,}/g);
+
+  if (numbers) {
+    score += numbers.length * 3;
+  }
+
+  // Beri nilai jika banyak baris
+  const lines = text.split(/\r?\n/).filter((x) => x.trim());
+
+  score += Math.min(lines.length, 20);
+
+  return score;
+}
+
+async function runShodOcrMultiPass(dataUrl) {
+  if (!window.Tesseract) {
+    throw new Error("Tesseract.js belum dimuat.");
+  }
+
+  const candidates = [];
+
+  const rotations = [0, 90, 180, 270];
+
+  const thresholds = [false, true];
+
+  for (const rotation of rotations) {
+    for (const threshold of thresholds) {
+      console.log(`OCR mencoba rotasi ${rotation}°, threshold=${threshold}`);
+
+      try {
+        const processed = await prepareShodOcrImage(
+          dataUrl,
+          rotation,
+          threshold,
+        );
+
+        const result = await Tesseract.recognize(processed, "eng", {
+          logger: function (message) {
+            console.log(
+              `OCR ${rotation}°`,
+              threshold,
+              message.status,
+              message.progress,
+            );
+          },
+        });
+
+        const text = result?.data?.text || "";
+
+        const words = result?.data?.words || [];
+
+        const score = scoreShodOcrResult(text);
+
+        console.log("OCR candidate:", {
+          rotation,
+          threshold,
+          score,
+          text,
+        });
+
+        candidates.push({
+          rotation,
+          threshold,
+          score,
+          text,
+          words,
+          confidence: Number(result?.data?.confidence || 0),
+        });
+      } catch (err) {
+        console.warn("OCR candidate gagal:", rotation, threshold, err);
+      }
+    }
+  }
+
+  if (!candidates.length) {
+    throw new Error("Semua proses OCR gagal.");
+  }
+
+  // Urutkan berdasarkan:
+  // 1. keyword yang berhasil ditemukan
+  // 2. jumlah angka
+  // 3. confidence
+  candidates.sort((a, b) => {
+    if (b.score !== a.score) {
+      return b.score - a.score;
+    }
+
+    return b.confidence - a.confidence;
+  });
+
+  console.log("SEMUA HASIL OCR:", candidates);
+
+  console.log("HASIL OCR TERBAIK:", candidates[0]);
+
+  return candidates[0];
+}
+
+function detectShodField(text) {
+  const n = normalizeOcrWord(text);
+
+  if (
+    n.includes("persenan") ||
+    n.includes("persen") ||
+    n.includes("infaqir") ||
+    n.includes("infakir") ||
+    n.includes("shodaqohir") ||
+    n.includes("shodakohir")
+  ) {
+    return "susulan_ir";
+  }
+
+  if (
+    n.includes("sambung") ||
+    n.includes("uangsambung") ||
+    n.includes("shodaqohsambung") ||
+    n.includes("shodakohsambung")
+  ) {
+    return "uang_sambung";
+  }
+
+  if (n.includes("jimpitan")) {
+    return "jimpitan";
+  }
+
+  if (n.includes("siarsiar") || n.includes("siar")) {
+    return "siar_siar";
+  }
+
+  if (n.includes("seribuan")) {
+    return "seribuan";
+  }
+
+  if (n === "kf" || n === "kafan") {
+    return "kafan";
+  }
+
+  if (n === "mt" || n.includes("ukhromt") || n.includes("ukhro")) {
+    return "ukhro_mt";
+  }
+
+  return null;
+}
+
+async function extractShodaqohWithAI() {
+  if (!window.shodUploadedImage || !window.shodUploadedImage.dataUrl) {
+    showToast("Pilih foto rekap terlebih dahulu.", "error");
+    return;
+  }
+
+  const extractBtn = document.getElementById("shodUploadExtract");
+
+  const originalText = extractBtn?.innerHTML;
+
+  try {
+    if (extractBtn) {
+      extractBtn.disabled = true;
+
+      extractBtn.innerHTML = `
+        <span
+          style="
+            width:14px;
+            height:14px;
+            border:2px solid currentColor;
+            border-right-color:transparent;
+            border-radius:50%;
+            display:inline-block;
+            animation:spin .6s linear infinite;
+          "
+        ></span>
+
+        <span>Menganalisis...</span>
+      `;
+    }
+
+    const dataUrl = window.shodUploadedImage.dataUrl;
+
+    /*
+     * dataUrl:
+     * data:image/jpeg;base64,/9j/4AAQ...
+     */
+
+    const result = await callShodaqohAI(dataUrl);
+
+    console.log("HASIL AI GEMINI:", result);
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || "AI gagal membaca foto.");
+    }
+
+    const data = result.data;
+
+    console.log("DATA SHODAQOH:", data);
+
+    applyShodaqohAIResult(data);
+
+    showToast(
+      "Data berhasil dibaca AI. Silakan periksa sebelum menyimpan.",
+      "success",
+    );
+  } catch (err) {
+    console.error("Gemini OCR gagal:", err);
+
+    showToast(err.message || "Gagal membaca foto.", "error");
+  } finally {
+    if (extractBtn) {
+      extractBtn.disabled = false;
+      extractBtn.innerHTML = originalText;
+    }
+  }
+}
+
+function applyShodaqohAIResult(data) {
+  const fieldMap = {
+    total: "shodPaymentAmount",
+
+    susulan_ir: "shod_susulan_ir",
+
+    uang_sambung: "shod_uang_sambung",
+
+    jimpitan: "shod_jimpitan",
+
+    siar_siar: "shod_siar_siar",
+
+    seribuan: "shod_seribuan",
+
+    kafan: "shod_kafan",
+
+    ukhro_mt: "shod_ukhro_mt",
+  };
+
+  Object.entries(fieldMap).forEach(([key, elementId]) => {
+    const input = document.getElementById(elementId);
+
+    if (!input) {
+      console.warn("Field tidak ditemukan:", elementId);
+      return;
+    }
+
+    const value = Number(data?.[key] || 0);
+
+    input.value = value > 0 ? value : "";
+
+    input.dispatchEvent(
+      new Event("input", {
+        bubbles: true,
+      }),
+    );
+  });
+
+  /*
+   * Keterangan
+   */
+  const keterangan = document.getElementById("shodKeterangan");
+
+  if (keterangan && data?.keterangan) {
+    keterangan.value = data.keterangan;
+  }
+
+  /*
+   * Update kalkulasi/alokasi
+   */
+  const total = document.getElementById("shodPaymentAmount");
+
+  if (total) {
+    total.dispatchEvent(
+      new Event("input", {
+        bubbles: true,
+      }),
+    );
+
+    total.dispatchEvent(
+      new Event("change", {
+        bubbles: true,
+      }),
+    );
+  }
+}
+async function callShodaqohAI(dataUrl) {
+  const response = await fetch(CONFIG.WEB_APP_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8",
+    },
+    body: JSON.stringify({
+      action: "extractShodaqoh",
+      dataUrl: dataUrl,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Server error: HTTP ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  console.log("RESPONSE AI SHODAQOH:", result);
+
+  if (!result.success) {
+    throw new Error(result.message || "Gagal mengekstrak data dari foto.");
+  }
+
+  return result;
 }

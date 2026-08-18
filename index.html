@@ -1236,10 +1236,29 @@
 
                       <!-- Susulan Bulan -->
                       <div
-                        id="shodSusulanBulan"
-                        class="grid grid-cols-3 gap-2 p-2 bg-[color:var(--surface-2)] rounded-lg"
+                        style="
+                          margin-top: 6px;
+                          padding: 10px;
+                          background: var(--surface-2);
+                          border-radius: 9px;
+                          border: 1px solid var(--border);
+                        "
                       >
-                        <!-- Dynamic content akan diisi JavaScript -->
+                        <div
+                          style="
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: var(--ink-soft);
+                            margin-bottom: 8px;
+                          "
+                        >
+                          Bulan Susulan IR
+                        </div>
+
+                        <div
+                          id="shodSusulanBulan"
+                          class="grid grid-cols-3 gap-2"
+                        ></div>
                       </div>
 
                       <!-- Uang Sambung -->
@@ -1446,52 +1465,76 @@
                       class="w-full rounded-lg max-h-48 object-contain bg-[color:var(--surface-alt)]"
                     />
 
-                    <div class="flex gap-2 mt-2">
+                    <div class="flex gap-2 mt-3">
+                      <!-- Ekstrak Data -->
                       <button
                         type="button"
                         id="shodUploadExtract"
-                        class="btn-primary flex-1"
-                      >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <circle cx="11" cy="11" r="8" />
-                          <path d="m21 21-4.35-4.35" />
-                          <path d="M11 8v6M8 11h6" />
-                        </svg>
-                        Ekstrak Data
-                      </button>
-
-                      <button
-                        type="button"
-                        id="shodUploadClear"
-                        class="btn-ghost flex-1"
+                        class="btn-primary flex-1 inline-flex items-center justify-center"
                         style="
-                          padding: 8px 0;
+                          height: 38px;
+                          padding: 0 14px;
+                          gap: 8px;
+                          border-radius: 9px;
                           font-size: 12px;
-                          display: flex;
-                          align-items: center;
-                          justify-content: center;
-                          gap: 6px;
+                          font-weight: 700;
+                          line-height: 1;
+                          white-space: nowrap;
                         "
                       >
                         <svg
-                          width="14"
-                          height="14"
+                          width="16"
+                          height="16"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
                           stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                          style="flex: 0 0 16px; display: block"
                         >
-                          <path d="M18 6L6 18" />
-                          <path d="M6 6l12 12" />
+                          <circle cx="11" cy="11" r="7" />
+                          <path d="m20 20-4-4" />
+                          <path d="M11 8v6M8 11h6" />
                         </svg>
-                        Hapus
+
+                        <span>Ekstrak Data</span>
+                      </button>
+
+                      <!-- Hapus -->
+                      <button
+                        type="button"
+                        id="shodUploadClear"
+                        class="btn-ghost flex-1 inline-flex items-center justify-center"
+                        style="
+                          height: 38px;
+                          padding: 0 14px;
+                          gap: 8px;
+                          border-radius: 9px;
+                          font-size: 12px;
+                          font-weight: 700;
+                          line-height: 1;
+                          white-space: nowrap;
+                        "
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                          style="flex: 0 0 16px; display: block"
+                        >
+                          <path d="M6 6l12 12" />
+                          <path d="M18 6L6 18" />
+                        </svg>
+
+                        <span>Hapus</span>
                       </button>
                     </div>
 
@@ -2601,6 +2644,7 @@
     <!-- ===================== SCRIPTS ===================== -->
     <script src="js/session-gate.js"></script>
     <script src="js/role.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="js/main.js"></script>
     <script src="js/events.js"></script>
   </body>
