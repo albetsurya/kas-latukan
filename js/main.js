@@ -1534,7 +1534,7 @@ function enterApp() {
 
   loadData();
 
-  setInterval(() => loadData(), CONFIG.POLL_INTERVAL_MS);
+  // setInterval(() => loadData(), CONFIG.POLL_INTERVAL_MS);
 }
 
 // ---------- TRANSAKSI ----------
