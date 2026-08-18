@@ -308,6 +308,18 @@ document.addEventListener("DOMContentLoaded", () => {
     openTxActionSheet(card.dataset.no);
   });
 
+  if (document.getElementById("btnCopyShodaqohRekap")) {
+    document
+      .getElementById("btnCopyShodaqohRekap")
+      .addEventListener("click", function () {
+        if (typeof copyShodaqohRekap === "function") {
+          copyShodaqohRekap();
+        } else {
+          showToast("Fungsi belum tersedia.", "error");
+        }
+      });
+  }
+
   if ($("btnActionCancel"))
     $("btnActionCancel").addEventListener("click", closeTxActionSheet);
 
