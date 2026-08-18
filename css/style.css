@@ -797,17 +797,113 @@ html[data-theme="dark"] #fabPostToKas {
 
 /* ---------- Toast ---------- */
 #toast {
-  position: absolute;
+  position: fixed !important;
+
   left: 16px;
   right: 16px;
-  bottom: 88px;
-  z-index: 60;
-  padding: 12px 16px;
-  border-radius: 14px;
+
+  bottom: calc(88px + env(safe-area-inset-bottom));
+
+  z-index: 999999 !important;
+
+  padding: 14px 18px;
+  border-radius: 16px;
+
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1.4;
+
   box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.4);
+
+  pointer-events: none;
+
+  /* Animasi masuk */
+  animation: toastSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+#toast.hidden {
+  display: none !important;
+}
+
+/* Animasi toast */
+@keyframes toastSlideUp {
+  from {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ========== MOBILE OPTIMIZATION ========== */
+
+/* Ukuran lebih kecil di mobile */
+@media (max-width: 480px) {
+  #toast {
+    left: 12px;
+    right: 12px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    padding: 12px 16px;
+    font-size: 13px;
+    border-radius: 14px;
+    z-index: 999999 !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+  #toast {
+    left: 10px;
+    right: 10px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    padding: 10px 14px;
+    font-size: 12px;
+    border-radius: 12px;
+    z-index: 999999 !important;
+  }
+}
+
+/* Saat keyboard terbuka di mobile */
+@media (max-height: 600px) {
+  #toast {
+    bottom: calc(70px + env(safe-area-inset-bottom));
+    padding: 10px 14px;
+    font-size: 12px;
+    z-index: 999999 !important;
+  }
+}
+
+/* ========== DARK MODE ========== */
+
+html[data-theme="dark"] #toast {
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6);
+}
+
+/* ========== VARIANT: SUCCESS ========== */
+#toast.success {
+  background: var(--pos);
+  color: #fff;
+}
+
+/* ========== VARIANT: ERROR ========== */
+#toast.error {
+  background: var(--neg);
+  color: #fff;
+}
+
+/* ========== VARIANT: WARNING ========== */
+#toast.warning {
+  background: var(--gold);
+  color: #fff;
+}
+
+/* ========== VARIANT: INFO ========== */
+#toast.info {
+  background: var(--brand);
+  color: #fff;
 }
 
 /* ---------- Print ---------- */
@@ -951,6 +1047,7 @@ body {
   max-width: 480px;
   min-height: 100dvh;
   box-sizing: border-box;
+  z-index: 1;
 
   display: flex;
   flex-direction: column;
@@ -1460,16 +1557,6 @@ html[data-theme="dark"] .month-dropdown-menu {
   width: 44px !important;
   height: 44px !important;
   border-radius: 9px !important;
-}
-
-/* Toast */
-#toast {
-  left: 12px;
-  right: 12px;
-  bottom: 74px;
-  padding: 10px 13px;
-  border-radius: 8px;
-  font-size: 12px;
 }
 
 /* Mobile density */

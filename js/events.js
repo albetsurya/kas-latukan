@@ -522,8 +522,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  console.log("1. DOM ready");
+
+  console.log("2. typeof setupShodUpload =", typeof setupShodUpload);
+
   if (typeof setupShodUpload === "function") {
+    console.log("3. Memanggil setupShodUpload...");
     setupShodUpload();
+    console.log("4. ✅ setupShodUpload selesai dipanggil");
+  } else {
+    console.warn("5. ⚠️ setupShodUpload TIDAK ditemukan!");
   }
 
   if ($("shodUploadExtract")) {
@@ -556,8 +564,13 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
   if ($("shodaqohPaymentOverlay")) {
-    $("shodaqohPaymentOverlay").addEventListener("click", (e) => {
-      if (e.target === $("shodaqohPaymentOverlay")) closeShodaqohPaymentForm();
+    $("shodaqohPaymentOverlay").addEventListener("click", function (e) {
+      if (e.target === this) {
+        // Panggil fungsi close yang sudah di-update
+        if (typeof closeShodaqohPaymentForm === "function") {
+          closeShodaqohPaymentForm();
+        }
+      }
     });
   }
 
@@ -1215,6 +1228,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (typeof closeShodMemberDeleteConfirm === "function") {
         closeShodMemberDeleteConfirm();
+      }
+      if (typeof closeShodaqohPaymentForm === "function") {
+        closeShodaqohPaymentForm();
       }
       if (typeof closeShodMemberForm === "function") {
         closeShodMemberForm();

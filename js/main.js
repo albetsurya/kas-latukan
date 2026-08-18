@@ -295,14 +295,22 @@ function showToast(msg, type = "success") {
   const el = $("toast");
   if (!el) return;
 
+  // Pastikan Toast berada langsung di body
+  if (el.parentElement !== document.body) {
+    document.body.appendChild(el);
+  }
+
   el.textContent = msg;
+
   el.style.background = type === "error" ? "var(--neg)" : "var(--brand-dark)";
 
   el.classList.remove("hidden");
 
   clearTimeout(toastTimer);
 
-  toastTimer = setTimeout(() => el.classList.add("hidden"), 3200);
+  toastTimer = setTimeout(() => {
+    el.classList.add("hidden");
+  }, 3200);
 }
 
 // ---------- API ----------
@@ -2369,38 +2377,274 @@ function openShodaqohPaymentForm(payment) {
 
   $("shodaqohPaymentOverlay")?.classList.remove("hidden");
 }
-function extractDataFromImage() {
-  // Simulasi OCR - akan diimplementasikan dengan API nanti
-  const ocrResult = $("shodOcrResult");
-  const ocrData = $("shodOcrData");
 
-  if (ocrResult) ocrResult.classList.remove("hidden");
+// ============================================================
+// SHODAQOH UPLOAD — EKSTRAKSI & ISI FORM OTOMATIS
+// ============================================================
+
+let shodUploadMode = false;
+
+function setupShodUpload() {
+  const uploadInput = document.getElementById("shodUploadInput");
+  const previewDiv = document.getElementById("shodUploadPreview");
+  const previewImg = document.getElementById("shodUploadPreviewImg");
+  const fileName = document.getElementById("shodUploadFileName");
+  const clearBtn = document.getElementById("shodUploadClear");
+  const extractBtn = document.getElementById("shodUploadExtract");
+  const ocrResult = document.getElementById("shodOcrResult");
+  const ocrData = document.getElementById("shodOcrData");
+
+  if (!uploadInput) return;
+
+  // Upload handler
+  uploadInput.addEventListener("change", function (e) {
+    const file = this.files[0];
+    if (!file) return;
+
+    // Tampilkan nama file
+    if (fileName) fileName.textContent = file.name;
+
+    // Tampilkan preview
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      if (previewImg) {
+        previewImg.src = event.target.result;
+        previewImg.style.display = "block";
+      }
+      if (previewDiv) previewDiv.classList.remove("hidden");
+      if (ocrResult) ocrResult.classList.add("hidden");
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Clear handler
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      clearShodUpload();
+    });
+  }
+
+  // Extract handler — ISI FORM OTOMATIS
+  if (extractBtn) {
+    extractBtn.addEventListener("click", function () {
+      if (typeof extractDataFromImage === "function") {
+        extractDataFromImage();
+      }
+    });
+  }
+}
+
+function clearShodUpload() {
+  const uploadInput = document.getElementById("shodUploadInput");
+  const previewDiv = document.getElementById("shodUploadPreview");
+  const previewImg = document.getElementById("shodUploadPreviewImg");
+  const fileName = document.getElementById("shodUploadFileName");
+  const ocrResult = document.getElementById("shodOcrResult");
+  const ocrData = document.getElementById("shodOcrData");
+
+  if (uploadInput) uploadInput.value = "";
+  if (fileName) fileName.textContent = "Pilih foto rekap";
+  if (previewDiv) previewDiv.classList.add("hidden");
+  if (previewImg) previewImg.src = "";
+  if (ocrResult) ocrResult.classList.add("hidden");
+  if (ocrData) ocrData.innerHTML = "";
+
+  // Reset form
+  const form = document.getElementById("shodaqohPaymentForm");
+  if (form) form.reset();
+
+  // Reset alokasi status
+  const statusText = document.getElementById("shodAllocationText");
+  const statusIcon = document.getElementById("shodAllocationIcon");
+  if (statusText) statusText.textContent = "BELUM SEIMBANG";
+  if (statusIcon) {
+    statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />`;
+    statusIcon.style.color = "var(--ink-soft)";
+  }
+
+  // Enable submit
+  const submitBtn = document.getElementById("btnSubmitShodaqohPayment");
+  if (submitBtn) submitBtn.disabled = true;
+}
+
+function extractDataFromImage() {
+  // ===== SIMULASI OCR — DI SINI NANTI DIHUBUNGKAN KE API OCR =====
+  const ocrResult = document.getElementById("shodOcrResult");
+  const ocrData = document.getElementById("shodOcrData");
+
+  // Tampilkan loading
   if (ocrData) {
     ocrData.innerHTML = `
-      <div class="flex items-center justify-between py-1 border-b border-[color:var(--line)] last:border-0">
-        <span class="text-[11px] text-[color:var(--ink-faint)]">Nama</span>
-        <span class="text-[11px] font-medium">Bp. H. Budi dan Istri</span>
-      </div>
-      <div class="flex items-center justify-between py-1 border-b border-[color:var(--line)] last:border-0">
-        <span class="text-[11px] text-[color:var(--ink-faint)]">Total</span>
-        <span class="text-[11px] font-mono font-bold">Rp 400.000</span>
-      </div>
-      <div class="flex items-center justify-between py-1 border-b border-[color:var(--line)] last:border-0">
-        <span class="text-[11px] text-[color:var(--ink-faint)]">Susulan IR</span>
-        <span class="text-[11px] font-mono">Rp 210.000</span>
-      </div>
-      <div class="flex items-center justify-between py-1 border-b border-[color:var(--line)] last:border-0">
-        <span class="text-[11px] text-[color:var(--ink-faint)]">Uang Sambung</span>
-        <span class="text-[11px] font-mono">Rp 115.000</span>
-      </div>
-      <div class="flex items-center justify-between py-1">
-        <span class="text-[11px] text-[color:var(--ink-faint)]">Status</span>
-        <span class="text-[11px] font-medium" style="color:var(--pos)">✓ Data siap diinput</span>
+      <div class="flex items-center justify-center py-4">
+        <span style="display:inline-block;width:16px;height:16px;border:2px solid var(--brand);border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;"></span>
+        Menganalisis foto...
       </div>
     `;
   }
+  if (ocrResult) ocrResult.classList.remove("hidden");
 
-  showToast("Data terdeteksi! Silakan cek dan sesuaikan.", "success");
+  // ===== SIMULASI DELAY OCR =====
+  setTimeout(function () {
+    // Data hasil OCR (simulasi)
+    const ocrDataResult = {
+      nama: "Bp. H. Budi dan Istri",
+      total: 400000,
+      susulan_ir: 210000,
+      uang_sambung: 115000,
+      jimpitan: 25000,
+      siar_siar: 15000,
+      seribuan: 10000,
+      kafan: 15000,
+      ukhro_mt: 10000,
+      susulan_bulan: ["2026-01", "2026-02"],
+      keterangan: "Pembayaran Jan-Feb 2026",
+    };
+
+    // Tampilkan hasil OCR
+    if (ocrData) {
+      ocrData.innerHTML = `
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Anggota</span>
+          <span class="text-[11px] font-medium">${escapeHtml(ocrDataResult.nama)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Total</span>
+          <span class="text-[11px] font-mono font-bold">${fmtRp(ocrDataResult.total)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Infak IR</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.susulan_ir)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Uang Sambung</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.uang_sambung)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Jimpitan</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.jimpitan)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Siar-siar</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.siar_siar)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Seribuan</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.seribuan)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Kafan</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.kafan)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-[color:var(--line)] last:border-0">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Ukhro MT</span>
+          <span class="text-[11px] font-mono">${fmtRp(ocrDataResult.ukhro_mt)}</span>
+        </div>
+        <div class="flex items-center justify-between py-1.5">
+          <span class="text-[10px] text-[color:var(--ink-faint)] font-bold uppercase">Status</span>
+          <span class="text-[11px] font-medium" style="color:var(--pos);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:4px;">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+            Data siap diinput
+          </span>
+        </div>
+      `;
+    }
+
+    // ===== ISI FORM OTOMATIS =====
+    // 1. Pilih anggota berdasarkan nama (cocokkan dengan daftar anggota)
+    const members = state.shodaqoh.members || [];
+    let matchedMember = null;
+    for (let i = 0; i < members.length; i++) {
+      const m = members[i];
+      const namaLower = m.nama.toLowerCase();
+      const ocrNamaLower = ocrDataResult.nama.toLowerCase();
+      // Cek jika nama OCR mengandung sebagian dari nama anggota
+      if (
+        namaLower.includes(ocrNamaLower) ||
+        ocrNamaLower.includes(namaLower)
+      ) {
+        matchedMember = m;
+        break;
+      }
+    }
+
+    if (matchedMember) {
+      // Pilih anggota di dropdown
+      const memberValue = document.getElementById("shodPaymentMemberValue");
+      const memberHidden = document.getElementById("shodPaymentMember");
+      if (memberValue) memberValue.textContent = matchedMember.nama;
+      if (memberHidden) memberHidden.value = matchedMember.member_id;
+
+      // Update tombol load last nominals
+      if (typeof updateLoadLastNominalsButton === "function") {
+        updateLoadLastNominalsButton();
+      }
+    }
+
+    // 2. Isi total pembayaran
+    const totalInput = document.getElementById("shodPaymentAmount");
+    if (totalInput) totalInput.value = ocrDataResult.total;
+
+    // 3. Isi alokasi
+    const fieldMap = {
+      susulan_ir: "shod_susulan_ir",
+      uang_sambung: "shod_uang_sambung",
+      jimpitan: "shod_jimpitan",
+      siar_siar: "shod_siar_siar",
+      seribuan: "shod_seribuan",
+      kafan: "shod_kafan",
+      ukhro_mt: "shod_ukhro_mt",
+    };
+
+    Object.keys(fieldMap).forEach(function (field) {
+      const inputId = fieldMap[field];
+      const input = document.getElementById(inputId);
+      const value = ocrDataResult[field] || 0;
+      if (input) {
+        input.value = value > 0 ? value : "";
+      }
+    });
+
+    // 4. Isi susulan bulan (checkbox)
+    if (
+      ocrDataResult.susulan_bulan &&
+      Array.isArray(ocrDataResult.susulan_bulan)
+    ) {
+      const checkboxes = document.querySelectorAll(
+        'input[name="shodSusulanBulan"]',
+      );
+      checkboxes.forEach(function (cb) {
+        cb.checked = ocrDataResult.susulan_bulan.indexOf(cb.value) !== -1;
+      });
+    }
+
+    // 5. Isi keterangan
+    const noteInput = document.getElementById("shodPaymentNote");
+    if (noteInput && ocrDataResult.keterangan) {
+      noteInput.value = ocrDataResult.keterangan;
+    }
+
+    // 6. Trigger allocation watcher untuk update status
+    setTimeout(function () {
+      const fields = Object.values(fieldMap);
+      fields.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      const totalEl = document.getElementById("shodPaymentAmount");
+      if (totalEl) totalEl.dispatchEvent(new Event("input", { bubbles: true }));
+    }, 100);
+
+    // 7. Pindah ke tab Manual agar form terlihat
+    if (typeof toggleShodMethod === "function") {
+      toggleShodMethod("manual");
+    }
+
+    showToast("Data berhasil diekstrak dan form terisi!", "success");
+  }, 1200); // Simulasi delay OCR
 }
 
 // ============================================================
@@ -2471,8 +2715,85 @@ async function handleShodaqohSubmit(e) {
 }
 
 function closeShodaqohPaymentForm() {
+  // Reset state
   state.shodaqoh.selectedPaymentId = null;
-  $("shodaqohPaymentOverlay")?.classList.add("hidden");
+  state.shodaqoh.editingNo = null;
+
+  // Reset form
+  const form = document.getElementById("shodaqohPaymentForm");
+  if (form) {
+    form.reset();
+    // Reset semua input number ke kosong (bukan 0)
+    form.querySelectorAll('input[type="number"]').forEach(function (input) {
+      input.value = "";
+    });
+    // Reset textarea
+    const note = document.getElementById("shodPaymentNote");
+    if (note) note.value = "";
+  }
+
+  // Reset allocation status ke default
+  const statusText = document.getElementById("shodAllocationText");
+  const statusIcon = document.getElementById("shodAllocationIcon");
+  if (statusText) {
+    statusText.textContent = "BELUM SEIMBANG";
+    statusText.style.color = "var(--ink-soft)";
+  }
+  if (statusIcon) {
+    statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />`;
+    statusIcon.style.color = "var(--ink-soft)";
+  }
+
+  // Disable submit button
+  const submitBtn = document.getElementById("btnSubmitShodaqohPayment");
+  if (submitBtn) submitBtn.disabled = true;
+
+  // Reset member dropdown
+  const memberValue = document.getElementById("shodPaymentMemberValue");
+  const memberHidden = document.getElementById("shodPaymentMember");
+  if (memberValue) memberValue.textContent = "Pilih anggota";
+  if (memberHidden) memberHidden.value = "";
+
+  // Reset date picker ke hari ini (bukan kosong)
+  const today = new Date();
+  const dateValueDisplay = document.getElementById("shodDateDropdownValue");
+  const dateHidden = document.getElementById("shodPaymentDate");
+  if (dateValueDisplay) dateValueDisplay.textContent = formatDateDisplay(today);
+  if (dateHidden) dateHidden.value = formatDateInput(today);
+  datePickerState.selectedDate = today;
+  datePickerState.currentMonth = today.getMonth();
+  datePickerState.currentYear = today.getFullYear();
+
+  // Reset susulan bulan (uncheck all checkboxes)
+  document
+    .querySelectorAll('input[name="shodSusulanBulan"]')
+    .forEach(function (cb) {
+      cb.checked = false;
+    });
+
+  // Reset upload section
+  if (typeof clearShodUpload === "function") {
+    clearShodUpload();
+  }
+
+  // Reset method toggle ke Manual (default)
+  if (typeof toggleShodMethod === "function") {
+    toggleShodMethod("manual");
+  }
+
+  // Reset tombol load last nominals
+  if (typeof updateLoadLastNominalsButton === "function") {
+    setTimeout(updateLoadLastNominalsButton, 50);
+  }
+
+  // Tutup overlay
+  const overlay = document.getElementById("shodaqohPaymentOverlay");
+  if (overlay) overlay.classList.add("hidden");
+
+  // Hapus backdrop date picker jika ada
+  removeDatePickerBackdrop();
 }
 
 // main.js — TAMBAHKAN DI BAGIAN SHODAQOH (setelah closeShodaqohPaymentForm)
