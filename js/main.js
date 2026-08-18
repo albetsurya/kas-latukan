@@ -300,9 +300,16 @@ function showToast(msg, type = "success") {
     document.body.appendChild(el);
   }
 
-  el.textContent = msg;
+  // Gunakan innerHTML agar SVG bisa dirender
+  // Tapi tetap aman karena kita kontrol kontennya
+  el.innerHTML = msg;
 
-  el.style.background = type === "error" ? "var(--neg)" : "var(--brand-dark)";
+  el.style.background =
+    type === "error"
+      ? "var(--neg)"
+      : type === "warning"
+        ? "var(--gold)"
+        : "var(--brand-dark)";
 
   el.classList.remove("hidden");
 
@@ -311,6 +318,32 @@ function showToast(msg, type = "success") {
   toastTimer = setTimeout(() => {
     el.classList.add("hidden");
   }, 3200);
+}
+
+// Helper untuk toast dengan icon (pakai showToast)
+function showToastWithIcon(message, type = "success") {
+  const icons = {
+    success: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>`,
+    info: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>`,
+    warning: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
+      <path d="M12 9v4M12 17h.01" />
+      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+    </svg>`,
+    error: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="15" y1="9" x2="9" y2="15" />
+      <line x1="9" y1="9" x2="15" y2="15" />
+    </svg>`,
+  };
+
+  const icon = icons[type] || icons.info;
+  showToast(`${icon} ${message}`, type);
 }
 
 // ---------- API ----------
@@ -2157,7 +2190,6 @@ async function loadLastNominals() {
     });
 
     if (hasData && sourceInfo.length > 0) {
-      // Ambil bulan unik dari source
       const monthKeys = sourceInfo
         .map(function (item) {
           const match = item.match(/\((.+)\)$/);
@@ -2165,16 +2197,29 @@ async function loadLastNominals() {
         })
         .filter(Boolean)
         .map(function (key) {
-          return fmtMonthYear(key); // fmtMonthYear akan handle "2026-07"
+          return fmtMonthYear(key);
         });
 
       const uniqueMonths = [...new Set(monthKeys)];
       const monthStr =
         uniqueMonths.length > 0 ? ` (${uniqueMonths.join(", ")})` : "";
 
-      showToast(`✅ Data terakhir dimuat${monthStr}`, "success");
+      // Langsung pakai showToast dengan HTML
+      showToast(
+        `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
+      <path d="M20 6L9 17l-5-5" />
+    </svg> Data terakhir dimuat${monthStr}`,
+        "success",
+      );
     } else if (!hasData) {
-      showToast("ℹ️ Tidak ada data sebelumnya.", "info");
+      showToast(
+        `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg> Tidak ada data sebelumnya.`,
+        "info",
+      );
     }
 
     // Trigger allocation watcher
@@ -3521,10 +3566,6 @@ function selectMember(memberId, memberName) {
 }
 
 // ============================================================
-// SHODAQOH DATE PICKER
-// ============================================================
-
-// ============================================================
 // SHODAQOH DATE PICKER DENGAN INPUT MANUAL
 // ============================================================
 
@@ -3802,13 +3843,6 @@ function renderDatePickerMenu() {
         closeDatePicker(dropdown);
       }
     });
-
-    // Blur - validasi
-    manualInput.addEventListener("blur", function () {
-      if (this.value) {
-        applyManualDate(this.value);
-      }
-    });
   }
 
   // Apply button
@@ -3909,12 +3943,17 @@ function selectDate(date) {
 
   const valueDisplay = document.getElementById("shodDateDropdownValue");
   const hiddenInput = document.getElementById("shodPaymentDate");
+  const manualInput = document.getElementById("shodDateManualInput");
 
   if (valueDisplay) {
     valueDisplay.textContent = formatDateDisplay(date);
   }
   if (hiddenInput) {
     hiddenInput.value = formatDateInput(date);
+  }
+
+  if (manualInput) {
+    manualInput.value = formattedDate;
   }
 
   const dropdown = document.getElementById("shodDateDropdown");
@@ -4212,12 +4251,6 @@ function renderTxDatePickerMenu() {
         closeTxDatePicker(dropdown);
       }
     });
-
-    manualInput.addEventListener("blur", function () {
-      if (this.value) {
-        applyTxManualDate(this.value);
-      }
-    });
   }
 
   // Apply button
@@ -4304,18 +4337,28 @@ function applyTxManualDate(dateStr) {
 
 function selectTxDate(date) {
   if (!date || isNaN(date.getTime())) return;
+
   txDatePickerState.selectedDate = date;
   txDatePickerState.currentMonth = date.getMonth();
   txDatePickerState.currentYear = date.getFullYear();
 
   const valueDisplay = document.getElementById("txDateDropdownValue");
   const hiddenInput = document.getElementById("txTanggal");
+  const manualInput = document.getElementById("txDateManualInput");
+
+  const formattedDate = formatDateInput(date);
 
   if (valueDisplay) {
     valueDisplay.textContent = formatDateDisplay(date);
   }
+
   if (hiddenInput) {
-    hiddenInput.value = formatDateInput(date);
+    hiddenInput.value = formattedDate;
+  }
+
+  // Sinkronkan manual input
+  if (manualInput) {
+    manualInput.value = formattedDate;
   }
 
   const dropdown = document.getElementById("txDateDropdown");
@@ -4364,14 +4407,6 @@ const ACCOUNT_CATEGORIES = [
   "BEBAN OPERASIONAL BULAN BERJALAN",
   "BEBAN PENGELUARAN LAIN-LAIN",
   "PEMASUKAN LAIN-LAIN",
-  "Infak IR",
-  "Pemasukan Uang Sambung",
-  "Pemasukan Jimpitan",
-  "Pemasukan Siar-siar",
-  "Pemasukan Seribuan",
-  "Pemasukan Kafan",
-  "Pemasukan Ukhro MT",
-  "Pemasukan Dana Kesehatan",
 ];
 
 function initTxAccountDropdown() {
