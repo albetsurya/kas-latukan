@@ -2043,7 +2043,12 @@ function setupShodaqohAllocationWatcher() {
 // SHODAQOH — LOAD LAST NOMINALS
 // ============================================================
 
+let lastNominalsLoading = false;
+
 async function loadLastNominals() {
+  // Cegah multiple click
+  if (lastNominalsLoading) return;
+
   const memberInput = document.getElementById("shodPaymentMember");
   const memberId = memberInput?.value || "";
 
@@ -2060,6 +2065,8 @@ async function loadLastNominals() {
 
   const btn = document.getElementById("btnLoadLastNominals");
   const originalText = btn?.innerHTML || "Data Terakhir";
+
+  lastNominalsLoading = true;
 
   // Set loading state
   if (btn) {
@@ -2165,10 +2172,45 @@ async function loadLastNominals() {
     console.error(err);
     showToast("Gagal memuat data: " + err.message, "error");
   } finally {
+    lastNominalsLoading = false;
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = originalText;
+      // Update state tombol berdasarkan member
+      updateLoadLastNominalsButton();
     }
+  }
+}
+
+// ============================================================
+// SHODAQOH — UPDATE LOAD LAST NOMINALS BUTTON STATE
+// ============================================================
+
+function updateLoadLastNominalsButton() {
+  const btn = document.getElementById("btnLoadLastNominals");
+  const memberInput = document.getElementById("shodPaymentMember");
+  const memberId = memberInput?.value || "";
+
+  if (!btn) return;
+
+  const hasMember = memberId && memberId.trim() !== "";
+
+  if (hasMember) {
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    btn.style.pointerEvents = "auto";
+    btn.style.borderColor = "var(--brand)";
+    btn.style.color = "var(--brand)";
+    btn.title = "Ambil data nominal terakhir dari anggota ini";
+  } else {
+    btn.disabled = true;
+    btn.style.opacity = "0.4";
+    btn.style.cursor = "not-allowed";
+    btn.style.pointerEvents = "none";
+    btn.style.borderColor = "var(--line)";
+    btn.style.color = "var(--ink-faint)";
+    btn.title = "Pilih anggota terlebih dahulu";
   }
 }
 
@@ -2199,6 +2241,11 @@ function openShodaqohPaymentForm(payment) {
 
   if (typeof clearShodUpload === "function") {
     clearShodUpload();
+  }
+
+  // Reset dan update tombol
+  if (typeof updateLoadLastNominalsButton === "function") {
+    setTimeout(updateLoadLastNominalsButton, 100);
   }
 
   const dateValueDisplay = $("shodDateDropdownValue");

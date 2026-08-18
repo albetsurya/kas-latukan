@@ -575,6 +575,46 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  // ===== PANTAU PERUBAHAN MEMBER UNTUK UPDATE TOMBOL =====
+  // Event listener untuk member dropdown
+  document.addEventListener("click", function (e) {
+    // Cek jika klik di dalam menu member dropdown
+    const menu = document.getElementById("shodPaymentMemberMenu");
+    if (menu && menu.contains(e.target)) {
+      const option = e.target.closest(".filter-dropdown-option");
+      if (option) {
+        // Tunggu sebentar agar value sudah terupdate
+        setTimeout(function () {
+          if (typeof updateLoadLastNominalsButton === "function") {
+            updateLoadLastNominalsButton();
+          }
+        }, 50);
+      }
+    }
+  });
+
+  // Juga pantau perubahan hidden input
+  const memberHidden = document.getElementById("shodPaymentMember");
+  if (memberHidden) {
+    // Gunakan MutationObserver untuk mendeteksi perubahan value
+    const observer = new MutationObserver(function () {
+      if (typeof updateLoadLastNominalsButton === "function") {
+        updateLoadLastNominalsButton();
+      }
+    });
+    observer.observe(memberHidden, {
+      attributes: true,
+      attributeFilter: ["value"],
+    });
+
+    // Juga event 'change' sebagai fallback
+    memberHidden.addEventListener("change", function () {
+      if (typeof updateLoadLastNominalsButton === "function") {
+        updateLoadLastNominalsButton();
+      }
+    });
+  }
+
   // ==================== PAYMENT EVENT FLOW ====================
   document.addEventListener("click", function (e) {
     const paymentBtn = e.target.closest("[data-shod-payment]");

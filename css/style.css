@@ -2991,28 +2991,57 @@ html[data-theme="dark"] .date-picker-manual-input {
   transition: all 0.2s ease;
   border-color: var(--brand);
   color: var(--brand);
+  background: var(--surface);
 }
 
-#btnLoadLastNominals:hover {
+#btnLoadLastNominals:hover:not(:disabled) {
   background: var(--brand-soft);
   border-color: var(--brand);
+  transform: translateY(-1px);
 }
 
-#btnLoadLastNominals:active {
+#btnLoadLastNominals:active:not(:disabled) {
   transform: scale(0.97);
 }
 
 #btnLoadLastNominals:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
+  pointer-events: none;
+  border-color: var(--line);
+  color: var(--ink-faint);
+}
+
+#btnLoadLastNominals:disabled svg {
+  stroke: var(--ink-faint);
+}
+
+#btnLoadLastNominals:not(:disabled) {
+  opacity: 1;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 #btnLoadLastNominals svg {
   transition: transform 0.3s ease;
 }
 
-#btnLoadLastNominals:hover svg {
+#btnLoadLastNominals:hover:not(:disabled) svg {
   transform: rotate(15deg);
+}
+
+/* Responsif mobile */
+@media (max-width: 480px) {
+  #btnLoadLastNominals {
+    font-size: 10px;
+    padding: 6px 10px;
+    min-height: 36px;
+  }
+
+  #btnLoadLastNominals svg {
+    width: 12px;
+    height: 12px;
+  }
 }
 
 /* Responsif mobile */
