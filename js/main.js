@@ -2157,21 +2157,24 @@ async function loadLastNominals() {
     });
 
     if (hasData && sourceInfo.length > 0) {
-      // Ambil hanya bulan sumber (unique)
-      const months = sourceInfo
+      // Ambil bulan unik dari source
+      const monthKeys = sourceInfo
         .map(function (item) {
           const match = item.match(/\((.+)\)$/);
           return match ? match[1] : "";
         })
-        .filter(Boolean);
+        .filter(Boolean)
+        .map(function (key) {
+          return fmtMonthYear(key); // fmtMonthYear akan handle "2026-07"
+        });
 
-      const uniqueMonths = [...new Set(months)];
+      const uniqueMonths = [...new Set(monthKeys)];
       const monthStr =
-        uniqueMonths.length > 0 ? ` (dari ${uniqueMonths.join(", ")})` : "";
+        uniqueMonths.length > 0 ? ` (${uniqueMonths.join(", ")})` : "";
 
-      showToast(`✅ Data terakhir berhasil dimuat${monthStr}`, "success");
+      showToast(`✅ Data terakhir dimuat${monthStr}`, "success");
     } else if (!hasData) {
-      showToast("ℹ️ Tidak ada data nominal sebelumnya.", "info");
+      showToast("ℹ️ Tidak ada data sebelumnya.", "info");
     }
 
     // Trigger allocation watcher
