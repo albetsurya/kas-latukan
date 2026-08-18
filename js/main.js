@@ -5,7 +5,7 @@
 const CONFIG = {
   WEB_APP_URL:
     "https://script.google.com/macros/s/AKfycbwqCvr9HQvij6g1q3r0tlxfCu3Slb8xhTCdIZ80jYNXdJIVTOtHHSwmEauU3CLt-yd2/exec",
-  POLL_INTERVAL_MS: 20000,
+  // POLL_INTERVAL_MS: 20000,
 };
 
 // ---------- STATE ----------
