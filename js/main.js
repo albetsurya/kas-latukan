@@ -43,6 +43,10 @@ let state = {
 
 const $ = (id) => document.getElementById(id);
 
+function isAdminUser() {
+  return state.isAdmin === true || state.isAdmin === "true";
+}
+
 // ---------- FORMAT HELPERS ----------
 const fmtRp = (n) => "Rp " + Math.round(Number(n) || 0).toLocaleString("id-ID");
 
@@ -1263,13 +1267,15 @@ function switchTab(tab) {
   }
 }
 
+// main.js — Update function untuk FAB visibility
+
 function updateFabVisibility() {
   const fabAdd = $("fabAdd");
   const fabPost = $("fabPostToKas");
 
   if (!fabAdd) return;
 
-  const isAdmin = state.isAdmin === true || state.isAdmin === "true";
+  const isAdmin = isAdminUser();
 
   // FAB Tambah Transaksi
   const isAllowedTab =
@@ -1284,11 +1290,18 @@ function updateFabVisibility() {
   if (fabPost) {
     const shouldShowPost = isAdmin && state.activeTab === "shodaqoh";
     fabPost.classList.toggle("hidden", !shouldShowPost);
+
+    // Tambahkan class untuk positioning yang konsisten
+    if (shouldShowPost) {
+      fabPost.style.display = "flex";
+    } else {
+      fabPost.style.display = "";
+    }
   }
 }
 
 function postShodaqohToKas() {
-  if (state.isAdmin !== true) {
+  if (!isAdminUser()) {
     showToast("Hanya admin yang dapat melakukan posting ke Kas.", "error");
     return;
   }
@@ -1714,20 +1727,92 @@ function renderShodaqohMembers() {
   const body = $("shodMembersList");
   if (!body) return;
 
-  body.innerHTML =
-    (state.shodaqoh.members || [])
-      .map(function (m) {
-        return `<button type="button" class="tx-card w-full text-left ${state.isAdmin ? "tx-card-clickable" : ""}" data-shod-member="${escapeHtml(m.member_id)}">
-        <div class="flex-1">
-          <p class="tx-title">${escapeHtml(m.nama)}</p>
-          <p class="tx-meta">Nominal bulanan ${fmtRp(m.nominal_bulanan)} · ${escapeHtml(m.status)}</p>
-        </div>
-        <span class="tx-chevron">${state.isAdmin ? "›" : ""}</span>
-      </button>`;
-      })
-      .join("") ||
-    '<p class="text-xs text-[color:var(--ink-faint)]">Belum ada anggota.</p>';
+  const members = state.shodaqoh.members || [];
+  const isAdmin = isAdminUser();
+
+  // Tambahkan header
+  const headerHtml = `
+    <div class="flex items-center justify-between mb-3 pb-2 border-b border-[color:var(--line)]">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
+        Daftar Anggota
+      </span>
+      <span class="text-[10px] text-[color:var(--ink-faint)]">
+        ${members.length} anggota
+      </span>
+    </div>
+  `;
+
+  if (members.length === 0) {
+    body.innerHTML = `
+      ${headerHtml}
+      <div class="text-center py-8">
+        <svg class="mx-auto mb-3 text-[color:var(--ink-faint)]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21a8 8 0 1 0-16 0" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <p class="text-xs text-[color:var(--ink-faint)]">Belum ada anggota.</p>
+        ${isAdmin ? `<button type="button" id="shodAddFirstMember" class="mt-2 text-xs font-bold" style="color:var(--brand);">+ Tambah anggota pertama</button>` : ""}
+      </div>
+    `;
+
+    const addBtn = document.getElementById("shodAddFirstMember");
+    if (addBtn && isAdmin) {
+      addBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (typeof openShodMemberForm === "function") {
+          openShodMemberForm(null);
+        }
+      });
+    }
+    return;
+  }
+
+  // Render dengan header + list anggota
+  body.innerHTML = `
+    ${headerHtml}
+    <div class="space-y-2">
+      ${members
+        .map(function (m) {
+          // Tentukan status badge
+          const statusClass =
+            m.status === "AKTIF" ? "status-active" : "status-inactive";
+          const statusLabel = m.status || "AKTIF";
+
+          return `
+          <button 
+            type="button" 
+            class="tx-card w-full text-left ${isAdmin ? "tx-card-clickable" : ""}" 
+            data-shod-member="${escapeHtml(m.member_id)}"
+            role="button"
+            tabindex="0"
+            aria-label="Detail anggota ${escapeHtml(m.nama)}"
+          >
+            <div class="flex-1 min-w-0">
+              <p class="tx-title">${escapeHtml(m.nama)}</p>
+              <p class="tx-meta flex items-center gap-2">
+                <span class="mono">${fmtRp(m.nominal_bulanan)}</span>
+                <span class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"></span>
+                <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;">
+                  ${escapeHtml(statusLabel)}
+                </span>
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-[color:var(--ink-faint)] mono">
+                ${m.total_paid ? fmtRp(m.total_paid) : "Rp 0"}
+              </span>
+              ${isAdmin ? `<span class="tx-chevron" style="color:var(--ink-faint);">›</span>` : ""}
+            </div>
+          </button>
+        `;
+        })
+        .join("")}
+    </div>
+  `;
 }
+
+// Event klik/keyboard untuk member dipusatkan di events.js.
+// Jangan pasang listener di sini agar tidak terjadi double trigger.
 
 function renderPaymentHistory() {
   const body = $("shodPaymentsList");
@@ -1752,6 +1837,11 @@ function renderPaymentHistory() {
           }
         }
 
+        // ===== STATUS BADGE - TULISAN "Lunas" atau "Belum" =====
+        const isLunas = p.status === "LUNAS" || p.status === "ACTIVE";
+        const statusClass = isLunas ? "status-active" : "status-inactive";
+        const statusLabel = isLunas ? "Lunas" : "Belum";
+
         return `<button type="button" class="tx-card w-full text-left" data-shod-payment="${escapeHtml(
           p.payment_id,
         )}">
@@ -1763,7 +1853,11 @@ function renderPaymentHistory() {
             </div>
             <div class="text-right">
               <p class="tx-amount mono">${fmtRp(p.total)}</p>
-              <p class="tx-meta">${escapeHtml(p.status)}</p>
+              <p class="tx-meta">
+                <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;">
+                  ${escapeHtml(statusLabel)}
+                </span>
+              </p>
             </div>
           </button>`;
       })
@@ -2183,28 +2277,62 @@ function closeShodaqohPaymentForm() {
 let shodMemberActionId = null;
 
 function openShodMemberActionSheet(memberId) {
-  if (!state.shodaqoh.members) return;
+  if (!state.shodaqoh.members) {
+    console.warn("Members data not loaded");
+    return;
+  }
 
   const member = state.shodaqoh.members.find(function (m) {
     return String(m.member_id) === String(memberId);
   });
-  if (!member) return;
 
+  if (!member) {
+    console.warn("Member not found:", memberId);
+    showToast("Anggota tidak ditemukan.", "error");
+    return;
+  }
+
+  console.log("Opening action sheet for:", member.nama, memberId);
   shodMemberActionId = memberId;
 
   if ($("shodMemberActionTitle")) {
     $("shodMemberActionTitle").textContent = member.nama;
   }
+
+  // Tentukan status badge
+  const statusClass =
+    member.status === "AKTIF" ? "status-active" : "status-inactive";
+  const statusLabel = member.status || "AKTIF";
+
   if ($("shodMemberActionSubtitle")) {
-    $("shodMemberActionSubtitle").textContent =
-      "Nominal bulanan " + fmtRp(member.nominal_bulanan);
+    $("shodMemberActionSubtitle").innerHTML =
+      "Nominal bulanan " +
+      fmtRp(member.nominal_bulanan) +
+      ' <span class="status-pill ' +
+      statusClass +
+      '" style="font-size:8px;padding:2px 10px;vertical-align:middle;">' +
+      statusLabel +
+      "</span>";
   }
 
-  $("shodMemberActionOverlay")?.classList.remove("hidden");
-}
+  const overlay = $("shodMemberActionOverlay");
+  if (overlay) {
+    overlay.classList.remove("hidden");
+    // Force reflow for animation
+    void overlay.offsetWidth;
 
+    // ===== FIX: Scroll sheet ke atas =====
+    const sheet = overlay.querySelector(".sheet");
+    if (sheet) {
+      sheet.scrollTop = 0;
+    }
+  }
+}
 function closeShodMemberActionSheet() {
-  $("shodMemberActionOverlay")?.classList.add("hidden");
+  const overlay = $("shodMemberActionOverlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
   shodMemberActionId = null;
 }
 
@@ -2350,6 +2478,43 @@ function closeShodMemberDeleteConfirm() {
 
 async function openShodaqohMemberDetail(memberId) {
   try {
+    // ===== TAMPILKAN SHEET DENGAN SKELETON LOADING =====
+    // Reset body ke skeleton loading
+    const body = $("shodMemberDetailBody");
+    if (body) {
+      body.innerHTML = `
+        ${[1, 2, 3, 4, 5]
+          .map(
+            () => `
+          <tr class="skeleton-row border-t border-[color:var(--line)]">
+            <td class="py-2"><div class="skeleton-line medium"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line short"></div></td>
+            <td class="py-2"><div class="skeleton-line medium"></div></td>
+            <td class="py-2"><div class="skeleton-line short"></div></td>
+          </tr>
+        `,
+          )
+          .join("")}
+      `;
+    }
+
+    // Reset meta ke skeleton
+    if ($("shodMemberDetailMeta")) {
+      $("shodMemberDetailMeta").innerHTML = `
+        <span class="skeleton-line" style="width:200px;height:14px;display:inline-block;border-radius:4px;"></span>
+      `;
+    }
+
+    // Reset title
+    if ($("shodMemberDetailTitle")) {
+      $("shodMemberDetailTitle").textContent = "Memuat...";
+    }
+
+    // Tampilkan overlay (sheet langsung terbuka)
+    $("shodMemberDetailOverlay")?.classList.remove("hidden");
+
+    // ===== FETCH DATA =====
     const session = getSession();
     const d = await apiPost({
       action: "getShodaqohMemberDetail",
@@ -2361,125 +2526,95 @@ async function openShodaqohMemberDetail(memberId) {
 
     const m = d.member;
 
+    // ===== UPDATE DENGAN DATA NYATA =====
+    // Update header
     if ($("shodMemberDetailTitle"))
       $("shodMemberDetailTitle").textContent = m.nama;
 
+    // ===== STATUS BADGE - TULISAN "Aktif" atau "Tidak Aktif" =====
+    const isActive = m.status === "AKTIF" || m.status === "ACTIVE";
+    const statusClass = isActive ? "status-active" : "status-inactive";
+    const statusLabel = isActive ? "Aktif" : "Tidak Aktif";
+
     if ($("shodMemberDetailMeta")) {
-      $("shodMemberDetailMeta").textContent =
-        `Nominal bulanan ${fmtRp(m.nominal_bulanan)} · ${m.status}`;
+      $("shodMemberDetailMeta").innerHTML = `
+        Nominal bulanan ${fmtRp(m.nominal_bulanan)}
+        <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;margin-left:4px;vertical-align:middle;">
+          ${escapeHtml(statusLabel)}
+        </span>
+      `;
     }
 
-    const body = $("shodMemberDetailBody");
+    // ===== RENDER OBLIGATIONS DI BODY =====
     if (body) {
       const obligations = (d.obligations || []).sort(function (a, b) {
         return b.periode.localeCompare(a.periode);
       });
 
-      body.innerHTML =
-        obligations.length === 0
-          ? '<tr><td colspan="5" class="py-6 text-center text-xs text-[color:var(--ink-faint)]">Belum ada data.</td></tr>'
-          : obligations
-              .map(function (o) {
-                // Format tanggal allocated_at
-                let allocatedAt = o.allocated_at || "—";
-                if (o.allocated_at) {
-                  const d = new Date(o.allocated_at);
-                  if (!isNaN(d.getTime())) {
-                    allocatedAt = fmtDateShort(o.allocated_at);
-                  }
-                }
+      if (obligations.length === 0) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-8 text-center text-xs text-[color:var(--ink-faint)]">
+              Belum ada data kewajiban.
+            </td>
+          </tr>
+        `;
+      } else {
+        body.innerHTML = obligations
+          .map(function (o) {
+            // Format tanggal allocated_at
+            let allocatedAt = o.allocated_at || "—";
+            if (o.allocated_at) {
+              const d = new Date(o.allocated_at);
+              if (!isNaN(d.getTime())) {
+                allocatedAt = fmtDateShort(o.allocated_at);
+              }
+            }
 
-                return `<tr class="border-t border-[color:var(--line)]">
-              <td class="py-2">${escapeHtml(fmtMonthYear(o.periode))}</td>
+            // ===== STATUS BADGE UNTUK OBLIGATION =====
+            const isLunas = o.status === "LUNAS" || o.status === "ACTIVE";
+            const obStatusClass = isLunas ? "status-active" : "status-inactive";
+            const obStatusLabel = isLunas ? "Lunas" : "Belum";
+
+            return `<tr class="border-t border-[color:var(--line)]">
+              <td class="py-2 font-medium">${escapeHtml(fmtMonthYear(o.periode))}</td>
               <td class="py-2 mono">${fmtRp(o.nominal_target)}</td>
               <td class="py-2">
-                <span class="status-pill ${o.status === "LUNAS" ? "status-positive" : "status-negative"}">
-                  ${escapeHtml(o.status || "—")}
+                <span class="status-pill ${obStatusClass}" style="font-size:8px;padding:2px 10px;">
+                  ${escapeHtml(obStatusLabel)}
                 </span>
               </td>
-              <td class="py-2 mono">${escapeHtml(o.payment_id || "—")}</td>
-              <td class="py-2">${escapeHtml(allocatedAt)}</td>
+              <td class="py-2 mono text-[color:var(--ink-soft)]">${escapeHtml(o.payment_id || "—")}</td>
+              <td class="py-2 text-[color:var(--ink-soft)]">${escapeHtml(allocatedAt)}</td>
             </tr>`;
-              })
-              .join("");
-    }
-
-    $("shodMemberDetailOverlay")?.classList.remove("hidden");
-  } catch (err) {
-    showToast(err.message, "error");
-  }
-}
-
-async function openShodaqohPaymentDetail(paymentId) {
-  try {
-    const d = await apiGetShodaqohPaymentDetail(paymentId);
-
-    if (!d.success)
-      throw new Error(d.message || "Gagal memuat detail pembayaran");
-
-    const p = d.payment;
-
-    if ($("shodPaymentDetailTitle"))
-      $("shodPaymentDetailTitle").textContent = p.payment_id;
-
-    // Format tanggal untuk meta
-    let formattedDate = p.tanggal;
-    if (p.tanggal) {
-      const d = new Date(p.tanggal);
-      if (!isNaN(d.getTime())) {
-        formattedDate = fmtDateShort(p.tanggal);
+          })
+          .join("");
       }
     }
-
-    if ($("shodPaymentDetailMeta")) {
-      $("shodPaymentDetailMeta").textContent =
-        `${p.nama} · ${formattedDate} · ${fmtRp(p.total)} · ${p.status}`;
-    }
-
-    const body = $("shodPaymentDetailBody");
-    if (body) {
-      const allocations = d.allocations || [];
-      body.innerHTML = allocations.length
-        ? allocations
-            .map(
-              (a) =>
-                `<div class="tx-card">
-                  <div class="flex-1">
-                    <p class="tx-title">${escapeHtml(
-                      getMonthLabel(a.periode),
-                    )}</p>
-                    <p class="tx-meta">Allocation ${escapeHtml(
-                      a.allocation_id || "",
-                    )}</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="tx-amount mono">${fmtRp(a.nominal_target || 0)}</p>
-                  </div>
-                </div>`,
-            )
-            .join("")
-        : '<p class="text-xs text-[color:var(--ink-faint)] text-center py-6">Tidak ada alokasi.</p>';
-    }
-
-    if ($("btnShodEditPayment"))
-      $("btnShodEditPayment").dataset.paymentId = paymentId;
-
-    if ($("btnShodReversePayment"))
-      $("btnShodReversePayment").dataset.paymentId = paymentId;
-
-    $("shodPaymentDetailOverlay")?.classList.remove("hidden");
   } catch (err) {
+    console.error(err);
+    // Tampilkan error di body
+    if (body) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="5" class="py-8 text-center">
+            <p class="text-xs text-[color:var(--neg)]">Gagal memuat data: ${escapeHtml(err.message)}</p>
+            <button type="button" id="btnRetryMemberDetail" class="mt-3 text-xs font-bold" style="color:var(--brand);">
+              Coba lagi
+            </button>
+          </td>
+        </tr>
+      `;
+
+      const retryBtn = document.getElementById("btnRetryMemberDetail");
+      if (retryBtn) {
+        retryBtn.addEventListener("click", function () {
+          openShodaqohMemberDetail(memberId);
+        });
+      }
+    }
     showToast(err.message, "error");
   }
-}
-
-async function apiGetShodaqohPaymentDetail(paymentId) {
-  const session = getSession();
-  return apiPost({
-    action: "getShodaqohPaymentDetail",
-    token: session?.token || "",
-    paymentId: paymentId,
-  });
 }
 
 function renderShodaqohFilters() {
@@ -3261,6 +3396,584 @@ function clearDate() {
   const dropdown = document.getElementById("shodDateDropdown");
   closeDatePicker(dropdown);
 }
+
+// ============================================================
+// TX DATE PICKER - SAMA DENGAN SHODAQOH DATE PICKER
+// ============================================================
+
+let txDatePickerState = {
+  currentMonth: new Date().getMonth(),
+  currentYear: new Date().getFullYear(),
+  selectedDate: null,
+};
+
+function initTxDatePicker() {
+  console.log("initTxDatePicker dipanggil");
+  const dropdown = document.getElementById("txDateDropdown");
+  const trigger = document.getElementById("txDateDropdownTrigger");
+  const valueDisplay = document.getElementById("txDateDropdownValue");
+  const menu = document.getElementById("txDateDropdownMenu");
+  const hiddenInput = document.getElementById("txTanggal");
+
+  if (!dropdown || !trigger || !valueDisplay || !menu || !hiddenInput) {
+    console.log("TX Date picker element tidak ditemukan");
+    return;
+  }
+
+  console.log("TX Date picker element ditemukan");
+
+  // Set default value
+  const today = new Date();
+  valueDisplay.textContent = formatDateDisplay(today);
+  hiddenInput.value = formatDateInput(today);
+  txDatePickerState.selectedDate = today;
+  txDatePickerState.currentMonth = today.getMonth();
+  txDatePickerState.currentYear = today.getFullYear();
+
+  renderTxDatePickerMenu();
+
+  // Toggle dropdown
+  trigger.addEventListener("click", function (e) {
+    e.stopPropagation();
+    toggleTxDatePicker(dropdown);
+  });
+
+  // Close on outside click
+  document.addEventListener("click", function (e) {
+    if (!dropdown.contains(e.target)) {
+      closeTxDatePicker(dropdown);
+    }
+  });
+
+  // Keyboard support
+  trigger.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleTxDatePicker(dropdown);
+    }
+    if (e.key === "Escape") {
+      closeTxDatePicker(dropdown);
+    }
+  });
+}
+
+function toggleTxDatePicker(dropdown) {
+  const isOpen = dropdown.classList.contains("open");
+  const trigger = dropdown.querySelector(".filter-dropdown-trigger");
+
+  // Tutup semua dropdown lain
+  document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
+    if (el.id !== dropdown.id) {
+      el.classList.remove("open");
+      el.querySelector(".filter-dropdown-trigger")?.setAttribute(
+        "aria-expanded",
+        "false",
+      );
+    }
+  });
+
+  if (isOpen) {
+    dropdown.classList.remove("open");
+    trigger?.setAttribute("aria-expanded", "false");
+    removeTxDatePickerBackdrop();
+  } else {
+    dropdown.classList.add("open");
+    trigger?.setAttribute("aria-expanded", "true");
+    renderTxDatePickerMenu();
+
+    // Fokus ke input saat dropdown terbuka
+    setTimeout(function () {
+      const manualInput = document.getElementById("txDateManualInput");
+      if (manualInput) {
+        manualInput.focus();
+        manualInput.select();
+      }
+    }, 100);
+
+    if (window.innerWidth <= 480) {
+      addTxDatePickerBackdrop(dropdown);
+    }
+  }
+}
+
+function addTxDatePickerBackdrop(dropdown) {
+  removeTxDatePickerBackdrop();
+  const backdrop = document.createElement("div");
+  backdrop.id = "txDatePickerBackdrop";
+  backdrop.addEventListener("click", function () {
+    closeTxDatePicker(dropdown);
+  });
+  document.body.appendChild(backdrop);
+}
+
+function removeTxDatePickerBackdrop() {
+  const backdrop = document.getElementById("txDatePickerBackdrop");
+  if (backdrop) backdrop.remove();
+}
+
+function closeTxDatePicker(dropdown) {
+  dropdown.classList.remove("open");
+  const trigger = dropdown.querySelector(".filter-dropdown-trigger");
+  trigger?.setAttribute("aria-expanded", "false");
+  removeTxDatePickerBackdrop();
+}
+
+function renderTxDatePickerMenu() {
+  const menu = document.getElementById("txDateDropdownMenu");
+  if (!menu) return;
+
+  const year = txDatePickerState.currentYear;
+  const month = txDatePickerState.currentMonth;
+
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+  let daysHtml = "";
+  const today = new Date();
+  const todayDate = today.getDate();
+  const todayMonth = today.getMonth();
+  const todayYear = today.getFullYear();
+
+  // Previous month days
+  const prevMonthDays = firstDay;
+  for (let i = prevMonthDays - 1; i >= 0; i--) {
+    const day = daysInPrevMonth - i;
+    daysHtml += `<button type="button" class="date-picker-day other-month" data-day="${day}" data-month="${month - 1}" data-year="${year}">${day}</button>`;
+  }
+
+  // Current month days
+  for (let i = 1; i <= daysInMonth; i++) {
+    const isToday =
+      i === todayDate && month === todayMonth && year === todayYear;
+    const isSelected =
+      txDatePickerState.selectedDate &&
+      txDatePickerState.selectedDate.getDate() === i &&
+      txDatePickerState.selectedDate.getMonth() === month &&
+      txDatePickerState.selectedDate.getFullYear() === year;
+
+    let classes = "date-picker-day";
+    if (isToday) classes += " today";
+    if (isSelected) classes += " selected";
+
+    daysHtml += `<button type="button" class="${classes}" data-day="${i}" data-month="${month}" data-year="${year}">${i}</button>`;
+  }
+
+  // Next month days
+  const totalDays = prevMonthDays + daysInMonth;
+  const remainingDays = 42 - totalDays;
+  for (let i = 1; i <= remainingDays; i++) {
+    daysHtml += `<button type="button" class="date-picker-day other-month" data-day="${i}" data-month="${month + 1}" data-year="${year}">${i}</button>`;
+  }
+
+  // Format tanggal saat ini untuk placeholder
+  const currentDate = txDatePickerState.selectedDate;
+  let currentDateStr = "";
+  if (currentDate) {
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const year = currentDate.getFullYear();
+    currentDateStr = `${day}-${month}-${year}`;
+  }
+
+  menu.innerHTML = `
+    <!-- Input manual -->
+    <div class="date-picker-input-wrap">
+      <input 
+        type="text" 
+        id="txDateManualInput"
+        class="date-picker-manual-input"
+        placeholder="dd-mm-yyyy"
+        value="${currentDateStr}"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button type="button" id="txDateManualApply" class="date-picker-apply">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="date-picker-divider"></div>
+
+    <!-- Calendar -->
+    <div class="date-picker-header">
+      <button type="button" class="date-picker-nav" data-direction="prev">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+      <span class="date-picker-month-year">${monthNames[month]} ${year}</span>
+      <button type="button" class="date-picker-nav" data-direction="next">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="date-picker-weekdays">
+      <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span>
+      <span>Kam</span><span>Jum</span><span>Sab</span>
+    </div>
+
+    <div class="date-picker-days">
+      ${daysHtml}
+    </div>
+
+    <div class="date-picker-footer">
+      <button type="button" class="date-picker-today">Hari Ini</button>
+      <button type="button" class="date-picker-clear">Hapus</button>
+    </div>
+  `;
+
+  // ===== EVENT LISTENERS =====
+
+  // Input manual - format otomatis
+  const manualInput = document.getElementById("txDateManualInput");
+  if (manualInput) {
+    manualInput.addEventListener("input", function (e) {
+      let value = this.value.replace(/\D/g, "");
+      if (value.length > 8) value = value.slice(0, 8);
+      if (value.length > 2) {
+        value = value.slice(0, 2) + "-" + value.slice(2);
+      }
+      if (value.length > 5) {
+        value = value.slice(0, 5) + "-" + value.slice(5);
+      }
+      this.value = value;
+    });
+
+    manualInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyTxManualDate(this.value);
+      }
+      if (e.key === "Escape") {
+        const dropdown = document.getElementById("txDateDropdown");
+        closeTxDatePicker(dropdown);
+      }
+    });
+
+    manualInput.addEventListener("blur", function () {
+      if (this.value) {
+        applyTxManualDate(this.value);
+      }
+    });
+  }
+
+  // Apply button
+  const applyBtn = document.getElementById("txDateManualApply");
+  if (applyBtn) {
+    applyBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const input = document.getElementById("txDateManualInput");
+      if (input) {
+        applyTxManualDate(input.value);
+      }
+    });
+  }
+
+  // Navigation
+  menu.querySelectorAll(".date-picker-nav").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const direction = this.dataset.direction;
+      if (direction === "prev") {
+        txDatePickerState.currentMonth--;
+        if (txDatePickerState.currentMonth < 0) {
+          txDatePickerState.currentMonth = 11;
+          txDatePickerState.currentYear--;
+        }
+      } else {
+        txDatePickerState.currentMonth++;
+        if (txDatePickerState.currentMonth > 11) {
+          txDatePickerState.currentMonth = 0;
+          txDatePickerState.currentYear++;
+        }
+      }
+      renderTxDatePickerMenu();
+    });
+  });
+
+  // Day selection
+  menu.querySelectorAll(".date-picker-day").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const day = parseInt(this.dataset.day);
+      const month = parseInt(this.dataset.month);
+      const year = parseInt(this.dataset.year);
+      const date = new Date(year, month, day);
+      selectTxDate(date);
+    });
+  });
+
+  // Today button
+  const todayBtn = menu.querySelector(".date-picker-today");
+  if (todayBtn) {
+    todayBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const today = new Date();
+      selectTxDate(today);
+    });
+  }
+
+  // Clear button
+  const clearBtn = menu.querySelector(".date-picker-clear");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      clearTxDate();
+    });
+  }
+}
+
+function applyTxManualDate(dateStr) {
+  if (!dateStr) return;
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return;
+  const day = parseInt(parts[0]);
+  const month = parseInt(parts[1]) - 1;
+  const year = parseInt(parts[2]);
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return;
+  if (day < 1 || day > 31) return;
+  if (month < 0 || month > 11) return;
+  if (year < 1900 || year > 2100) return;
+  const date = new Date(year, month, day);
+  if (date.getDate() !== day) return;
+  selectTxDate(date);
+}
+
+function selectTxDate(date) {
+  if (!date || isNaN(date.getTime())) return;
+  txDatePickerState.selectedDate = date;
+  txDatePickerState.currentMonth = date.getMonth();
+  txDatePickerState.currentYear = date.getFullYear();
+
+  const valueDisplay = document.getElementById("txDateDropdownValue");
+  const hiddenInput = document.getElementById("txTanggal");
+
+  if (valueDisplay) {
+    valueDisplay.textContent = formatDateDisplay(date);
+  }
+  if (hiddenInput) {
+    hiddenInput.value = formatDateInput(date);
+  }
+
+  const dropdown = document.getElementById("txDateDropdown");
+  closeTxDatePicker(dropdown);
+
+  if (hiddenInput) {
+    hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+}
+
+function clearTxDate() {
+  const valueDisplay = document.getElementById("txDateDropdownValue");
+  const hiddenInput = document.getElementById("txTanggal");
+  const manualInput = document.getElementById("txDateManualInput");
+
+  if (valueDisplay) valueDisplay.textContent = "Pilih tanggal";
+  if (hiddenInput) hiddenInput.value = "";
+  if (manualInput) manualInput.value = "";
+
+  txDatePickerState.selectedDate = null;
+
+  const dropdown = document.getElementById("txDateDropdown");
+  closeTxDatePicker(dropdown);
+}
+
+// ============================================================
+// TX ACCOUNT DROPDOWN - SAMA DENGAN MEMBER DROPDOWN
+// ============================================================
+
+const ACCOUNT_CATEGORIES = [
+  "SALDO AWAL",
+  "PEMASUKAN INFAK SAMBUNG",
+  "INFAK IR",
+  "PEMASUKAN UANG SAMBUNG",
+  "PEMASUKAN INFAK JUMAT",
+  "JIMPITAN",
+  "SIAR-SIAR",
+  "KAFAN",
+  "INFAK SERIBUAN",
+  "PEMASUKAN UKHRO MT",
+  "SETOR INFAK SAMBUNG",
+  "SETOR 2/3 INFAK JUMAT",
+  "INFAQ SAMBUNG DESA",
+  "INFAQ SAMBUNG DAERAH",
+  "UKHRO MT",
+  "BEBAN OPERASIONAL BULAN BERJALAN",
+  "BEBAN PENGELUARAN LAIN-LAIN",
+  "PEMASUKAN LAIN-LAIN",
+  "Infak IR",
+  "Pemasukan Uang Sambung",
+  "Pemasukan Jimpitan",
+  "Pemasukan Siar-siar",
+  "Pemasukan Seribuan",
+  "Pemasukan Kafan",
+  "Pemasukan Ukhro MT",
+  "Pemasukan Dana Kesehatan",
+];
+
+function initTxAccountDropdown() {
+  console.log("initTxAccountDropdown dipanggil");
+  const dropdown = document.getElementById("txAccountDropdown");
+  const trigger = document.getElementById("txAccountDropdownTrigger");
+  const valueDisplay = document.getElementById("txAccountDropdownValue");
+  const menu = document.getElementById("txAccountDropdownMenu");
+  const hiddenInput = document.getElementById("txAccount");
+
+  if (!dropdown || !trigger || !valueDisplay || !menu || !hiddenInput) {
+    console.log("Account dropdown element tidak ditemukan");
+    return;
+  }
+
+  console.log("Account dropdown element ditemukan");
+
+  // Render account list
+  renderTxAccountDropdownMenu();
+
+  // Toggle dropdown
+  trigger.addEventListener("click", function (e) {
+    e.stopPropagation();
+    toggleTxAccountDropdown();
+  });
+
+  // Close on outside click
+  document.addEventListener("click", function (e) {
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove("open");
+      trigger.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  // Keyboard support
+  trigger.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleTxAccountDropdown();
+    }
+    if (e.key === "Escape") {
+      dropdown.classList.remove("open");
+      trigger.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+function toggleTxAccountDropdown() {
+  const dropdown = document.getElementById("txAccountDropdown");
+  const trigger = document.getElementById("txAccountDropdownTrigger");
+  const isOpen = dropdown.classList.contains("open");
+
+  // Tutup semua dropdown lain
+  document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
+    if (el.id !== dropdown.id) {
+      el.classList.remove("open");
+      el.querySelector(".filter-dropdown-trigger")?.setAttribute(
+        "aria-expanded",
+        "false",
+      );
+    }
+  });
+
+  if (isOpen) {
+    dropdown.classList.remove("open");
+    trigger?.setAttribute("aria-expanded", "false");
+  } else {
+    dropdown.classList.add("open");
+    trigger?.setAttribute("aria-expanded", "true");
+    renderTxAccountDropdownMenu();
+  }
+}
+
+function renderTxAccountDropdownMenu() {
+  const menu = document.getElementById("txAccountDropdownMenu");
+  const hiddenInput = document.getElementById("txAccount");
+  if (!menu) return;
+
+  const selectedValue = hiddenInput?.value || "";
+
+  menu.innerHTML = ACCOUNT_CATEGORIES.map(function (account) {
+    const isSelected = account === selectedValue;
+    return `
+        <button type="button" 
+          class="filter-dropdown-option ${isSelected ? "active" : ""}"
+          data-account="${escapeHtml(account)}"
+          role="option"
+          aria-selected="${isSelected}">
+          ${escapeHtml(account)}
+        </button>
+      `;
+  }).join("");
+}
+
+function selectTxAccount(account) {
+  const valueDisplay = document.getElementById("txAccountDropdownValue");
+  const hiddenInput = document.getElementById("txAccount");
+  const dropdown = document.getElementById("txAccountDropdown");
+  const trigger = document.getElementById("txAccountDropdownTrigger");
+
+  if (valueDisplay) valueDisplay.textContent = account || "Pilih kategori";
+  if (hiddenInput) hiddenInput.value = account || "";
+
+  // Tutup dropdown
+  if (dropdown) {
+    dropdown.classList.remove("open");
+    trigger?.setAttribute("aria-expanded", "false");
+  }
+
+  // Update active state
+  renderTxAccountDropdownMenu();
+}
+
+// ============================================================
+// INIT TX FORM
+// ============================================================
+
+function initTxForm() {
+  initTxDatePicker();
+  initTxAccountDropdown();
+
+  // Event untuk account dropdown - pilih option
+  document.addEventListener("click", function (e) {
+    const option = e.target.closest(
+      "#txAccountDropdownMenu .filter-dropdown-option",
+    );
+    if (option) {
+      e.preventDefault();
+      const account = option.dataset.account;
+      if (account) {
+        selectTxAccount(account);
+      }
+    }
+  });
+}
+
+// Panggil initTxForm saat DOM ready
+document.addEventListener("DOMContentLoaded", function () {
+  // ... existing code ...
+
+  // Init TX form
+  setTimeout(function () {
+    initTxForm();
+  }, 200);
+});
 
 function formatDateDisplay(date) {
   const bulan = [

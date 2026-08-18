@@ -401,55 +401,220 @@ html[data-theme="dark"] .hero-card .white-text {
   font-weight: 700;
 }
 
-/* ---------- FAB ---------- */
-#fabAdd {
+/* ============================================================
+   FLOATING ACTION BUTTONS (FAB) — MODERN & CONSISTENT
+   ============================================================ */
+
+/* Base FAB style */
+.fab {
   position: fixed;
-  width: 46px;
-  height: 46px;
-  right: max(18px, calc((100vw - 480px) / 2 + 18px));
-  bottom: calc(85px + env(safe-area-inset-bottom));
   z-index: 40;
-
+  border: none;
   border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
-
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
 
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
-  transition: transform 0.12s ease;
+.fab:active {
+  transform: scale(0.92);
+}
+
+.fab.hidden {
+  display: none !important;
+}
+
+.fab svg {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.fab:hover svg {
+  transform: scale(1.05);
+}
+
+.fab:active svg {
+  transform: scale(0.85);
+}
+
+/* FAB Add — Primary action (lebih besar) */
+#fabAdd {
+  width: 56px;
+  height: 56px;
+  right: max(20px, calc((100vw - 480px) / 2 + 20px));
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
+}
+
+#fabAdd svg {
+  width: 24px;
+  height: 24px;
+}
+
+#fabAdd:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(22, 163, 74, 0.45);
 }
 
 #fabAdd:active {
-  transform: scale(0.93);
+  transform: scale(0.92);
 }
 
-#fabAdd.hidden {
-  display: none !important;
-}
-
+/* FAB Post to Kas — Secondary action (lebih kecil) */
 #fabPostToKas {
-  right: 16px;
-  bottom: 130px;
+  width: 48px;
+  height: 48px;
+  right: max(24px, calc((100vw - 480px) / 2 + 24px));
+  bottom: calc(160px + env(safe-area-inset-bottom));
+  background: var(--gold);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(199, 154, 68, 0.3);
+}
+
+#fabPostToKas svg {
+  width: 20px;
+  height: 20px;
+}
+
+#fabPostToKas:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 10px 32px rgba(199, 154, 68, 0.4);
 }
 
 #fabPostToKas:active {
-  transform: scale(0.93);
+  transform: scale(0.92);
 }
 
-#fabPostToKas.hidden {
-  display: none !important;
+/* FAB Label tooltip — Stylist & modern */
+.fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
 }
 
+.fab:hover .fab-label,
+.fab:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* Mobile responsive */
 @media (max-width: 480px) {
+  #fabAdd {
+    width: 50px;
+    height: 50px;
+    right: 16px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+
+  #fabAdd svg {
+    width: 22px;
+    height: 22px;
+  }
+
   #fabPostToKas {
-    right: 14px;
-    bottom: 120px;
     width: 44px;
     height: 44px;
+    right: 20px;
+    bottom: calc(144px + env(safe-area-inset-bottom));
   }
+
+  #fabPostToKas svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .fab-label {
+    display: none; /* Sembunyikan label di mobile untuk clean look */
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+  #fabAdd {
+    width: 46px;
+    height: 46px;
+    right: 14px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  #fabAdd svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  #fabPostToKas {
+    width: 40px;
+    height: 40px;
+    right: 18px;
+    bottom: calc(136px + env(safe-area-inset-bottom));
+  }
+
+  #fabPostToKas svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Dark mode adjustments */
+html[data-theme="dark"] .fab {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] #fabAdd {
+  box-shadow: 0 8px 28px rgba(40, 199, 111, 0.3);
+}
+
+html[data-theme="dark"] #fabPostToKas {
+  box-shadow: 0 6px 24px rgba(233, 173, 56, 0.25);
+}
+
+/* Pulse animation untuk FAB Add — menarik perhatian */
+@keyframes fabPulse {
+  0% {
+    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(22, 163, 74, 0.55),
+      0 0 0 8px rgba(22, 163, 74, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
+  }
+}
+
+#fabAdd:not(:hover) {
+  animation: fabPulse 3s ease-in-out infinite;
+}
+
+/* Hentikan pulse saat hover */
+#fabAdd:hover {
+  animation: none;
 }
 
 /* ---------- Sheets ---------- */
@@ -1616,17 +1781,6 @@ html.authenticated #shell {
   background: var(--neg-soft);
   color: var(--neg);
 }
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(2px);
-}
 
 @keyframes spin {
   to {
@@ -1634,10 +1788,14 @@ html.authenticated #shell {
   }
 }
 
+/* ============================================================
+   MODAL OVERLAY - HARUS DI ATAS SEMUA SHEET
+   ============================================================ */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 99999 !important; /* Di atas semua sheet */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1646,9 +1804,15 @@ html.authenticated #shell {
   backdrop-filter: blur(2px);
 }
 
+.modal-overlay.hidden {
+  display: none !important;
+}
+
 .modal-box {
   width: 100%;
   max-width: 380px;
+  position: relative;
+  z-index: 100000 !important; /* Di atas modal overlay */
 }
 
 .modal-icon {
@@ -2857,4 +3021,855 @@ html[data-theme="dark"] .date-picker-manual-input {
 .tx-chevron {
   flex-shrink: 0;
   margin-left: 2px;
+}
+
+/* ============================================================
+   LOGOUT CONFIRM MODAL
+   ============================================================ */
+
+#logoutConfirmOverlay .modal-box {
+  max-width: 360px;
+}
+
+#logoutConfirmOverlay .modal-icon svg {
+  stroke-width: 2;
+}
+
+#logoutConfirmOverlay .btn-primary[style*="background: var(--neg)"]:hover {
+  background: var(--neg-dark) !important;
+}
+
+#logoutConfirmOverlay .btn-primary[style*="background: var(--neg)"]:active {
+  transform: scale(0.97);
+}
+
+/* ============================================================
+   STATUS BADGE — AKTIF / TIDAK AKTIF
+   ============================================================ */
+
+.status-active {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.status-inactive {
+  background: var(--neg-soft);
+  color: var(--neg);
+}
+
+/* ============================================================
+   SHODAQOH MEMBERS LIST — IMPROVED STYLING
+   ============================================================ */
+
+#shodMembersList {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+
+#shodMembersList .tx-card {
+  padding: 12px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+#shodMembersList .tx-card:hover {
+  background: var(--surface-alt);
+  border-color: var(--line);
+}
+
+#shodMembersList .tx-card:active {
+  transform: scale(0.98);
+  background: var(--surface-alt);
+}
+
+#shodMembersList .tx-card.tx-card-clickable {
+  cursor: pointer;
+}
+
+#shodMembersList .tx-card .tx-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#shodMembersList .tx-card .tx-meta {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+#shodMembersList .tx-card .status-pill {
+  font-size: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Scrollbar styling */
+#shodMembersList::-webkit-scrollbar {
+  width: 4px;
+}
+
+#shodMembersList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#shodMembersList::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+/* Empty state */
+#shodMembersList .empty-state svg {
+  opacity: 0.4;
+}
+
+#shodMembersList .empty-state p {
+  color: var(--ink-faint);
+}
+
+/* Dark mode */
+html[data-theme="dark"] #shodMembersList .tx-card:hover {
+  background: var(--surface-alt);
+}
+
+html[data-theme="dark"] #shodMembersList .tx-card:active {
+  background: var(--surface-alt);
+}
+/* ============================================================
+   SHEET ACTION — LEBIH PENDEK (COMPACT) & RESPONSIF
+   ============================================================ */
+
+/* Member Action Sheet - lebih pendek */
+#shodMemberActionOverlay .sheet {
+  height: auto;
+  max-height: 55vh;
+  min-height: 0;
+  padding: 8px 16px 0;
+}
+
+#shodMemberActionOverlay .sheet .card {
+  padding: 4px !important;
+  border-radius: 10px;
+}
+
+#shodMemberActionOverlay .sheet .card button {
+  padding: 10px 12px !important;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  transition: all 0.15s ease;
+}
+
+#shodMemberActionOverlay .sheet .card button:hover {
+  background: var(--surface-alt);
+}
+
+#shodMemberActionOverlay .sheet .card button:active {
+  transform: scale(0.98);
+}
+
+#shodMemberActionOverlay .sheet .card .icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: var(--surface-alt);
+  border: none;
+}
+
+#shodMemberActionOverlay .sheet .card .icon-btn svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
+#shodMemberActionOverlay .sheet .card .icon-btn:hover {
+  background: var(--surface);
+}
+
+/* TX Action Sheet - konsisten dengan member action sheet */
+#txActionOverlay .sheet {
+  height: auto;
+  max-height: 55vh;
+  min-height: 0;
+  padding: 8px 16px 0;
+}
+
+#txActionOverlay .sheet .card {
+  padding: 4px !important;
+  border-radius: 10px;
+}
+
+#txActionOverlay .sheet .card button {
+  padding: 10px 12px !important;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  transition: all 0.15s ease;
+}
+
+#txActionOverlay .sheet .card button:hover {
+  background: var(--surface-alt);
+}
+
+#txActionOverlay .sheet .card button:active {
+  transform: scale(0.98);
+}
+
+#txActionOverlay .sheet .card .icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: var(--surface-alt);
+  border: none;
+}
+
+#txActionOverlay .sheet .card .icon-btn svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
+#txActionOverlay .sheet .card .icon-btn:hover {
+  background: var(--surface);
+}
+
+/* Sheet header untuk action sheets - lebih kompak & konsisten */
+#shodMemberActionOverlay .sheet-header,
+#txActionOverlay .sheet-header {
+  padding-top: 4px;
+  padding-bottom: 6px;
+  flex-shrink: 0;
+}
+
+#shodMemberActionOverlay .sheet-handle,
+#txActionOverlay .sheet-handle {
+  margin: 4px auto 8px;
+  width: 32px;
+  height: 3px;
+  background: var(--line);
+  border-radius: 999px;
+}
+
+#shodMemberActionOverlay .sheet .sheet-scroll,
+#txActionOverlay .sheet .sheet-scroll {
+  padding-top: 2px;
+  padding-bottom: 8px;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Title & subtitle di action sheet - konsisten */
+#shodMemberActionOverlay #shodMemberActionTitle,
+#txActionOverlay #txActionTitle {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+#shodMemberActionOverlay #shodMemberActionSubtitle,
+#txActionOverlay #txActionSubtitle {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+   PERBAIKAN Z-INDEX UNTUK KLIK
+   ============================================================ */
+
+#shodMembersList .tx-card {
+  z-index: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+#shodMembersList .tx-card:active {
+  transform: scale(0.98);
+  z-index: 2;
+}
+
+#shodPaymentsList .tx-card {
+  cursor: pointer;
+}
+
+/* Pastikan sheet overlay di atas semua */
+#shodMemberActionOverlay,
+#txActionOverlay {
+  z-index: 500;
+}
+
+#shodMemberActionOverlay .sheet,
+#txActionOverlay .sheet {
+  z-index: 501;
+}
+
+/* ============================================================
+   RESPONSIF UNTUK MOBILE — KONSISTEN
+   ============================================================ */
+
+@media (max-width: 480px) {
+  #shodMemberActionOverlay .sheet,
+  #txActionOverlay .sheet {
+    max-height: 50vh;
+    padding: 6px 12px 0;
+  }
+
+  #shodMemberActionOverlay .sheet .card button,
+  #txActionOverlay .sheet .card button {
+    padding: 8px 10px !important;
+    min-height: 36px;
+    font-size: 11.5px;
+  }
+
+  #shodMemberActionOverlay .sheet .card .icon-btn,
+  #txActionOverlay .sheet .card .icon-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  #shodMemberActionOverlay .sheet .card .icon-btn svg,
+  #txActionOverlay .sheet .card .icon-btn svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  #shodMemberActionOverlay #shodMemberActionTitle,
+  #txActionOverlay #txActionTitle {
+    font-size: 13px;
+  }
+
+  #shodMemberActionOverlay #shodMemberActionSubtitle,
+  #txActionOverlay #txActionSubtitle {
+    font-size: 10px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+  #shodMemberActionOverlay .sheet,
+  #txActionOverlay .sheet {
+    max-height: 45vh;
+    padding: 4px 10px 0;
+  }
+
+  #shodMemberActionOverlay .sheet .card button,
+  #txActionOverlay .sheet .card button {
+    padding: 6px 8px !important;
+    min-height: 32px;
+    font-size: 10.5px;
+  }
+}
+
+/* ============================================================
+   ANIMASI SHEET ACTION
+   ============================================================ */
+
+#shodMemberActionOverlay:not(.hidden) .sheet,
+#txActionOverlay:not(.hidden) .sheet {
+  animation: sheetUp 0.2s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Dark mode adjustments */
+html[data-theme="dark"] #shodMemberActionOverlay .sheet .card .icon-btn,
+html[data-theme="dark"] #txActionOverlay .sheet .card .icon-btn {
+  background: var(--surface-alt);
+}
+
+html[data-theme="dark"] #shodMemberActionOverlay .sheet .card button:hover,
+html[data-theme="dark"] #txActionOverlay .sheet .card button:hover {
+  background: var(--surface-alt);
+}
+
+/* ============================================================
+   SHEET V4 — BODY-LEVEL VIEWPORT LAYER
+   ============================================================ */
+body > .sheet-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  z-index: 10000 !important; /* Turunkan dari 10000 ke 9999 agar modal bisa di atas */
+  box-sizing: border-box !important;
+  background: rgba(4, 8, 7, 0.55) !important;
+  overscroll-behavior: contain !important;
+  touch-action: none !important;
+}
+
+body > .sheet-overlay.hidden {
+  display: none !important;
+}
+
+body > .sheet-overlay:not(.hidden) > .sheet {
+  position: relative !important;
+  z-index: 10001 !important;
+  width: min(100vw, 480px) !important;
+  max-width: 480px !important;
+  max-height: 92dvh !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  border-radius: 18px 18px 0 0 !important;
+  box-sizing: border-box !important;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Bottom navigation is intentionally below an open sheet. */
+#bottomnav {
+  z-index: 50 !important;
+}
+
+/* Header system used by every sheet. */
+body > .sheet-overlay .sheet-header {
+  flex: 0 0 auto !important;
+  padding: 4px 0 14px !important;
+  margin: 0 !important;
+  background: var(--app-bg) !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+body > .sheet-overlay .sheet-header .sheet-handle,
+body > .sheet-overlay > .sheet > .sheet-handle {
+  width: 38px !important;
+  height: 4px !important;
+  margin: 6px auto 14px !important;
+  border-radius: 999px !important;
+  background: var(--line) !important;
+}
+
+body > .sheet-overlay .sheet-title {
+  margin: 0 !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+  color: var(--ink) !important;
+  letter-spacing: -0.025em !important;
+  text-align: left !important;
+}
+
+body > .sheet-overlay .sheet-subtitle {
+  margin: 5px 0 0 !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  color: var(--ink-soft) !important;
+  text-align: left !important;
+}
+
+body > .sheet-overlay .sheet-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-top: 8px !important;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Action sheets: konsisten antara member dan tx action */
+body > #shodMemberActionOverlay > .sheet,
+body > #txActionOverlay > .sheet {
+  max-height: 58vh !important;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+}
+
+body > #shodMemberActionOverlay .sheet-header,
+body > #txActionOverlay .sheet-header {
+  padding-top: 4px !important;
+  padding-bottom: 10px !important;
+}
+
+body > #shodMemberActionOverlay .sheet-title,
+body > #txActionOverlay .sheet-title {
+  text-align: center !important;
+  font-size: 15px !important;
+}
+
+body > #shodMemberActionOverlay .sheet-subtitle,
+body > #txActionOverlay .sheet-subtitle {
+  text-align: center !important;
+  font-size: 11px !important;
+}
+
+body > #shodMemberActionOverlay .sheet-scroll,
+body > #txActionOverlay .sheet-scroll {
+  padding-bottom: calc(34px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Payment sheet has its own long form; keep it above nav and scroll inside. */
+body > #shodaqohPaymentOverlay > .sheet {
+  height: min(92dvh, 760px) !important;
+  max-height: 92dvh !important;
+  overflow: hidden !important;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+}
+
+body > #shodaqohPaymentOverlay .sheet-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-bottom: calc(36px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Transaction sheet gets exactly the same header treatment. */
+#txOverlay > .sheet {
+  height: auto !important;
+  max-height: 82dvh !important;
+  overflow: hidden !important;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+}
+
+#txOverlay .sheet-scroll {
+  max-height: calc(82dvh - 100px) !important;
+  overflow-y: auto !important;
+  padding-bottom: 12px !important;
+}
+
+#txOverlay .sheet-header {
+  padding-bottom: 10px !important;
+}
+
+#txOverlay .sheet-header .sheet-handle {
+  margin-bottom: 9px !important;
+}
+
+#txOverlay .sheet-header .sheet-subtitle {
+  margin-top: 3px !important;
+}
+
+@media (max-width: 480px) {
+  body > .sheet-overlay:not(.hidden) > .sheet {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  body > #shodMemberActionOverlay > .sheet,
+  body > #txActionOverlay > .sheet {
+    max-height: 60vh !important;
+  }
+}
+
+@media (max-width: 380px) {
+  body > #shodMemberActionOverlay > .sheet,
+  body > #txActionOverlay > .sheet {
+    max-height: 58vh !important;
+  }
+}
+
+/* ============================================================
+   V6 — HEADER VARIANTS
+   ============================================================ */
+body > .sheet-overlay .sheet-header-action {
+  display: block !important;
+  text-align: center !important;
+  padding: 4px 0 12px !important;
+  margin: 0 !important;
+}
+body > .sheet-overlay .sheet-header-action .sheet-handle {
+  width: 32px !important;
+  height: 3px !important;
+  margin: 4px auto 8px !important;
+  border-radius: 999px !important;
+}
+body > .sheet-overlay .sheet-header-action .sheet-title {
+  margin: 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 15px !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--ink) !important;
+}
+body > .sheet-overlay .sheet-header-action .sheet-subtitle {
+  margin: 3px 0 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  color: var(--ink-soft) !important;
+}
+body > .sheet-overlay .sheet-header-payment {
+  display: block !important;
+  text-align: center !important;
+  padding: 4px 0 14px !important;
+  margin: 0 !important;
+}
+body > .sheet-overlay .sheet-header-payment .sheet-handle {
+  width: 38px !important;
+  height: 4px !important;
+  margin: 6px auto 12px !important;
+  border-radius: 999px !important;
+}
+body > .sheet-overlay .sheet-header-payment .sheet-header-icon {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 auto 8px !important;
+  border-radius: 12px !important;
+  background: var(--brand-soft) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--brand) !important;
+}
+body > .sheet-overlay .sheet-header-payment .sheet-title {
+  margin: 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  color: var(--ink) !important;
+}
+body > .sheet-overlay .sheet-header-payment .sheet-subtitle {
+  margin: 5px 0 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  color: var(--ink-soft) !important;
+}
+
+/* ============================================================
+   PAYMENT ITEM — CLICKABLE
+   ============================================================ */
+
+[data-shod-payment] {
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+[data-shod-payment]:hover {
+  background: var(--surface-alt);
+}
+
+[data-shod-payment]:active {
+  transform: scale(0.98);
+}
+
+[data-shod-payment] .tx-card {
+  border-radius: 10px;
+  padding: 12px 10px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  background: var(--surface);
+}
+
+[data-shod-payment]:hover .tx-card {
+  border-color: var(--line);
+}
+
+[data-shod-payment]:active .tx-card {
+  background: var(--surface-alt);
+}
+
+/* ============================================================
+   PAYMENT DETAIL SHEET — KONSISTEN DENGAN ACTION SHEET
+   ============================================================ */
+
+/* Payment Detail - lebih tinggi dari action sheet karena ada konten detail */
+body > #shodPaymentDetailOverlay > .sheet {
+  max-height: 78dvh !important;
+  height: auto !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  overflow: hidden !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-header {
+  padding-top: 4px !important;
+  padding-bottom: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-title {
+  text-align: center !important;
+  font-size: 15px !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-subtitle {
+  text-align: center !important;
+  font-size: 11px !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+}
+
+/* ============================================================
+   KONSISTENSI UNTUK SEMUA ACTION SHEET
+   ============================================================ */
+
+/* Member Action & Transaction Action - compact (hanya aksi) */
+body > #shodMemberActionOverlay > .sheet,
+body > #txActionOverlay > .sheet {
+  max-height: 55vh !important;
+  height: auto !important;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Payment Detail - lebih tinggi karena ada konten detail */
+body > #shodPaymentDetailOverlay > .sheet {
+  max-height: 78dvh !important;
+  height: auto !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Responsif mobile */
+@media (max-width: 480px) {
+  body > #shodMemberActionOverlay > .sheet,
+  body > #txActionOverlay > .sheet {
+    max-height: 60vh !important;
+  }
+
+  body > #shodPaymentDetailOverlay > .sheet {
+    max-height: 82dvh !important;
+  }
+}
+
+@media (max-width: 380px) {
+  body > #shodMemberActionOverlay > .sheet,
+  body > #txActionOverlay > .sheet {
+    max-height: 58vh !important;
+  }
+
+  body > #shodPaymentDetailOverlay > .sheet {
+    max-height: 80dvh !important;
+  }
+}
+
+/* ============================================================
+   SKELETON LOADING
+   ============================================================ */
+
+.skeleton-loading {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-line {
+  background: var(--line);
+  border-radius: 4px;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Skeleton untuk tx-card di payment detail */
+#shodPaymentDetailBody .tx-card.skeleton-loading {
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+#shodPaymentDetailBody .tx-card.skeleton-loading:last-child {
+  border-bottom: none;
+}
+
+/* Dark mode */
+html[data-theme="dark"] .skeleton-line {
+  background: var(--line);
+}
+
+html[data-theme="dark"] .skeleton-loading {
+  background: transparent;
+}
+
+/* ============================================================
+   MEMBER DETAIL SHEET — KONSISTEN DENGAN PAYMENT DETAIL
+   ============================================================ */
+
+body > #shodMemberDetailOverlay > .sheet {
+  max-height: 78dvh !important;
+  height: auto !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  overflow: hidden !important;
+}
+
+body > #shodMemberDetailOverlay .sheet-header {
+  padding-top: 4px !important;
+  padding-bottom: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+body > #shodMemberDetailOverlay .sheet-title {
+  text-align: center !important;
+  font-size: 15px !important;
+}
+
+body > #shodMemberDetailOverlay .sheet-subtitle {
+  text-align: center !important;
+  font-size: 11px !important;
+}
+
+body > #shodMemberDetailOverlay .sheet-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Skeleton loading untuk tabel member detail */
+#shodMemberDetailBody .skeleton-row td {
+  padding: 10px 4px;
+}
+
+#shodMemberDetailBody .skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--line);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+#shodMemberDetailBody .skeleton-line.short {
+  width: 40%;
+}
+
+#shodMemberDetailBody .skeleton-line.medium {
+  width: 60%;
+}
+
+#shodMemberDetailBody .skeleton-line.long {
+  width: 80%;
 }

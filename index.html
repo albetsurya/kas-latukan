@@ -996,20 +996,7 @@
 
           <!-- Member list -->
           <div class="card p-4">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="font-display text-[13px] font-extrabold">
-                Daftar Anggota
-              </h2>
-              <button
-                id="btnAddMember"
-                class="text-xs font-bold"
-                style="color: var(--brand)"
-              >
-                + Tambah
-              </button>
-            </div>
-
-            <div id="shodMembersList" class="space-y-2"></div>
+            <div id="shodMembersList"></div>
           </div>
 
           <!-- Payment history -->
@@ -1024,10 +1011,7 @@
           <div id="shodaqohPaymentOverlay" class="sheet-overlay hidden">
             <div class="sheet">
               <!-- ===== HEADER DENGAN SPACE LEBIH BESAR ===== -->
-              <div
-                class="sheet-header"
-                style="padding-top: 12px; padding-bottom: 16px"
-              >
+              <div class="sheet-header sheet-header-payment">
                 <div class="sheet-handle"></div>
 
                 <!-- Icon/Logo kecil di atas judul -->
@@ -1516,105 +1500,195 @@
 
           <!-- ==================== MEMBER ACTION SHEET ==================== -->
           <div id="shodMemberActionOverlay" class="sheet-overlay hidden">
-            <div class="sheet">
-              <div class="sheet-handle"></div>
-
-              <h3
-                class="font-display text-[16px] font-extrabold"
-                id="shodMemberActionTitle"
+            <div
+              class="sheet"
+              style="height: auto; max-height: 55vh; min-height: 0"
+            >
+              <div
+                class="sheet-header"
+                style="padding-top: 4px; padding-bottom: 6px"
               >
-                Anggota
-              </h3>
-              <p
-                class="text-[12.5px] text-[color:var(--ink-soft)] mt-1 mb-4"
-                id="shodMemberActionSubtitle"
-              ></p>
-
-              <div class="card p-1 divide-y divide-[color:var(--line)]">
-                <button
-                  type="button"
-                  id="btnMemberActionDetail"
-                  class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+                <div
+                  class="sheet-handle"
+                  style="margin: 4px auto 8px; width: 32px; height: 3px"
+                ></div>
+                <h3
+                  class="font-display text-[15px] font-extrabold text-center"
+                  id="shodMemberActionTitle"
                 >
-                  <span class="icon-btn" style="pointer-events: none">
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                      <path d="M12 8v4" />
-                      <path d="M12 16h.01" />
-                    </svg>
-                  </span>
-                  <span class="font-display text-[13.5px] font-bold flex-1"
-                    >Detail Anggota</span
-                  >
-                </button>
-
-                <button
-                  type="button"
-                  id="btnMemberActionEdit"
-                  class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-                >
-                  <span class="icon-btn" style="pointer-events: none">
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
-                      />
-                    </svg>
-                  </span>
-                  <span class="font-display text-[13.5px] font-bold flex-1"
-                    >Edit Anggota</span
-                  >
-                </button>
-
-                <button
-                  type="button"
-                  id="btnMemberActionDelete"
-                  class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-                  style="color: var(--neg)"
-                >
-                  <span
-                    class="icon-btn"
-                    style="pointer-events: none; color: var(--neg)"
-                  >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
-                      />
-                    </svg>
-                  </span>
-                  <span class="font-display text-[13.5px] font-bold flex-1"
-                    >Hapus Anggota</span
-                  >
-                </button>
+                  Anggota
+                </h3>
+                <p
+                  class="text-[11px] text-[color:var(--ink-soft)] text-center mt-0.5"
+                  id="shodMemberActionSubtitle"
+                ></p>
               </div>
 
-              <button
-                type="button"
-                id="btnMemberActionCancel"
-                class="btn-ghost w-full mt-3"
+              <div
+                class="sheet-scroll"
+                style="padding-top: 2px; padding-bottom: 8px"
               >
-                Batal
-              </button>
+                <div
+                  class="card p-1 divide-y divide-[color:var(--line)]"
+                  style="border-radius: 10px; padding: 4px !important"
+                >
+                  <button
+                    type="button"
+                    id="btnMemberActionDetail"
+                    class="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[color:var(--surface-alt)] transition-colors"
+                    style="min-height: 40px; font-size: 12.5px"
+                  >
+                    <span
+                      class="icon-btn"
+                      style="
+                        pointer-events: none;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 8px;
+                        flex-shrink: 0;
+                        background: var(--surface-alt);
+                        border: none;
+                      "
+                    >
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
+                      </svg>
+                    </span>
+                    <span class="font-display text-[13px] font-bold flex-1"
+                      >Detail Anggota</span
+                    >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="var(--ink-faint)"
+                      stroke-width="1.5"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="btnMemberActionEdit"
+                    class="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[color:var(--surface-alt)] transition-colors"
+                    style="min-height: 40px; font-size: 12.5px"
+                  >
+                    <span
+                      class="icon-btn"
+                      style="
+                        pointer-events: none;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 8px;
+                        flex-shrink: 0;
+                        background: var(--surface-alt);
+                        border: none;
+                      "
+                    >
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                        />
+                      </svg>
+                    </span>
+                    <span class="font-display text-[13px] font-bold flex-1"
+                      >Edit Anggota</span
+                    >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="var(--ink-faint)"
+                      stroke-width="1.5"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="btnMemberActionDelete"
+                    class="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[color:var(--neg-soft)] transition-colors"
+                    style="
+                      color: var(--neg);
+                      min-height: 40px;
+                      font-size: 12.5px;
+                    "
+                  >
+                    <span
+                      class="icon-btn"
+                      style="
+                        pointer-events: none;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 8px;
+                        flex-shrink: 0;
+                        background: var(--neg-soft);
+                        border: none;
+                        color: var(--neg);
+                      "
+                    >
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
+                        />
+                      </svg>
+                    </span>
+                    <span class="font-display text-[13px] font-bold flex-1"
+                      >Hapus Anggota</span
+                    >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="var(--neg)"
+                      stroke-width="1.5"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  id="btnMemberActionCancel"
+                  class="btn-ghost w-full mt-2"
+                  style="
+                    padding: 10px 0;
+                    font-size: 12.5px;
+                    border-radius: 10px;
+                  "
+                >
+                  Batal
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1744,79 +1818,166 @@
           <!-- ==================== MEMBER DETAIL ==================== -->
           <div id="shodMemberDetailOverlay" class="sheet-overlay hidden">
             <div class="sheet">
-              <div class="sheet-handle"></div>
-
-              <h3
-                id="shodMemberDetailTitle"
-                class="font-display text-[16px] font-extrabold"
-              >
-                Detail Anggota
-              </h3>
-              <p
-                id="shodMemberDetailMeta"
-                class="text-xs text-[color:var(--ink-soft)] mt-1 mb-4"
-              ></p>
-
-              <div class="overflow-x-auto">
-                <table class="w-full text-xs">
-                  <thead>
-                    <tr>
-                      <th class="py-2 text-left">Periode</th>
-                      <th class="py-2 text-left">Target</th>
-                      <th class="py-2 text-left">Status</th>
-                      <th class="py-2 text-left">Payment</th>
-                      <th class="py-2 text-left">Tanggal</th>
-                    </tr>
-                  </thead>
-                  <tbody id="shodMemberDetailBody"></tbody>
-                </table>
+              <div class="sheet-header sheet-header-action">
+                <div class="sheet-handle"></div>
+                <h3 class="sheet-title" id="shodMemberDetailTitle">
+                  Detail Anggota
+                </h3>
+                <p class="sheet-subtitle" id="shodMemberDetailMeta">
+                  Memuat...
+                </p>
               </div>
 
-              <button
-                type="button"
-                id="btnCloseShodMemberDetail"
-                class="btn-ghost w-full mt-4"
-              >
-                Tutup
-              </button>
+              <div class="sheet-scroll">
+                <!-- Table member obligations -->
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs">
+                    <thead>
+                      <tr class="border-b border-[color:var(--line)]">
+                        <th
+                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider"
+                        >
+                          Periode
+                        </th>
+                        <th
+                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider"
+                        >
+                          Target
+                        </th>
+                        <th
+                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider"
+                        >
+                          Status
+                        </th>
+                        <th
+                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider"
+                        >
+                          Payment
+                        </th>
+                        <th
+                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider"
+                        >
+                          Tanggal
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="shodMemberDetailBody">
+                      <!-- Skeleton akan diisi oleh JavaScript -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <button
+                  type="button"
+                  id="btnCloseShodMemberDetail"
+                  class="btn-ghost w-full mt-4"
+                >
+                  Tutup
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- ==================== PAYMENT DETAIL ==================== -->
           <div id="shodPaymentDetailOverlay" class="sheet-overlay hidden">
             <div class="sheet">
-              <div class="sheet-handle"></div>
+              <div class="sheet-header sheet-header-action">
+                <div class="sheet-handle"></div>
+                <h3 class="sheet-title" id="shodPaymentDetailTitle">
+                  Detail Pembayaran
+                </h3>
+                <p class="sheet-subtitle" id="shodPaymentDetailMeta">
+                  Memuat...
+                </p>
+              </div>
 
-              <h3
-                id="shodPaymentDetailTitle"
-                class="font-display text-[16px] font-extrabold"
-              >
-                Detail Pembayaran
-              </h3>
-              <p
-                id="shodPaymentDetailMeta"
-                class="text-xs text-[color:var(--ink-soft)] mt-1 mb-4"
-              ></p>
+              <div class="sheet-scroll">
+                <!-- Allocation details -->
+                <div id="shodPaymentDetailBody" class="space-y-2"></div>
 
-              <div id="shodPaymentDetailBody" class="space-y-2"></div>
+                <!-- ===== ACTION BUTTONS ===== -->
+                <div class="card p-1 divide-y divide-[color:var(--line)] mt-4">
+                  <button
+                    type="button"
+                    id="btnShodEditPayment"
+                    class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+                  >
+                    <span class="icon-btn" style="pointer-events: none">
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                        />
+                      </svg>
+                    </span>
+                    <span class="font-display text-[13.5px] font-bold flex-1"
+                      >Edit Pembayaran</span
+                    >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="var(--ink-faint)"
+                      stroke-width="1.5"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
 
-              <div class="grid grid-cols-3 gap-2 mt-4">
+                  <button
+                    type="button"
+                    id="btnShodReversePayment"
+                    class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+                    style="color: var(--neg)"
+                  >
+                    <span
+                      class="icon-btn"
+                      style="pointer-events: none; color: var(--neg)"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M3 10h18M3 6h18M5 14h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 1 2-2z"
+                        />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
+                      </svg>
+                    </span>
+                    <span class="font-display text-[13.5px] font-bold flex-1"
+                      >Reversal Pembayaran</span
+                    >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="var(--neg)"
+                      stroke-width="1.5"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   id="btnCloseShodPaymentDetail"
-                  class="btn-ghost"
+                  class="btn-ghost w-full mt-3"
                 >
                   Tutup
-                </button>
-                <button type="button" id="btnShodEditPayment" class="btn-ghost">
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  id="btnShodReversePayment"
-                  class="btn-primary"
-                >
-                  Reversal
                 </button>
               </div>
             </div>
@@ -1824,16 +1985,17 @@
         </section>
       </main>
 
-      <!-- ===================== FAB ===================== -->
+      <!-- ===================== FLOATING ACTION BUTTONS ===================== -->
+      <!-- FAB ADD — Primary action -->
       <button
         id="fabAdd"
-        class="hidden"
+        class="fab hidden"
         data-action="create"
         aria-label="Tambah transaksi"
       >
         <svg
-          width="22"
-          height="22"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -1841,31 +2003,14 @@
         >
           <path d="M12 5v14M5 12h14" />
         </svg>
+        <span class="fab-label">Tambah Transaksi</span>
       </button>
 
-      <!-- FAB POST KE KAS (Hanya muncul di tab Infak Bulanan) -->
+      <!-- FAB POST KE KAS — Secondary action (hanya di tab Infak Bulanan) -->
       <button
         id="fabPostToKas"
-        class="hidden"
-        aria-label="Post ke Kas"
-        style="
-          position: fixed;
-          right: max(18px, calc((100vw - 480px) / 2 + 18px));
-          bottom: 140px;
-          z-index: 40;
-          width: 46px;
-          height: 46px;
-          border-radius: 50%;
-          background: var(--gold);
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px rgba(199, 154, 68, 0.3);
-          border: none;
-          cursor: pointer;
-          transition: transform 0.15s ease;
-        "
+        class="fab hidden"
+        aria-label="Post ke Kas Utama"
       >
         <svg
           width="20"
@@ -1879,6 +2024,7 @@
           <polyline points="15 3 21 3 21 9" />
           <line x1="9" y1="15" x2="21" y2="3" />
         </svg>
+        <span class="fab-label">Post ke Kas</span>
       </button>
 
       <!-- ===================== BOTTOM NAV ===================== -->
@@ -1975,132 +2121,189 @@
       <!-- ===================== TRANSACTION SHEETS ===================== -->
       <div id="txOverlay" class="sheet-overlay hidden">
         <div class="sheet">
-          <div class="sheet-handle"></div>
-          <h3 class="font-display text-[16px] font-extrabold" id="txSheetTitle">
-            Tambah Transaksi
-          </h3>
-          <p class="text-[12.5px] text-[color:var(--ink-soft)] mt-1 mb-4">
-            Saldo akan dihitung otomatis dari saldo berjalan.
-          </p>
+          <div class="sheet-header sheet-header-payment">
+            <div class="sheet-handle"></div>
 
-          <form id="txForm" class="space-y-3 create-form">
-            <div class="field-group">
-              <label class="field-label">Jenis Transaksi</label>
-              <div class="seg-toggle">
-                <button
-                  type="button"
-                  id="segDebet"
-                  class="seg-btn active-debet"
-                >
-                  Pemasukan
+            <!-- Icon/Logo kecil di atas judul -->
+            <div class="sheet-header-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M3 10h18M3 6h18M5 14h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 1 2-2z"
+                />
+              </svg>
+            </div>
+
+            <h3 class="sheet-title" id="txSheetTitle">Tambah Transaksi</h3>
+            <p class="sheet-subtitle">
+              Saldo akan dihitung otomatis dari saldo berjalan.
+            </p>
+          </div>
+
+          <div class="sheet-scroll">
+            <form id="txForm" class="space-y-3 create-form">
+              <div class="field-group">
+                <label class="field-label">Jenis Transaksi</label>
+                <div class="seg-toggle">
+                  <button
+                    type="button"
+                    id="segDebet"
+                    class="seg-btn active-debet"
+                  >
+                    Pemasukan
+                  </button>
+                  <button type="button" id="segKredit" class="seg-btn">
+                    Pengeluaran
+                  </button>
+                </div>
+              </div>
+
+              <!-- ===== DATE & ACCOUNT - DUA KOLOM ===== -->
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
+              >
+                <!-- DATE PICKER -->
+                <div class="field-group">
+                  <label class="field-label">Tanggal</label>
+                  <div class="filter-dropdown" id="txDateDropdown">
+                    <button
+                      type="button"
+                      id="txDateDropdownTrigger"
+                      class="filter-dropdown-trigger"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                    >
+                      <span
+                        id="txDateDropdownValue"
+                        class="filter-dropdown-value"
+                        >Pilih tanggal</span
+                      >
+                      <svg
+                        class="filter-dropdown-chevron"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                    <div
+                      id="txDateDropdownMenu"
+                      class="filter-dropdown-menu"
+                      role="listbox"
+                      aria-label="Pilih tanggal"
+                    >
+                      <!-- Calendar akan diisi oleh JavaScript -->
+                    </div>
+                  </div>
+                  <input type="hidden" id="txTanggal" value="" />
+                </div>
+
+                <!-- ACCOUNT DROPDOWN -->
+                <div class="field-group">
+                  <label class="field-label">Account (Kategori)</label>
+                  <div class="filter-dropdown" id="txAccountDropdown">
+                    <button
+                      type="button"
+                      id="txAccountDropdownTrigger"
+                      class="filter-dropdown-trigger"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                    >
+                      <span
+                        id="txAccountDropdownValue"
+                        class="filter-dropdown-value"
+                        >Pilih kategori</span
+                      >
+                      <svg
+                        class="filter-dropdown-chevron"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                    <div
+                      id="txAccountDropdownMenu"
+                      class="filter-dropdown-menu"
+                      role="listbox"
+                      aria-label="Pilih kategori"
+                    >
+                      <!-- Options akan diisi oleh JavaScript -->
+                    </div>
+                  </div>
+                  <input type="hidden" id="txAccount" value="" />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Keterangan</label>
+                <textarea
+                  required
+                  id="txKeterangan"
+                  rows="2"
+                  placeholder="Deskripsi rinci transaksi"
+                  class="field-input"
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Jumlah Nominal (Rp)</label>
+                <input
+                  required
+                  id="txJumlah"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="0"
+                  class="field-input mono"
+                />
+              </div>
+
+              <p
+                id="txError"
+                class="hidden text-xs px-3 py-2.5 form-error"
+                style="color: var(--neg); background: var(--neg-soft)"
+              ></p>
+
+              <div class="flex gap-2.5 pt-1">
+                <button type="button" id="btnCancelTx" class="btn-ghost flex-1">
+                  Batal
                 </button>
-                <button type="button" id="segKredit" class="seg-btn">
-                  Pengeluaran
+                <button
+                  type="submit"
+                  id="btnSubmitTx"
+                  class="btn-primary flex-1"
+                >
+                  Simpan
                 </button>
               </div>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Tanggal</label>
-              <input required id="txTanggal" type="date" class="field-input" />
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Account (Kategori)</label>
-              <input
-                required
-                id="txAccount"
-                type="text"
-                list="accountCategories"
-                placeholder="Pilih atau ketik kategori…"
-                class="field-input"
-              />
-              <datalist id="accountCategories">
-                <option value="SALDO AWAL"></option>
-                <option value="PEMASUKAN INFAK SAMBUNG"></option>
-                <option value="INFAK IR"></option>
-                <option value="PEMASUKAN UANG SAMBUNG"></option>
-                <option value="PEMASUKAN INFAK JUMAT"></option>
-                <option value="JIMPITAN"></option>
-                <option value="SIAR-SIAR"></option>
-                <option value="KAFAN"></option>
-                <option value="INFAK SERIBUAN"></option>
-                <option value="PEMASUKAN UKHRO MT"></option>
-                <option value="SETOR INFAK SAMBUNG"></option>
-                <option value="SETOR 2/3 INFAK JUMAT"></option>
-                <option value="INFAQ SAMBUNG DESA"></option>
-                <option value="INFAQ SAMBUNG DAERAH"></option>
-                <option value="UKHRO MT"></option>
-                <option value="BEBAN OPERASIONAL BULAN BERJALAN"></option>
-                <option value="BEBAN PENGELUARAN LAIN-LAIN"></option>
-                <option value="PEMASUKAN LAIN-LAIN"></option>
-                <option value="Infak IR"></option>
-                <option value="Pemasukan Uang Sambung"></option>
-                <option value="Pemasukan Jimpitan"></option>
-                <option value="Pemasukan Siar-siar"></option>
-                <option value="Pemasukan Seribuan"></option>
-                <option value="Pemasukan Kafan"></option>
-                <option value="Pemasukan Ukhro MT"></option>
-                <option value="Pemasukan Dana Kesehatan"></option>
-              </datalist>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Keterangan</label>
-              <textarea
-                required
-                id="txKeterangan"
-                rows="2"
-                placeholder="Deskripsi rinci transaksi"
-                class="field-input"
-              ></textarea>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Jumlah Nominal (Rp)</label>
-              <input
-                required
-                id="txJumlah"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="0"
-                class="field-input mono"
-              />
-            </div>
-
-            <p
-              id="txError"
-              class="hidden text-xs px-3 py-2.5 form-error"
-              style="color: var(--neg); background: var(--neg-soft)"
-            ></p>
-
-            <div class="flex gap-2.5 pt-1">
-              <button type="button" id="btnCancelTx" class="btn-ghost flex-1">
-                Batal
-              </button>
-              <button type="submit" id="btnSubmitTx" class="btn-primary flex-1">
-                Simpan
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 
       <!-- ===================== TX ACTION SHEET ===================== -->
       <div id="txActionOverlay" class="sheet-overlay hidden">
         <div class="sheet">
-          <div class="sheet-handle"></div>
-          <h3
-            class="font-display text-[16px] font-extrabold"
-            id="txActionTitle"
-          >
-            Transaksi
-          </h3>
-          <p
-            class="text-[12.5px] text-[color:var(--ink-soft)] mt-1 mb-4"
-            id="txActionSubtitle"
-          ></p>
+          <div class="sheet-header sheet-header-action">
+            <div class="sheet-handle"></div>
+            <h3 class="sheet-title" id="txActionTitle">Transaksi</h3>
+            <p class="sheet-subtitle" id="txActionSubtitle"></p>
+          </div>
 
           <div class="card p-1 divide-y divide-[color:var(--line)]">
             <button
@@ -2262,6 +2465,55 @@
               class="btn-primary"
             >
               Lanjutkan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== LOGOUT CONFIRM ===================== -->
+      <div id="logoutConfirmOverlay" class="modal-overlay hidden">
+        <div class="card modal-box p-5">
+          <div
+            class="modal-icon"
+            style="background: var(--neg-soft); color: var(--neg)"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </div>
+
+          <h3
+            class="font-display text-[15.5px] font-extrabold text-center mt-3"
+          >
+            Keluar dari Aplikasi?
+          </h3>
+          <p
+            class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5"
+            id="logoutConfirmDesc"
+          >
+            Anda akan keluar dari sesi saat ini. Data tetap tersimpan.
+          </p>
+
+          <div class="flex gap-2.5 pt-4">
+            <button type="button" id="btnLogoutCancel" class="btn-ghost flex-1">
+              Batal
+            </button>
+            <button
+              type="button"
+              id="btnLogoutConfirm"
+              class="btn-primary flex-1"
+              style="background: var(--neg)"
+            >
+              Keluar
             </button>
           </div>
         </div>
