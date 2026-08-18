@@ -2157,9 +2157,21 @@ async function loadLastNominals() {
     });
 
     if (hasData && sourceInfo.length > 0) {
-      showToast(`Data terakhir dari: ${sourceInfo.join(", ")}`, "success");
+      // Ambil hanya bulan sumber (unique)
+      const months = sourceInfo
+        .map(function (item) {
+          const match = item.match(/\((.+)\)$/);
+          return match ? match[1] : "";
+        })
+        .filter(Boolean);
+
+      const uniqueMonths = [...new Set(months)];
+      const monthStr =
+        uniqueMonths.length > 0 ? ` (dari ${uniqueMonths.join(", ")})` : "";
+
+      showToast(`✅ Data terakhir berhasil dimuat${monthStr}`, "success");
     } else if (!hasData) {
-      showToast("Tidak ada data nominal sebelumnya untuk anggota ini.", "info");
+      showToast("ℹ️ Tidak ada data nominal sebelumnya.", "info");
     }
 
     // Trigger allocation watcher
