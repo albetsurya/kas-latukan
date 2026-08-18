@@ -371,13 +371,18 @@ async function refreshAllData() {
   }
 }
 
-// Ubah loadData() menjadi panggil refreshAllData()
 async function loadData() {
   if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
     if ($("configWarning")) $("configWarning").classList.remove("hidden");
     renderTxList([], "txList", "txEmpty");
     return;
   }
+
+  // Tampilkan skeleton untuk semua tab
+  renderHomeSkeleton();
+  renderHistorySkeleton();
+  renderRecapSkeleton();
+
   await refreshAllData();
 }
 
@@ -495,6 +500,16 @@ function renderAllMonthChipRows() {
 function refreshScopedUI() {
   renderHome();
   applyFilters();
+
+  // Hapus chart skeleton dan tampilkan canvas
+  const chartWrapper = document.getElementById("chartWrapper");
+  if (chartWrapper) {
+    const skeleton = chartWrapper.querySelector(".chart-skeleton");
+    if (skeleton) skeleton.remove();
+
+    const canvas = chartWrapper.querySelector("#saldoChart");
+    if (canvas) canvas.style.display = "block";
+  }
 }
 
 function computeScope(monthKey) {
@@ -1545,6 +1560,9 @@ const SHOD_STATUS_LABELS = {
 
 async function loadShodaqohData(monthKey) {
   try {
+    // ===== TAMPILKAN SKELETON LOADING =====
+    renderShodaqohSkeleton();
+
     const month = monthKey || state.shodaqoh.selectedMonth || "";
     const data = await apiGetShodaqoh(month);
     if (!data.success) throw new Error(data.message || "Gagal memuat data");
@@ -1575,6 +1593,8 @@ async function loadShodaqohData(monthKey) {
   } catch (err) {
     console.error(err);
     showToast("Gagal memuat Shodaqoh IR: " + err.message, "error");
+    // Tampilkan state error di dashboard
+    renderShodaqohError(err.message);
   }
 }
 
@@ -4001,4 +4021,382 @@ function formatDateInput(date) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function renderShodaqohSkeleton() {
+  // Dashboard stats
+  const statIds = [
+    "shodTarget",
+    "shodReceived",
+    "shodPaidCount",
+    "shodUnpaidCount",
+  ];
+  statIds.forEach((id) => {
+    const el = $(id);
+    if (el) {
+      el.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
+    }
+  });
+
+  // Month label
+  const monthLabel = $("shodMonthLabel");
+  if (monthLabel) {
+    monthLabel.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:120px;height:12px;border-radius:4px;"></span>`;
+  }
+
+  // Allocation detail - semua total
+  const allocIds = [
+    "shodTotalSusulanIr",
+    "shodTotalUangSambung",
+    "shodTotalJimpitan",
+    "shodTotalSiarSiar",
+    "shodTotalSeribuan",
+    "shodTotalKafan",
+    "shodTotalUkhroMt",
+  ];
+  allocIds.forEach((id) => {
+    const el = $(id);
+    if (el) {
+      el.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:60px;height:14px;border-radius:4px;"></span>`;
+    }
+  });
+
+  // Post status - hidden saat loading
+  const postStatus = $("shodPostStatus");
+  if (postStatus) postStatus.classList.add("hidden");
+
+  // Monitoring table body - skeleton
+  const monitoringBody = $("shodMonitoringBody");
+  if (monitoringBody) {
+    monitoringBody.innerHTML = `
+      ${[1, 2, 3, 4, 5]
+        .map(
+          () => `
+        <tr class="border-t border-[color:var(--line)]">
+          <td class="py-3 pr-3"><span class="skeleton-line" style="display:inline-block;width:120px;height:14px;border-radius:4px;"></span></td>
+          <td class="py-3"><span class="skeleton-line" style="display:inline-block;width:70px;height:14px;border-radius:4px;"></span></td>
+          <td class="py-3"><span class="skeleton-line" style="display:inline-block;width:50px;height:14px;border-radius:4px;"></span></td>
+          <td class="py-3"><span class="skeleton-line" style="display:inline-block;width:80px;height:14px;border-radius:4px;"></span></td>
+        </tr>
+      `,
+        )
+        .join("")}
+    `;
+  }
+
+  // Member count
+  const memberCount = $("shodMemberCount");
+  if (memberCount) {
+    memberCount.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:30px;height:12px;border-radius:4px;"></span>`;
+  }
+
+  // Members list - skeleton
+  const membersList = $("shodMembersList");
+  if (membersList) {
+    membersList.innerHTML = `
+      <div class="flex items-center justify-between mb-3 pb-2 border-b border-[color:var(--line)]">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
+          Daftar Anggota
+        </span>
+        <span class="skeleton-line" style="display:inline-block;width:30px;height:12px;border-radius:4px;"></span>
+      </div>
+      ${[1, 2, 3, 4]
+        .map(
+          () => `
+        <div class="tx-card skeleton-loading">
+          <div class="flex-1">
+            <div class="skeleton-line" style="width:60%;height:16px;border-radius:4px;"></div>
+            <div class="skeleton-line mt-2" style="width:40%;height:12px;border-radius:4px;"></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="skeleton-line" style="width:50px;height:14px;border-radius:4px;"></div>
+          </div>
+        </div>
+      `,
+        )
+        .join("")}
+    `;
+  }
+
+  // Payment history - skeleton
+  const paymentsList = $("shodPaymentsList");
+  if (paymentsList) {
+    paymentsList.innerHTML = `
+      ${[1, 2, 3]
+        .map(
+          () => `
+        <div class="tx-card skeleton-loading">
+          <div class="flex-1">
+            <div class="skeleton-line" style="width:50%;height:16px;border-radius:4px;"></div>
+            <div class="skeleton-line mt-2" style="width:70%;height:12px;border-radius:4px;"></div>
+          </div>
+          <div class="text-right">
+            <div class="skeleton-line" style="width:60px;height:16px;border-radius:4px;margin-left:auto;"></div>
+            <div class="skeleton-line mt-2" style="width:40px;height:12px;border-radius:4px;margin-left:auto;"></div>
+          </div>
+        </div>
+      `,
+        )
+        .join("")}
+    `;
+  }
+}
+
+function renderShodaqohError(message) {
+  // Tampilkan error di dashboard stats
+  const statIds = [
+    "shodTarget",
+    "shodReceived",
+    "shodPaidCount",
+    "shodUnpaidCount",
+  ];
+  statIds.forEach((id) => {
+    const el = $(id);
+    if (el) {
+      el.innerHTML = `<span style="color:var(--neg);font-size:11px;">Error</span>`;
+    }
+  });
+
+  // Monitoring body - error state
+  const monitoringBody = $("shodMonitoringBody");
+  if (monitoringBody) {
+    monitoringBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="py-8 text-center">
+          <p class="text-xs text-[color:var(--neg)]">Gagal memuat data: ${escapeHtml(message)}</p>
+          <button type="button" id="btnRetryShodaqoh" class="mt-3 text-xs font-bold" style="color:var(--brand);">
+            Coba lagi
+          </button>
+        </td>
+      </tr>
+    `;
+
+    const retryBtn = document.getElementById("btnRetryShodaqoh");
+    if (retryBtn) {
+      retryBtn.addEventListener("click", function () {
+        loadShodaqohData(state.shodaqoh.selectedMonth);
+      });
+    }
+  }
+
+  // Members list - error state
+  const membersList = $("shodMembersList");
+  if (membersList) {
+    membersList.innerHTML = `
+      <div class="text-center py-8">
+        <p class="text-xs text-[color:var(--neg)]">Gagal memuat data anggota</p>
+      </div>
+    `;
+  }
+
+  // Payment history - error state
+  const paymentsList = $("shodPaymentsList");
+  if (paymentsList) {
+    paymentsList.innerHTML = `
+      <div class="text-center py-8">
+        <p class="text-xs text-[color:var(--neg)]">Gagal memuat riwayat pembayaran</p>
+      </div>
+    `;
+  }
+}
+
+function renderHomeSkeleton() {
+  // Hero card - saldo
+  const saldoAkhir = $("homeSaldoAkhir");
+  if (saldoAkhir) {
+    saldoAkhir.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:140px;height:30px;border-radius:4px;"></span>`;
+  }
+
+  const periodeText = $("homePeriodeText");
+  if (periodeText) {
+    periodeText.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:120px;height:14px;border-radius:4px;"></span>`;
+  }
+
+  const totalTx = $("homeTotalTx");
+  if (totalTx) {
+    totalTx.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:60px;height:14px;border-radius:4px;"></span>`;
+  }
+
+  const saldoAwal = $("homeSaldoAwal");
+  if (saldoAwal) {
+    saldoAwal.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
+  }
+
+  // Stat cards - debet & kredit
+  const debet = $("homeDebet");
+  if (debet) {
+    debet.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:18px;border-radius:4px;"></span>`;
+  }
+
+  const kredit = $("homeKredit");
+  if (kredit) {
+    kredit.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:18px;border-radius:4px;"></span>`;
+  }
+
+  // Surplus
+  const surplus = $("homeSurplus");
+  if (surplus) {
+    surplus.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:18px;border-radius:4px;"></span>`;
+  }
+
+  const surplusBadge = $("homeSurplusBadge");
+  if (surplusBadge) {
+    surplusBadge.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:50px;height:16px;border-radius:999px;"></span>`;
+  }
+
+  // ===== CHART SKELETON - PAS DI DALAM WRAPPER =====
+  const chartWrapper = document.getElementById("chartWrapper");
+  if (chartWrapper) {
+    // Hapus skeleton lama jika ada
+    const oldSkeleton = chartWrapper.querySelector(".chart-skeleton");
+    if (oldSkeleton) oldSkeleton.remove();
+
+    // Sembunyikan canvas
+    const canvas = chartWrapper.querySelector("#saldoChart");
+    if (canvas) canvas.style.display = "none";
+
+    // Buat skeleton baru
+    const skeleton = document.createElement("div");
+    skeleton.className = "chart-skeleton";
+    skeleton.innerHTML = `
+      <div class="chart-skeleton-content">
+        <!-- Garis grid horizontal -->
+        <div class="chart-skeleton-grid">
+          <div class="chart-skeleton-grid-line"></div>
+          <div class="chart-skeleton-grid-line"></div>
+          <div class="chart-skeleton-grid-line"></div>
+          <div class="chart-skeleton-grid-line"></div>
+          <div class="chart-skeleton-grid-line"></div>
+        </div>
+        <!-- Garis grafik (wave) -->
+        <div class="chart-skeleton-wave">
+          <div class="chart-skeleton-wave-line"></div>
+        </div>
+        <!-- Label sumbu X -->
+        <div class="chart-skeleton-labels">
+          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+        </div>
+      </div>
+    `;
+    chartWrapper.appendChild(skeleton);
+  }
+
+  // Recent transactions - skeleton
+  const recentList = $("homeRecentList");
+  if (recentList) {
+    recentList.innerHTML = `
+      ${[1, 2, 3, 4, 5]
+        .map(
+          () => `
+        <div class="tx-card skeleton-loading">
+          <div class="tx-icon skeleton-line" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;"></div>
+          <div class="flex-1">
+            <div class="skeleton-line" style="width:60%;height:16px;border-radius:4px;"></div>
+            <div class="skeleton-line mt-2" style="width:40%;height:12px;border-radius:4px;"></div>
+            <div class="skeleton-line mt-1" style="width:30%;height:10px;border-radius:4px;"></div>
+          </div>
+          <div class="text-right">
+            <div class="skeleton-line" style="width:60px;height:16px;border-radius:4px;margin-left:auto;"></div>
+            <div class="skeleton-line mt-2" style="width:40px;height:12px;border-radius:4px;margin-left:auto;"></div>
+          </div>
+        </div>
+      `,
+        )
+        .join("")}
+    `;
+  }
+
+  // Chart scope label
+  const chartScope = $("chartScopeLabel");
+  if (chartScope) {
+    chartScope.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>`;
+  }
+}
+
+function renderHistorySkeleton() {
+  // Saldo summary
+  const saldoAwal = $("rySaldoAwal");
+  if (saldoAwal) {
+    saldoAwal.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
+  }
+
+  const saldoAkhir = $("rySaldoAkhir");
+  if (saldoAkhir) {
+    saldoAkhir.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
+  }
+
+  const periodHint = $("periodHint");
+  if (periodHint) {
+    periodHint.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:180px;height:14px;border-radius:4px;"></span>`;
+  }
+
+  // Transaction list - skeleton
+  const txList = $("txList");
+  if (txList) {
+    txList.innerHTML = `
+      ${[1, 2, 3, 4, 5, 6, 7, 8]
+        .map(
+          () => `
+        <div class="tx-card skeleton-loading">
+          <div class="tx-icon skeleton-line" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;"></div>
+          <div class="flex-1">
+            <div class="skeleton-line" style="width:60%;height:16px;border-radius:4px;"></div>
+            <div class="skeleton-line mt-2" style="width:40%;height:12px;border-radius:4px;"></div>
+            <div class="skeleton-line mt-1" style="width:30%;height:10px;border-radius:4px;"></div>
+          </div>
+          <div class="text-right">
+            <div class="skeleton-line" style="width:60px;height:16px;border-radius:4px;margin-left:auto;"></div>
+            <div class="skeleton-line mt-2" style="width:40px;height:12px;border-radius:4px;margin-left:auto;"></div>
+          </div>
+        </div>
+      `,
+        )
+        .join("")}
+    `;
+  }
+
+  // Empty state - hidden
+  const txEmpty = $("txEmpty");
+  if (txEmpty) {
+    txEmpty.classList.add("hidden");
+  }
+}
+
+function renderRecapSkeleton() {
+  const recapList = $("recapList");
+  if (recapList) {
+    recapList.innerHTML = `
+      ${[1, 2, 3, 4, 5, 6]
+        .map(
+          () => `
+        <div class="card p-4 skeleton-loading">
+          <div class="flex items-center justify-between">
+            <div class="skeleton-line" style="width:120px;height:18px;border-radius:4px;"></div>
+            <div class="skeleton-line" style="width:20px;height:16px;border-radius:4px;"></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-3">
+            <div>
+              <div class="skeleton-line" style="width:30px;height:10px;border-radius:4px;"></div>
+              <div class="skeleton-line mt-1" style="width:60px;height:14px;border-radius:4px;"></div>
+            </div>
+            <div>
+              <div class="skeleton-line" style="width:30px;height:10px;border-radius:4px;"></div>
+              <div class="skeleton-line mt-1" style="width:60px;height:14px;border-radius:4px;"></div>
+            </div>
+            <div>
+              <div class="skeleton-line" style="width:30px;height:10px;border-radius:4px;"></div>
+              <div class="skeleton-line mt-1" style="width:60px;height:14px;border-radius:4px;"></div>
+            </div>
+          </div>
+        </div>
+      `,
+        )
+        .join("")}
+    `;
+  }
 }
