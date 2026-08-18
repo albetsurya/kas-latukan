@@ -2983,6 +2983,52 @@ html[data-theme="dark"] .date-picker-manual-input {
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
 
+/* ============================================================
+   SHODAQOH - LOAD LAST NOMINALS BUTTON
+   ============================================================ */
+
+#btnLoadLastNominals {
+  transition: all 0.2s ease;
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+#btnLoadLastNominals:hover {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+}
+
+#btnLoadLastNominals:active {
+  transform: scale(0.97);
+}
+
+#btnLoadLastNominals:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#btnLoadLastNominals svg {
+  transition: transform 0.3s ease;
+}
+
+#btnLoadLastNominals:hover svg {
+  transform: rotate(15deg);
+}
+
+/* Responsif mobile */
+@media (max-width: 480px) {
+  #btnLoadLastNominals {
+    font-size: 10px;
+    padding: 6px 10px;
+    min-height: 36px;
+  }
+
+  #btnLoadLastNominals svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
 /* ---------- Modal / transaction helpers ---------- */
 .modal-overlay {
   position: fixed;

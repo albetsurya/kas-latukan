@@ -2040,6 +2040,146 @@ function setupShodaqohAllocationWatcher() {
 }
 
 // ============================================================
+// SHODAQOH — LOAD LAST NOMINALS
+// ============================================================
+
+async function loadLastNominals() {
+  const memberInput = document.getElementById("shodPaymentMember");
+  const memberId = memberInput?.value || "";
+
+  if (!memberId) {
+    showToast("Pilih anggota terlebih dahulu.", "error");
+    return;
+  }
+
+  const session = getSession();
+  if (!session) {
+    showToast("Sesi admin berakhir, silakan login ulang.", "error");
+    return;
+  }
+
+  const btn = document.getElementById("btnLoadLastNominals");
+  const originalText = btn?.innerHTML || "Data Terakhir";
+
+  // Set loading state
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:4px;"></span>
+      Memuat...
+    `;
+  }
+
+  try {
+    // Ambil bulan yang dipilih dari filter, atau bulan berjalan
+    const selectedMonth = state.shodaqoh.selectedMonth || getCurrentMonthKey();
+
+    const res = await apiPost({
+      action: "getShodaqohLastNominals",
+      token: session.token,
+      memberId: memberId,
+      beforeMonth: selectedMonth,
+    });
+
+    if (!res.success) {
+      showToast(res.message || "Gagal memuat data terakhir.", "error");
+      return;
+    }
+
+    // ===== ISI INPUT DENGAN DATA DARI BACKEND =====
+    const values = res.values || {};
+
+    // Mapping field ke ID input
+    const fieldMap = {
+      susulan_ir: "shod_susulan_ir",
+      uang_sambung: "shod_uang_sambung",
+      jimpitan: "shod_jimpitan",
+      siar_siar: "shod_siar_siar",
+      seribuan: "shod_seribuan",
+      kafan: "shod_kafan",
+      ukhro_mt: "shod_ukhro_mt",
+    };
+
+    let total = 0;
+    let hasData = false;
+
+    Object.keys(fieldMap).forEach((field) => {
+      const inputId = fieldMap[field];
+      const input = document.getElementById(inputId);
+      const value = Number(values[field] || 0);
+
+      if (input) {
+        input.value = value > 0 ? value : "";
+        if (value > 0) hasData = true;
+      }
+
+      total += value;
+    });
+
+    // Isi total pembayaran
+    const totalInput = document.getElementById("shodPaymentAmount");
+    if (totalInput && total > 0) {
+      totalInput.value = total;
+    }
+
+    // Tampilkan sumber data (bulan)
+    const source = res.source || {};
+    let sourceInfo = [];
+    Object.keys(source).forEach((field) => {
+      if (source[field]) {
+        const label =
+          {
+            susulan_ir: "Infak IR",
+            uang_sambung: "Uang Sambung",
+            jimpitan: "Jimpitan",
+            siar_siar: "Siar-siar",
+            seribuan: "Seribuan",
+            kafan: "Kafan",
+            ukhro_mt: "Ukhro MT",
+          }[field] || field;
+        sourceInfo.push(`${label} (${source[field]})`);
+      }
+    });
+
+    if (hasData && sourceInfo.length > 0) {
+      showToast(`Data terakhir dari: ${sourceInfo.join(", ")}`, "success");
+    } else if (!hasData) {
+      showToast("Tidak ada data nominal sebelumnya untuk anggota ini.", "info");
+    }
+
+    // Trigger allocation watcher
+    if (typeof setupShodaqohAllocationWatcher === "function") {
+      // Trigger update setelah nilai diisi
+      setTimeout(() => {
+        const fields = Object.values(fieldMap);
+        fields.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        const totalEl = document.getElementById("shodPaymentAmount");
+        if (totalEl)
+          totalEl.dispatchEvent(new Event("input", { bubbles: true }));
+      }, 100);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Gagal memuat data: " + err.message, "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+}
+
+function getCurrentMonthKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+// ============================================================
 // SHODAQOH PAYMENT FORM — OPEN / CLOSE
 // ============================================================
 

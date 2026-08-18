@@ -561,6 +561,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ==================== SHODAQOH - LOAD LAST NOMINALS ====================
+
+  if (document.getElementById("btnLoadLastNominals")) {
+    document
+      .getElementById("btnLoadLastNominals")
+      .addEventListener("click", function () {
+        if (typeof loadLastNominals === "function") {
+          loadLastNominals();
+        } else {
+          showToast("Fungsi belum tersedia.", "error");
+        }
+      });
+  }
+
   // ==================== PAYMENT EVENT FLOW ====================
   document.addEventListener("click", function (e) {
     const paymentBtn = e.target.closest("[data-shod-payment]");
