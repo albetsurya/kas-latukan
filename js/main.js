@@ -1943,6 +1943,10 @@ function renderShodaqohAllocation() {
     totalUkhroMt += Number(p.ukhro_mt || 0);
   });
 
+  // Dana Kesehatan = 20% dari Uang Sambung
+  const danaKesehatan = totalUangSambung * 0.2;
+  const uangSambungAfterKesehatan = totalUangSambung - danaKesehatan;
+
   const set = function (id, v) {
     const el = $(id);
     if (el) el.textContent = v;
@@ -1955,6 +1959,17 @@ function renderShodaqohAllocation() {
   set("shodTotalSeribuan", fmtRp(totalSeribuan));
   set("shodTotalKafan", fmtRp(totalKafan));
   set("shodTotalUkhroMt", fmtRp(totalUkhroMt));
+  set("shodTotalDanaKesehatan", fmtRp(danaKesehatan));
+
+  // Tampilkan sisa Uang Sambung setelah dipotong Dana Kesehatan
+  const uangSambungEl = $("shodUangSambungAfterKesehatan");
+  if (uangSambungEl) {
+    const sisa = totalUangSambung - danaKesehatan;
+    uangSambungEl.textContent = `sisa: ${fmtRp(sisa)}`;
+    uangSambungEl.style.color =
+      danaKesehatan > 0 ? "var(--pos)" : "var(--ink-faint)";
+    uangSambungEl.style.fontWeight = danaKesehatan > 0 ? "600" : "normal";
+  }
 }
 
 function getFilteredMonitoringRows() {
