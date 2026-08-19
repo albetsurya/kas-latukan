@@ -1510,7 +1510,6 @@ function switchTab(tab) {
 function updateFabVisibility() {
   const fabAdd = $("fabAdd");
   const fabPost = $("fabPostToKas");
-  const fabPrint = $("fabPrint");
 
   if (!fabAdd) return;
 
@@ -1533,11 +1532,6 @@ function updateFabVisibility() {
     } else {
       fabPost.style.display = "";
     }
-  }
-
-  if (fabPrint) {
-    const shouldShowPrint = state.activeTab === "history";
-    fabPrint.classList.toggle("hidden", !shouldShowPrint);
   }
 }
 
