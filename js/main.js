@@ -1815,77 +1815,7 @@ function renderShodaqohScreen() {
   renderShodaqohDashboard();
   renderShodaqohAllocation();
   renderShodaqohFilters();
-  renderShodaqohTabs();
-
-  const container = document.querySelector("#screen-shodaqoh");
-  if (!container) return;
-
-  const oldTabsContent = container.querySelector(
-    ".shod-tabs-content-container",
-  );
-
-  if (oldTabsContent) {
-    oldTabsContent.remove();
-  }
-
-  const monitoringCard = container.querySelector(
-    ".card:has(#shodMonitoringBody)",
-  );
-
-  const membersCard = container.querySelector(".card:has(#shodMembersList)");
-
-  const paymentsCard = container.querySelector(".card:has(#shodPaymentsList)");
-
-  if (monitoringCard) {
-    monitoringCard.remove();
-  }
-
-  if (membersCard) {
-    membersCard.remove();
-  }
-
-  if (paymentsCard) {
-    paymentsCard.remove();
-  }
-
-  const tabContainer = document.createElement("div");
-  tabContainer.className = "shod-tabs-content-container";
-  tabContainer.style.cssText = "margin-top:12px;";
-
-  const monitoringTab = document.createElement("div");
-  monitoringTab.className = "shod-tab-content shod-tab-content-shod-monitoring";
-
-  if (monitoringCard) {
-    monitoringTab.appendChild(monitoringCard);
-  }
-
-  const membersTab = document.createElement("div");
-  membersTab.className = "shod-tab-content shod-tab-content-shod-members";
-  membersTab.style.display = "none";
-
-  if (membersCard) {
-    membersTab.appendChild(membersCard);
-  }
-
-  const paymentsTab = document.createElement("div");
-  paymentsTab.className = "shod-tab-content shod-tab-content-shod-payments";
-  paymentsTab.style.display = "none";
-
-  if (paymentsCard) {
-    paymentsTab.appendChild(paymentsCard);
-  }
-
-  tabContainer.appendChild(monitoringTab);
-  tabContainer.appendChild(membersTab);
-  tabContainer.appendChild(paymentsTab);
-
-  const tabsNav = container.querySelector(".shod-tabs-container");
-
-  if (tabsNav) {
-    tabsNav.insertAdjacentElement("afterend", tabContainer);
-  } else {
-    container.appendChild(tabContainer);
-  }
+  renderShodaqohTabs(); // Ini sudah handle semuanya
 }
 
 function renderShodaqohDashboard() {
@@ -2249,14 +2179,13 @@ function renderShodaqohTabs() {
   );
   if (oldContentContainer) oldContentContainer.remove();
 
-  // Buat tabs container
+  // Buat tabs container - LANGSUNG MENEMPEL DI BACKGROUND APP (tanpa card wrapper)
   const tabsHtml = `
     <div class="shod-tabs-container" style="
       position: relative;
       z-index: 1;
-      background: var(--app-bg);
-      padding: 4px 0 10px 0;
-      border-bottom: 1px solid var(--line);
+      background: transparent;
+      padding: 12px 0 10px 0;
       margin: 0;
     ">
       <div class="shod-tabs" style="
@@ -2328,114 +2257,88 @@ function renderShodaqohTabs() {
     }
   }
 
-  // Buat container untuk konten tab
+  // Buat container untuk konten tab - SETIAP TAB PUNYA WRAPPER CARD SENDIRI
   const tabsContainer = container.querySelector(".shod-tabs-container");
   const contentContainer = document.createElement("div");
   contentContainer.className = "shod-tabs-content-container";
-  contentContainer.style.cssText = "margin-top:12px;";
+  contentContainer.style.cssText = "margin-top:8px;";
 
-  // Buat 3 tab content
+  // Buat 3 tab content dengan wrapper card masing-masing
   const monitoringContent = document.createElement("div");
   monitoringContent.className =
     "shod-tab-content shod-tab-content-shod-monitoring";
   monitoringContent.style.display = "block";
+  monitoringContent.innerHTML = `
+    <div class="card p-4">
+      <div class="shod-monitoring-wrapper">
+        <!-- Header dengan judul dan statistik -->
+        <div class="shod-monitoring-header" style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 2px 0 12px 0;
+          border-bottom: 1px solid var(--line);
+          margin-bottom: 10px;
+          flex-wrap: wrap;
+          gap: 6px;
+        ">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
+              Monitoring
+            </span>
+            <span class="text-[9px] text-[color:var(--ink-faint)] ml-2" id="shodMemberCount">
+              0 anggota
+            </span>
+          </div>
+          <div class="flex items-center gap-3" id="shodStatsBadge">
+            <span class="text-[9px] text-[color:var(--pos)]">
+              ● 0 Lunas
+            </span>
+            <span class="text-[9px] text-[color:var(--neg)]">
+              ● 0 Belum
+            </span>
+          </div>
+        </div>
+        
+        <!-- Tabel monitoring -->
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--line);">
+                <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Anggota</th>
+                <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Target</th>
+                <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Status</th>
+                <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Tgl Bayar</th>
+              </tr>
+            </thead>
+            <tbody id="shodMonitoringBody">
+              <tr><td colspan="4" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
 
   const membersContent = document.createElement("div");
   membersContent.className = "shod-tab-content shod-tab-content-shod-members";
   membersContent.style.display = "none";
+  membersContent.innerHTML = `
+    <div class="card p-4">
+      <div id="shodMembersList"></div>
+    </div>
+  `;
 
   const paymentsContent = document.createElement("div");
   paymentsContent.className = "shod-tab-content shod-tab-content-shod-payments";
   paymentsContent.style.display = "none";
-
-  // Cari card yang sudah ada
-  const monitoringCard = container.querySelector(
-    ".card:has(#shodMonitoringBody)",
-  );
-  const membersCard = container.querySelector(".card:has(#shodMembersList)");
-  const paymentsCard = container.querySelector(".card:has(#shodPaymentsList)");
-
-  if (monitoringCard) {
-    monitoringContent.appendChild(monitoringCard);
-  } else {
-    // Buat card monitoring dengan title dan header
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-    <div class="shod-monitoring-wrapper">
-      <!-- Header dengan judul dan statistik -->
-      <div class="shod-monitoring-header" style="
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 2px 0 12px 0;
-        border-bottom: 1px solid var(--line);
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-        gap: 6px;
-      ">
-        <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
-            Monitoring
-          </span>
-          <span class="text-[9px] text-[color:var(--ink-faint)] ml-2" id="shodMemberCount">
-            0 anggota
-          </span>
-        </div>
-        <div class="flex items-center gap-3" id="shodStatsBadge">
-          <span class="text-[9px] text-[color:var(--pos)]">
-            ● 0 Lunas
-          </span>
-          <span class="text-[9px] text-[color:var(--neg)]">
-            ● 0 Belum
-          </span>
-        </div>
-      </div>
-      
-      <!-- Tabel monitoring -->
-      <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:11px;">
-          <thead>
-            <tr style="border-bottom:1px solid var(--line);">
-              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Anggota</th>
-              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Target</th>
-              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Status</th>
-              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Tgl Bayar</th>
-            </tr>
-          </thead>
-          <tbody id="shodMonitoringBody">
-            <tr><td colspan="4" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">Memuat data...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-    monitoringContent.appendChild(card);
-  }
-
-  if (membersCard) {
-    membersContent.appendChild(membersCard);
-  } else {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div id="shodMembersList"></div>
-    `;
-    membersContent.appendChild(card);
-  }
-
-  if (paymentsCard) {
-    paymentsContent.appendChild(paymentsCard);
-  } else {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
+  paymentsContent.innerHTML = `
+    <div class="card p-4">
       <div id="shodPaymentsList">
         <p class="py-6 text-center text-xs text-[color:var(--ink-faint)]">Belum ada pembayaran.</p>
       </div>
-    `;
-    paymentsContent.appendChild(card);
-  }
+    </div>
+  `;
 
   contentContainer.appendChild(monitoringContent);
   contentContainer.appendChild(membersContent);
