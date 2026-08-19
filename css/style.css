@@ -597,6 +597,30 @@ h3 {
   transform: scale(0.92);
 }
 
+#fabPrint {
+  width: 48px;
+  height: 48px;
+  right: max(24px, calc((100vw - 480px) / 2 + 24px));
+  bottom: calc(150px + env(safe-area-inset-bottom));
+  background: var(--ink-soft);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(23, 25, 28, 0.3);
+}
+
+#fabPrint svg {
+  width: 19px;
+  height: 19px;
+}
+
+#fabPrint:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 10px 32px rgba(23, 25, 28, 0.4);
+}
+
+#fabPrint:active {
+  transform: scale(0.92);
+}
+
 .fab-label {
   position: absolute;
   right: calc(100% + 12px);
@@ -645,6 +669,16 @@ h3 {
     width: 18px;
     height: 18px;
   }
+  #fabPrint {
+    width: 44px;
+    height: 44px;
+    right: 20px;
+    bottom: calc(144px + env(safe-area-inset-bottom));
+  }
+  #fabPrint svg {
+    width: 17px;
+    height: 17px;
+  }
   .fab-label {
     display: none;
   }
@@ -670,6 +704,16 @@ h3 {
   #fabPostToKas svg {
     width: 16px;
     height: 16px;
+  }
+  #fabPrint {
+    width: 40px;
+    height: 40px;
+    right: 18px;
+    bottom: calc(136px + env(safe-area-inset-bottom));
+  }
+  #fabPrint svg {
+    width: 15px;
+    height: 15px;
   }
   #shell main {
     padding-left: 13px;
@@ -697,6 +741,10 @@ html[data-theme="dark"] #fabAdd {
 
 html[data-theme="dark"] #fabPostToKas {
   box-shadow: 0 6px 24px rgba(233, 173, 56, 0.25);
+}
+
+html[data-theme="dark"] #fabPrint {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
 }
 
 .sheet-overlay {
@@ -1494,100 +1542,338 @@ html[data-theme="dark"] #toast {
 
 #printArea {
   display: none;
+  width: 100%;
+  transform: none;
 }
 
+/* ===== Print layout: A4 portrait, 1cm margin on every side ===== */
+@page {
+  size: A4 portrait;
+  margin: 1cm;
+}
+
+/* ============================================================
+   PRINT STYLES - Full A4 with 1cm margins
+   ============================================================ */
+
+/* Print area - pastikan di atas semua */
+#printArea {
+  display: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: white !important;
+  z-index: 999999 !important;
+  overflow: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #1e293b !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Saat print, sembunyikan semua kecuali print area */
 @media print {
-  body {
-    background: #fff !important;
-    padding: 0 !important;
+  body * {
+    visibility: hidden !important;
   }
-  #shell {
-    display: none !important;
+
+  #printArea,
+  #printArea * {
+    visibility: visible !important;
   }
+
   #printArea {
     display: block !important;
-  }
-  #printArea table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 10.5px;
-  }
-  #printArea th,
-  #printArea td {
-    border-bottom: 1px solid #cbd5e1;
-    padding: 5px 6px;
-    text-align: left;
-  }
-  #printArea th {
-    background: #f1f5f9;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  @page {
-    size: A4;
-    margin: 12mm;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    z-index: 999999 !important;
+    overflow: visible !important;
   }
 }
 
-:root {
-  --print-scale: 1;
+/* Baseline text color for every cell */
+#printArea th,
+#printArea td {
+  color: #1e293b !important;
 }
 
-#printArea {
-  transform-origin: top left;
+#printArea * {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
-@media print {
-  #printArea {
-    transform: scale(var(--print-scale, 1));
-    width: calc(100% / var(--print-scale, 1));
-  }
+/* TABLE - Full width */
+#printArea table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
-#printArea .print-header {
-  text-align: center;
-  margin-bottom: 10px;
+/* Column widths */
+#printArea col.col-no {
+  width: 5%;
+}
+#printArea col.col-tgl {
+  width: 12%;
+}
+#printArea col.col-ket {
+  width: 48%;
+}
+#printArea col.col-debet,
+#printArea col.col-kredit,
+#printArea col.col-saldo {
+  width: 11.66%;
 }
 
-#printArea .print-header h1 {
-  font-size: 15px;
+/* Header styles */
+#printArea thead {
+  display: table-header-group;
+}
+
+#printArea thead th {
+  padding: 4px 4px;
+  font-size: 8.5px;
   font-weight: 800;
-  margin: 0;
-  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1e293b;
 }
 
-#printArea .print-header h2 {
-  font-size: 13px;
+/* Body rows */
+#printArea th,
+#printArea td {
+  border-bottom: 0.5px solid #cbd5e1;
+  padding: 4.5px 4px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  page-break-inside: avoid;
+  vertical-align: middle;
+}
+
+/* Alternating row colors */
+#printArea tbody tr:nth-child(even) {
+  background: #f4f6f8 !important;
+}
+
+/* TFOOT - Styling */
+#printArea tfoot {
+  display: table-row-group;
+}
+
+#printArea tfoot td {
   font-weight: 800;
-  margin: 1px 0 0;
-  letter-spacing: 0.01em;
+  font-size: 9px;
+  padding: 4.5px 4px;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #16a34a;
+  border-top: 2px solid #1e293b;
 }
 
-#printArea .print-header p {
-  font-size: 11px;
-  font-weight: 700;
-  margin: 3px 0 0;
-  color: #334155;
+#printArea tfoot tr.print-total-saldo td {
+  background: #12833d !important;
+  color: #ffffff !important;
+  border-top: 2px solid #1e293b;
+  border-bottom: 2px solid #1e293b;
 }
 
+/* Right-align numbers */
 #printArea table td.num,
 #printArea table th.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#printArea tfoot td {
-  font-weight: 800;
-  background: #16a34a !important;
-  color: #ffffff !important;
-  border-bottom: 1px solid #16a34a;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+/* Font bold helper */
+#printArea .font-bold {
+  font-weight: 800 !important;
 }
 
-#printArea tfoot tr.print-total-saldo td {
-  background: #12833d !important;
-  color: #ffffff !important;
+/* Header */
+#printArea .print-header {
+  text-align: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #1e293b;
+}
+
+#printArea .print-header h1 {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+#printArea .print-header h2 {
+  font-size: 12px;
+  font-weight: 800;
+  margin: 2px 0 0;
+  letter-spacing: 0.3px;
+}
+
+#printArea .print-header p {
+  font-size: 10px;
+  font-weight: 600;
+  margin: 3px 0 0;
+  color: #334155;
+}
+
+/* ============================================================
+   PRINT MEDIA QUERY - A4 with 1cm margins
+   ============================================================ */
+@media print {
+  /* Sembunyikan semua body */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Sembunyikan semua elemen di body kecuali printArea */
+  body * {
+    visibility: hidden !important;
+  }
+
+  #printArea,
+  #printArea * {
+    visibility: visible !important;
+  }
+
+  #printArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    z-index: 999999 !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  #printArea .print-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 1cm !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  #printArea .print-table-wrapper {
+    display: block !important;
+    width: 100% !important;
+    flex: 1 !important;
+    overflow: visible !important;
+  }
+
+  #printArea table {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    font-size: 9.5px !important;
+    line-height: 1.3 !important;
+  }
+
+  #printArea .print-header {
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  #printArea .print-header h1 {
+    font-size: 13px !important;
+  }
+
+  #printArea .print-header h2 {
+    font-size: 11px !important;
+  }
+
+  #printArea .print-header p {
+    font-size: 9px !important;
+    margin-top: 2px !important;
+  }
+
+  #printArea th,
+  #printArea td {
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+  }
+
+  #printArea thead th {
+    padding: 3.5px 3px !important;
+    font-size: 8px !important;
+  }
+
+  #printArea tfoot td {
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 1cm !important;
+    padding: 0 !important;
+  }
+
+  #printArea tbody tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #printArea tfoot {
+    display: table-footer-group !important;
+  }
+
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  #printArea tbody tr:nth-child(even) {
+    background: #f4f6f8 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea thead th {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea tfoot td {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea tfoot tr.print-total-saldo td {
+    background: #12833d !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
 
 .status-pill {
@@ -1618,6 +1904,79 @@ html[data-theme="dark"] #toast {
 .status-inactive {
   background: var(--neg-soft);
   color: var(--neg);
+}
+
+/* Badge status untuk pembayaran anggota */
+.badge-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Hijau - Lunas (sesuai atau lebih) */
+.badge-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border-color: #10b981;
+}
+
+/* Kuning - Kurang dari target */
+.badge-warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+/* Merah - Belum bayar */
+.badge-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+/* Abu-abu - Default */
+.badge-secondary {
+  background: rgba(100, 116, 139, 0.12);
+  color: #64748b;
+  border-color: #64748b;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .badge-success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: #34d399;
+}
+
+[data-theme="dark"] .badge-warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: #fbbf24;
+}
+
+[data-theme="dark"] .badge-danger {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border-color: #f87171;
+}
+
+[data-theme="dark"] .badge-secondary {
+  background: rgba(100, 116, 139, 0.2);
+  color: #94a3b8;
+  border-color: #94a3b8;
+}
+
+/* Hover effect */
+.tx-card:hover .badge-status {
+  transform: scale(1.05);
 }
 
 .modal-overlay {
@@ -4656,5 +5015,44 @@ body > #txActionOverlay > .sheet {
 @media (max-width: 480px) {
   .chart-header .chart-value {
     font-size: 15px;
+  }
+}
+/* Monitoring table compact */
+#shodMonitoringBody tr td {
+  padding: 4px 6px !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+}
+
+#shodMonitoringBody tr td:first-child {
+  padding-left: 2px !important;
+}
+
+#shodMonitoringBody tr td:last-child {
+  padding-right: 2px !important;
+}
+
+/* Tabular numbers for alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Truncate long names */
+#shodMonitoringBody .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  #shodMonitoringBody tr td {
+    padding: 3px 4px !important;
+    font-size: 8.5px !important;
+  }
+
+  .badge-status {
+    font-size: 6.5px !important;
+    padding: 1px 5px !important;
   }
 }

@@ -53,10 +53,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if ($("btnRefresh")) {
     $("btnRefresh").addEventListener("click", () => {
-      $("btnRefresh").classList.add("spin");
-      loadData().finally(() =>
-        setTimeout(() => $("btnRefresh").classList.remove("spin"), 400),
-      );
+      const btn = $("btnRefresh");
+      btn.classList.add("spin");
+      btn.disabled = true;
+
+      refreshAllDataWithShodaqoh()
+        .then(() => {
+          showToast("Data berhasil disinkronkan!", "success");
+        })
+        .catch((err) => {
+          showToast("Gagal sinkron: " + err.message, "error");
+        })
+        .finally(() => {
+          btn.disabled = false;
+          setTimeout(() => btn.classList.remove("spin"), 400);
+        });
     });
   }
 
@@ -70,8 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
 
-  if ($("btnPrint")) {
-    $("btnPrint").addEventListener("click", () => {
+  if ($("fabPrint")) {
+    $("fabPrint").addEventListener("click", () => {
       const monthKey = state.selectedMonth;
       const scope = computeScope(monthKey);
 
@@ -89,14 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if ($("printTotalSaldo"))
         $("printTotalSaldo").textContent = fmtRp(scope.akhir);
 
-      fitPrintToOnePage();
-      window.print();
+      printReport();
     });
   }
-
-  window.addEventListener("afterprint", () => {
-    document.documentElement.style.setProperty("--print-scale", "1");
-  });
 
   if ($("btnLogout")) {
     $("btnLogout").addEventListener("click", () => {
@@ -351,7 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if ($("btnActionCancel"))
     $("btnActionCancel").addEventListener("click", closeTxActionSheet);
-
 
   if ($("btnActionEdit")) {
     $("btnActionEdit").addEventListener("click", () => {
@@ -714,8 +719,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-
   const membersList = document.getElementById("shodMembersList");
   if (membersList) {
     // Gunakan MutationObserver untuk mendeteksi perubahan pada members list
@@ -869,7 +872,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
 
   if ($("btnAddMember")) {
     $("btnAddMember").addEventListener("click", function () {

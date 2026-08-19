@@ -368,6 +368,35 @@ async function apiPost(payload) {
   return res.json();
 }
 
+// Tambahkan fungsi untuk sync manual
+async function manualSync() {
+  const btn = document.getElementById("btnSync");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;"></span>
+      Menyinkronkan...
+    `;
+  }
+
+  try {
+    await refreshAllDataWithShodaqoh();
+    showToast("Semua data berhasil disinkronkan!", "success");
+  } catch (err) {
+    showToast("Gagal sinkron: " + err.message, "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:4px;">
+          <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9h-4m-5 9A9 9 0 0 1 3 12m9 9a9 9 0 0 1-9-9m9 9v-4M3 12a9 9 0 0 1 9-9m-9 9h4m5-9a9 9 0 0 1 9 9m-9-9v4" />
+        </svg>
+        Sinkron
+      `;
+    }
+  }
+}
+
 async function refreshAllData() {
   try {
     const data = await apiGet();
@@ -383,9 +412,6 @@ async function refreshAllData() {
     renderRecapList();
     refreshScopedUI();
 
-    const monthKey = state.shodaqoh.selectedMonth || "";
-    await loadShodaqohData(monthKey);
-
     if ($("lastSync")) {
       $("lastSync").textContent =
         "tersinkron " + new Date().toLocaleTimeString("id-ID");
@@ -396,6 +422,28 @@ async function refreshAllData() {
   }
 }
 
+// Fungsi baru untuk refresh ALL termasuk shodaqoh
+async function refreshAllDataWithShodaqoh() {
+  try {
+    // 1. Refresh data kas
+    await refreshAllData();
+
+    // 2. Refresh data shodaqoh jika sudah pernah di-load atau tab aktif
+    if (state.shodaqoh.loaded || state.activeTab === "shodaqoh") {
+      const monthKey = state.shodaqoh.selectedMonth || "";
+      await loadShodaqohData(monthKey);
+    }
+
+    // 3. Update last sync
+    if ($("lastSync")) {
+      $("lastSync").textContent =
+        "tersinkron " + new Date().toLocaleTimeString("id-ID");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Gagal refresh data: " + err.message, "error");
+  }
+}
 async function loadData() {
   if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
     if ($("configWarning")) $("configWarning").classList.remove("hidden");
@@ -407,7 +455,8 @@ async function loadData() {
   renderHistorySkeleton();
   renderRecapSkeleton();
 
-  await refreshAllData();
+  // Gunakan refreshAllDataWithShodaqoh untuk sync semua data
+  await refreshAllDataWithShodaqoh();
 }
 
 function getMonthsDesc() {
@@ -717,39 +766,47 @@ function renderRecapList() {
           ${
             state.isAdmin
               ? `
-                <div
-                  class="mt-3 pt-3"
-                  style="border-top:1px solid var(--line);"
-                >
-
-                  <button
-                    type="button"
-                    class="btn-carry-forward w-full flex items-center justify-center gap-2"
-                    data-month="${m}"
-                    data-next-month="${nextMonthKey}"
-                  >
-
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M5 12h14" />
-                      <path d="m13 6 6 6-6 6" />
-                    </svg>
-
-                    <span>
-                      Jadikan Saldo Awal
-                      ${getMonthLabel(nextMonthKey)}
-                    </span>
-
-                  </button>
-
-                </div>
-              `
+      <div
+        class="mt-3 pt-3"
+        style="border-top:1px solid var(--line);"
+      >
+        <button
+          type="button"
+          class="btn-carry-forward w-full flex items-center justify-center gap-1.5"
+          data-month="${m}"
+          data-next-month="${nextMonthKey}"
+          style="
+            padding: 4px 12px;
+            border: 1.5px solid var(--pos);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--pos);
+            font-size: 10px;
+            font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            width: 100%;
+          "
+          onmouseover="this.style.background='var(--pos-soft)'"
+          onmouseout="this.style.background='transparent'"
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--pos)"
+            stroke-width="2.2"
+            style="flex-shrink:0;"
+          >
+            <path d="M5 12h14" />
+            <path d="m13 6 6 6-6 6" />
+          </svg>
+          <span>Saldo Awal ${getMonthLabel(nextMonthKey)}</span>
+        </button>
+      </div>
+    `
               : ""
           }
 
@@ -1238,88 +1295,159 @@ function renderTxList(rows, containerId, emptyId, opts) {
 }
 
 function buildPrintTable(rows) {
-  if (!$("printTableBody")) return;
+  const body = document.getElementById("printTableBody");
+  if (!body) return;
 
-  $("printTableBody").innerHTML = rows
-    .map(
-      (t, idx) =>
-        `
-  <tr>
-    <td>${idx + 1}</td>
-    <td>${t.tanggal}</td>
-    <td>${escapeHtml(t.account)}</td>
-    <td>${escapeHtml(t.keterangan)}</td>
-    <td class="num">
-      ${t.debet ? fmtRp(t.debet) : "-"}
-    </td>
-    <td class="num">
-      ${t.kredit ? fmtRp(t.kredit) : "-"}
-    </td>
-    <td class="num">
-      ${fmtRp(t.saldo)}
-    </td>
-  </tr>`,
-    )
-    .join("");
-}
-
-function fitPrintToOnePage() {
-  const area = $("printArea");
-
-  if (!area) return;
-
-  const prevDisplay = area.style.display;
-
-  const prevPosition = area.style.position;
-
-  const prevLeft = area.style.left;
-
-  const prevTop = area.style.top;
-
-  const prevWidth = area.style.width;
-
-  const prevTransform = area.style.transform;
-
-  document.documentElement.style.setProperty("--print-scale", "1");
-
-  area.style.transform = "none";
-
-  area.style.display = "block";
-
-  area.style.position = "fixed";
-
-  area.style.left = "-9999px";
-
-  area.style.top = "0";
-
-  area.style.width = "186mm";
-
-  const mmToPx = 96 / 25.4;
-
-  const availableHeightPx = (297 - 24) * mmToPx;
-
-  const contentHeightPx = area.scrollHeight;
-
-  let scale = 1;
-
-  if (contentHeightPx > availableHeightPx) {
-    scale = Math.max(0.35, availableHeightPx / contentHeightPx);
+  // Jika rows kosong atau undefined
+  if (!rows || rows.length === 0) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center;padding:20px;color:#94a3b8;font-size:9px;">
+          Tidak ada transaksi untuk periode ini.
+        </td>
+      </tr>
+    `;
+    // Reset totals
+    updatePrintTotals([]);
+    return;
   }
 
-  document.documentElement.style.setProperty("--print-scale", scale);
+  // Build table rows dengan data yang valid
+  body.innerHTML = rows
+    .map((t, idx) => {
+      const no = idx + 1;
+      const tanggal = t.tanggal ? fmtDateShort(t.tanggal) : "-";
+      const keterangan = t.keterangan
+        ? escapeHtml(toTitleCase(t.keterangan))
+        : "-";
+      const debet = Number(t.debet) || 0;
+      const kredit = Number(t.kredit) || 0;
+      const saldo = Number(t.saldo) || 0;
 
-  area.style.display = prevDisplay;
+      return `
+        <tr>
+          <td style="text-align:center;">${no}</td>
+          <td>${tanggal}</td>
+          <td>${keterangan}</td>
+          <td class="num">${debet > 0 ? fmtRp(debet) : "—"}</td>
+          <td class="num">${kredit > 0 ? fmtRp(kredit) : "—"}</td>
+          <td class="num">${fmtRp(saldo)}</td>
+        </tr>
+      `;
+    })
+    .join("");
 
-  area.style.position = prevPosition;
-
-  area.style.left = prevLeft;
-
-  area.style.top = prevTop;
-
-  area.style.width = prevWidth;
-
-  area.style.transform = prevTransform;
+  // Update totals di footer
+  updatePrintTotals(rows);
 }
+
+// Fungsi baru untuk update totals
+function updatePrintTotals(rows) {
+  const totalDebet = rows.reduce((sum, t) => sum + (Number(t.debet) || 0), 0);
+  const totalKredit = rows.reduce((sum, t) => sum + (Number(t.kredit) || 0), 0);
+  const lastSaldo =
+    rows.length > 0 ? Number(rows[rows.length - 1].saldo) || 0 : 0;
+
+  const debetEl = document.getElementById("printTotalDebet");
+  const kreditEl = document.getElementById("printTotalKredit");
+  const saldoEl = document.getElementById("printTotalSaldo");
+
+  if (debetEl) debetEl.textContent = fmtRp(totalDebet);
+  if (kreditEl) kreditEl.textContent = fmtRp(totalKredit);
+  if (saldoEl) saldoEl.textContent = fmtRp(lastSaldo);
+}
+
+function printReport() {
+  const area = document.getElementById("printArea");
+  if (!area) {
+    window.print();
+    return;
+  }
+
+  // Ambil data berdasarkan filter
+  const monthKey = state.selectedMonth || "all";
+  const scope = computeScope(monthKey);
+
+  // Filter berdasarkan search
+  const searchEl = document.getElementById("searchInput");
+  const q = searchEl ? searchEl.value.trim().toLowerCase() : "";
+
+  let rows = scope.list || [];
+  if (q) {
+    rows = rows.filter((t) =>
+      `${t.tanggal} ${t.account || ""} ${t.keterangan || ""}`
+        .toLowerCase()
+        .includes(q),
+    );
+  }
+
+  // Update period label
+  const periodEl = document.getElementById("printPeriod");
+  if (periodEl) {
+    if (state.selectedMonth === "all") {
+      periodEl.textContent = getPeriodRangeLabel();
+    } else {
+      periodEl.textContent = getMonthLabel(state.selectedMonth);
+    }
+  }
+
+  // Build table
+  buildPrintTable(rows);
+
+  // Simpan state sebelumnya
+  const prevDisplay = area.style.display;
+  const prevPosition = area.style.position;
+  const prevLeft = area.style.left;
+  const prevTop = area.style.top;
+
+  // Tampilkan area print di luar viewport agar tidak terlihat
+  area.style.display = "block";
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  area.style.top = "0";
+  area.style.zIndex = "999999";
+  area.style.background = "white";
+  area.style.width = "100%";
+  area.style.height = "100%";
+
+  // Force reflow
+  void area.offsetHeight;
+
+  // Restore function
+  const restore = () => {
+    area.style.display = prevDisplay || "none";
+    area.style.position = prevPosition || "";
+    area.style.left = prevLeft || "";
+    area.style.top = prevTop || "";
+    area.style.zIndex = "";
+    area.style.background = "";
+    area.style.width = "";
+    area.style.height = "";
+  };
+
+  // Print
+  window.print();
+
+  // Restore setelah print
+  window.addEventListener("afterprint", restore, { once: true });
+  setTimeout(restore, 1000);
+}
+
+// Fungsi untuk tombol print di history
+function setupPrintButton() {
+  const printBtn = document.getElementById("btnPrintReport");
+  if (printBtn) {
+    printBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      printReport();
+    });
+  }
+}
+
+// Panggil setup saat DOM ready
+document.addEventListener("DOMContentLoaded", function () {
+  setupPrintButton();
+});
 
 function applyFilters() {
   const monthKey = state.selectedMonth;
@@ -1382,6 +1510,7 @@ function switchTab(tab) {
 function updateFabVisibility() {
   const fabAdd = $("fabAdd");
   const fabPost = $("fabPostToKas");
+  const fabPrint = $("fabPrint");
 
   if (!fabAdd) return;
 
@@ -1404,6 +1533,11 @@ function updateFabVisibility() {
     } else {
       fabPost.style.display = "";
     }
+  }
+
+  if (fabPrint) {
+    const shouldShowPrint = state.activeTab === "history";
+    fabPrint.classList.toggle("hidden", !shouldShowPrint);
   }
 }
 
@@ -1524,8 +1658,8 @@ async function executePostToKas(monthKey) {
       showPostResultModal(res);
     }
 
-    await loadData();
-    await loadShodaqohData(state.shodaqoh.selectedMonth);
+    // Refresh semua data (kas + shodaqoh)
+    await refreshAllDataWithShodaqoh();
   } catch (err) {
     showToast(err.message, "error");
   } finally {
@@ -1929,7 +2063,7 @@ function renderShodaqohMonitoring() {
   ).length;
   const filteredCount = rows.length;
 
-  // Update header monitoring dengan judul dan statistik
+  // Update header
   const headerEl = document.querySelector(".shod-monitoring-header");
   if (headerEl) {
     headerEl.innerHTML = `
@@ -1942,29 +2076,46 @@ function renderShodaqohMonitoring() {
         </span>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-[9px] text-[color:var(--pos)]">
-          ● ${lunasCount} Lunas
-        </span>
-        <span class="text-[9px] text-[color:var(--neg)]">
-          ● ${belumCount} Belum
-        </span>
+        <span class="text-[9px] text-[color:var(--pos)]">● ${lunasCount} Lunas</span>
+        <span class="text-[9px] text-[color:var(--neg)]">● ${belumCount} Belum</span>
       </div>
     `;
   }
 
-  // Update counter di tabel (fallback)
-  const countEl = $("shodMemberCount");
-  if (countEl) {
-    countEl.textContent = `${filteredCount} dari ${totalMembers} anggota · ${lunasCount} lunas, ${belumCount} belum`;
-  }
-
   if (rows.length === 0) {
-    body.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">
+    body.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">
       Tidak ada data sesuai filter.
     </td></tr>`;
     return;
   }
 
+  // Fungsi untuk menentukan warna badge berdasarkan status
+  function getBadgeClass(r) {
+    const totalPaid = r.total_paid || 0;
+    const target = r.target || 0;
+    const status = r.status || "BELUM";
+
+    if (status === "LUNAS") return "badge-success";
+    if (totalPaid === 0) return "badge-danger";
+    if (totalPaid < target) return "badge-warning";
+    if (totalPaid >= target) return "badge-success";
+    return "badge-secondary";
+  }
+
+  // Fungsi untuk label badge
+  function getBadgeLabel(r) {
+    const totalPaid = r.total_paid || 0;
+    const target = r.target || 0;
+    const status = r.status || "BELUM";
+
+    if (status === "LUNAS") return "Lunas ✓";
+    if (totalPaid === 0) return "Belum Bayar";
+    if (totalPaid < target) return `Kurang ${fmtRp(target - totalPaid)}`;
+    if (totalPaid >= target) return "Lunas ✓";
+    return "—";
+  }
+
+  // TAMPILAN TABLE - dengan kolom Total Paid
   body.innerHTML = rows
     .map(function (r) {
       let formattedDate = "—";
@@ -1975,19 +2126,20 @@ function renderShodaqohMonitoring() {
         }
       }
 
-      const isLunas = r.status === "LUNAS";
-      const statusClass = isLunas ? "status-positive" : "status-negative";
-      const statusLabel = isLunas ? "Lunas" : "Belum";
+      const badgeClass = getBadgeClass(r);
+      const badgeLabel = getBadgeLabel(r);
+      const totalPaid = r.total_paid || 0;
 
       return `<tr class="border-t border-[color:var(--line)]">
-        <td class="py-2 pr-3 font-semibold text-[11px]">${escapeHtml(r.nama)}</td>
-        <td class="py-2 mono text-[10px]">${fmtRp(r.target)}</td>
-        <td class="py-2">
-          <span class="status-pill ${statusClass}" style="font-size:8px;padding:1px 8px;border-radius:999px;">
-            ${statusLabel}
+        <td class="py-1.5 pr-2 font-semibold text-[10.5px] truncate max-w-[120px]">${escapeHtml(r.nama)}</td>
+        <td class="py-1.5 mono text-[9.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(r.target)}</td>
+        <td class="py-1.5 mono text-[9.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(totalPaid)}</td>
+        <td class="py-1.5 text-center whitespace-nowrap">
+          <span class="badge-status ${badgeClass}" style="font-size:7px;padding:1.5px 7px;border-radius:999px;font-weight:600;white-space:nowrap;display:inline-block;">
+            ${badgeLabel}
           </span>
         </td>
-        <td class="py-2 text-[9px] text-[color:var(--ink-soft)]">
+        <td class="py-1.5 text-[8.5px] text-[color:var(--ink-soft)] whitespace-nowrap">
           ${formattedDate}
         </td>
       </tr>`;
@@ -2002,228 +2154,101 @@ function renderShodaqohMembers() {
   const members = state.shodaqoh.members || [];
   const isAdmin = isAdminUser();
 
-  /*
-   * =========================================================
-   * CONTAINER UTAMA
-   * =========================================================
-   */
-
+  // Tampilkan anggota tanpa data pembayaran
   body.innerHTML = `
     <div class="shod-members-container">
-
       <div class="shod-members-header">
-
         <div class="shod-members-title">
-          <span>
-            Daftar Anggota
-          </span>
+          <span>Kelola Anggota</span>
         </div>
-
         <div class="shod-members-header-right">
-
-          <span class="shod-members-count">
-            ${members.length} anggota
-          </span>
-
+          <span class="shod-members-count">${members.length} anggota</span>
           ${
             isAdmin
               ? `
-            <button
-              type="button"
-              id="shodAddMemberBtn"
-              class="shod-members-add"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                aria-hidden="true"
-              >
+            <button type="button" id="shodAddMemberBtn" class="shod-members-add">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg>
-
               <span>Tambah</span>
             </button>
           `
               : ""
           }
-
         </div>
-
       </div>
 
-
-      <!-- ===================================================
-           SCROLL AREA
-           =================================================== -->
-
-      <div
-        class="shod-members-scroll"
-        id="shodMembersScroll"
-      >
-
+      <div class="shod-members-scroll" id="shodMembersScroll">
         ${
           members.length === 0
             ? `
           <div class="shod-members-empty">
-
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              aria-hidden="true"
-            >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M20 21a8 8 0 1 0-16 0" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-
-            <p>
-              Belum ada anggota.
-            </p>
-
+            <p>Belum ada anggota.</p>
             ${
               isAdmin
                 ? `
-              <button
-                type="button"
-                id="shodAddFirstMember"
-              >
-                + Tambah anggota pertama
-              </button>
+              <button type="button" id="shodAddFirstMember">+ Tambah anggota pertama</button>
             `
                 : ""
             }
-
           </div>
         `
             : `
           <div class="shod-members-items">
-
             ${members
               .map(function (m) {
                 const statusClass =
                   m.status === "AKTIF" ? "status-active" : "status-inactive";
-
                 const statusLabel = m.status || "AKTIF";
 
                 return `
-                  <button
-                    type="button"
-                    class="tx-card w-full text-left ${
-                      isAdmin ? "tx-card-clickable" : ""
-                    }"
-                    data-shod-member="${escapeHtml(m.member_id)}"
-                    role="button"
-                    tabindex="0"
-                    aria-label="Detail anggota ${escapeHtml(m.nama)}"
-                  >
-
-                    <div class="flex-1 min-w-0">
-
-                      <p class="tx-title">
-                        ${escapeHtml(m.nama)}
-                      </p>
-
-                      <p class="tx-meta flex items-center gap-2">
-
-                        <span class="mono">
-                          ${fmtRp(m.nominal_bulanan)}
-                        </span>
-
-                        <span
-                          class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"
-                        ></span>
-
-                        <span
-                          class="status-pill ${statusClass}"
-                          style="
-                            font-size:8px;
-                            padding:2px 10px;
-                          "
-                        >
-                          ${escapeHtml(statusLabel)}
-                        </span>
-
-                      </p>
-
-                    </div>
-
-
-                    <div class="flex items-center gap-2">
-
-                      <span
-                        class="text-[10px] text-[color:var(--ink-faint)] mono"
-                      >
-                        ${m.total_paid ? fmtRp(m.total_paid) : "Rp 0"}
+                <button type="button" class="tx-card w-full text-left ${isAdmin ? "tx-card-clickable" : ""}" 
+                        data-shod-member="${escapeHtml(m.member_id)}" role="button" tabindex="0">
+                  <div class="flex-1 min-w-0">
+                    <p class="tx-title">${escapeHtml(m.nama)}</p>
+                    <p class="tx-meta flex items-center gap-2">
+                      <span class="mono">${fmtRp(m.nominal_bulanan)}</span>
+                      <span class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"></span>
+                      <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;">
+                        ${escapeHtml(statusLabel)}
                       </span>
-
-                      ${
-                        isAdmin
-                          ? `
-                        <span
-                          class="tx-chevron"
-                          aria-hidden="true"
-                        >
-                          ›
-                        </span>
-                      `
-                          : ""
-                      }
-
-                    </div>
-
-                  </button>
-                `;
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    ${isAdmin ? `<span class="tx-chevron" aria-hidden="true">›</span>` : ""}
+                  </div>
+                </button>
+              `;
               })
               .join("")}
-
           </div>
         `
         }
-
       </div>
-
     </div>
   `;
 
-  /*
-   * =========================================================
-   * EVENT TAMBAH ANGGOTA
-   * =========================================================
-   */
-
+  // Event listeners untuk tombol tambah
   const addBtn = $("shodAddMemberBtn");
-
   if (addBtn && isAdmin) {
     addBtn.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-
       if (typeof openShodMemberForm === "function") {
         openShodMemberForm(null);
       }
     });
   }
 
-  /*
-   * =========================================================
-   * EVENT TAMBAH ANGGOTA PERTAMA
-   * =========================================================
-   */
-
   const addFirstBtn = $("shodAddFirstMember");
-
   if (addFirstBtn && isAdmin) {
     addFirstBtn.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-
       if (typeof openShodMemberForm === "function") {
         openShodMemberForm(null);
       }
@@ -2366,7 +2391,8 @@ function renderShodaqohTabs() {
               <tr style="border-bottom:1px solid var(--line);">
                 <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Anggota</th>
                 <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Target</th>
-                <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Status</th>
+                <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Dibayar</th>
+                 <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Status</th>
                 <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Tgl Bayar</th>
               </tr>
             </thead>
@@ -2553,6 +2579,8 @@ async function addShodaqohMember(nama, nominalBulanan = 200000) {
 
     if (!res.success) throw new Error(res.message);
     showToast("Anggota berhasil ditambahkan.");
+
+    // Refresh data shodaqoh saja
     await loadShodaqohData(state.shodaqoh.selectedMonth);
     return res;
   } catch (err) {
@@ -2576,6 +2604,8 @@ async function deleteShodaqohMember(memberId) {
 
     if (!res.success) throw new Error(res.message);
     showToast(res.message || "Anggota berhasil dihapus.");
+
+    // Refresh data shodaqoh saja
     await loadShodaqohData(state.shodaqoh.selectedMonth);
     return res;
   } catch (err) {
@@ -2601,6 +2631,8 @@ async function editShodaqohMember(memberId, nama, nominalBulanan) {
 
     if (!res.success) throw new Error(res.message);
     showToast(res.message || "Anggota berhasil diperbarui.");
+
+    // Refresh data shodaqoh saja
     await loadShodaqohData(state.shodaqoh.selectedMonth);
     return res;
   } catch (err) {
@@ -5882,53 +5914,60 @@ function renderShodaqohSkeleton() {
   monitoring.className = "shod-tab-content shod-tab-content-shod-monitoring";
 
   monitoring.innerHTML = `
-    <div class="card p-5">
-      <div
-        style="
-          height:14px;
-          width:90px;
-          border-radius:4px;
-          margin-bottom:16px;
-        "
-        class="skeleton-line"
-      ></div>
-
-      <div
-        style="
-          display:grid;
-          grid-template-columns:1.5fr 1fr .8fr 1fr;
-          gap:12px;
-          padding-bottom:10px;
-        "
-      >
-        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+  <div class="card p-4">
+    <!-- Header Skeleton -->
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>
+        <span class="skeleton-line" style="display:inline-block;width:60px;height:10px;border-radius:4px;"></span>
       </div>
-
-      ${[1, 2, 3, 4, 5]
-        .map(
-          () => `
-            <div
-              style="
-                display:grid;
-                grid-template-columns:1.5fr 1fr .8fr 1fr;
-                gap:12px;
-                padding:13px 0;
-                border-top:1px solid var(--line);
-              "
-            >
-              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
-              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
-              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
-              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
-            </div>
-          `,
-        )
-        .join("")}
+      <div class="flex items-center gap-3">
+        <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
+        <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
+      </div>
     </div>
-  `;
+
+    <!-- Header Kolom Skeleton -->
+    <div
+      style="
+        display:grid;
+        grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
+        gap:8px;
+        padding-bottom:8px;
+        border-bottom:1px solid var(--line);
+      "
+    >
+      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+    </div>
+
+    <!-- Baris Data Skeleton -->
+    ${[1, 2, 3, 4, 5, 6, 7]
+      .map(
+        () => `
+          <div
+            style="
+              display:grid;
+              grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
+              gap:8px;
+              padding:10px 0;
+              border-bottom:1px solid var(--line);
+            "
+          >
+            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
+            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
+            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
+            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
+            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
+          </div>
+        `,
+      )
+      .join("")}
+  </div>
+`;
 
   const members = document.createElement("div");
   members.className = "shod-tab-content shod-tab-content-shod-members";

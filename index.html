@@ -662,31 +662,6 @@
             </div>
           </div>
 
-          <div class="card p-1 divide-y divide-[color:var(--line)]">
-            <button
-              id="btnPrint"
-              class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-            >
-              <span class="icon-btn" style="pointer-events: none">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"
-                  />
-                </svg>
-              </span>
-              <span class="font-display text-[13.5px] font-bold flex-1"
-                >Cetak / Ekspor PDF</span
-              >
-            </button>
-          </div>
-
           <div class="card p-5">
             <p class="eyebrow mb-1.5">Sinkronisasi</p>
             <p class="text-[12.5px] text-[color:var(--ink-soft)]">
@@ -2131,6 +2106,22 @@
         <span class="fab-label">Post ke Kas</span>
       </button>
 
+      <button id="fabPrint" class="fab hidden" aria-label="Cetak / Ekspor PDF">
+        <svg
+          width="19"
+          height="19"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"
+          />
+        </svg>
+        <span class="fab-label">Cetak / Ekspor PDF</span>
+      </button>
+
       <nav id="bottomnav" class="flex">
         <button class="nav-btn active" data-tab="home">
           <span class="nav-pill">
@@ -2673,46 +2664,57 @@
     </div>
 
     <div id="printArea">
-      <div class="print-header">
-        <h1>REKAP LAPORAN KEUANGAN OPERASIONAL</h1>
-        <h2>KELOMPOK LATUKAN</h2>
-        <p id="printPeriod"></p>
-      </div>
+      <div class="print-wrapper">
+        <div class="print-header">
+          <h1>REKAP LAPORAN KEUANGAN OPERASIONAL</h1>
+          <h2>KELOMPOK LATUKAN</h2>
+          <h2 id="printPeriod"></h2>
+        </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Tanggal</th>
-            <th>Account</th>
-            <th>Keterangan</th>
-            <th class="num">Debet</th>
-            <th class="num">Kredit</th>
-            <th class="num">Saldo</th>
-          </tr>
-        </thead>
-        <tbody id="printTableBody"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="4">TOTAL PEMASUKAN</td>
-            <td class="num" id="printTotalDebet">Rp 0</td>
-            <td class="num">—</td>
-            <td class="num">—</td>
-          </tr>
-          <tr>
-            <td colspan="4">TOTAL PENGELUARAN</td>
-            <td class="num">—</td>
-            <td class="num" id="printTotalKredit">Rp 0</td>
-            <td class="num">—</td>
-          </tr>
-          <tr class="print-total-saldo">
-            <td colspan="4">SALDO AKHIR</td>
-            <td class="num">—</td>
-            <td class="num">—</td>
-            <td class="num" id="printTotalSaldo">Rp 0</td>
-          </tr>
-        </tfoot>
-      </table>
+        <div class="print-table-wrapper">
+          <table>
+            <colgroup>
+              <col class="col-no" />
+              <col class="col-tgl" />
+              <col class="col-ket" />
+              <col class="col-debet" />
+              <col class="col-kredit" />
+              <col class="col-saldo" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Tanggal</th>
+                <th>Keterangan</th>
+                <th class="num">Debet</th>
+                <th class="num">Kredit</th>
+                <th class="num">Saldo</th>
+              </tr>
+            </thead>
+            <tbody id="printTableBody"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="num font-bold">TOTAL PEMASUKAN</td>
+                <td class="num font-bold" id="printTotalDebet">Rp 0</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+              </tr>
+              <tr>
+                <td colspan="3" class="num font-bold">TOTAL PENGELUARAN</td>
+                <td class="num">—</td>
+                <td class="num font-bold" id="printTotalKredit">Rp 0</td>
+                <td class="num">—</td>
+              </tr>
+              <tr class="print-total-saldo">
+                <td colspan="3" class="num font-bold">SALDO AKHIR</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+                <td class="num font-bold" id="printTotalSaldo">Rp 0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div id="toast" class="hidden"></div>
