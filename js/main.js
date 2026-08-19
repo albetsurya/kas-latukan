@@ -422,6 +422,29 @@ async function refreshAllData() {
   }
 }
 
+async function refreshAllDataWithShodaqoh() {
+  try {
+    // 1. Refresh data kas
+    await refreshAllData();
+
+    // 2. Refresh data shodaqoh jika sudah pernah di-load
+    //    JANGAN load otomatis hanya karena tab aktif!
+    if (state.shodaqoh.loaded) {
+      const monthKey = state.shodaqoh.selectedMonth || "";
+      await loadShodaqohData(monthKey);
+    }
+
+    // 3. Update last sync
+    if ($("lastSync")) {
+      $("lastSync").textContent =
+        "tersinkron " + new Date().toLocaleTimeString("id-ID");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Gagal refresh data: " + err.message, "error");
+  }
+}
+
 // Fungsi baru untuk refresh ALL termasuk shodaqoh
 async function refreshAllDataWithShodaqoh() {
   try {
@@ -455,10 +478,10 @@ async function loadData() {
   renderHistorySkeleton();
   renderRecapSkeleton();
 
-  // Gunakan refreshAllDataWithShodaqoh untuk sync semua data
-  await refreshAllDataWithShodaqoh();
-}
+  await refreshAllData(); // Hanya refresh kas, bukan shodaqoh
 
+  // Shodaqoh akan di-load oleh switchTab jika diperlukan
+}
 function getMonthsDesc() {
   return [...new Set(state.transactions.map((t) => getMonthKey(t.tanggal)))]
     .filter(Boolean)
@@ -1444,6 +1467,454 @@ function setupPrintButton() {
   }
 }
 
+function printShodaqohReport() {
+  const monthKey = state.shodaqoh.selectedMonth;
+  if (!monthKey) {
+    showToast("Pilih bulan terlebih dahulu.", "error");
+    return;
+  }
+
+  const payments = state.shodaqoh.payments || [];
+  if (payments.length === 0) {
+    showToast("Belum ada data pembayaran untuk bulan ini.", "error");
+    return;
+  }
+
+  // Siapkan container print
+  const area = document.getElementById("printShodaqohArea");
+  if (!area) return;
+
+  // Set Judul Periode
+  const periodEl = document.getElementById("printShodaqohPeriod");
+  if (periodEl) {
+    periodEl.textContent = "Periode: " + getMonthLabel(monthKey);
+  }
+
+  // Filter data berdasarkan bulan yang dipilih
+  const filteredPayments = payments.filter(function (p) {
+    return String(p.tanggal).slice(0, 7) === monthKey;
+  });
+
+  // Siapkan variabel total
+  let totalIr = 0,
+    totalSambung = 0,
+    totalJimpitan = 0,
+    totalSiar = 0;
+  let totalSeribuan = 0,
+    totalKafan = 0,
+    totalUkhro = 0,
+    grandTotal = 0;
+
+  const body = document.getElementById("printShodaqohBody");
+  if (body) {
+    body.innerHTML = filteredPayments
+      .map(function (p, idx) {
+        const no = idx + 1;
+        const nama = p.nama || "-";
+        const ir = Number(p.susulan_ir || 0);
+        const sambung = Number(p.uang_sambung || 0);
+        const jimpitan = Number(p.jimpitan || 0);
+        const siar = Number(p.siar_siar || 0);
+        const seribuan = Number(p.seribuan || 0);
+        const kafan = Number(p.kafan || 0);
+        const ukhro = Number(p.ukhro_mt || 0);
+        const total = ir + sambung + jimpitan + siar + seribuan + kafan + ukhro;
+
+        // Akumulasi total
+        totalIr += ir;
+        totalSambung += sambung;
+        totalJimpitan += jimpitan;
+        totalSiar += siar;
+        totalSeribuan += seribuan;
+        totalKafan += kafan;
+        totalUkhro += ukhro;
+        grandTotal += total;
+
+        return `<tr>
+        <td style="text-align:center;">${no}</td>
+        <td>${escapeHtml(nama)}</td>
+        <td class="num">${ir > 0 ? fmtRp(ir) : "—"}</td>
+        <td class="num">${sambung > 0 ? fmtRp(sambung) : "—"}</td>
+        <td class="num">${jimpitan > 0 ? fmtRp(jimpitan) : "—"}</td>
+        <td class="num">${siar > 0 ? fmtRp(siar) : "—"}</td>
+        <td class="num">${seribuan > 0 ? fmtRp(seribuan) : "—"}</td>
+        <td class="num">${kafan > 0 ? fmtRp(kafan) : "—"}</td>
+        <td class="num">${ukhro > 0 ? fmtRp(ukhro) : "—"}</td>
+        <td class="num font-bold">${fmtRp(total)}</td>
+      </tr>`;
+      })
+      .join("");
+  }
+
+  // Update Footer Totals
+  document.getElementById("printShodTotalIr").textContent = fmtRp(totalIr);
+  document.getElementById("printShodTotalSambung").textContent =
+    fmtRp(totalSambung);
+  document.getElementById("printShodTotalJimpitan").textContent =
+    fmtRp(totalJimpitan);
+  document.getElementById("printShodTotalSiar").textContent = fmtRp(totalSiar);
+  document.getElementById("printShodTotalSeribuan").textContent =
+    fmtRp(totalSeribuan);
+  document.getElementById("printShodTotalKafan").textContent =
+    fmtRp(totalKafan);
+  document.getElementById("printShodTotalUkhro").textContent =
+    fmtRp(totalUkhro);
+  document.getElementById("printShodGrandTotal").textContent =
+    fmtRp(grandTotal);
+
+  // Proses Print
+  const prevDisplay = area.style.display;
+  area.style.display = "block";
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  area.style.top = "0";
+  area.style.zIndex = "999999";
+  area.style.background = "white";
+  area.style.width = "100%";
+  area.style.height = "100%";
+
+  void area.offsetHeight; // Force reflow
+
+  const restore = () => {
+    area.style.display = prevDisplay || "none";
+    area.style.position = "";
+    area.style.left = "";
+    area.style.top = "";
+    area.style.zIndex = "";
+    area.style.background = "";
+    area.style.width = "";
+    area.style.height = "";
+  };
+
+  window.print();
+  window.addEventListener("afterprint", restore, { once: true });
+  setTimeout(restore, 1000);
+}
+
+// Event Listener untuk tombol Print Shodaqoh
+document.addEventListener("DOMContentLoaded", function () {
+  const printBtn = document.getElementById("btnPrintShodaqoh");
+  if (printBtn) {
+    printBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      printShodaqohReport();
+    });
+  }
+});
+
+function printShodaqohReport() {
+  const monthKey = state.shodaqoh.selectedMonth;
+  if (!monthKey) {
+    showToast("Pilih bulan terlebih dahulu.", "error");
+    return;
+  }
+
+  const payments = state.shodaqoh.payments || [];
+  if (payments.length === 0) {
+    showToast("Belum ada data pembayaran untuk bulan ini.", "error");
+    return;
+  }
+
+  const area = document.getElementById("printShodaqohArea");
+  if (!area) return;
+
+  // 1. Set Judul Periode
+  const periodEl = document.getElementById("printShodaqohPeriod");
+  if (periodEl) {
+    periodEl.textContent = "Periode: " + getMonthLabel(monthKey);
+  }
+
+  // 2. Filter data berdasarkan bulan yang dipilih
+  const filteredPayments = payments.filter(function (p) {
+    return String(p.tanggal).slice(0, 7) === monthKey;
+  });
+
+  // 3. Kumpulkan semua bulan susulan unik dan URUTKAN TERBALIK (dari terbaru ke terlama)
+  let allSusulanMonths = new Set();
+  filteredPayments.forEach(function (p) {
+    if (p.susulan_bulan) {
+      let bulanArray = [];
+      if (typeof p.susulan_bulan === "string") {
+        bulanArray = p.susulan_bulan.split(",").filter(Boolean);
+      } else if (Array.isArray(p.susulan_bulan)) {
+        bulanArray = p.susulan_bulan;
+      }
+      bulanArray.forEach(function (key) {
+        if (key.length === 7) {
+          allSusulanMonths.add(key);
+        }
+      });
+    }
+  });
+
+  // Urutkan dari yang TERBARU ke TERLAMA
+  let sortedSusulanMonths = Array.from(allSusulanMonths).sort().reverse();
+
+  // B A T A S I : Hanya ambil 3 BULAN TERAKHIR saja
+  if (sortedSusulanMonths.length > 3) {
+    sortedSusulanMonths = sortedSusulanMonths.slice(0, 3);
+  }
+
+  // Balik urutannya agar tampil dari yang TERLAMA ke TERBARU (untuk tampilan tabel)
+  let displaySusulanMonths = [...sortedSusulanMonths].reverse();
+
+  const thead = document.getElementById("printShodaqohHead");
+  const body = document.getElementById("printShodaqohBody");
+  const tfoot = document.getElementById("printShodaqohFoot");
+  if (!thead || !body || !tfoot) return;
+
+  // 3.5 UPDATE COLGROUP dengan kolom IR dinamis
+  const table = document.getElementById("printShodaqohTable");
+  if (table) {
+    let colgroupHTML = `
+      <col class="col-no" />
+      <col class="col-nama" />
+    `;
+
+    // Tambahkan col untuk setiap bulan susulan
+    displaySusulanMonths.forEach(function () {
+      colgroupHTML += `<col class="col-ir" />`;
+    });
+
+    // Tambahkan col untuk kolom lainnya
+    colgroupHTML += `
+      <col class="col-sambung" />
+      <col class="col-jimpitan" />
+      <col class="col-siar" />
+      <col class="col-seribuan" />
+      <col class="col-kafan" />
+      <col class="col-ukhro" />
+      <col class="col-total" />
+    `;
+
+    // Ganti colgroup
+    const oldColgroup = table.querySelector("colgroup");
+    if (oldColgroup) {
+      oldColgroup.innerHTML = colgroupHTML;
+    }
+  }
+
+  // 4. Siapkan variabel total
+  let totalIr = {};
+  let totalSambung = 0,
+    totalJimpitan = 0,
+    totalSiar = 0;
+  let totalSeribuan = 0,
+    totalKafan = 0,
+    totalUkhro = 0,
+    grandTotal = 0;
+  let grandTotalIr = 0;
+
+  displaySusulanMonths.forEach(function (m) {
+    totalIr[m] = 0;
+  });
+
+  // 5. BANGUN HEADER 2 BARIS
+  let headerHTML = "";
+
+  // --- BARIS PERTAMA (Header Utama) ---
+  headerHTML += `<tr>`;
+  headerHTML += `<th rowspan="2" style="text-align:left;width:3%;">No</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:left;width:16%;">Nama Anggota</th>`;
+
+  // Kolom Infak IR (colspan untuk 3 bulan)
+  const irColspan =
+    displaySusulanMonths.length > 0 ? displaySusulanMonths.length : 1;
+  headerHTML += `<th colspan="${irColspan}" style="text-align:center;width:${irColspan * 12}%;">Infak IR (Susulan)</th>`;
+
+  // Kolom Lainnya (masing-masing dengan rowspan 2) - RATA KANAN
+  headerHTML += `<th rowspan="2" style="text-align:right;width:8%;">Uang Sambung</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:right;width:8%;">Jimpitan</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:right;width:8%;">Siar-siar</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:right;width:8%;">Seribuan</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:right;width:8%;">Kafan</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:right;width:8%;">Ukhro MT</th>`;
+  headerHTML += `<th rowspan="2" style="text-align:right;width:9%;">Total</th>`;
+  headerHTML += `</tr>`;
+
+  // --- BARIS KEDUA (Sub-Header untuk Infak IR) ---
+  headerHTML += `<tr>`;
+
+  // Sub-Header untuk Infak IR (Bulan-bulan) - RATA KANAN
+  if (displaySusulanMonths.length > 0) {
+    displaySusulanMonths.forEach(function (key) {
+      const y = key.slice(2, 4);
+      const m = parseInt(key.slice(5, 7));
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "Mei",
+        "Jun",
+        "Jul",
+        "Ags",
+        "Sep",
+        "Okt",
+        "Nov",
+        "Des",
+      ];
+      headerHTML += `<th style="text-align:right;width:12%;">${monthNames[m - 1]}'${y}</th>`;
+    });
+  } else {
+    headerHTML += `<th style="text-align:right;width:12%;">—</th>`;
+  }
+  headerHTML += `</tr>`;
+
+  let bodyHTML = filteredPayments
+    .map(function (p, idx) {
+      const no = idx + 1;
+      const nama = p.nama || "-";
+
+      const sambung = Number(p.uang_sambung || 0);
+      const jimpitan = Number(p.jimpitan || 0);
+      const siar = Number(p.siar_siar || 0);
+      const seribuan = Number(p.seribuan || 0);
+      const kafan = Number(p.kafan || 0);
+      const ukhro = Number(p.ukhro_mt || 0);
+
+      // Ambil data IR per bulan
+      let irData = {};
+      if (p.susulan_bulan) {
+        let bulanArray = [];
+        if (typeof p.susulan_bulan === "string") {
+          bulanArray = p.susulan_bulan.split(",").filter(Boolean);
+        } else if (Array.isArray(p.susulan_bulan)) {
+          bulanArray = p.susulan_bulan;
+        }
+
+        if (bulanArray.length > 0) {
+          const totalIR = Number(p.susulan_ir || 0);
+          let irPerBulan = Math.round(totalIR / bulanArray.length);
+
+          bulanArray.forEach(function (key) {
+            if (key.length === 7 && displaySusulanMonths.includes(key)) {
+              irData[key] = irPerBulan;
+              if (totalIr[key] !== undefined) {
+                totalIr[key] += irPerBulan;
+                grandTotalIr += irPerBulan;
+              }
+            }
+          });
+        }
+      }
+
+      let rowHTML = `<tr>
+    <td style="text-align:left;padding:6px 4px;font-size:9.5px;">${no}</td>
+    <td style="text-align:left;padding:6px 4px;font-size:9.5px;">${escapeHtml(nama)}</td>`;
+
+      // Tampilkan IR per bulan - RATA KANAN
+      displaySusulanMonths.forEach(function (key) {
+        let val = irData[key] || 0;
+        rowHTML += `<td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${val > 0 ? fmtRp(val) : "—"}</td>`;
+      });
+
+      // Kolom lainnya - RATA KANAN
+      rowHTML += `
+    <td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${sambung > 0 ? fmtRp(sambung) : "—"}</td>
+    <td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${jimpitan > 0 ? fmtRp(jimpitan) : "—"}</td>
+    <td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${siar > 0 ? fmtRp(siar) : "—"}</td>
+    <td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${seribuan > 0 ? fmtRp(seribuan) : "—"}</td>
+    <td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${kafan > 0 ? fmtRp(kafan) : "—"}</td>
+    <td class="num" style="text-align:right;padding:6px 4px;font-size:9.5px;">${ukhro > 0 ? fmtRp(ukhro) : "—"}</td>`;
+
+      // Total per baris - RATA KANAN
+      let total = sambung + jimpitan + siar + seribuan + kafan + ukhro;
+      displaySusulanMonths.forEach(function (key) {
+        total += irData[key] || 0;
+      });
+
+      rowHTML += `<td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(total)}</td>
+  </tr>`;
+
+      // Akumulasi total footer
+      totalSambung += sambung;
+      totalJimpitan += jimpitan;
+      totalSiar += siar;
+      totalSeribuan += seribuan;
+      totalKafan += kafan;
+      totalUkhro += ukhro;
+      grandTotal += total;
+
+      return rowHTML;
+    })
+    .join("");
+
+  // 7. BANGUN FOOTER
+  let footerHTML = "";
+
+  // Baris 1: Total Keseluruhan per kolom
+  footerHTML += `<tr class="print-total-saldo">`;
+  footerHTML += `<td colspan="2" class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">TOTAL KESELURUHAN</td>`;
+
+  // Total per bulan IR - RATA KANAN
+  displaySusulanMonths.forEach(function (key) {
+    footerHTML += `<td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${totalIr[key] > 0 ? fmtRp(totalIr[key]) : "—"}</td>`;
+  });
+
+  // Total lainnya - RATA KANAN
+  footerHTML += `
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(totalSambung)}</td>
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(totalJimpitan)}</td>
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(totalSiar)}</td>
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(totalSeribuan)}</td>
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(totalKafan)}</td>
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(totalUkhro)}</td>
+  <td class="num font-bold" style="text-align:right;padding:6px 4px;font-size:9.5px;">${fmtRp(grandTotal)}</td>
+`;
+  footerHTML += `</tr>`;
+
+  // Baris 2: Grand Total Infak IR
+  if (displaySusulanMonths.length > 0) {
+    footerHTML += `<tr class="print-grand-total-ir" style="background: #e8f5e9 !important;">`;
+    footerHTML += `<td colspan="2" class="num font-bold" style="background: #e8f5e9 !important; color: #1e293b !important; text-align:right;padding:6px 4px;font-size:9.5px;">GRAND TOTAL IR</td>`;
+
+    displaySusulanMonths.forEach(function (key) {
+      footerHTML += `<td class="num font-bold" style="background: #e8f5e9 !important; color: #1e293b !important; text-align:right;padding:6px 4px;font-size:9.5px; border-top: 2px solid #16a34a;">${totalIr[key] > 0 ? fmtRp(totalIr[key]) : "—"}</td>`;
+    });
+
+    const otherCols = 7;
+    footerHTML += `<td colspan="${otherCols}" style="background: #e8f5e9 !important; border-top: 2px solid #16a34a; padding:6px 4px;"></td>`;
+    footerHTML += `</tr>`;
+  }
+
+  // 8. GABUNGKAN SEMUA & RENDER
+  thead.innerHTML = headerHTML;
+  body.innerHTML = bodyHTML;
+  tfoot.innerHTML = footerHTML;
+
+  // 9. PROSES PRINT
+  const prevDisplay = area.style.display;
+  area.style.display = "block";
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  area.style.top = "0";
+  area.style.zIndex = "999999";
+  area.style.background = "white";
+  area.style.width = "100%";
+  area.style.height = "100%";
+
+  void area.offsetHeight;
+
+  const restore = () => {
+    area.style.display = prevDisplay || "none";
+    area.style.position = "";
+    area.style.left = "";
+    area.style.top = "";
+    area.style.zIndex = "";
+    area.style.background = "";
+    area.style.width = "";
+    area.style.height = "";
+    document.body.classList.remove("printing");
+  };
+
+  document.body.classList.add("printing");
+  window.print();
+  window.removeEventListener("afterprint", restore);
+  window.addEventListener("afterprint", restore, { once: true });
+  setTimeout(restore, 2000);
+}
+
 // Panggil setup saat DOM ready
 document.addEventListener("DOMContentLoaded", function () {
   setupPrintButton();
@@ -1891,6 +2362,28 @@ async function loadShodaqohData(monthKey) {
       throw new Error(data.message || "Gagal memuat data");
     }
 
+    // HAPUS SKELETON DAN TAMPILKAN KONTEN ASLI
+    const container = document.querySelector("#screen-shodaqoh");
+    if (container) {
+      // Hapus wrapper skeleton
+      container
+        .querySelectorAll(".shod-skeleton-wrapper")
+        .forEach((el) => el.remove());
+
+      // Tampilkan kembali semua konten asli
+      const children = container.children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        // Hanya tampilkan yang bukan skeleton wrapper
+        if (
+          !child.classList ||
+          !child.classList.contains("shod-skeleton-wrapper")
+        ) {
+          child.style.display = "";
+        }
+      }
+    }
+
     state.shodaqoh.loaded = true;
     state.shodaqoh.currentMonth = data.currentMonth || "";
     state.shodaqoh.selectedMonth =
@@ -1913,15 +2406,11 @@ async function loadShodaqohData(monthKey) {
       );
     }
 
-    // Render UI utama
     renderShodaqohDashboard();
     renderShodaqohAllocation();
     renderShodaqohFilters();
-
-    // Render tabs - ini akan membuat struktur dan memicu render data
     renderShodaqohTabs();
 
-    // Update post status
     const postStatus = $("shodPostStatus");
     if (postStatus) {
       const payments = state.shodaqoh.payments || [];
@@ -5790,192 +6279,145 @@ function renderShodaqohSkeleton() {
   const container = document.querySelector("#screen-shodaqoh");
   if (!container) return;
 
-  const dashboard = container.querySelector(".shod-dashboard");
-  const allocation = container.querySelector(".shod-allocation");
-  const filters = container.querySelector(".shod-filters");
-
-  if (dashboard) dashboard.classList.add("hidden");
-  if (allocation) allocation.classList.add("hidden");
-  if (filters) filters.classList.add("hidden");
-
+  // Hapus skeleton lama jika ada
   container
-    .querySelectorAll(".shod-tabs-content-container")
+    .querySelectorAll(".shod-skeleton-wrapper")
     .forEach((el) => el.remove());
 
-  container
-    .querySelectorAll(
-      ".card:has(#shodMonitoringBody), .card:has(#shodMembersList), .card:has(#shodPaymentsList)",
-    )
-    .forEach((el) => el.remove());
-
-  let tabsContainer = container.querySelector(".shod-tabs-container");
-
-  if (!tabsContainer) {
-    tabsContainer = document.createElement("div");
-    tabsContainer.className = "shod-tabs-container";
-
-    container.appendChild(tabsContainer);
+  // SEMBUNYIKAN SEMUA KONTEN ASLI
+  const children = container.children;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    if (child.classList && child.classList.contains("shod-skeleton-wrapper"))
+      continue;
+    child.style.display = "none";
   }
 
-  tabsContainer.innerHTML = `
-    <div
-      class="shod-tabs"
-      style="
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:6px;
-      "
-    >
-      <div
-        class="shod-tab"
-        data-tab="shod-monitoring"
-        style="
-          height:34px;
-          border:1px solid var(--line);
-          border-radius:8px;
-          background:var(--surface);
-          display:flex;
-          align-items:center;
-          justify-content:center;
-        "
-      >
-        <span
-          class="skeleton-line"
-          style="
-            display:block;
-            width:48px;
-            height:10px;
-            border-radius:4px;
-          "
-        ></span>
-      </div>
+  // Buat wrapper skeleton
+  const wrapper = document.createElement("div");
+  wrapper.className = "shod-skeleton-wrapper";
+  wrapper.style.cssText = "display:block;width:100%;";
 
-      <div
-        class="shod-tab"
-        data-tab="shod-members"
-        style="
-          height:34px;
-          border:1px solid var(--line);
-          border-radius:8px;
-          background:var(--surface);
-          display:flex;
-          align-items:center;
-          justify-content:center;
-        "
-      >
-        <span
-          class="skeleton-line"
-          style="
-            display:block;
-            width:48px;
-            height:10px;
-            border-radius:4px;
-          "
-        ></span>
+  wrapper.innerHTML = `
+    <!-- Skeleton: Header (judul + tombol) -->
+    <div class="flex items-center justify-between gap-3 skeleton-loading" style="margin-bottom:12px;">
+      <div>
+        <div class="skeleton-line" style="width:80px;height:10px;border-radius:4px;margin-bottom:4px;"></div>
+        <div class="skeleton-line" style="width:200px;height:24px;border-radius:4px;margin-bottom:4px;"></div>
+        <div class="skeleton-line" style="width:120px;height:14px;border-radius:4px;"></div>
       </div>
+      <div class="flex items-center gap-2">
+        <div class="skeleton-line" style="width:34px;height:34px;border-radius:8px;"></div>
+        <div class="skeleton-line" style="width:34px;height:34px;border-radius:8px;"></div>
+      </div>
+    </div>
 
-      <div
-        class="shod-tab"
-        data-tab="shod-payments"
-        style="
-          height:34px;
-          border:1px solid var(--line);
-          border-radius:8px;
-          background:var(--surface);
-          display:flex;
-          align-items:center;
-          justify-content:center;
-        "
-      >
-        <span
-          class="skeleton-line"
-          style="
-            display:block;
-            width:48px;
-            height:10px;
-            border-radius:4px;
-          "
-        ></span>
+    <!-- Skeleton: Dashboard 4 card (grid 2x2) -->
+    <div class="grid grid-cols-2 gap-3" style="margin-bottom:12px;">
+      ${[1, 2, 3, 4]
+        .map(
+          () => `
+        <div class="card p-4 skeleton-loading">
+          <div class="skeleton-line" style="width:40%;height:10px;border-radius:4px;margin-bottom:6px;"></div>
+          <div class="skeleton-line" style="width:60%;height:20px;border-radius:4px;"></div>
+        </div>
+      `,
+        )
+        .join("")}
+    </div>
+
+    <!-- Skeleton: Rincian Alokasi Pembayaran -->
+    <div class="card p-4" style="margin-bottom:12px;">
+      <div class="skeleton-line" style="width:50%;height:14px;border-radius:4px;margin-bottom:12px;"></div>
+      <div class="grid grid-cols-2 gap-2">
+        ${[1, 2, 3, 4, 5, 6, 7, 8]
+          .map(
+            () => `
+          <div class="card p-3 skeleton-loading">
+            <div class="skeleton-line" style="width:60%;height:8px;border-radius:4px;margin-bottom:4px;"></div>
+            <div class="skeleton-line" style="width:50%;height:16px;border-radius:4px;"></div>
+          </div>
+        `,
+          )
+          .join("")}
       </div>
+    </div>
+
+    <!-- Skeleton: Filter (4 dropdown) -->
+    <div class="card p-4" style="margin-bottom:12px;">
+      <div class="grid grid-cols-2 gap-3 skeleton-loading">
+        ${[1, 2, 3, 4]
+          .map(
+            () => `
+          <div>
+            <div class="skeleton-line" style="width:30%;height:8px;border-radius:4px;margin-bottom:4px;"></div>
+            <div class="skeleton-line" style="width:100%;height:34px;border-radius:8px;"></div>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+    </div>
+
+    <!-- Skeleton: Tabs (3 tab) -->
+    <div style="margin-bottom:8px;">
+      <div class="shod-tabs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        ${[1, 2, 3]
+          .map(
+            () => `
+          <div style="height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;">
+            <span class="skeleton-line" style="display:block;width:48px;height:10px;border-radius:4px;"></span>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+    </div>
+
+    <!-- Skeleton: Monitoring Table -->
+    <div class="card p-4">
+      <!-- Header table -->
+      <div class="flex items-center justify-between mb-3 skeleton-loading">
+        <div class="flex items-center gap-3">
+          <span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>
+          <span class="skeleton-line" style="display:inline-block;width:60px;height:10px;border-radius:4px;"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
+          <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
+        </div>
+      </div>
+      
+      <!-- Table header -->
+      <div style="display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 1fr;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+        ${["Anggota", "Target", "Dibayar", "Status", "Tgl Bayar"]
+          .map(
+            () =>
+              `<span class="skeleton-line" style="height:10px;border-radius:4px;"></span>`,
+          )
+          .join("")}
+      </div>
+      
+      <!-- Table rows -->
+      ${[1, 2, 3, 4, 5, 6, 7]
+        .map(
+          () => `
+        <div style="display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);">
+          ${[1, 2, 3, 4, 5]
+            .map(
+              () =>
+                `<span class="skeleton-line" style="height:12px;border-radius:4px;"></span>`,
+            )
+            .join("")}
+        </div>
+      `,
+        )
+        .join("")}
     </div>
   `;
 
-  const content = document.createElement("div");
-  content.className = "shod-tabs-content-container";
-  content.style.cssText = "margin-top:12px;";
-
-  const monitoring = document.createElement("div");
-  monitoring.className = "shod-tab-content shod-tab-content-shod-monitoring";
-
-  monitoring.innerHTML = `
-  <div class="card p-4">
-    <!-- Header Skeleton -->
-    <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-3">
-        <span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>
-        <span class="skeleton-line" style="display:inline-block;width:60px;height:10px;border-radius:4px;"></span>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
-        <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
-      </div>
-    </div>
-
-    <!-- Header Kolom Skeleton -->
-    <div
-      style="
-        display:grid;
-        grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
-        gap:8px;
-        padding-bottom:8px;
-        border-bottom:1px solid var(--line);
-      "
-    >
-      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-      <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
-    </div>
-
-    <!-- Baris Data Skeleton -->
-    ${[1, 2, 3, 4, 5, 6, 7]
-      .map(
-        () => `
-          <div
-            style="
-              display:grid;
-              grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
-              gap:8px;
-              padding:10px 0;
-              border-bottom:1px solid var(--line);
-            "
-          >
-            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
-            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
-            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
-            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
-            <span class="skeleton-line" style="height:12px;border-radius:4px;"></span>
-          </div>
-        `,
-      )
-      .join("")}
-  </div>
-`;
-
-  const members = document.createElement("div");
-  members.className = "shod-tab-content shod-tab-content-shod-members";
-  members.style.display = "none";
-
-  const payments = document.createElement("div");
-  payments.className = "shod-tab-content shod-tab-content-shod-payments";
-  payments.style.display = "none";
-
-  content.appendChild(monitoring);
-  content.appendChild(members);
-  content.appendChild(payments);
-
-  tabsContainer.insertAdjacentElement("afterend", content);
+  // Masukkan skeleton di awal container (sebelum konten asli)
+  container.insertBefore(wrapper, container.firstChild);
 }
 
 function renderShodaqohError(message) {

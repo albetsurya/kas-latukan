@@ -735,33 +735,61 @@
                 Bulan berjalan
               </p>
             </div>
-            <button
-              id="btnCopyShodaqohRekap"
-              class="icon-btn"
-              style="
-                width: 30px;
-                height: 30px;
-                border-radius: 8px;
-                background: var(--surface-alt);
-                border-color: var(--line);
-                color: var(--ink-soft);
-              "
-              title="Salin rekap ke clipboard"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
+            <div class="flex items-center gap-2">
+              <button
+                id="btnPrintShodaqoh"
+                class="icon-btn"
+                style="
+                  width: 34px;
+                  height: 34px;
+                  border-radius: 8px;
+                  background: var(--surface-alt);
+                  border-color: var(--line);
+                  color: var(--ink-soft);
+                "
+                title="Cetak Rekap Shodaqoh"
               >
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path
-                  d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                />
-              </svg>
-            </button>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"
+                  />
+                </svg>
+              </button>
+              <button
+                id="btnCopyShodaqohRekap"
+                class="icon-btn"
+                style="
+                  width: 34px;
+                  height: 34px;
+                  border-radius: 8px;
+                  background: var(--surface-alt);
+                  border-color: var(--line);
+                  color: var(--ink-soft);
+                "
+                title="Salin rekap ke clipboard"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -2747,6 +2775,36 @@
                 <td class="num font-bold" id="printTotalSaldo">Rp 0</td>
               </tr>
             </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="printShodaqohArea">
+      <div class="print-wrapper">
+        <div class="print-header">
+          <h1>REKAP SHODAQOH BULANAN</h1>
+          <h2>KELOMPOK LATUKAN</h2>
+          <p id="printShodaqohPeriod">Periode: -</p>
+        </div>
+
+        <div class="print-table-wrapper">
+          <table id="printShodaqohTable">
+            <colgroup>
+              <col class="col-no" />
+              <col class="col-nama" />
+              <!-- Kolom IR akan ditambahkan dinamis melalui JavaScript -->
+              <col class="col-sambung" />
+              <col class="col-jimpitan" />
+              <col class="col-siar" />
+              <col class="col-seribuan" />
+              <col class="col-kafan" />
+              <col class="col-ukhro" />
+              <col class="col-total" />
+            </colgroup>
+            <thead id="printShodaqohHead"></thead>
+            <tbody id="printShodaqohBody"></tbody>
+            <tfoot id="printShodaqohFoot"></tfoot>
           </table>
         </div>
       </div>
