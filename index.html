@@ -29,7 +29,6 @@
   </head>
 
   <body>
-    <!-- ===================== AUTH GATE ===================== -->
     <div id="authScreen">
       <div id="authCard">
         <div
@@ -156,9 +155,7 @@
       </div>
     </div>
 
-    <!-- ===================== SHELL ===================== -->
     <div id="shell" class="hidden">
-      <!-- ===================== TOP BAR ===================== -->
       <div
         id="topbar"
         class="px-5 pt-4 pb-3 flex items-center justify-between gap-3"
@@ -212,9 +209,7 @@
         </div>
       </div>
 
-      <!-- ===================== CONTENT ===================== -->
       <main class="flex-1 overflow-y-auto pb-28 px-5 space-y-5">
-        <!-- CONFIG WARNING -->
         <div
           id="configWarning"
           class="hidden fade-in border border-amber-300/60 bg-[color:var(--gold-soft)] text-[color:var(--gold)] text-xs rounded-2xl px-4 py-3"
@@ -224,9 +219,7 @@
           bagian atas <code>js/main.js</code>, lalu muat ulang halaman.
         </div>
 
-        <!-- ============ SCREEN: BERANDA ============ -->
         <section id="screen-home" class="screen active space-y-5">
-          <!-- Home period filter -->
           <div class="home-period-filter">
             <div class="home-period-label">
               <span class="home-period-label-dot"></span>
@@ -282,49 +275,57 @@
             </div>
           </div>
 
-          <!-- Hero card -->
-          <div class="hero-card px-6 pt-6 pb-5">
+          <div
+            class="hero-card px-6 pt-6 pb-5"
+            style="
+              background: var(--surface) !important;
+              border: 1px solid var(--line);
+            "
+          >
             <p
-              class="eyebrow white-text font-bold text-[12px] tracking-wider uppercase"
-              style="color: rgba(255, 255, 255, 0.9)"
+              class="eyebrow font-bold text-[12px] tracking-wider uppercase"
+              style="color: var(--ink-soft)"
             >
               Saldo Kas
             </p>
             <p
               class="mono font-display text-[30px] font-extrabold mt-1.5 leading-none"
+              style="color: var(--ink)"
               id="homeSaldoAkhir"
             >
               Rp 0
             </p>
 
             <p
-              class="text-[11.5px] mt-2 white-text font-semibold tracking-wide"
-              style="color: rgba(255, 255, 255, 0.95)"
+              class="text-[11.5px] mt-2 font-semibold tracking-wide"
+              style="color: var(--ink-soft)"
             >
               <span id="homePeriodeText">Semua Periode</span>
-              <span style="color: rgba(255, 255, 255, 0.5)" class="mx-1"
-                >·</span
+              <span style="color: var(--ink-faint)" class="mx-1">·</span>
+              <span
+                id="homeTotalTx"
+                class="font-extrabold"
+                style="color: var(--ink)"
+                >0 transaksi</span
               >
-              <span id="homeTotalTx" class="font-extrabold">0 transaksi</span>
             </p>
 
             <div
               class="flex items-center gap-1.5 mt-2.5 pt-2"
-              style="border-top: 1px solid rgba(255, 255, 255, 0.22)"
+              style="border-top: 1px solid var(--line)"
             >
               <span
-                class="text-[11px] white-text font-bold"
-                style="color: rgba(255, 255, 255, 0.85)"
+                class="text-[11px] font-bold"
+                style="color: var(--ink-soft)"
                 id="homeLabelSaldoAwal"
                 >Saldo Awal (Awal Tahun)</span
               >
-              <span
-                class="text-[10.5px] white-text"
-                style="color: rgba(255, 255, 255, 0.45)"
+              <span class="text-[10.5px]" style="color: var(--ink-faint)"
                 >·</span
               >
               <span
-                class="mono text-[12px] font-extrabold white-text"
+                class="mono text-[12px] font-extrabold"
+                style="color: var(--brand)"
                 id="homeSaldoAwal"
                 >Rp 0</span
               >
@@ -333,7 +334,6 @@
 
           <div class="receipt-edge -mt-4"></div>
 
-          <!-- Stat cards -->
           <div class="grid grid-cols-2 gap-3 -mt-1">
             <div class="stat-chip p-4">
               <p class="eyebrow" style="color: var(--pos)">Pemasukan</p>
@@ -358,7 +358,6 @@
             </div>
           </div>
 
-          <!-- Surplus -->
           <div class="stat-chip p-4 flex items-center justify-between">
             <div>
               <p class="eyebrow" id="homeSurplusLabel">Surplus Periode Ini</p>
@@ -375,7 +374,6 @@
             </div>
           </div>
 
-          <!-- Chart -->
           <div class="card p-5">
             <div class="flex items-center justify-between mb-3">
               <h2 class="font-display text-[13px] font-extrabold">
@@ -389,14 +387,10 @@
             </div>
 
             <div class="h-40 relative" id="chartWrapper">
-              <!-- Canvas untuk chart -->
               <canvas id="saldoChart"></canvas>
-
-              <!-- Skeleton akan ditempatkan di sini oleh JavaScript -->
             </div>
           </div>
 
-          <!-- Recent transactions -->
           <div class="card p-5">
             <div class="flex items-center justify-between mb-2">
               <h2 class="font-display text-[13px] font-extrabold">
@@ -415,9 +409,7 @@
           </div>
         </section>
 
-        <!-- ============ SCREEN: RIWAYAT ============ -->
         <section id="screen-history" class="screen space-y-5">
-          <!-- Search -->
           <div class="relative">
             <svg
               class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--ink-faint)]"
@@ -440,7 +432,6 @@
             />
           </div>
 
-          <!-- Period filter -->
           <div class="home-period-filter">
             <div class="home-period-label">
               <span class="home-period-label-dot"></span>
@@ -497,7 +488,6 @@
             </div>
           </div>
 
-          <!-- Saldo summary -->
           <div class="grid grid-cols-2 gap-3">
             <div class="stat-chip p-4">
               <p class="eyebrow">Saldo Awal</p>
@@ -531,7 +521,6 @@
             id="periodHint"
           ></p>
 
-          <!-- Transaction list -->
           <div class="card p-5">
             <div id="txList"></div>
             <div
@@ -543,7 +532,6 @@
           </div>
         </section>
 
-        <!-- ============ SCREEN: REKAP ============ -->
         <section id="screen-recap" class="screen space-y-4">
           <p class="text-[11.5px] text-[color:var(--ink-soft)] px-1">
             Ketuk salah satu bulan untuk membuka riwayat lengkapnya.
@@ -552,7 +540,6 @@
           <div id="recapList" class="space-y-2.5"></div>
         </section>
 
-        <!-- ============ SCREEN: PROFIL ============ -->
         <section id="screen-profile" class="screen space-y-5">
           <div class="card p-5 flex items-center gap-4">
             <div
@@ -597,7 +584,6 @@
             Keluar
           </button>
 
-          <!-- Theme toggle -->
           <div class="card p-5">
             <p class="eyebrow mb-3">Tampilan</p>
 
@@ -635,7 +621,6 @@
             </div>
           </div>
 
-          <!-- Print -->
           <div class="card p-1 divide-y divide-[color:var(--line)]">
             <button
               id="btnPrint"
@@ -661,7 +646,6 @@
             </button>
           </div>
 
-          <!-- Sync info -->
           <div class="card p-5">
             <p class="eyebrow mb-1.5">Sinkronisasi</p>
             <p class="text-[12.5px] text-[color:var(--ink-soft)]">
@@ -670,9 +654,7 @@
           </div>
         </section>
 
-        <!-- ============ SCREEN: SHODAQOH IR ============ -->
         <section id="screen-shodaqoh" class="screen space-y-5">
-          <!-- Header -->
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="eyebrow">Infak Bulanan</p>
@@ -693,9 +675,9 @@
                 width: 30px;
                 height: 30px;
                 border-radius: 8px;
-                background: var(--brand-soft);
-                border-color: var(--brand);
-                color: var(--brand);
+                background: var(--surface-alt);
+                border-color: var(--line);
+                color: var(--ink-soft);
               "
               title="Salin rekap ke clipboard"
             >
@@ -715,38 +697,58 @@
             </button>
           </div>
 
-          <!-- Dashboard -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="stat-chip p-4">
-              <p class="eyebrow">Target</p>
-              <p id="shodTarget" class="mono text-sm font-extrabold mt-1">
+              <p class="eyebrow" style="color: var(--ink-soft)">Target</p>
+              <p
+                id="shodTarget"
+                class="mono text-sm font-extrabold mt-1"
+                style="color: var(--ink)"
+              >
                 Rp 0
               </p>
             </div>
 
             <div class="stat-chip p-4">
-              <p class="eyebrow">Pembayaran</p>
-              <p id="shodReceived" class="mono text-sm font-extrabold mt-1">
+              <p class="eyebrow" style="color: var(--ink-soft)">Pembayaran</p>
+              <p
+                id="shodReceived"
+                class="mono text-sm font-extrabold mt-1"
+                style="color: var(--ink)"
+              >
                 Rp 0
               </p>
             </div>
 
-            <div class="stat-chip p-4">
-              <p class="eyebrow">Lunas</p>
-              <p id="shodPaidCount" class="mono text-sm font-extrabold mt-1">
+            <div
+              class="stat-chip p-4"
+              style="background: var(--pos-soft); border-color: var(--pos)"
+            >
+              <p class="eyebrow" style="color: var(--pos)">Lunas</p>
+              <p
+                id="shodPaidCount"
+                class="mono text-sm font-extrabold mt-1"
+                style="color: var(--pos)"
+              >
                 0
               </p>
             </div>
 
-            <div class="stat-chip p-4">
-              <p class="eyebrow">Belum</p>
-              <p id="shodUnpaidCount" class="mono text-sm font-extrabold mt-1">
+            <div
+              class="stat-chip p-4"
+              style="background: var(--neg-soft); border-color: var(--neg)"
+            >
+              <p class="eyebrow" style="color: var(--neg)">Belum</p>
+              <p
+                id="shodUnpaidCount"
+                class="mono text-sm font-extrabold mt-1"
+                style="color: var(--neg)"
+              >
                 0
               </p>
             </div>
           </div>
 
-          <!-- Post status -->
           <div
             id="shodPostStatus"
             class="card p-3 flex items-center gap-3 hidden"
@@ -766,7 +768,6 @@
             >
           </div>
 
-          <!-- Allocation detail -->
           <div class="card p-4">
             <p class="eyebrow mb-2">Rincian Alokasi Pembayaran</p>
 
@@ -853,7 +854,6 @@
             </div>
           </div>
 
-          <!-- Filters -->
           <div class="card p-4">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div class="filter-group">
@@ -998,7 +998,6 @@
             </div>
           </div>
 
-          <!-- Monitoring -->
           <div class="card p-4 overflow-x-auto">
             <div class="flex items-center justify-between mb-3">
               <h2 class="font-display text-[13px] font-extrabold">
@@ -1024,12 +1023,10 @@
             </table>
           </div>
 
-          <!-- Member list -->
           <div class="card p-4">
             <div id="shodMembersList"></div>
           </div>
 
-          <!-- Payment history -->
           <div class="card p-4">
             <h2 class="font-display text-[13px] font-extrabold mb-3">
               Riwayat Pembayaran
@@ -1037,14 +1034,11 @@
             <div id="shodPaymentsList" class="space-y-2"></div>
           </div>
 
-          <!-- ==================== SHODAQOH PAYMENT FORM ==================== -->
           <div id="shodaqohPaymentOverlay" class="sheet-overlay hidden">
             <div class="sheet">
-              <!-- ===== HEADER DENGAN SPACE LEBIH BESAR ===== -->
               <div class="sheet-header sheet-header-payment">
                 <div class="sheet-handle"></div>
 
-                <!-- Icon/Logo kecil di atas judul -->
                 <div
                   style="
                     display: flex;
@@ -1090,9 +1084,7 @@
                 </p>
               </div>
 
-              <!-- Sisa konten sheet -->
               <div class="sheet-scroll">
-                <!-- Method toggle -->
                 <div class="field-group">
                   <label class="field-label">Metode Input</label>
                   <div class="seg-toggle">
@@ -1109,7 +1101,6 @@
                   </div>
                 </div>
 
-                <!-- Member & Date -->
                 <div class="grid-cols-2" style="margin: 12px 0">
                   <div class="field-group">
                     <label class="field-label">Nama Anggota</label>
@@ -1148,7 +1139,6 @@
                     <input type="hidden" id="shodPaymentMember" value="" />
                   </div>
 
-                  <!-- Tanggal -->
                   <div class="field-group">
                     <label class="field-label">Tanggal</label>
                     <div class="filter-dropdown" id="shodDateDropdown">
@@ -1181,17 +1171,13 @@
                         class="filter-dropdown-menu"
                         role="listbox"
                         aria-label="Pilih tanggal"
-                      >
-                        <!-- Input text akan diisi oleh JavaScript -->
-                      </div>
+                      ></div>
                     </div>
                     <input type="hidden" id="shodPaymentDate" value="" />
                   </div>
                 </div>
 
-                <!-- Form -->
                 <form id="shodaqohPaymentForm" class="create-form space-y-3">
-                  <!-- Total Pembayaran -->
                   <div class="field-group">
                     <label class="field-label">Total Pembayaran</label>
                     <div style="display: flex; gap: 8px; align-items: center">
@@ -1243,12 +1229,10 @@
                     </div>
                   </div>
 
-                  <!-- Alokasi Pembayaran -->
                   <div class="field-group">
                     <label class="field-label">Alokasi Pembayaran</label>
 
                     <div class="allocation-items">
-                      <!-- Susulan IR -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Infak IR</span>
                         <input
@@ -1261,7 +1245,6 @@
                         />
                       </div>
 
-                      <!-- Susulan Bulan -->
                       <div
                         style="
                           margin-top: 6px;
@@ -1288,7 +1271,6 @@
                         ></div>
                       </div>
 
-                      <!-- Uang Sambung -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Uang Sambung</span>
                         <input
@@ -1301,7 +1283,6 @@
                         />
                       </div>
 
-                      <!-- Jimpitan -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Jimpitan</span>
                         <input
@@ -1314,7 +1295,6 @@
                         />
                       </div>
 
-                      <!-- Siar-siar -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Siar-siar</span>
                         <input
@@ -1327,7 +1307,6 @@
                         />
                       </div>
 
-                      <!-- Seribuan -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Seribuan</span>
                         <input
@@ -1340,7 +1319,6 @@
                         />
                       </div>
 
-                      <!-- Kafan -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Kafan</span>
                         <input
@@ -1353,7 +1331,6 @@
                         />
                       </div>
 
-                      <!-- Ukhro MT -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Ukhro MT</span>
                         <input
@@ -1368,7 +1345,6 @@
                     </div>
                   </div>
 
-                  <!-- Allocation status -->
                   <div
                     class="flex items-center justify-between p-3 bg-[color:var(--surface-2)] rounded-xl"
                   >
@@ -1396,7 +1372,6 @@
                     </span>
                   </div>
 
-                  <!-- Keterangan -->
                   <div class="field-group">
                     <label class="field-label">Keterangan</label>
                     <textarea
@@ -1407,7 +1382,6 @@
                     ></textarea>
                   </div>
 
-                  <!-- Buttons -->
                   <div class="flex gap-2.5 pt-1">
                     <button
                       type="button"
@@ -1427,12 +1401,10 @@
                   </div>
                 </form>
 
-                <!-- Upload section -->
                 <div id="shodUploadSection" class="hidden space-y-3 mt-3">
                   <div class="field-group">
                     <label class="field-label">Upload Foto Rekap</label>
 
-                    <!-- Modern file upload -->
                     <div class="relative">
                       <input
                         type="file"
@@ -1493,7 +1465,6 @@
                     />
 
                     <div class="flex gap-2 mt-3">
-                      <!-- Ekstrak Data -->
                       <button
                         type="button"
                         id="shodUploadExtract"
@@ -1529,7 +1500,6 @@
                         <span>Ekstrak Data</span>
                       </button>
 
-                      <!-- Hapus -->
                       <button
                         type="button"
                         id="shodUploadClear"
@@ -1599,8 +1569,10 @@
             </div>
           </div>
 
-          <!-- ==================== MEMBER ACTION SHEET ==================== -->
-          <div id="shodMemberActionOverlay" class="sheet-overlay hidden">
+          <div
+            id="shodMemberActionOverlay"
+            class="sheet-overlay sheet-action hidden"
+          >
             <div
               class="sheet"
               style="height: auto; max-height: 55vh; min-height: 0"
@@ -1793,7 +1765,6 @@
             </div>
           </div>
 
-          <!-- ==================== MEMBER FORM ==================== -->
           <div id="shodMemberFormOverlay" class="sheet-overlay hidden">
             <div class="sheet">
               <div class="sheet-handle"></div>
@@ -1862,7 +1833,6 @@
             </div>
           </div>
 
-          <!-- ==================== DELETE MEMBER CONFIRM ==================== -->
           <div id="deleteMemberConfirmOverlay" class="modal-overlay hidden">
             <div class="card modal-box p-5">
               <div
@@ -1916,8 +1886,10 @@
             </div>
           </div>
 
-          <!-- ==================== MEMBER DETAIL ==================== -->
-          <div id="shodMemberDetailOverlay" class="sheet-overlay hidden">
+          <div
+            id="shodMemberDetailOverlay"
+            class="sheet-overlay sheet-action hidden"
+          >
             <div class="sheet">
               <div class="sheet-header sheet-header-action">
                 <div class="sheet-handle"></div>
@@ -1930,7 +1902,6 @@
               </div>
 
               <div class="sheet-scroll">
-                <!-- Table member obligations -->
                 <div class="overflow-x-auto">
                   <table class="w-full text-xs">
                     <thead>
@@ -1962,9 +1933,7 @@
                         </th>
                       </tr>
                     </thead>
-                    <tbody id="shodMemberDetailBody">
-                      <!-- Skeleton akan diisi oleh JavaScript -->
-                    </tbody>
+                    <tbody id="shodMemberDetailBody"></tbody>
                   </table>
                 </div>
 
@@ -1979,8 +1948,10 @@
             </div>
           </div>
 
-          <!-- ==================== PAYMENT DETAIL ==================== -->
-          <div id="shodPaymentDetailOverlay" class="sheet-overlay hidden">
+          <div
+            id="shodPaymentDetailOverlay"
+            class="sheet-overlay sheet-action hidden"
+          >
             <div class="sheet">
               <div class="sheet-header sheet-header-action">
                 <div class="sheet-handle"></div>
@@ -1993,10 +1964,8 @@
               </div>
 
               <div class="sheet-scroll">
-                <!-- Allocation details -->
                 <div id="shodPaymentDetailBody" class="space-y-2"></div>
 
-                <!-- ===== ACTION BUTTONS ===== -->
                 <div class="card p-1 divide-y divide-[color:var(--line)] mt-4">
                   <button
                     type="button"
@@ -2086,8 +2055,6 @@
         </section>
       </main>
 
-      <!-- ===================== FLOATING ACTION BUTTONS ===================== -->
-      <!-- FAB ADD — Primary action -->
       <button
         id="fabAdd"
         class="fab hidden"
@@ -2107,7 +2074,6 @@
         <span class="fab-label">Tambah Transaksi</span>
       </button>
 
-      <!-- FAB POST KE KAS — Secondary action (hanya di tab Infak Bulanan) -->
       <button
         id="fabPostToKas"
         class="fab hidden"
@@ -2128,7 +2094,6 @@
         <span class="fab-label">Post ke Kas</span>
       </button>
 
-      <!-- ===================== BOTTOM NAV ===================== -->
       <nav id="bottomnav" class="flex">
         <button class="nav-btn active" data-tab="home">
           <span class="nav-pill">
@@ -2219,13 +2184,11 @@
         </button>
       </nav>
 
-      <!-- ===================== TRANSACTION SHEETS ===================== -->
       <div id="txOverlay" class="sheet-overlay hidden">
         <div class="sheet">
           <div class="sheet-header sheet-header-payment">
             <div class="sheet-handle"></div>
 
-            <!-- Icon/Logo kecil di atas judul -->
             <div class="sheet-header-icon">
               <svg
                 width="20"
@@ -2265,11 +2228,9 @@
                 </div>
               </div>
 
-              <!-- ===== DATE & ACCOUNT - DUA KOLOM ===== -->
               <div
                 style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
               >
-                <!-- DATE PICKER -->
                 <div class="field-group">
                   <label class="field-label">Tanggal</label>
                   <div class="filter-dropdown" id="txDateDropdown">
@@ -2302,14 +2263,11 @@
                       class="filter-dropdown-menu"
                       role="listbox"
                       aria-label="Pilih tanggal"
-                    >
-                      <!-- Calendar akan diisi oleh JavaScript -->
-                    </div>
+                    ></div>
                   </div>
                   <input type="hidden" id="txTanggal" value="" />
                 </div>
 
-                <!-- ACCOUNT DROPDOWN -->
                 <div class="field-group">
                   <label class="field-label">Account (Kategori)</label>
                   <div class="filter-dropdown" id="txAccountDropdown">
@@ -2342,9 +2300,7 @@
                       class="filter-dropdown-menu"
                       role="listbox"
                       aria-label="Pilih kategori"
-                    >
-                      <!-- Options akan diisi oleh JavaScript -->
-                    </div>
+                    ></div>
                   </div>
                   <input type="hidden" id="txAccount" value="" />
                 </div>
@@ -2397,8 +2353,7 @@
         </div>
       </div>
 
-      <!-- ===================== TX ACTION SHEET ===================== -->
-      <div id="txActionOverlay" class="sheet-overlay hidden">
+      <div id="txActionOverlay" class="sheet-overlay sheet-action hidden">
         <div class="sheet">
           <div class="sheet-header sheet-header-action">
             <div class="sheet-handle"></div>
@@ -2495,7 +2450,6 @@
         </div>
       </div>
 
-      <!-- ===================== DELETE CONFIRM ===================== -->
       <div id="deleteConfirmOverlay" class="modal-overlay hidden">
         <div class="card modal-box p-5">
           <div
@@ -2544,26 +2498,46 @@
         </div>
       </div>
 
-      <!-- ===================== CARRY FORWARD ===================== -->
-      <div id="carryForwardOverlay" class="sheet-overlay hidden">
-        <div class="sheet">
-          <div class="sheet-handle"></div>
-          <h3 class="font-display text-[16px] font-extrabold">
+      <div id="carryForwardOverlay" class="modal-overlay hidden">
+        <div class="card modal-box p-5">
+          <div
+            class="modal-icon"
+            style="background: var(--gold-soft); color: var(--gold)"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M5 12h14" />
+              <path d="m13 6 6 6-6 6" />
+            </svg>
+          </div>
+          <h3
+            class="font-display text-[15.5px] font-extrabold text-center mt-3"
+          >
             Jadikan Saldo Awal
           </h3>
           <p
+            class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5"
             id="carryForwardDesc"
-            class="text-[12.5px] text-[color:var(--ink-soft)] mt-2 mb-5"
           ></p>
-
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" id="btnCarryForwardCancel" class="btn-ghost">
+          <div class="flex gap-2.5 pt-4">
+            <button
+              type="button"
+              id="btnCarryForwardCancel"
+              class="btn-ghost flex-1"
+            >
               Batal
             </button>
             <button
               type="button"
               id="btnCarryForwardConfirm"
-              class="btn-primary"
+              class="btn-primary flex-1"
+              style="background: var(--gold); color: #fff"
             >
               Lanjutkan
             </button>
@@ -2571,7 +2545,6 @@
         </div>
       </div>
 
-      <!-- ===================== LOGOUT CONFIRM ===================== -->
       <div id="logoutConfirmOverlay" class="modal-overlay hidden">
         <div class="card modal-box p-5">
           <div
@@ -2621,7 +2594,6 @@
       </div>
     </div>
 
-    <!-- ===================== PRINT-ONLY REPORT ===================== -->
     <div id="printArea">
       <div class="print-header">
         <h1>REKAP LAPORAN KEUANGAN OPERASIONAL</h1>
@@ -2665,10 +2637,8 @@
       </table>
     </div>
 
-    <!-- ===================== TOAST ===================== -->
     <div id="toast" class="hidden"></div>
 
-    <!-- ===================== SCRIPTS ===================== -->
     <script src="js/session-gate.js"></script>
     <script src="js/role.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>

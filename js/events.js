@@ -1,12 +1,20 @@
-// events.js
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Semua bottom-sheet dipindahkan ke <body> agar benar-benar berada
-  // di viewport layer dan selalu di atas bottom navigation.
   document.querySelectorAll("#shell .sheet-overlay").forEach((overlay) => {
     document.body.appendChild(overlay);
   });
   document.body.classList.add("sheet-system-ready");
+
+  const actionOverlays = [
+    "txActionOverlay",
+    "shodMemberActionOverlay",
+    "shodPaymentDetailOverlay",
+    "shodMemberDetailOverlay",
+  ];
+
+  actionOverlays.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("sheet-action");
+  });
 
   initTheme();
 
@@ -323,12 +331,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if ($("btnActionCancel"))
     $("btnActionCancel").addEventListener("click", closeTxActionSheet);
 
-  if ($("txActionOverlay")) {
-    $("txActionOverlay").addEventListener("click", (e) => {
-      if (e.target === $("txActionOverlay")) {
-        closeTxActionSheet();
-      }
-    });
+  const txActionOverlay = document.getElementById("txActionOverlay");
+  if (txActionOverlay) {
+    txActionOverlay.classList.add("sheet-action");
+    const sheet = txActionOverlay.querySelector(".sheet");
+    if (sheet) {
+      sheet.style.cssText = `
+        max-height: 58vh !important;
+        height: auto !important;
+        min-height: auto !important;
+        padding: 6px 16px 10px !important;
+        overflow: hidden !important;
+        border-radius: 18px 18px 0 0 !important;
+      `;
+    }
   }
 
   if ($("btnActionEdit")) {
@@ -486,8 +502,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==================== SHODAQOH IR ====================
-
   if ($("shodFilterYear"))
     $("shodFilterYear").addEventListener("change", function () {
       state.shodaqoh.filters.year = this.value;
@@ -516,8 +530,6 @@ document.addEventListener("DOMContentLoaded", () => {
       renderShodaqohMonitoring();
     });
 
-  // ==================== UPLOAD FOTO ====================
-
   if ($("shodMethodManual")) {
     $("shodMethodManual").addEventListener("click", function () {
       if (typeof toggleShodMethod === "function") {
@@ -534,16 +546,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  console.log("1. DOM ready");
-
-  console.log("2. typeof setupShodUpload =", typeof setupShodUpload);
-
   if (typeof setupShodUpload === "function") {
-    console.log("3. Memanggil setupShodUpload...");
     setupShodUpload();
-    console.log("4. ✅ setupShodUpload selesai dipanggil");
-  } else {
-    console.warn("5. ⚠️ setupShodUpload TIDAK ditemukan!");
   }
 
   if ($("shodUploadClear")) {
@@ -553,8 +557,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
-  // ==================== PAYMENT FORM ====================
 
   if ($("btnShodAddPayment"))
     $("btnShodAddPayment").addEventListener("click", () => {
@@ -570,15 +572,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if ($("shodaqohPaymentOverlay")) {
     $("shodaqohPaymentOverlay").addEventListener("click", function (e) {
       if (e.target === this) {
-        // Panggil fungsi close yang sudah di-update
         if (typeof closeShodaqohPaymentForm === "function") {
           closeShodaqohPaymentForm();
         }
       }
     });
   }
-
-  // ==================== SHODAQOH - LOAD LAST NOMINALS ====================
 
   if (document.getElementById("btnLoadLastNominals")) {
     document
@@ -592,15 +591,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // ===== PANTAU PERUBAHAN MEMBER UNTUK UPDATE TOMBOL =====
-  // Event listener untuk member dropdown
   document.addEventListener("click", function (e) {
-    // Cek jika klik di dalam menu member dropdown
     const menu = document.getElementById("shodPaymentMemberMenu");
     if (menu && menu.contains(e.target)) {
       const option = e.target.closest(".filter-dropdown-option");
       if (option) {
-        // Tunggu sebentar agar value sudah terupdate
         setTimeout(function () {
           if (typeof updateLoadLastNominalsButton === "function") {
             updateLoadLastNominalsButton();
@@ -610,10 +605,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Juga pantau perubahan hidden input
   const memberHidden = document.getElementById("shodPaymentMember");
   if (memberHidden) {
-    // Gunakan MutationObserver untuk mendeteksi perubahan value
     const observer = new MutationObserver(function () {
       if (typeof updateLoadLastNominalsButton === "function") {
         updateLoadLastNominalsButton();
@@ -624,7 +617,6 @@ document.addEventListener("DOMContentLoaded", () => {
       attributeFilter: ["value"],
     });
 
-    // Juga event 'change' sebagai fallback
     memberHidden.addEventListener("change", function () {
       if (typeof updateLoadLastNominalsButton === "function") {
         updateLoadLastNominalsButton();
@@ -632,7 +624,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==================== PAYMENT EVENT FLOW ====================
   document.addEventListener("click", function (e) {
     const paymentBtn = e.target.closest("[data-shod-payment]");
     if (paymentBtn) {
@@ -652,7 +643,6 @@ document.addEventListener("DOMContentLoaded", () => {
     paymentBtn.click();
   });
 
-  // ==================== MEMBER EVENT FLOW ====================
   document.addEventListener("click", function (e) {
     const memberBtn = e.target.closest("[data-shod-member]");
     if (memberBtn) {
@@ -712,27 +702,71 @@ document.addEventListener("DOMContentLoaded", () => {
     memberBtn.click();
   });
 
-  // ==================== MEMBER DETAIL - CLOSE ====================
-
   if ($("btnCloseShodMemberDetail")) {
     $("btnCloseShodMemberDetail").addEventListener("click", function () {
       $("shodMemberDetailOverlay")?.classList.add("hidden");
     });
   }
 
-  if ($("shodMemberDetailOverlay")) {
-    $("shodMemberDetailOverlay").addEventListener("click", function (e) {
-      if (e.target === this) {
-        $("shodMemberDetailOverlay")?.classList.add("hidden");
-      }
-    });
+  const memberDetailOverlay = document.getElementById(
+    "shodMemberDetailOverlay",
+  );
+  if (memberDetailOverlay) {
+    memberDetailOverlay.classList.add("sheet-action");
+    const sheet = memberDetailOverlay.querySelector(".sheet");
+    if (sheet) {
+      sheet.style.cssText = `
+        max-height: 78dvh !important;
+        height: auto !important;
+        min-height: auto !important;
+        padding: 6px 16px 10px !important;
+        overflow: hidden !important;
+        border-radius: 18px 18px 0 0 !important;
+      `;
+    }
   }
 
-  if ($("shodPaymentDetailOverlay")) {
-    $("shodPaymentDetailOverlay").addEventListener("click", function (e) {
-      if (e.target === this) {
-        $("shodPaymentDetailOverlay")?.classList.add("hidden");
+  const paymentDetailOverlay = document.getElementById(
+    "shodPaymentDetailOverlay",
+  );
+  if (paymentDetailOverlay) {
+    paymentDetailOverlay.classList.add("sheet-action");
+    const sheet = paymentDetailOverlay.querySelector(".sheet");
+    if (sheet) {
+      sheet.style.cssText = `
+        max-height: 78dvh !important;
+        height: auto !important;
+        min-height: auto !important;
+        padding: 6px 16px 10px !important;
+        overflow: hidden !important;
+        border-radius: 18px 18px 0 0 !important;
+      `;
+    }
+  }
+
+  const membersList = document.getElementById("shodMembersList");
+  if (membersList) {
+    // Gunakan MutationObserver untuk mendeteksi perubahan pada members list
+    const observer = new MutationObserver(function () {
+      // Cek apakah header sudah sticky
+      const header = membersList.querySelector(".shod-members-header");
+      if (header) {
+        header.style.position = "sticky";
+        header.style.top = "0";
+        header.style.zIndex = "10";
+        header.style.background = "var(--surface)";
+        header.style.padding = "8px 0 10px 0";
+        header.style.borderBottom = "1px solid var(--line)";
+        header.style.display = "flex";
+        header.style.alignItems = "center";
+        header.style.justifyContent = "space-between";
       }
+    });
+
+    observer.observe(membersList, {
+      childList: true,
+      subtree: true,
+      characterData: true,
     });
   }
 
@@ -740,8 +774,6 @@ document.addEventListener("DOMContentLoaded", () => {
     $("btnCloseShodPaymentDetail").addEventListener("click", function () {
       $("shodPaymentDetailOverlay")?.classList.add("hidden");
     });
-
-  // ==================== EDIT & REVERSAL ====================
 
   if ($("btnShodEditPayment")) {
     $("btnShodEditPayment").addEventListener("click", async () => {
@@ -763,7 +795,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showReverseConfirmModal(paymentId) {
-    // Hapus modal yang sudah ada sebelumnya
     const existingModal = document.getElementById("reverseConfirmOverlay");
     if (existingModal) {
       existingModal.remove();
@@ -772,7 +803,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
     overlay.id = "reverseConfirmOverlay";
-    overlay.style.zIndex = "99999 !important"; // Pastikan di atas semua
+    overlay.style.zIndex = "99999 !important";
     overlay.innerHTML = `
     <div class="card modal-box p-5" style="max-width:400px;z-index:100000 !important;">
       <div class="modal-icon" style="background:var(--neg-soft);color:var(--neg);">
@@ -799,7 +830,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
-    // Append ke body, bukan ke dalam sheet
     document.body.appendChild(overlay);
 
     const closeModal = function () {
@@ -809,20 +839,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Event listener untuk tombol batal
     const cancelBtn = document.getElementById("btnReverseCancel");
     if (cancelBtn) {
       cancelBtn.addEventListener("click", closeModal);
     }
 
-    // Event listener untuk klik di luar modal
     overlay.addEventListener("click", function (e) {
       if (e.target === overlay) {
         closeModal();
       }
     });
 
-    // Event listener untuk tombol confirm
     const confirmBtn = document.getElementById("btnReverseConfirm");
     if (confirmBtn) {
       confirmBtn.addEventListener("click", async function () {
@@ -831,7 +858,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Keyboard Escape
     const escHandler = function (e) {
       if (e.key === "Escape") {
         closeModal();
@@ -872,17 +898,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if ($("shodMemberActionOverlay")) {
-    $("shodMemberActionOverlay").addEventListener("click", function (e) {
-      if (e.target === this) {
-        if (typeof closeShodMemberActionSheet === "function") {
-          closeShodMemberActionSheet();
-        }
-      }
-    });
+  const memberActionOverlay = document.getElementById(
+    "shodMemberActionOverlay",
+  );
+  if (memberActionOverlay) {
+    memberActionOverlay.classList.add("sheet-action");
+    const sheet = memberActionOverlay.querySelector(".sheet");
+    if (sheet) {
+      sheet.style.cssText = `
+        max-height: 58vh !important;
+        height: auto !important;
+        min-height: auto !important;
+        padding: 6px 16px 10px !important;
+        overflow: hidden !important;
+        border-radius: 18px 18px 0 0 !important;
+      `;
+    }
   }
-
-  // ==================== MEMBER FORM ====================
 
   if ($("btnAddMember")) {
     $("btnAddMember").addEventListener("click", function () {
@@ -981,8 +1013,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==================== MEMBER DELETE CONFIRM ====================
-
   if ($("btnDeleteMemberCancel")) {
     $("btnDeleteMemberCancel").addEventListener("click", function () {
       if (typeof closeShodMemberDeleteConfirm === "function") {
@@ -1046,8 +1076,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
-  // ==================== DELETE TRANSACTION ====================
 
   function openDeleteConfirm() {
     const tx = state.transactions.find(
@@ -1136,8 +1164,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==================== AUTH ====================
-
   if ($("btnTogglePassword")) {
     $("btnTogglePassword").addEventListener("click", () => {
       const pwdInput = $("authPassword");
@@ -1199,8 +1225,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==================== GLOBAL EVENTS ====================
-
   document.addEventListener("click", (event) => {
     const homeDropdown = $("homeMonthDropdown");
     const historyDropdown = $("historyMonthDropdown");
@@ -1256,8 +1280,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 150);
 
-  // ==================== INIT SESSION ====================
-
   const existing = getSession();
 
   if (existing) {
@@ -1268,8 +1290,6 @@ document.addEventListener("DOMContentLoaded", () => {
     enterApp();
   }
 });
-
-// ==================== FUNGSI GLOBAL ====================
 
 async function apiGetShodaqohPaymentDetail(paymentId) {
   const session = getSession();
@@ -1285,8 +1305,6 @@ async function apiGetShodaqohPaymentDetail(paymentId) {
 
 async function openShodaqohPaymentDetail(paymentId) {
   try {
-    // ===== TAMPILKAN SHEET DENGAN SKELETON LOADING =====
-    // Reset body ke skeleton loading
     const body = $("shodPaymentDetailBody");
     if (body) {
       body.innerHTML = `
@@ -1311,22 +1329,18 @@ async function openShodaqohPaymentDetail(paymentId) {
       `;
     }
 
-    // Reset meta ke skeleton
     if ($("shodPaymentDetailMeta")) {
       $("shodPaymentDetailMeta").innerHTML = `
         <span class="skeleton-line" style="width:200px;height:14px;display:inline-block;border-radius:4px;"></span>
       `;
     }
 
-    // Reset title
     if ($("shodPaymentDetailTitle")) {
       $("shodPaymentDetailTitle").textContent = "Memuat...";
     }
 
-    // Tampilkan overlay (sheet langsung terbuka)
     $("shodPaymentDetailOverlay")?.classList.remove("hidden");
 
-    // ===== FETCH DATA =====
     const d = await apiGetShodaqohPaymentDetail(paymentId);
 
     if (!d.success)
@@ -1334,8 +1348,6 @@ async function openShodaqohPaymentDetail(paymentId) {
 
     const p = d.payment;
 
-    // ===== UPDATE DENGAN DATA NYATA =====
-    // Update header
     if ($("shodPaymentDetailTitle"))
       $("shodPaymentDetailTitle").textContent = `Pembayaran · ${p.payment_id}`;
 
@@ -1347,7 +1359,6 @@ async function openShodaqohPaymentDetail(paymentId) {
       }
     }
 
-    // ===== STATUS BADGE - TULISAN "Lunas" atau "Belum" =====
     const isLunas = p.status === "LUNAS" || p.status === "ACTIVE";
     const statusClass = isLunas ? "status-active" : "status-inactive";
     const statusLabel = isLunas ? "Lunas" : "Belum";
@@ -1361,7 +1372,6 @@ async function openShodaqohPaymentDetail(paymentId) {
       `;
     }
 
-    // ===== RENDER ALOKASI DI BODY =====
     if (body) {
       const allocations = d.allocations || [];
 
@@ -1422,7 +1432,6 @@ async function openShodaqohPaymentDetail(paymentId) {
           })
           .join("");
       } else {
-        // Fallback: cek dari payment fields
         const allocationFields = [
           { field: "susulan_ir", label: "Infak IR" },
           { field: "uang_sambung", label: "Uang Sambung" },
@@ -1476,7 +1485,6 @@ async function openShodaqohPaymentDetail(paymentId) {
       }
     }
 
-    // Simpan paymentId di tombol aksi
     if ($("btnShodEditPayment"))
       $("btnShodEditPayment").dataset.paymentId = paymentId;
 
@@ -1484,7 +1492,6 @@ async function openShodaqohPaymentDetail(paymentId) {
       $("btnShodReversePayment").dataset.paymentId = paymentId;
   } catch (err) {
     console.error(err);
-    // Tampilkan error di body
     if (body) {
       body.innerHTML = `
         <div class="text-center py-8">

@@ -1,14 +1,8 @@
-/* =========================================================================
-   KONFIGURASI — GANTI URL INI DENGAN URL WEB APP APPS SCRIPT ANDA
-   Contoh: https://script.google.com/macros/s/AKfycb.../exec
-   ========================================================================= */
 const CONFIG = {
   WEB_APP_URL:
     "https://script.google.com/macros/s/AKfycbwqCvr9HQvij6g1q3r0tlxfCu3Slb8xhTCdIZ80jYNXdJIVTOtHHSwmEauU3CLt-yd2/exec",
-  // POLL_INTERVAL_MS: 20000,
 };
 
-// ---------- STATE ----------
 let state = {
   saldoAwal: 0,
   totalDebet: 0,
@@ -47,7 +41,6 @@ function isAdminUser() {
   return state.isAdmin === true || state.isAdmin === "true";
 }
 
-// ---------- FORMAT HELPERS ----------
 const fmtRp = (n) => "Rp " + Math.round(Number(n) || 0).toLocaleString("id-ID");
 
 const getMonthKey = (tanggal) => (tanggal || "").slice(0, 7);
@@ -202,7 +195,6 @@ function escapeHtml(str) {
   );
 }
 
-// ---------- SESSION ----------
 const SESSION_KEY = "kas_user";
 
 function saveSession(token, nama, role, expiresAt) {
@@ -240,7 +232,6 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
-// ---------- THEME ----------
 const ICON_SUN =
   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>';
 
@@ -288,14 +279,12 @@ function initTheme() {
   applyTheme(saved);
 }
 
-// ---------- TOAST ----------
 let toastTimer;
 
 function showToast(msg, type = "success") {
   const el = $("toast");
   if (!el) return;
 
-  // Jika pesan mengandung SVG, gunakan innerHTML, else gunakan textContent
   const isHtml = msg.includes("<svg") || msg.includes("<span");
 
   if (isHtml) {
@@ -320,7 +309,6 @@ function showToast(msg, type = "success") {
   }, 3200);
 }
 
-// Helper untuk toast dengan icon (pakai showToast)
 function showToastWithIcon(message, type = "success") {
   const icons = {
     success: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
@@ -346,7 +334,6 @@ function showToastWithIcon(message, type = "success") {
   showToast(`${icon} ${message}`, type);
 }
 
-// ---------- API ----------
 async function apiGet() {
   const res = await fetch(`${CONFIG.WEB_APP_URL}?action=getData`);
 
@@ -381,10 +368,8 @@ async function apiPost(payload) {
   return res.json();
 }
 
-// ---------- LOAD DATA ----------
 async function refreshAllData() {
   try {
-    // 1. Load Kas Utama
     const data = await apiGet();
     if (!data.success) throw new Error(data.message || "Gagal memuat data kas");
 
@@ -398,7 +383,6 @@ async function refreshAllData() {
     renderRecapList();
     refreshScopedUI();
 
-    // 2. Load Shodaqoh
     const monthKey = state.shodaqoh.selectedMonth || "";
     await loadShodaqohData(monthKey);
 
@@ -419,7 +403,6 @@ async function loadData() {
     return;
   }
 
-  // Tampilkan skeleton untuk semua tab
   renderHomeSkeleton();
   renderHistorySkeleton();
   renderRecapSkeleton();
@@ -427,7 +410,6 @@ async function loadData() {
   await refreshAllData();
 }
 
-// ---------- BULAN / DROPDOWN PERIODE ----------
 function getMonthsDesc() {
   return [...new Set(state.transactions.map((t) => getMonthKey(t.tanggal)))]
     .filter(Boolean)
@@ -542,7 +524,6 @@ function refreshScopedUI() {
   renderHome();
   applyFilters();
 
-  // Hapus chart skeleton dan tampilkan canvas
   const chartWrapper = document.getElementById("chartWrapper");
   if (chartWrapper) {
     const skeleton = chartWrapper.querySelector(".chart-skeleton");
@@ -621,7 +602,6 @@ function computeMonthlySeries() {
   };
 }
 
-// ---------- REKAP ----------
 function renderRecapList() {
   const months = getMonthsDesc();
   const wrap = $("recapList");
@@ -797,7 +777,6 @@ function renderRecapList() {
   });
 }
 
-// ---------- CARRY FORWARD ----------
 function openCarryForwardConfirm(monthKey, nextMonthKey) {
   if (!monthKey || !nextMonthKey) return;
 
@@ -816,7 +795,6 @@ function openCarryForwardConfirm(monthKey, nextMonthKey) {
   $("carryForwardOverlay")?.classList.remove("hidden");
 }
 
-// ---------- HOME ----------
 function renderHome() {
   const scope = computeScope(state.selectedMonth);
 
@@ -990,7 +968,6 @@ function renderChart() {
   });
 }
 
-// ---------- RIWAYAT ----------
 function renderSummaryHistory(scope, monthKey) {
   if ($("rySaldoAwal")) $("rySaldoAwal").textContent = fmtRp(scope.awal);
 
@@ -1263,7 +1240,6 @@ function fitPrintToOnePage() {
   area.style.transform = prevTransform;
 }
 
-// ---------- FILTER / SEARCH ----------
 function applyFilters() {
   const monthKey = state.selectedMonth;
 
@@ -1286,7 +1262,6 @@ function applyFilters() {
   buildPrintTable(filtered);
 }
 
-// ---------- TABS ----------
 const TAB_TITLES = {
   home: "Beranda",
   history: "Riwayat",
@@ -1323,8 +1298,6 @@ function switchTab(tab) {
   }
 }
 
-// main.js — Update function untuk FAB visibility
-
 function updateFabVisibility() {
   const fabAdd = $("fabAdd");
   const fabPost = $("fabPostToKas");
@@ -1333,7 +1306,6 @@ function updateFabVisibility() {
 
   const isAdmin = isAdminUser();
 
-  // FAB Tambah Transaksi
   const isAllowedTab =
     state.activeTab === "home" ||
     state.activeTab === "history" ||
@@ -1342,12 +1314,10 @@ function updateFabVisibility() {
   const shouldShowAdd = isAdmin && isAllowedTab;
   fabAdd.classList.toggle("hidden", !shouldShowAdd);
 
-  // FAB Post ke Kas (hanya di tab shodaqoh)
   if (fabPost) {
     const shouldShowPost = isAdmin && state.activeTab === "shodaqoh";
     fabPost.classList.toggle("hidden", !shouldShowPost);
 
-    // Tambahkan class untuk positioning yang konsisten
     if (shouldShowPost) {
       fabPost.style.display = "flex";
     } else {
@@ -1389,7 +1359,6 @@ function postShodaqohToKas() {
     return;
   }
 
-  // Tampilkan modal konfirmasi
   showPostConfirmModal(monthKey, totalPayments);
 }
 
@@ -1457,7 +1426,6 @@ async function executePostToKas(monthKey) {
 
   const btn = $("btnShodPostToKas") || $("fabPostToKas");
 
-  // Set loading
   setButtonLoading(btn, true);
 
   try {
@@ -1480,7 +1448,6 @@ async function executePostToKas(monthKey) {
   } catch (err) {
     showToast(err.message, "error");
   } finally {
-    // Restore button
     setButtonLoading(btn, false);
   }
 }
@@ -1546,10 +1513,8 @@ function generateShodaqohRekapText() {
   const monthKey = state.shodaqoh.selectedMonth;
   const monthLabel = getMonthLabel(monthKey);
 
-  // Ambil data dari state
   const payments = state.shodaqoh.payments || [];
 
-  // Hitung total per pos
   let totalSusulanIr = 0;
   let totalUangSambung = 0;
   let totalJimpitan = 0;
@@ -1577,12 +1542,10 @@ function generateShodaqohRekapText() {
     totalKafan +
     totalUkhroMt;
 
-  // Fungsi format angka dengan titik ribuan
   const formatNumber = (n) => {
     return Math.round(n || 0).toLocaleString("id-ID");
   };
 
-  // Buat teks rekap
   let lines = [];
   lines.push(`*Bulan ${monthLabel}*`);
   lines.push("");
@@ -1599,12 +1562,10 @@ function generateShodaqohRekapText() {
   return lines.join("\n");
 }
 
-// Fungsi untuk copy teks ke clipboard
 async function copyShodaqohRekap() {
   const btn = document.getElementById("btnCopyShodaqohRekap");
   if (!btn) return;
 
-  // Cek apakah ada data
   const payments = state.shodaqoh.payments || [];
   const hasData = payments.some((p) => {
     return (
@@ -1628,7 +1589,6 @@ async function copyShodaqohRekap() {
   try {
     await navigator.clipboard.writeText(text);
 
-    // Feedback visual
     btn.classList.add("copied");
     const originalHtml = btn.innerHTML;
     btn.innerHTML = `
@@ -1644,7 +1604,6 @@ async function copyShodaqohRekap() {
       btn.innerHTML = originalHtml;
     }, 2000);
   } catch (err) {
-    // Fallback: gunakan metode lama
     try {
       const textarea = document.createElement("textarea");
       textarea.value = text;
@@ -1663,7 +1622,6 @@ async function copyShodaqohRekap() {
   }
 }
 
-// ---------- AUTH UI ----------
 function setAdminUI(isAdmin, nama) {
   state.isAdmin = isAdmin;
   state.adminName = nama || "";
@@ -1695,11 +1653,8 @@ function enterApp() {
   switchTab("home");
 
   loadData();
-
-  // setInterval(() => loadData(), CONFIG.POLL_INTERVAL_MS);
 }
 
-// ---------- TRANSAKSI ----------
 function setTxJenis(jenis) {
   state.txJenis = jenis;
 
@@ -1710,10 +1665,6 @@ function setTxJenis(jenis) {
     $("segKredit").classList.toggle("active-kredit", jenis === "kredit");
 }
 
-// =========================================================================
-// SHODAQOH IR — FRONTEND SEDERHANA
-// =========================================================================
-
 const SHOD_STATUS_LABELS = {
   ALL: "Semua",
   LUNAS: "Lunas",
@@ -1722,12 +1673,14 @@ const SHOD_STATUS_LABELS = {
 
 async function loadShodaqohData(monthKey) {
   try {
-    // ===== TAMPILKAN SKELETON LOADING =====
     renderShodaqohSkeleton();
 
     const month = monthKey || state.shodaqoh.selectedMonth || "";
     const data = await apiGetShodaqoh(month);
-    if (!data.success) throw new Error(data.message || "Gagal memuat data");
+
+    if (!data.success) {
+      throw new Error(data.message || "Gagal memuat data");
+    }
 
     state.shodaqoh.loaded = true;
     state.shodaqoh.currentMonth = data.currentMonth || "";
@@ -1751,11 +1704,28 @@ async function loadShodaqohData(monthKey) {
       );
     }
 
-    renderShodaqohScreen();
+    // Render UI utama
+    renderShodaqohDashboard();
+    renderShodaqohAllocation();
+    renderShodaqohFilters();
+
+    // Render tabs - ini akan membuat struktur dan memicu render data
+    renderShodaqohTabs();
+
+    // Update post status
+    const postStatus = $("shodPostStatus");
+    if (postStatus) {
+      const payments = state.shodaqoh.payments || [];
+      const allPosted =
+        payments.length > 0 &&
+        payments.every(function (p) {
+          return String(p.kas_transaction_no || "").includes("POSTED");
+        });
+      postStatus.classList.toggle("hidden", !allPosted);
+    }
   } catch (err) {
     console.error(err);
     showToast("Gagal memuat Shodaqoh IR: " + err.message, "error");
-    // Tampilkan state error di dashboard
     renderShodaqohError(err.message);
   }
 }
@@ -1764,9 +1734,77 @@ function renderShodaqohScreen() {
   renderShodaqohDashboard();
   renderShodaqohAllocation();
   renderShodaqohFilters();
-  renderShodaqohMonitoring();
-  renderShodaqohMembers();
-  renderPaymentHistory();
+  renderShodaqohTabs();
+
+  const container = document.querySelector("#screen-shodaqoh");
+  if (!container) return;
+
+  const oldTabsContent = container.querySelector(
+    ".shod-tabs-content-container",
+  );
+
+  if (oldTabsContent) {
+    oldTabsContent.remove();
+  }
+
+  const monitoringCard = container.querySelector(
+    ".card:has(#shodMonitoringBody)",
+  );
+
+  const membersCard = container.querySelector(".card:has(#shodMembersList)");
+
+  const paymentsCard = container.querySelector(".card:has(#shodPaymentsList)");
+
+  if (monitoringCard) {
+    monitoringCard.remove();
+  }
+
+  if (membersCard) {
+    membersCard.remove();
+  }
+
+  if (paymentsCard) {
+    paymentsCard.remove();
+  }
+
+  const tabContainer = document.createElement("div");
+  tabContainer.className = "shod-tabs-content-container";
+  tabContainer.style.cssText = "margin-top:12px;";
+
+  const monitoringTab = document.createElement("div");
+  monitoringTab.className = "shod-tab-content shod-tab-content-shod-monitoring";
+
+  if (monitoringCard) {
+    monitoringTab.appendChild(monitoringCard);
+  }
+
+  const membersTab = document.createElement("div");
+  membersTab.className = "shod-tab-content shod-tab-content-shod-members";
+  membersTab.style.display = "none";
+
+  if (membersCard) {
+    membersTab.appendChild(membersCard);
+  }
+
+  const paymentsTab = document.createElement("div");
+  paymentsTab.className = "shod-tab-content shod-tab-content-shod-payments";
+  paymentsTab.style.display = "none";
+
+  if (paymentsCard) {
+    paymentsTab.appendChild(paymentsCard);
+  }
+
+  tabContainer.appendChild(monitoringTab);
+  tabContainer.appendChild(membersTab);
+  tabContainer.appendChild(paymentsTab);
+
+  const tabsNav = container.querySelector(".shod-tabs-container");
+
+  if (tabsNav) {
+    tabsNav.insertAdjacentElement("afterend", tabContainer);
+  } else {
+    container.appendChild(tabContainer);
+  }
 }
 
 function renderShodaqohDashboard() {
@@ -1782,23 +1820,14 @@ function renderShodaqohDashboard() {
   set("shodMemberCount", String(d.memberCount || 0));
   set("shodMonthLabel", getMonthLabel(state.shodaqoh.selectedMonth));
 
-  // Warna merah jika >50% belum bayar
-  const unpaidEl = $("shodUnpaidCount");
-  const cardUnpaid = unpaidEl?.closest(".stat-chip");
-  if (cardUnpaid && d.unpaidCount > 0 && d.memberCount > 0) {
-    const percentage = (d.unpaidCount / d.memberCount) * 100;
-    if (percentage > 50) {
-      cardUnpaid.style.background = "var(--neg-soft)";
-      cardUnpaid.style.borderColor = "var(--neg)";
-      unpaidEl.style.color = "var(--neg)";
-    } else {
-      cardUnpaid.style.background = "";
-      cardUnpaid.style.borderColor = "";
-      unpaidEl.style.color = "";
-    }
+  // Ubah warna Pembayaran jika lebih dari 0
+  const receivedEl = $("shodReceived");
+  if (receivedEl && d.received > 0) {
+    receivedEl.style.color = "var(--pos)";
+  } else if (receivedEl) {
+    receivedEl.style.color = "var(--ink)";
   }
 
-  // === INDIKATOR SUDAH DIPOST ===
   const postStatus = $("shodPostStatus");
   if (postStatus) {
     const payments = state.shodaqoh.payments || [];
@@ -1814,7 +1843,6 @@ function renderShodaqohDashboard() {
 function renderShodaqohAllocation() {
   const payments = state.shodaqoh.payments || [];
 
-  // Hitung total per pos
   let totalSusulanIr = 0;
   let totalUangSambung = 0;
   let totalJimpitan = 0;
@@ -1824,7 +1852,6 @@ function renderShodaqohAllocation() {
   let totalUkhroMt = 0;
 
   payments.forEach(function (p) {
-    // Gunakan uang_sambung
     const uangSambung = p.uang_sambung || p.uang || 0;
     totalSusulanIr += Number(p.susulan_ir || 0);
     totalUangSambung += Number(uangSambung);
@@ -1868,11 +1895,45 @@ function renderShodaqohMonitoring() {
     return true;
   });
 
+  // Hitung statistik
+  const totalMembers = state.shodaqoh.monitoring?.length || 0;
+  const lunasCount = rows.filter((r) => r.status === "LUNAS").length;
+  const belumCount = rows.filter(
+    (r) => r.status === "BELUM" || r.status === "PENDING",
+  ).length;
+  const filteredCount = rows.length;
+
+  // Update header monitoring dengan judul dan statistik
+  const headerEl = document.querySelector(".shod-monitoring-header");
+  if (headerEl) {
+    headerEl.innerHTML = `
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
+          Monitoring
+        </span>
+        <span class="text-[9px] text-[color:var(--ink-faint)] ml-2">
+          ${filteredCount} dari ${totalMembers} anggota
+        </span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-[9px] text-[color:var(--pos)]">
+          ● ${lunasCount} Lunas
+        </span>
+        <span class="text-[9px] text-[color:var(--neg)]">
+          ● ${belumCount} Belum
+        </span>
+      </div>
+    `;
+  }
+
+  // Update counter di tabel (fallback)
   const countEl = $("shodMemberCount");
-  if (countEl) countEl.textContent = rows.length + " anggota";
+  if (countEl) {
+    countEl.textContent = `${filteredCount} dari ${totalMembers} anggota · ${lunasCount} lunas, ${belumCount} belum`;
+  }
 
   if (rows.length === 0) {
-    body.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-xs text-[color:var(--ink-faint)]">
+    body.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">
       Tidak ada data sesuai filter.
     </td></tr>`;
     return;
@@ -1882,22 +1943,25 @@ function renderShodaqohMonitoring() {
     .map(function (r) {
       let formattedDate = "—";
       if (r.allocated_at) {
-        // Gunakan fmtDateShort untuk konsistensi
         const d = new Date(r.allocated_at);
         if (!isNaN(d.getTime())) {
           formattedDate = fmtDateShort(r.allocated_at);
         }
       }
 
+      const isLunas = r.status === "LUNAS";
+      const statusClass = isLunas ? "status-positive" : "status-negative";
+      const statusLabel = isLunas ? "Lunas" : "Belum";
+
       return `<tr class="border-t border-[color:var(--line)]">
-        <td class="py-3 pr-3 font-semibold">${escapeHtml(r.nama)}</td>
-        <td class="py-3 mono">${fmtRp(r.target)}</td>
-        <td class="py-3">
-          <span class="status-pill ${r.status === "LUNAS" ? "status-positive" : "status-negative"}">
-            ${r.status}
+        <td class="py-2 pr-3 font-semibold text-[11px]">${escapeHtml(r.nama)}</td>
+        <td class="py-2 mono text-[10px]">${fmtRp(r.target)}</td>
+        <td class="py-2">
+          <span class="status-pill ${statusClass}" style="font-size:8px;padding:1px 8px;border-radius:999px;">
+            ${statusLabel}
           </span>
         </td>
-        <td class="py-3 text-xs">
+        <td class="py-2 text-[9px] text-[color:var(--ink-soft)]">
           ${formattedDate}
         </td>
       </tr>`;
@@ -1912,20 +1976,77 @@ function renderShodaqohMembers() {
   const members = state.shodaqoh.members || [];
   const isAdmin = isAdminUser();
 
-  // Tambahkan header
+  // Gunakan struktur dengan sticky header
+  const container = document.createElement("div");
+  container.className = "shod-members-container";
+  container.style.cssText = `
+    position: relative;
+    max-height: 400px;
+    overflow-y: auto;
+  `;
+
   const headerHtml = `
-    <div class="flex items-center justify-between mb-3 pb-2 border-b border-[color:var(--line)]">
+    <div class="shod-members-header" style="
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--surface);
+      padding: 8px 0 10px 0;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    ">
       <span class="text-[10px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
         Daftar Anggota
       </span>
-      <span class="text-[10px] text-[color:var(--ink-faint)]">
-        ${members.length} anggota
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] text-[color:var(--ink-faint)]">
+          ${members.length} anggota
+        </span>
+        ${
+          isAdmin
+            ? `
+          <button type="button" id="shodAddMemberBtn" class="add-member-btn" style="
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border: none;
+            border-radius: 6px;
+            background: var(--brand);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+          ">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Tambah
+          </button>
+        `
+            : ""
+        }
+      </div>
     </div>
   `;
 
+  // Kosongkan body
+  body.innerHTML = "";
+
+  // Buat wrapper dengan scroll
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText = `
+    max-height: 400px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  `;
+
   if (members.length === 0) {
-    body.innerHTML = `
+    wrapper.innerHTML = `
       ${headerHtml}
       <div class="text-center py-8">
         <svg class="mx-auto mb-3 text-[color:var(--ink-faint)]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1936,6 +2057,7 @@ function renderShodaqohMembers() {
         ${isAdmin ? `<button type="button" id="shodAddFirstMember" class="mt-2 text-xs font-bold" style="color:var(--brand);">+ Tambah anggota pertama</button>` : ""}
       </div>
     `;
+    body.appendChild(wrapper);
 
     const addBtn = document.getElementById("shodAddFirstMember");
     if (addBtn && isAdmin) {
@@ -1946,55 +2068,366 @@ function renderShodaqohMembers() {
         }
       });
     }
+
+    const addBtn2 = document.getElementById("shodAddMemberBtn");
+    if (addBtn2 && isAdmin) {
+      addBtn2.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (typeof openShodMemberForm === "function") {
+          openShodMemberForm(null);
+        }
+      });
+    }
     return;
   }
 
-  // Render dengan header + list anggota
-  body.innerHTML = `
-    ${headerHtml}
-    <div class="space-y-2">
-      ${members
-        .map(function (m) {
-          // Tentukan status badge
-          const statusClass =
-            m.status === "AKTIF" ? "status-active" : "status-inactive";
-          const statusLabel = m.status || "AKTIF";
+  const membersHtml = members
+    .map(function (m) {
+      const statusClass =
+        m.status === "AKTIF" ? "status-active" : "status-inactive";
+      const statusLabel = m.status || "AKTIF";
 
-          return `
-          <button 
-            type="button" 
-            class="tx-card w-full text-left ${isAdmin ? "tx-card-clickable" : ""}" 
-            data-shod-member="${escapeHtml(m.member_id)}"
-            role="button"
-            tabindex="0"
-            aria-label="Detail anggota ${escapeHtml(m.nama)}"
-          >
-            <div class="flex-1 min-w-0">
-              <p class="tx-title">${escapeHtml(m.nama)}</p>
-              <p class="tx-meta flex items-center gap-2">
-                <span class="mono">${fmtRp(m.nominal_bulanan)}</span>
-                <span class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"></span>
-                <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;">
-                  ${escapeHtml(statusLabel)}
-                </span>
-              </p>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] text-[color:var(--ink-faint)] mono">
-                ${m.total_paid ? fmtRp(m.total_paid) : "Rp 0"}
+      return `
+        <button 
+          type="button" 
+          class="tx-card w-full text-left ${isAdmin ? "tx-card-clickable" : ""}" 
+          data-shod-member="${escapeHtml(m.member_id)}"
+          role="button"
+          tabindex="0"
+          aria-label="Detail anggota ${escapeHtml(m.nama)}"
+          style="padding: 10px 4px;"
+        >
+          <div class="flex-1 min-w-0">
+            <p class="tx-title">${escapeHtml(m.nama)}</p>
+            <p class="tx-meta flex items-center gap-2">
+              <span class="mono">${fmtRp(m.nominal_bulanan)}</span>
+              <span class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"></span>
+              <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;">
+                ${escapeHtml(statusLabel)}
               </span>
-              ${isAdmin ? `<span class="tx-chevron" style="color:var(--ink-faint);">›</span>` : ""}
-            </div>
-          </button>
-        `;
-        })
-        .join("")}
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-[color:var(--ink-faint)] mono">
+              ${m.total_paid ? fmtRp(m.total_paid) : "Rp 0"}
+            </span>
+            ${isAdmin ? `<span class="tx-chevron" style="color:var(--ink-faint);">›</span>` : ""}
+          </div>
+        </button>
+      `;
+    })
+    .join("");
+
+  wrapper.innerHTML = `
+    ${headerHtml}
+    <div class="space-y-1 pt-2">
+      ${membersHtml}
     </div>
   `;
+
+  body.appendChild(wrapper);
+
+  // Event listener untuk tombol tambah anggota
+  const addBtn = document.getElementById("shodAddMemberBtn");
+  if (addBtn && isAdmin) {
+    addBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (typeof openShodMemberForm === "function") {
+        openShodMemberForm(null);
+      }
+    });
+  }
 }
 
-// Event klik/keyboard untuk member dipusatkan di events.js.
-// Jangan pasang listener di sini agar tidak terjadi double trigger.
+function renderShodaqohTabs() {
+  const container = document.querySelector("#screen-shodaqoh");
+  if (!container) return;
+
+  // Hapus tabs container yang lama jika ada
+  const oldTabsContainer = container.querySelector(".shod-tabs-container");
+  if (oldTabsContainer) oldTabsContainer.remove();
+
+  // Hapus content container yang lama
+  const oldContentContainer = container.querySelector(
+    ".shod-tabs-content-container",
+  );
+  if (oldContentContainer) oldContentContainer.remove();
+
+  // Buat tabs container
+  const tabsHtml = `
+    <div class="shod-tabs-container" style="
+      position: relative;
+      z-index: 1;
+      background: var(--app-bg);
+      padding: 4px 0 10px 0;
+      border-bottom: 1px solid var(--line);
+      margin: 0;
+    ">
+      <div class="shod-tabs" style="
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+      ">
+        <button class="shod-tab active" data-tab="shod-monitoring" style="
+          padding: 8px 0;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--brand);
+          color: #fff;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-align: center;
+        ">
+          Monitoring
+        </button>
+        <button class="shod-tab" data-tab="shod-members" style="
+          padding: 8px 0;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--surface);
+          color: var(--ink-soft);
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-align: center;
+        ">
+          Anggota
+        </button>
+        <button class="shod-tab" data-tab="shod-payments" style="
+          padding: 8px 0;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--surface);
+          color: var(--ink-soft);
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-align: center;
+        ">
+          Riwayat
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Cari card filter atau allocation untuk menempatkan tabs
+  const filterCard = container.querySelector(".card:has(.filter-group)");
+  if (filterCard) {
+    filterCard.insertAdjacentHTML("afterend", tabsHtml);
+  } else {
+    const allocationCard = container.querySelector(
+      ".card:has(#shodTotalSusulanIr)",
+    );
+    if (allocationCard) {
+      allocationCard.insertAdjacentHTML("afterend", tabsHtml);
+    } else {
+      container.insertAdjacentHTML("beforeend", tabsHtml);
+    }
+  }
+
+  // Buat container untuk konten tab
+  const tabsContainer = container.querySelector(".shod-tabs-container");
+  const contentContainer = document.createElement("div");
+  contentContainer.className = "shod-tabs-content-container";
+  contentContainer.style.cssText = "margin-top:12px;";
+
+  // Buat 3 tab content
+  const monitoringContent = document.createElement("div");
+  monitoringContent.className =
+    "shod-tab-content shod-tab-content-shod-monitoring";
+  monitoringContent.style.display = "block";
+
+  const membersContent = document.createElement("div");
+  membersContent.className = "shod-tab-content shod-tab-content-shod-members";
+  membersContent.style.display = "none";
+
+  const paymentsContent = document.createElement("div");
+  paymentsContent.className = "shod-tab-content shod-tab-content-shod-payments";
+  paymentsContent.style.display = "none";
+
+  // Cari card yang sudah ada
+  const monitoringCard = container.querySelector(
+    ".card:has(#shodMonitoringBody)",
+  );
+  const membersCard = container.querySelector(".card:has(#shodMembersList)");
+  const paymentsCard = container.querySelector(".card:has(#shodPaymentsList)");
+
+  if (monitoringCard) {
+    monitoringContent.appendChild(monitoringCard);
+  } else {
+    // Buat card monitoring dengan title dan header
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+    <div class="shod-monitoring-wrapper">
+      <!-- Header dengan judul dan statistik -->
+      <div class="shod-monitoring-header" style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 0 12px 0;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 6px;
+      ">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
+            Monitoring
+          </span>
+          <span class="text-[9px] text-[color:var(--ink-faint)] ml-2" id="shodMemberCount">
+            0 anggota
+          </span>
+        </div>
+        <div class="flex items-center gap-3" id="shodStatsBadge">
+          <span class="text-[9px] text-[color:var(--pos)]">
+            ● 0 Lunas
+          </span>
+          <span class="text-[9px] text-[color:var(--neg)]">
+            ● 0 Belum
+          </span>
+        </div>
+      </div>
+      
+      <!-- Tabel monitoring -->
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--line);">
+              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Anggota</th>
+              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Target</th>
+              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Status</th>
+              <th class="text-left text-[9px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)] py-1.5">Tgl Bayar</th>
+            </tr>
+          </thead>
+          <tbody id="shodMonitoringBody">
+            <tr><td colspan="4" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+    monitoringContent.appendChild(card);
+  }
+
+  if (membersCard) {
+    membersContent.appendChild(membersCard);
+  } else {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div id="shodMembersList"></div>
+    `;
+    membersContent.appendChild(card);
+  }
+
+  if (paymentsCard) {
+    paymentsContent.appendChild(paymentsCard);
+  } else {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div id="shodPaymentsList">
+        <p class="py-6 text-center text-xs text-[color:var(--ink-faint)]">Belum ada pembayaran.</p>
+      </div>
+    `;
+    paymentsContent.appendChild(card);
+  }
+
+  contentContainer.appendChild(monitoringContent);
+  contentContainer.appendChild(membersContent);
+  contentContainer.appendChild(paymentsContent);
+
+  tabsContainer.insertAdjacentElement("afterend", contentContainer);
+
+  // Event listener untuk tab
+  container.querySelectorAll(".shod-tab").forEach((tab) => {
+    tab.addEventListener("click", function () {
+      // Update active tab style
+      container.querySelectorAll(".shod-tab").forEach((t) => {
+        t.classList.remove("active");
+        t.style.background = "var(--surface)";
+        t.style.color = "var(--ink-soft)";
+      });
+      this.classList.add("active");
+      this.style.background = "var(--brand)";
+      this.style.color = "#fff";
+
+      // Show/hide content
+      const target = this.dataset.tab;
+      container.querySelectorAll(".shod-tab-content").forEach((el) => {
+        el.style.display = "none";
+      });
+
+      const content = container.querySelector(`.shod-tab-content-${target}`);
+      if (content) {
+        content.style.display = "block";
+        // Render data sesuai tab yang aktif
+        if (target === "shod-monitoring") {
+          renderShodaqohMonitoring();
+        } else if (target === "shod-members") {
+          renderShodaqohMembers();
+        } else if (target === "shod-payments") {
+          renderPaymentHistory();
+        }
+      }
+    });
+  });
+
+  // Render data untuk tab aktif (Monitoring)
+  setTimeout(() => {
+    renderShodaqohMonitoring();
+  }, 100);
+}
+
+function renderActiveShodaqohTab() {
+  const container = document.querySelector("#screen-shodaqoh");
+  if (!container) return;
+
+  const activeTab = container.querySelector(".shod-tab.active");
+  const tabName = activeTab?.dataset.tab || "shod-monitoring";
+
+  const monitoringTab = container.querySelector(
+    ".shod-tab-content-shod-monitoring",
+  );
+
+  const membersTab = container.querySelector(".shod-tab-content-shod-members");
+
+  const paymentsTab = container.querySelector(
+    ".shod-tab-content-shod-payments",
+  );
+
+  if (monitoringTab) {
+    monitoringTab.style.display = tabName === "shod-monitoring" ? "" : "none";
+  }
+
+  if (membersTab) {
+    membersTab.style.display = tabName === "shod-members" ? "" : "none";
+  }
+
+  if (paymentsTab) {
+    paymentsTab.style.display = tabName === "shod-payments" ? "" : "none";
+  }
+
+  if (tabName === "shod-monitoring") {
+    renderShodaqohMonitoring();
+  }
+
+  if (tabName === "shod-members") {
+    renderShodaqohMembers();
+  }
+
+  if (tabName === "shod-payments") {
+    renderPaymentHistory();
+  }
+}
 
 function renderPaymentHistory() {
   const body = $("shodPaymentsList");
@@ -2010,7 +2443,6 @@ function renderPaymentHistory() {
   body.innerHTML =
     rows
       .map((p) => {
-        // Format tanggal konsisten dengan fmtDateShort
         let formattedDate = p.tanggal;
         if (p.tanggal) {
           const d = new Date(p.tanggal);
@@ -2019,14 +2451,13 @@ function renderPaymentHistory() {
           }
         }
 
-        // ===== STATUS BADGE - TULISAN "Lunas" atau "Belum" =====
         const isLunas = p.status === "LUNAS" || p.status === "ACTIVE";
         const statusClass = isLunas ? "status-active" : "status-inactive";
         const statusLabel = isLunas ? "Lunas" : "Belum";
 
         return `<button type="button" class="tx-card w-full text-left" data-shod-payment="${escapeHtml(
           p.payment_id,
-        )}">
+        )}" style="padding: 10px 4px;">
             <div class="flex-1">
               <p class="tx-title">${escapeHtml(p.payment_id)}</p>
               <p class="tx-meta">${escapeHtml(formattedDate)} · ${escapeHtml(
@@ -2070,10 +2501,6 @@ async function addShodaqohMember(nama, nominalBulanan = 200000) {
     showToast(err.message, "error");
   }
 }
-
-// ============================================================
-// SHODAQOH MEMBER — API CALLS
-// ============================================================
 
 async function deleteShodaqohMember(memberId) {
   const session = getSession();
@@ -2123,10 +2550,6 @@ async function editShodaqohMember(memberId, nama, nominalBulanan) {
   }
 }
 
-// ============================================================
-// SHODAQOH PAYMENT FORM — WATCHER
-// ============================================================
-
 function setupShodaqohAllocationWatcher() {
   const fields = [
     "shodPaymentAmount",
@@ -2143,7 +2566,7 @@ function setupShodaqohAllocationWatcher() {
     const total = Number($("shodPaymentAmount")?.value || 0);
     const alokasi = [
       "shod_susulan_ir",
-      "shod_uang_sambung", // ← konsisten
+      "shod_uang_sambung",
       "shod_jimpitan",
       "shod_siar_siar",
       "shod_seribuan",
@@ -2201,14 +2624,9 @@ function setupShodaqohAllocationWatcher() {
   setTimeout(updateTotal, 100);
 }
 
-// ============================================================
-// SHODAQOH — LOAD LAST NOMINALS
-// ============================================================
-
 let lastNominalsLoading = false;
 
 async function loadLastNominals() {
-  // Cegah multiple click
   if (lastNominalsLoading) return;
 
   const memberInput = document.getElementById("shodPaymentMember");
@@ -2230,7 +2648,6 @@ async function loadLastNominals() {
 
   lastNominalsLoading = true;
 
-  // Set loading state
   if (btn) {
     btn.disabled = true;
     btn.innerHTML = `
@@ -2240,7 +2657,6 @@ async function loadLastNominals() {
   }
 
   try {
-    // Ambil bulan yang dipilih dari filter, atau bulan berjalan
     const selectedMonth = state.shodaqoh.selectedMonth || getCurrentMonthKey();
 
     const res = await apiPost({
@@ -2255,10 +2671,8 @@ async function loadLastNominals() {
       return;
     }
 
-    // ===== ISI INPUT DENGAN DATA DARI BACKEND =====
     const values = res.values || {};
 
-    // Mapping field ke ID input
     const fieldMap = {
       susulan_ir: "shod_susulan_ir",
       uang_sambung: "shod_uang_sambung",
@@ -2285,13 +2699,11 @@ async function loadLastNominals() {
       total += value;
     });
 
-    // Isi total pembayaran
     const totalInput = document.getElementById("shodPaymentAmount");
     if (totalInput && total > 0) {
       totalInput.value = total;
     }
 
-    // Tampilkan sumber data (bulan)
     const source = res.source || {};
     let sourceInfo = [];
     Object.keys(source).forEach((field) => {
@@ -2325,7 +2737,6 @@ async function loadLastNominals() {
       const monthStr =
         uniqueMonths.length > 0 ? ` (${uniqueMonths.join(", ")})` : "";
 
-      // Langsung pakai showToast dengan HTML
       showToast(
         `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:6px;flex-shrink:0;">
       <path d="M20 6L9 17l-5-5" />
@@ -2343,9 +2754,7 @@ async function loadLastNominals() {
       );
     }
 
-    // Trigger allocation watcher
     if (typeof setupShodaqohAllocationWatcher === "function") {
-      // Trigger update setelah nilai diisi
       setTimeout(() => {
         const fields = Object.values(fieldMap);
         fields.forEach((id) => {
@@ -2365,15 +2774,10 @@ async function loadLastNominals() {
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = originalText;
-      // Update state tombol berdasarkan member
       updateLoadLastNominalsButton();
     }
   }
 }
-
-// ============================================================
-// SHODAQOH — UPDATE LOAD LAST NOMINALS BUTTON STATE
-// ============================================================
 
 function updateLoadLastNominalsButton() {
   const btn = document.getElementById("btnLoadLastNominals");
@@ -2410,10 +2814,6 @@ function getCurrentMonthKey() {
   return `${year}-${month}`;
 }
 
-// ============================================================
-// SHODAQOH PAYMENT FORM — OPEN / CLOSE
-// ============================================================
-
 function openShodaqohPaymentForm(payment) {
   state.shodaqoh.selectedPaymentId = payment?.payment_id || null;
 
@@ -2432,7 +2832,6 @@ function openShodaqohPaymentForm(payment) {
     clearShodUpload();
   }
 
-  // Reset dan update tombol
   if (typeof updateLoadLastNominalsButton === "function") {
     setTimeout(updateLoadLastNominalsButton, 100);
   }
@@ -2484,7 +2883,6 @@ function openShodaqohPaymentForm(payment) {
   if ($("shodPaymentNote"))
     $("shodPaymentNote").value = payment?.keterangan || "";
 
-  // PERBAIKI: Gunakan "uang_sambung" konsisten
   [
     "susulan_ir",
     "uang_sambung",
@@ -2498,7 +2896,6 @@ function openShodaqohPaymentForm(payment) {
     if (el) el.value = payment?.[pos] || "";
   });
 
-  // SUSULAN BULAN - GRID 3 KOLOM DENGAN TAHUN
   const bulanWrap = $("shodSusulanBulan");
   if (bulanWrap) {
     const selected = payment?.susulan_bulan
@@ -2511,7 +2908,6 @@ function openShodaqohPaymentForm(payment) {
       const key =
         d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
 
-      // Mapping bulan Indonesia ke short label
       const monthNames = {
         Januari: "Jan",
         Februari: "Feb",
@@ -2534,7 +2930,6 @@ function openShodaqohPaymentForm(payment) {
       months.push({ key, shortLabel, year });
     }
 
-    // RENDER GRID 3 KOLOM DENGAN TAHUN
     bulanWrap.innerHTML = months
       .map(
         (m) => `
@@ -2559,10 +2954,6 @@ function openShodaqohPaymentForm(payment) {
   $("shodaqohPaymentOverlay")?.classList.remove("hidden");
 }
 
-// ============================================================
-// SHODAQOH UPLOAD — EKSTRAKSI & ISI FORM OTOMATIS
-// ============================================================
-
 let shodUploadMode = false;
 
 function setupShodUpload() {
@@ -2576,7 +2967,6 @@ function setupShodUpload() {
 
   if (!uploadInput) return;
 
-  // Jangan pasang event listener dua kali
   if (uploadInput.dataset.shodUploadInitialized === "1") {
     return;
   }
@@ -2588,14 +2978,12 @@ function setupShodUpload() {
 
     if (!file) return;
 
-    // Validasi file
     if (!file.type.startsWith("image/")) {
       showToast("File yang dipilih bukan foto.", "error");
       this.value = "";
       return;
     }
 
-    // Maksimal 12 MB
     if (file.size > 12 * 1024 * 1024) {
       showToast("Ukuran foto maksimal 12 MB.", "error");
       this.value = "";
@@ -2603,7 +2991,6 @@ function setupShodUpload() {
     }
 
     try {
-      // Simpan file
       window.shodUploadedImage = {
         file: file,
         dataUrl: "",
@@ -2616,7 +3003,6 @@ function setupShodUpload() {
         fileName.textContent = file.name;
       }
 
-      // Baca file untuk OCR
       const reader = new FileReader();
 
       reader.onload = function (event) {
@@ -2624,7 +3010,6 @@ function setupShodUpload() {
 
         window.shodUploadedImage.dataUrl = dataUrl;
 
-        // Preview
         if (previewImg) {
           previewImg.src = dataUrl;
           previewImg.style.display = "block";
@@ -2667,7 +3052,6 @@ function clearShodUpload() {
   const ocrResult = document.getElementById("shodOcrResult");
   const ocrData = document.getElementById("shodOcrData");
 
-  // Hapus data foto
   window.shodUploadedImage = null;
 
   if (uploadInput) {
@@ -2694,14 +3078,12 @@ function clearShodUpload() {
     ocrData.innerHTML = "";
   }
 
-  // Reset form
   const form = document.getElementById("shodaqohPaymentForm");
 
   if (form) {
     form.reset();
   }
 
-  // Reset status alokasi
   const statusText = document.getElementById("shodAllocationText");
   const statusIcon = document.getElementById("shodAllocationIcon");
 
@@ -3493,10 +3875,6 @@ async function submitShodaqohAI() {
   }
 }
 
-// ============================================================
-// SHODAQOH PAYMENT — SUBMIT HANDLER
-// ============================================================
-
 async function handleShodaqohSubmit(e) {
   e.preventDefault();
 
@@ -3506,7 +3884,6 @@ async function handleShodaqohSubmit(e) {
     return;
   }
 
-  // ===== AMBIL DARI HIDDEN INPUT =====
   const memberId = $("shodPaymentMember").value;
   const tanggal = $("shodPaymentDate").value;
 
@@ -3561,24 +3938,19 @@ async function handleShodaqohSubmit(e) {
 }
 
 function closeShodaqohPaymentForm() {
-  // Reset state
   state.shodaqoh.selectedPaymentId = null;
   state.shodaqoh.editingNo = null;
 
-  // Reset form
   const form = document.getElementById("shodaqohPaymentForm");
   if (form) {
     form.reset();
-    // Reset semua input number ke kosong (bukan 0)
     form.querySelectorAll('input[type="number"]').forEach(function (input) {
       input.value = "";
     });
-    // Reset textarea
     const note = document.getElementById("shodPaymentNote");
     if (note) note.value = "";
   }
 
-  // Reset allocation status ke default
   const statusText = document.getElementById("shodAllocationText");
   const statusIcon = document.getElementById("shodAllocationIcon");
   if (statusText) {
@@ -3592,17 +3964,14 @@ function closeShodaqohPaymentForm() {
     statusIcon.style.color = "var(--ink-soft)";
   }
 
-  // Disable submit button
   const submitBtn = document.getElementById("btnSubmitShodaqohPayment");
   if (submitBtn) submitBtn.disabled = true;
 
-  // Reset member dropdown
   const memberValue = document.getElementById("shodPaymentMemberValue");
   const memberHidden = document.getElementById("shodPaymentMember");
   if (memberValue) memberValue.textContent = "Pilih anggota";
   if (memberHidden) memberHidden.value = "";
 
-  // Reset date picker ke hari ini (bukan kosong)
   const today = new Date();
   const dateValueDisplay = document.getElementById("shodDateDropdownValue");
   const dateHidden = document.getElementById("shodPaymentDate");
@@ -3612,33 +3981,27 @@ function closeShodaqohPaymentForm() {
   datePickerState.currentMonth = today.getMonth();
   datePickerState.currentYear = today.getFullYear();
 
-  // Reset susulan bulan (uncheck all checkboxes)
   document
     .querySelectorAll('input[name="shodSusulanBulan"]')
     .forEach(function (cb) {
       cb.checked = false;
     });
 
-  // Reset upload section
   if (typeof clearShodUpload === "function") {
     clearShodUpload();
   }
 
-  // Reset method toggle ke Manual (default)
   if (typeof toggleShodMethod === "function") {
     toggleShodMethod("manual");
   }
 
-  // Reset tombol load last nominals
   if (typeof updateLoadLastNominalsButton === "function") {
     setTimeout(updateLoadLastNominalsButton, 50);
   }
 
-  // Tutup overlay
   const overlay = document.getElementById("shodaqohPaymentOverlay");
   if (overlay) overlay.classList.add("hidden");
 
-  // Hapus backdrop date picker jika ada
   removeDatePickerBackdrop();
 }
 
@@ -3735,12 +4098,6 @@ function renderShodaqohAiSusulanBulan(selectedMonths = []) {
     });
 }
 
-// main.js — TAMBAHKAN DI BAGIAN SHODAQOH (setelah closeShodaqohPaymentForm)
-
-// ============================================================
-// SHODAQOH MEMBER — ACTION SHEET
-// ============================================================
-
 let shodMemberActionId = null;
 
 function openShodMemberActionSheet(memberId) {
@@ -3766,7 +4123,6 @@ function openShodMemberActionSheet(memberId) {
     $("shodMemberActionTitle").textContent = member.nama;
   }
 
-  // Tentukan status badge
   const statusClass =
     member.status === "AKTIF" ? "status-active" : "status-inactive";
   const statusLabel = member.status || "AKTIF";
@@ -3785,16 +4141,15 @@ function openShodMemberActionSheet(memberId) {
   const overlay = $("shodMemberActionOverlay");
   if (overlay) {
     overlay.classList.remove("hidden");
-    // Force reflow for animation
     void overlay.offsetWidth;
 
-    // ===== FIX: Scroll sheet ke atas =====
     const sheet = overlay.querySelector(".sheet");
     if (sheet) {
       sheet.scrollTop = 0;
     }
   }
 }
+
 function closeShodMemberActionSheet() {
   const overlay = $("shodMemberActionOverlay");
   if (overlay) {
@@ -3802,10 +4157,6 @@ function closeShodMemberActionSheet() {
   }
   shodMemberActionId = null;
 }
-
-// ============================================================
-// SHODAQOH MEMBER — ADD / EDIT FORM
-// ============================================================
 
 function openShodMemberForm(memberId) {
   const isEdit = memberId !== null && memberId !== undefined;
@@ -3849,10 +4200,6 @@ function closeShodMemberForm() {
   if (errorEl) errorEl.classList.add("hidden");
 }
 
-// ============================================================
-// SHODAQOH MEMBER — DELETE
-// ============================================================
-
 function openShodMemberDeleteConfirm(memberId) {
   if (!state.shodaqoh.members) return;
 
@@ -3878,7 +4225,7 @@ function toggleShodMethod(method) {
   const uploadBtn = $("shodMethodUpload");
   const form = $("shodaqohPaymentForm");
   const uploadSection = $("shodUploadSection");
-  const memberField = $("shodPaymentMember")?.closest(".grid"); // Anggota & Tanggal
+  const memberField = $("shodPaymentMember")?.closest(".grid");
 
   const manualIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
@@ -3904,7 +4251,6 @@ function toggleShodMethod(method) {
 
     form.classList.remove("hidden");
     uploadSection.classList.add("hidden");
-    // Anggota & Tanggal tetap terlihat
     if (memberField) memberField.style.display = "grid";
 
     if ($("shodPaymentSubtitle")) {
@@ -3924,7 +4270,6 @@ function toggleShodMethod(method) {
 
     form.classList.add("hidden");
     uploadSection.classList.remove("hidden");
-    // Anggota & Tanggal tetap terlihat
     if (memberField) memberField.style.display = "grid";
 
     if ($("shodPaymentSubtitle")) {
@@ -3939,14 +4284,8 @@ function closeShodMemberDeleteConfirm() {
   shodMemberActionId = null;
 }
 
-// ============================================================
-// SHODAQOH IR — FUNGSI DETAIL
-// ============================================================
-
 async function openShodaqohMemberDetail(memberId) {
   try {
-    // ===== TAMPILKAN SHEET DENGAN SKELETON LOADING =====
-    // Reset body ke skeleton loading
     const body = $("shodMemberDetailBody");
     if (body) {
       body.innerHTML = `
@@ -3966,22 +4305,18 @@ async function openShodaqohMemberDetail(memberId) {
       `;
     }
 
-    // Reset meta ke skeleton
     if ($("shodMemberDetailMeta")) {
       $("shodMemberDetailMeta").innerHTML = `
         <span class="skeleton-line" style="width:200px;height:14px;display:inline-block;border-radius:4px;"></span>
       `;
     }
 
-    // Reset title
     if ($("shodMemberDetailTitle")) {
       $("shodMemberDetailTitle").textContent = "Memuat...";
     }
 
-    // Tampilkan overlay (sheet langsung terbuka)
     $("shodMemberDetailOverlay")?.classList.remove("hidden");
 
-    // ===== FETCH DATA =====
     const session = getSession();
     const d = await apiPost({
       action: "getShodaqohMemberDetail",
@@ -3993,12 +4328,9 @@ async function openShodaqohMemberDetail(memberId) {
 
     const m = d.member;
 
-    // ===== UPDATE DENGAN DATA NYATA =====
-    // Update header
     if ($("shodMemberDetailTitle"))
       $("shodMemberDetailTitle").textContent = m.nama;
 
-    // ===== STATUS BADGE - TULISAN "Aktif" atau "Tidak Aktif" =====
     const isActive = m.status === "AKTIF" || m.status === "ACTIVE";
     const statusClass = isActive ? "status-active" : "status-inactive";
     const statusLabel = isActive ? "Aktif" : "Tidak Aktif";
@@ -4012,7 +4344,6 @@ async function openShodaqohMemberDetail(memberId) {
       `;
     }
 
-    // ===== RENDER OBLIGATIONS DI BODY =====
     if (body) {
       const obligations = (d.obligations || []).sort(function (a, b) {
         return b.periode.localeCompare(a.periode);
@@ -4029,7 +4360,6 @@ async function openShodaqohMemberDetail(memberId) {
       } else {
         body.innerHTML = obligations
           .map(function (o) {
-            // Format tanggal allocated_at
             let allocatedAt = o.allocated_at || "—";
             if (o.allocated_at) {
               const d = new Date(o.allocated_at);
@@ -4038,7 +4368,6 @@ async function openShodaqohMemberDetail(memberId) {
               }
             }
 
-            // ===== STATUS BADGE UNTUK OBLIGATION =====
             const isLunas = o.status === "LUNAS" || o.status === "ACTIVE";
             const obStatusClass = isLunas ? "status-active" : "status-inactive";
             const obStatusLabel = isLunas ? "Lunas" : "Belum";
@@ -4060,7 +4389,6 @@ async function openShodaqohMemberDetail(memberId) {
     }
   } catch (err) {
     console.error(err);
-    // Tampilkan error di body
     if (body) {
       body.innerHTML = `
         <tr>
@@ -4107,7 +4435,6 @@ function renderShodaqohFilters() {
     { value: "BELUM", label: "Belum" },
   ];
 
-  // Years
   const years = [
     ...new Set(
       state.shodaqoh.payments
@@ -4119,7 +4446,6 @@ function renderShodaqohFilters() {
     .sort()
     .reverse();
 
-  // Members — format untuk dropdown dengan nama panjang
   const members = [
     { value: "", label: "Semua" },
     ...(state.shodaqoh.members || []).map(function (m) {
@@ -4148,10 +4474,8 @@ function renderFilterDropdown(prefix, items, selectedValue) {
 
   if (!menu || !value) return;
 
-  // Update value text
   if (Array.isArray(items) && items.length > 0) {
     const selectedItem = items.find(function (item) {
-      // Perbaiki: bandingkan dengan benar untuk nilai kosong
       const itemVal = item.value !== undefined ? item.value : item;
       return String(itemVal) === String(selectedValue);
     });
@@ -4163,7 +4487,6 @@ function renderFilterDropdown(prefix, items, selectedValue) {
     }
   }
 
-  // Build menu
   menu.innerHTML = items
     .map(function (item) {
       const val = item.value !== undefined ? item.value : item;
@@ -4179,7 +4502,6 @@ function renderFilterDropdown(prefix, items, selectedValue) {
     })
     .join("");
 
-  // Event: toggle dropdown
   trigger.onclick = function (event) {
     event.stopPropagation();
     const dropdown = $(prefix + "Dropdown");
@@ -4199,7 +4521,6 @@ function renderFilterDropdown(prefix, items, selectedValue) {
       ?.setAttribute("aria-expanded", String(!isOpen));
   };
 
-  // Event: select option
   menu.querySelectorAll(".filter-dropdown-option").forEach(function (option) {
     option.onclick = function (event) {
       event.stopPropagation();
@@ -4211,7 +4532,6 @@ function renderFilterDropdown(prefix, items, selectedValue) {
         .querySelector(".filter-dropdown-trigger")
         ?.setAttribute("aria-expanded", "false");
 
-      // Update state berdasarkan prefix
       const filterKey = prefix.replace("shod", "").toLowerCase();
 
       if (filterKey === "year") {
@@ -4229,10 +4549,8 @@ function renderFilterDropdown(prefix, items, selectedValue) {
           loadShodaqohData("");
         }
       } else if (filterKey === "member") {
-        // PERBAIKI: Simpan nilai kosong sebagai "" (bukan "Semua")
         state.shodaqoh.filters.memberId = val || "";
         value.textContent = label || "Semua";
-        // Refresh monitoring dan payment history
         renderShodaqohMonitoring();
         renderPaymentHistory();
       } else if (filterKey === "status") {
@@ -4241,7 +4559,6 @@ function renderFilterDropdown(prefix, items, selectedValue) {
         renderShodaqohMonitoring();
       }
 
-      // Update active state
       menu.querySelectorAll(".filter-dropdown-option").forEach(function (el) {
         el.classList.toggle("active", el.dataset.value === val);
         el.setAttribute("aria-selected", el.dataset.value === val);
@@ -4249,6 +4566,7 @@ function renderFilterDropdown(prefix, items, selectedValue) {
     };
   });
 }
+
 document.addEventListener("click", function (event) {
   document
     .querySelectorAll(".filter-dropdown.open")
@@ -4296,10 +4614,6 @@ function setButtonLoading(btn, isLoading) {
   }
 }
 
-// ============================================================
-// SHODAQOH PAYMENT MEMBER DROPDOWN
-// ============================================================
-
 function initShodMemberDropdown() {
   console.log("initShodMemberDropdown dipanggil");
   const dropdown = document.getElementById("shodPaymentMemberDropdown");
@@ -4321,17 +4635,14 @@ function initShodMemberDropdown() {
 
   console.log("Element ditemukan, merender dropdown...");
 
-  // Render member list
   renderMemberDropdownMenu();
 
-  // Toggle dropdown
   trigger.addEventListener("click", function (e) {
     e.stopPropagation();
     console.log("Trigger diklik");
     toggleMemberDropdown();
   });
 
-  // Close on outside click
   document.addEventListener("click", function (e) {
     if (!dropdown.contains(e.target)) {
       dropdown.classList.remove("open");
@@ -4339,7 +4650,6 @@ function initShodMemberDropdown() {
     }
   });
 
-  // Keyboard support
   trigger.addEventListener("keydown", function (e) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -4357,7 +4667,6 @@ function toggleMemberDropdown() {
   const trigger = document.getElementById("shodPaymentMemberTrigger");
   const isOpen = dropdown.classList.contains("open");
 
-  // Tutup semua dropdown lain
   document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
     if (el.id !== dropdown.id) {
       el.classList.remove("open");
@@ -4413,7 +4722,6 @@ function renderMemberDropdownMenu() {
     })
     .join("");
 
-  // Event: select member
   menu.querySelectorAll(".filter-dropdown-option").forEach(function (option) {
     option.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -4434,19 +4742,13 @@ function selectMember(memberId, memberName) {
   if (valueDisplay) valueDisplay.textContent = memberName || "Pilih anggota";
   if (hiddenInput) hiddenInput.value = memberId || "";
 
-  // Tutup dropdown
   if (dropdown) {
     dropdown.classList.remove("open");
     trigger?.setAttribute("aria-expanded", "false");
   }
 
-  // Update active state
   renderMemberDropdownMenu();
 }
-
-// ============================================================
-// SHODAQOH DATE PICKER DENGAN INPUT MANUAL
-// ============================================================
 
 let datePickerState = {
   currentMonth: new Date().getMonth(),
@@ -4469,7 +4771,6 @@ function initShodDatePicker() {
 
   console.log("Date picker element ditemukan");
 
-  // Set default value
   const today = new Date();
   valueDisplay.textContent = formatDateDisplay(today);
   hiddenInput.value = formatDateInput(today);
@@ -4479,20 +4780,17 @@ function initShodDatePicker() {
 
   renderDatePickerMenu();
 
-  // Toggle dropdown
   trigger.addEventListener("click", function (e) {
     e.stopPropagation();
     toggleDatePicker(dropdown);
   });
 
-  // Close on outside click
   document.addEventListener("click", function (e) {
     if (!dropdown.contains(e.target)) {
       closeDatePicker(dropdown);
     }
   });
 
-  // Keyboard support
   trigger.addEventListener("keydown", function (e) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -4508,7 +4806,6 @@ function toggleDatePicker(dropdown) {
   const isOpen = dropdown.classList.contains("open");
   const trigger = dropdown.querySelector(".filter-dropdown-trigger");
 
-  // Tutup semua dropdown lain
   document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
     if (el.id !== dropdown.id) {
       el.classList.remove("open");
@@ -4528,7 +4825,6 @@ function toggleDatePicker(dropdown) {
     trigger?.setAttribute("aria-expanded", "true");
     renderDatePickerMenu();
 
-    // Fokus ke input saat dropdown terbuka
     setTimeout(function () {
       const manualInput = document.getElementById("shodDateManualInput");
       if (manualInput) {
@@ -4597,14 +4893,12 @@ function renderDatePickerMenu() {
   const todayMonth = today.getMonth();
   const todayYear = today.getFullYear();
 
-  // Previous month days
   const prevMonthDays = firstDay;
   for (let i = prevMonthDays - 1; i >= 0; i--) {
     const day = daysInPrevMonth - i;
     daysHtml += `<button type="button" class="date-picker-day other-month" data-day="${day}" data-month="${month - 1}" data-year="${year}">${day}</button>`;
   }
 
-  // Current month days
   for (let i = 1; i <= daysInMonth; i++) {
     const isToday =
       i === todayDate && month === todayMonth && year === todayYear;
@@ -4621,14 +4915,12 @@ function renderDatePickerMenu() {
     daysHtml += `<button type="button" class="${classes}" data-day="${i}" data-month="${month}" data-year="${year}">${i}</button>`;
   }
 
-  // Next month days
   const totalDays = prevMonthDays + daysInMonth;
   const remainingDays = 42 - totalDays;
   for (let i = 1; i <= remainingDays; i++) {
     daysHtml += `<button type="button" class="date-picker-day other-month" data-day="${i}" data-month="${month + 1}" data-year="${year}">${i}</button>`;
   }
 
-  // Format tanggal saat ini untuk placeholder
   const currentDate = datePickerState.selectedDate;
   let currentDateStr = "";
   if (currentDate) {
@@ -4639,7 +4931,6 @@ function renderDatePickerMenu() {
   }
 
   menu.innerHTML = `
-    <!-- Input manual -->
     <div class="date-picker-input-wrap">
       <input 
         type="text" 
@@ -4659,7 +4950,6 @@ function renderDatePickerMenu() {
 
     <div class="date-picker-divider"></div>
 
-    <!-- Calendar -->
     <div class="date-picker-header">
       <button type="button" class="date-picker-nav" data-direction="prev">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -4689,26 +4979,17 @@ function renderDatePickerMenu() {
     </div>
   `;
 
-  // ===== EVENT LISTENERS =====
-
-  // Input manual - format otomatis
   const manualInput = document.getElementById("shodDateManualInput");
   if (manualInput) {
     manualInput.addEventListener("input", function (e) {
-      // Format otomatis: dd-mm-yyyy
       let value = this.value.replace(/\D/g, "");
-
-      // Batasi panjang
       if (value.length > 8) value = value.slice(0, 8);
-
-      // Tambahkan dash
       if (value.length > 2) {
         value = value.slice(0, 2) + "-" + value.slice(2);
       }
       if (value.length > 5) {
         value = value.slice(0, 5) + "-" + value.slice(5);
       }
-
       this.value = value;
     });
 
@@ -4724,7 +5005,6 @@ function renderDatePickerMenu() {
     });
   }
 
-  // Apply button
   const applyBtn = document.getElementById("shodDateManualApply");
   if (applyBtn) {
     applyBtn.addEventListener("click", function (e) {
@@ -4736,7 +5016,6 @@ function renderDatePickerMenu() {
     });
   }
 
-  // Navigation
   menu.querySelectorAll(".date-picker-nav").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -4758,7 +5037,6 @@ function renderDatePickerMenu() {
     });
   });
 
-  // Day selection
   menu.querySelectorAll(".date-picker-day").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -4770,7 +5048,6 @@ function renderDatePickerMenu() {
     });
   });
 
-  // Today button
   const todayBtn = menu.querySelector(".date-picker-today");
   if (todayBtn) {
     todayBtn.addEventListener("click", function (e) {
@@ -4780,7 +5057,6 @@ function renderDatePickerMenu() {
     });
   }
 
-  // Clear button
   const clearBtn = menu.querySelector(".date-picker-clear");
   if (clearBtn) {
     clearBtn.addEventListener("click", function (e) {
@@ -4790,26 +5066,19 @@ function renderDatePickerMenu() {
   }
 }
 
-// Fungsi untuk apply manual date
 function applyManualDate(dateStr) {
   if (!dateStr) return;
-
-  // Format: dd-mm-yyyy
   const parts = dateStr.split("-");
   if (parts.length !== 3) return;
-
   const day = parseInt(parts[0]);
-  const month = parseInt(parts[1]) - 1; // JS month is 0-based
+  const month = parseInt(parts[1]) - 1;
   const year = parseInt(parts[2]);
-
   if (isNaN(day) || isNaN(month) || isNaN(year)) return;
   if (day < 1 || day > 31) return;
   if (month < 0 || month > 11) return;
   if (year < 1900 || year > 2100) return;
-
   const date = new Date(year, month, day);
-  if (date.getDate() !== day) return; // Invalid date
-
+  if (date.getDate() !== day) return;
   selectDate(date);
 }
 
@@ -4821,9 +5090,7 @@ function selectDate(date) {
   datePickerState.currentYear = date.getFullYear();
 
   const valueDisplay = document.getElementById("shodDateDropdownValue");
-
   const hiddenInput = document.getElementById("shodPaymentDate");
-
   const manualInput = document.getElementById("shodDateManualInput");
 
   const day = String(date.getDate()).padStart(2, "0");
@@ -4878,10 +5145,6 @@ function clearDate() {
   closeDatePicker(dropdown);
 }
 
-// ============================================================
-// TX DATE PICKER - SAMA DENGAN SHODAQOH DATE PICKER
-// ============================================================
-
 let txDatePickerState = {
   currentMonth: new Date().getMonth(),
   currentYear: new Date().getFullYear(),
@@ -4903,7 +5166,6 @@ function initTxDatePicker() {
 
   console.log("TX Date picker element ditemukan");
 
-  // Set default value
   const today = new Date();
   valueDisplay.textContent = formatDateDisplay(today);
   hiddenInput.value = formatDateInput(today);
@@ -4913,20 +5175,17 @@ function initTxDatePicker() {
 
   renderTxDatePickerMenu();
 
-  // Toggle dropdown
   trigger.addEventListener("click", function (e) {
     e.stopPropagation();
     toggleTxDatePicker(dropdown);
   });
 
-  // Close on outside click
   document.addEventListener("click", function (e) {
     if (!dropdown.contains(e.target)) {
       closeTxDatePicker(dropdown);
     }
   });
 
-  // Keyboard support
   trigger.addEventListener("keydown", function (e) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -4942,7 +5201,6 @@ function toggleTxDatePicker(dropdown) {
   const isOpen = dropdown.classList.contains("open");
   const trigger = dropdown.querySelector(".filter-dropdown-trigger");
 
-  // Tutup semua dropdown lain
   document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
     if (el.id !== dropdown.id) {
       el.classList.remove("open");
@@ -4962,7 +5220,6 @@ function toggleTxDatePicker(dropdown) {
     trigger?.setAttribute("aria-expanded", "true");
     renderTxDatePickerMenu();
 
-    // Fokus ke input saat dropdown terbuka
     setTimeout(function () {
       const manualInput = document.getElementById("txDateManualInput");
       if (manualInput) {
@@ -5031,14 +5288,12 @@ function renderTxDatePickerMenu() {
   const todayMonth = today.getMonth();
   const todayYear = today.getFullYear();
 
-  // Previous month days
   const prevMonthDays = firstDay;
   for (let i = prevMonthDays - 1; i >= 0; i--) {
     const day = daysInPrevMonth - i;
     daysHtml += `<button type="button" class="date-picker-day other-month" data-day="${day}" data-month="${month - 1}" data-year="${year}">${day}</button>`;
   }
 
-  // Current month days
   for (let i = 1; i <= daysInMonth; i++) {
     const isToday =
       i === todayDate && month === todayMonth && year === todayYear;
@@ -5055,14 +5310,12 @@ function renderTxDatePickerMenu() {
     daysHtml += `<button type="button" class="${classes}" data-day="${i}" data-month="${month}" data-year="${year}">${i}</button>`;
   }
 
-  // Next month days
   const totalDays = prevMonthDays + daysInMonth;
   const remainingDays = 42 - totalDays;
   for (let i = 1; i <= remainingDays; i++) {
     daysHtml += `<button type="button" class="date-picker-day other-month" data-day="${i}" data-month="${month + 1}" data-year="${year}">${i}</button>`;
   }
 
-  // Format tanggal saat ini untuk placeholder
   const currentDate = txDatePickerState.selectedDate;
   let currentDateStr = "";
   if (currentDate) {
@@ -5073,7 +5326,6 @@ function renderTxDatePickerMenu() {
   }
 
   menu.innerHTML = `
-    <!-- Input manual -->
     <div class="date-picker-input-wrap">
       <input 
         type="text" 
@@ -5093,7 +5345,6 @@ function renderTxDatePickerMenu() {
 
     <div class="date-picker-divider"></div>
 
-    <!-- Calendar -->
     <div class="date-picker-header">
       <button type="button" class="date-picker-nav" data-direction="prev">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -5123,9 +5374,6 @@ function renderTxDatePickerMenu() {
     </div>
   `;
 
-  // ===== EVENT LISTENERS =====
-
-  // Input manual - format otomatis
   const manualInput = document.getElementById("txDateManualInput");
   if (manualInput) {
     manualInput.addEventListener("input", function (e) {
@@ -5152,7 +5400,6 @@ function renderTxDatePickerMenu() {
     });
   }
 
-  // Apply button
   const applyBtn = document.getElementById("txDateManualApply");
   if (applyBtn) {
     applyBtn.addEventListener("click", function (e) {
@@ -5164,7 +5411,6 @@ function renderTxDatePickerMenu() {
     });
   }
 
-  // Navigation
   menu.querySelectorAll(".date-picker-nav").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -5186,7 +5432,6 @@ function renderTxDatePickerMenu() {
     });
   });
 
-  // Day selection
   menu.querySelectorAll(".date-picker-day").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -5198,7 +5443,6 @@ function renderTxDatePickerMenu() {
     });
   });
 
-  // Today button
   const todayBtn = menu.querySelector(".date-picker-today");
   if (todayBtn) {
     todayBtn.addEventListener("click", function (e) {
@@ -5208,7 +5452,6 @@ function renderTxDatePickerMenu() {
     });
   }
 
-  // Clear button
   const clearBtn = menu.querySelector(".date-picker-clear");
   if (clearBtn) {
     clearBtn.addEventListener("click", function (e) {
@@ -5255,7 +5498,6 @@ function selectTxDate(date) {
     hiddenInput.value = formattedDate;
   }
 
-  // Sinkronkan manual input
   if (manualInput) {
     manualInput.value = formattedDate;
   }
@@ -5282,10 +5524,6 @@ function clearTxDate() {
   const dropdown = document.getElementById("txDateDropdown");
   closeTxDatePicker(dropdown);
 }
-
-// ============================================================
-// TX ACCOUNT DROPDOWN - SAMA DENGAN MEMBER DROPDOWN
-// ============================================================
 
 const ACCOUNT_CATEGORIES = [
   "SALDO AWAL",
@@ -5323,16 +5561,13 @@ function initTxAccountDropdown() {
 
   console.log("Account dropdown element ditemukan");
 
-  // Render account list
   renderTxAccountDropdownMenu();
 
-  // Toggle dropdown
   trigger.addEventListener("click", function (e) {
     e.stopPropagation();
     toggleTxAccountDropdown();
   });
 
-  // Close on outside click
   document.addEventListener("click", function (e) {
     if (!dropdown.contains(e.target)) {
       dropdown.classList.remove("open");
@@ -5340,7 +5575,6 @@ function initTxAccountDropdown() {
     }
   });
 
-  // Keyboard support
   trigger.addEventListener("keydown", function (e) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -5358,7 +5592,6 @@ function toggleTxAccountDropdown() {
   const trigger = document.getElementById("txAccountDropdownTrigger");
   const isOpen = dropdown.classList.contains("open");
 
-  // Tutup semua dropdown lain
   document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
     if (el.id !== dropdown.id) {
       el.classList.remove("open");
@@ -5409,25 +5642,18 @@ function selectTxAccount(account) {
   if (valueDisplay) valueDisplay.textContent = account || "Pilih kategori";
   if (hiddenInput) hiddenInput.value = account || "";
 
-  // Tutup dropdown
   if (dropdown) {
     dropdown.classList.remove("open");
     trigger?.setAttribute("aria-expanded", "false");
   }
 
-  // Update active state
   renderTxAccountDropdownMenu();
 }
-
-// ============================================================
-// INIT TX FORM
-// ============================================================
 
 function initTxForm() {
   initTxDatePicker();
   initTxAccountDropdown();
 
-  // Event untuk account dropdown - pilih option
   document.addEventListener("click", function (e) {
     const option = e.target.closest(
       "#txAccountDropdownMenu .filter-dropdown-option",
@@ -5442,11 +5668,7 @@ function initTxForm() {
   });
 }
 
-// Panggil initTxForm saat DOM ready
 document.addEventListener("DOMContentLoaded", function () {
-  // ... existing code ...
-
-  // Init TX form
   setTimeout(function () {
     initTxForm();
   }, 200);
@@ -5481,184 +5703,265 @@ function formatDateInput(date) {
 }
 
 function renderShodaqohSkeleton() {
-  // Dashboard stats
-  const statIds = [
-    "shodTarget",
-    "shodReceived",
-    "shodPaidCount",
-    "shodUnpaidCount",
-  ];
-  statIds.forEach((id) => {
-    const el = $(id);
-    if (el) {
-      el.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
-    }
-  });
+  const container = document.querySelector("#screen-shodaqoh");
+  if (!container) return;
 
-  // Month label
-  const monthLabel = $("shodMonthLabel");
-  if (monthLabel) {
-    monthLabel.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:120px;height:12px;border-radius:4px;"></span>`;
+  const dashboard = container.querySelector(".shod-dashboard");
+  const allocation = container.querySelector(".shod-allocation");
+  const filters = container.querySelector(".shod-filters");
+
+  if (dashboard) dashboard.classList.add("hidden");
+  if (allocation) allocation.classList.add("hidden");
+  if (filters) filters.classList.add("hidden");
+
+  container
+    .querySelectorAll(".shod-tabs-content-container")
+    .forEach((el) => el.remove());
+
+  container
+    .querySelectorAll(
+      ".card:has(#shodMonitoringBody), .card:has(#shodMembersList), .card:has(#shodPaymentsList)",
+    )
+    .forEach((el) => el.remove());
+
+  let tabsContainer = container.querySelector(".shod-tabs-container");
+
+  if (!tabsContainer) {
+    tabsContainer = document.createElement("div");
+    tabsContainer.className = "shod-tabs-container";
+
+    container.appendChild(tabsContainer);
   }
 
-  // Allocation detail - semua total
-  const allocIds = [
-    "shodTotalSusulanIr",
-    "shodTotalUangSambung",
-    "shodTotalJimpitan",
-    "shodTotalSiarSiar",
-    "shodTotalSeribuan",
-    "shodTotalKafan",
-    "shodTotalUkhroMt",
-  ];
-  allocIds.forEach((id) => {
-    const el = $(id);
-    if (el) {
-      el.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:60px;height:14px;border-radius:4px;"></span>`;
-    }
-  });
+  tabsContainer.innerHTML = `
+    <div
+      class="shod-tabs"
+      style="
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:6px;
+      "
+    >
+      <div
+        class="shod-tab"
+        data-tab="shod-monitoring"
+        style="
+          height:34px;
+          border:1px solid var(--line);
+          border-radius:8px;
+          background:var(--surface);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        "
+      >
+        <span
+          class="skeleton-line"
+          style="
+            display:block;
+            width:48px;
+            height:10px;
+            border-radius:4px;
+          "
+        ></span>
+      </div>
 
-  // Post status - hidden saat loading
-  const postStatus = $("shodPostStatus");
-  if (postStatus) postStatus.classList.add("hidden");
+      <div
+        class="shod-tab"
+        data-tab="shod-members"
+        style="
+          height:34px;
+          border:1px solid var(--line);
+          border-radius:8px;
+          background:var(--surface);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        "
+      >
+        <span
+          class="skeleton-line"
+          style="
+            display:block;
+            width:48px;
+            height:10px;
+            border-radius:4px;
+          "
+        ></span>
+      </div>
 
-  // Monitoring table body - skeleton
-  const monitoringBody = $("shodMonitoringBody");
-  if (monitoringBody) {
-    monitoringBody.innerHTML = `
+      <div
+        class="shod-tab"
+        data-tab="shod-payments"
+        style="
+          height:34px;
+          border:1px solid var(--line);
+          border-radius:8px;
+          background:var(--surface);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        "
+      >
+        <span
+          class="skeleton-line"
+          style="
+            display:block;
+            width:48px;
+            height:10px;
+            border-radius:4px;
+          "
+        ></span>
+      </div>
+    </div>
+  `;
+
+  const content = document.createElement("div");
+  content.className = "shod-tabs-content-container";
+  content.style.cssText = "margin-top:12px;";
+
+  const monitoring = document.createElement("div");
+  monitoring.className = "shod-tab-content shod-tab-content-shod-monitoring";
+
+  monitoring.innerHTML = `
+    <div class="card p-5">
+      <div
+        style="
+          height:14px;
+          width:90px;
+          border-radius:4px;
+          margin-bottom:16px;
+        "
+        class="skeleton-line"
+      ></div>
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:1.5fr 1fr .8fr 1fr;
+          gap:12px;
+          padding-bottom:10px;
+        "
+      >
+        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+        <span class="skeleton-line" style="height:10px;border-radius:4px;"></span>
+      </div>
+
       ${[1, 2, 3, 4, 5]
         .map(
           () => `
-        <tr class="border-t border-[color:var(--line)]">
-          <td class="py-3 pr-3"><span class="skeleton-line" style="display:inline-block;width:120px;height:14px;border-radius:4px;"></span></td>
-          <td class="py-3"><span class="skeleton-line" style="display:inline-block;width:70px;height:14px;border-radius:4px;"></span></td>
-          <td class="py-3"><span class="skeleton-line" style="display:inline-block;width:50px;height:14px;border-radius:4px;"></span></td>
-          <td class="py-3"><span class="skeleton-line" style="display:inline-block;width:80px;height:14px;border-radius:4px;"></span></td>
-        </tr>
-      `,
+            <div
+              style="
+                display:grid;
+                grid-template-columns:1.5fr 1fr .8fr 1fr;
+                gap:12px;
+                padding:13px 0;
+                border-top:1px solid var(--line);
+              "
+            >
+              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
+              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
+              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
+              <span class="skeleton-line" style="height:14px;border-radius:4px;"></span>
+            </div>
+          `,
         )
         .join("")}
-    `;
-  }
+    </div>
+  `;
 
-  // Member count
-  const memberCount = $("shodMemberCount");
-  if (memberCount) {
-    memberCount.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:30px;height:12px;border-radius:4px;"></span>`;
-  }
+  const members = document.createElement("div");
+  members.className = "shod-tab-content shod-tab-content-shod-members";
+  members.style.display = "none";
 
-  // Members list - skeleton
-  const membersList = $("shodMembersList");
-  if (membersList) {
-    membersList.innerHTML = `
-      <div class="flex items-center justify-between mb-3 pb-2 border-b border-[color:var(--line)]">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
-          Daftar Anggota
-        </span>
-        <span class="skeleton-line" style="display:inline-block;width:30px;height:12px;border-radius:4px;"></span>
-      </div>
-      ${[1, 2, 3, 4]
-        .map(
-          () => `
-        <div class="tx-card skeleton-loading">
-          <div class="flex-1">
-            <div class="skeleton-line" style="width:60%;height:16px;border-radius:4px;"></div>
-            <div class="skeleton-line mt-2" style="width:40%;height:12px;border-radius:4px;"></div>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="skeleton-line" style="width:50px;height:14px;border-radius:4px;"></div>
-          </div>
-        </div>
-      `,
-        )
-        .join("")}
-    `;
-  }
+  const payments = document.createElement("div");
+  payments.className = "shod-tab-content shod-tab-content-shod-payments";
+  payments.style.display = "none";
 
-  // Payment history - skeleton
-  const paymentsList = $("shodPaymentsList");
-  if (paymentsList) {
-    paymentsList.innerHTML = `
-      ${[1, 2, 3]
-        .map(
-          () => `
-        <div class="tx-card skeleton-loading">
-          <div class="flex-1">
-            <div class="skeleton-line" style="width:50%;height:16px;border-radius:4px;"></div>
-            <div class="skeleton-line mt-2" style="width:70%;height:12px;border-radius:4px;"></div>
-          </div>
-          <div class="text-right">
-            <div class="skeleton-line" style="width:60px;height:16px;border-radius:4px;margin-left:auto;"></div>
-            <div class="skeleton-line mt-2" style="width:40px;height:12px;border-radius:4px;margin-left:auto;"></div>
-          </div>
-        </div>
-      `,
-        )
-        .join("")}
-    `;
-  }
+  content.appendChild(monitoring);
+  content.appendChild(members);
+  content.appendChild(payments);
+
+  tabsContainer.insertAdjacentElement("afterend", content);
 }
 
 function renderShodaqohError(message) {
-  // Tampilkan error di dashboard stats
-  const statIds = [
-    "shodTarget",
-    "shodReceived",
-    "shodPaidCount",
-    "shodUnpaidCount",
-  ];
-  statIds.forEach((id) => {
-    const el = $(id);
-    if (el) {
-      el.innerHTML = `<span style="color:var(--neg);font-size:11px;">Error</span>`;
-    }
-  });
+  const container = document.querySelector("#screen-shodaqoh");
+  if (!container) return;
 
-  // Monitoring body - error state
-  const monitoringBody = $("shodMonitoringBody");
-  if (monitoringBody) {
-    monitoringBody.innerHTML = `
-      <tr>
-        <td colspan="4" class="py-8 text-center">
-          <p class="text-xs text-[color:var(--neg)]">Gagal memuat data: ${escapeHtml(message)}</p>
-          <button type="button" id="btnRetryShodaqoh" class="mt-3 text-xs font-bold" style="color:var(--brand);">
+  const monitoringTab = container.querySelector(
+    ".shod-tab-content-shod-monitoring",
+  );
+
+  if (monitoringTab) {
+    monitoringTab.innerHTML = `
+      <div class="card p-5">
+        <div
+          class="flex flex-col items-center justify-center text-center py-8"
+        >
+          <div
+            class="w-10 h-10 rounded-full flex items-center justify-center"
+            style="background:var(--neg-soft);color:var(--neg);"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 8v4"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+          </div>
+
+          <p
+            class="text-xs mt-3"
+            style="color:var(--neg);"
+          >
+            Gagal memuat data
+          </p>
+
+          <button
+            type="button"
+            id="btnRetryShodaqoh"
+            class="btn-primary mt-4"
+          >
             Coba lagi
           </button>
-        </td>
-      </tr>
+        </div>
+      </div>
     `;
 
-    const retryBtn = document.getElementById("btnRetryShodaqoh");
+    const retryBtn = $("btnRetryShodaqoh");
+
     if (retryBtn) {
-      retryBtn.addEventListener("click", function () {
+      retryBtn.addEventListener("click", () => {
         loadShodaqohData(state.shodaqoh.selectedMonth);
       });
     }
   }
 
-  // Members list - error state
-  const membersList = $("shodMembersList");
-  if (membersList) {
-    membersList.innerHTML = `
-      <div class="text-center py-8">
-        <p class="text-xs text-[color:var(--neg)]">Gagal memuat data anggota</p>
-      </div>
-    `;
+  const membersTab = container.querySelector(".shod-tab-content-shod-members");
+
+  const paymentsTab = container.querySelector(
+    ".shod-tab-content-shod-payments",
+  );
+
+  if (membersTab) {
+    membersTab.style.display = "none";
   }
 
-  // Payment history - error state
-  const paymentsList = $("shodPaymentsList");
-  if (paymentsList) {
-    paymentsList.innerHTML = `
-      <div class="text-center py-8">
-        <p class="text-xs text-[color:var(--neg)]">Gagal memuat riwayat pembayaran</p>
-      </div>
-    `;
+  if (paymentsTab) {
+    paymentsTab.style.display = "none";
   }
 }
 
 function renderHomeSkeleton() {
-  // Hero card - saldo
   const saldoAkhir = $("homeSaldoAkhir");
   if (saldoAkhir) {
     saldoAkhir.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:140px;height:30px;border-radius:4px;"></span>`;
@@ -5679,7 +5982,6 @@ function renderHomeSkeleton() {
     saldoAwal.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
   }
 
-  // Stat cards - debet & kredit
   const debet = $("homeDebet");
   if (debet) {
     debet.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:18px;border-radius:4px;"></span>`;
@@ -5690,7 +5992,6 @@ function renderHomeSkeleton() {
     kredit.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:18px;border-radius:4px;"></span>`;
   }
 
-  // Surplus
   const surplus = $("homeSurplus");
   if (surplus) {
     surplus.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:18px;border-radius:4px;"></span>`;
@@ -5701,23 +6002,18 @@ function renderHomeSkeleton() {
     surplusBadge.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:50px;height:16px;border-radius:999px;"></span>`;
   }
 
-  // ===== CHART SKELETON - PAS DI DALAM WRAPPER =====
   const chartWrapper = document.getElementById("chartWrapper");
   if (chartWrapper) {
-    // Hapus skeleton lama jika ada
     const oldSkeleton = chartWrapper.querySelector(".chart-skeleton");
     if (oldSkeleton) oldSkeleton.remove();
 
-    // Sembunyikan canvas
     const canvas = chartWrapper.querySelector("#saldoChart");
     if (canvas) canvas.style.display = "none";
 
-    // Buat skeleton baru
     const skeleton = document.createElement("div");
     skeleton.className = "chart-skeleton";
     skeleton.innerHTML = `
       <div class="chart-skeleton-content">
-        <!-- Garis grid horizontal -->
         <div class="chart-skeleton-grid">
           <div class="chart-skeleton-grid-line"></div>
           <div class="chart-skeleton-grid-line"></div>
@@ -5725,11 +6021,9 @@ function renderHomeSkeleton() {
           <div class="chart-skeleton-grid-line"></div>
           <div class="chart-skeleton-grid-line"></div>
         </div>
-        <!-- Garis grafik (wave) -->
         <div class="chart-skeleton-wave">
           <div class="chart-skeleton-wave-line"></div>
         </div>
-        <!-- Label sumbu X -->
         <div class="chart-skeleton-labels">
           <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
           <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
@@ -5743,7 +6037,6 @@ function renderHomeSkeleton() {
     chartWrapper.appendChild(skeleton);
   }
 
-  // Recent transactions - skeleton
   const recentList = $("homeRecentList");
   if (recentList) {
     recentList.innerHTML = `
@@ -5768,7 +6061,6 @@ function renderHomeSkeleton() {
     `;
   }
 
-  // Chart scope label
   const chartScope = $("chartScopeLabel");
   if (chartScope) {
     chartScope.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>`;
@@ -5776,7 +6068,6 @@ function renderHomeSkeleton() {
 }
 
 function renderHistorySkeleton() {
-  // Saldo summary
   const saldoAwal = $("rySaldoAwal");
   if (saldoAwal) {
     saldoAwal.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:16px;border-radius:4px;"></span>`;
@@ -5792,7 +6083,6 @@ function renderHistorySkeleton() {
     periodHint.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:180px;height:14px;border-radius:4px;"></span>`;
   }
 
-  // Transaction list - skeleton
   const txList = $("txList");
   if (txList) {
     txList.innerHTML = `
@@ -5817,7 +6107,6 @@ function renderHistorySkeleton() {
     `;
   }
 
-  // Empty state - hidden
   const txEmpty = $("txEmpty");
   if (txEmpty) {
     txEmpty.classList.add("hidden");
@@ -5881,7 +6170,6 @@ function normalizeOcrWord(text) {
 function shodMatchField(text) {
   const n = normalizeShodOcrText(text);
 
-  // Persenan / Infak IR / Shodaqoh IR
   if (
     /\bpersenan\b/.test(n) ||
     /\bpersen\b/.test(n) ||
@@ -5891,37 +6179,30 @@ function shodMatchField(text) {
     return "susulan_ir";
   }
 
-  // Sambung / Uang Sambung / Shodaqoh Sambung
   if (
     /\bsambung\b/.test(n) ||
-    /\buang\s+sambung\b/.test(n) ||
     /\buang\s+sambung\b/.test(n) ||
     /\b(shodaqoh|shodagoh)\s+sambung\b/.test(n)
   ) {
     return "uang_sambung";
   }
 
-  // Jimpitan
   if (/\bjimpitan\b/.test(n)) {
     return "jimpitan";
   }
 
-  // Siar-siar
   if (/\bsiar[\s-]*siar\b/.test(n)) {
     return "siar_siar";
   }
 
-  // Seribuan
   if (/\bseribuan\b/.test(n)) {
     return "seribuan";
   }
 
-  // Kafan / Kf
   if (n === "kf" || n === "kaf" || /\bkafan\b/.test(n)) {
     return "kafan";
   }
 
-  // MT / Ukhro MT
   if (
     n === "mt" ||
     /\bmt\b/.test(n) ||
@@ -5937,7 +6218,6 @@ function shodMatchField(text) {
 function shodAmountFromText(value) {
   let s = String(value || "").trim();
 
-  // Koreksi OCR yang umum pada angka tulisan tangan
   s = s
     .replace(/[oO]/g, "0")
     .replace(/[lI|]/g, "1")
@@ -5983,7 +6263,6 @@ function shodParseTable(text) {
 
     if (!normalized) continue;
 
-    // TOTAL
     if (/\btotal\b/.test(normalized)) {
       const total = shodAmountFromText(line);
 
@@ -5994,14 +6273,12 @@ function shodParseTable(text) {
       continue;
     }
 
-    // Cari jenis shodaqoh
     const field = shodMatchField(normalized);
 
     if (!field) {
       continue;
     }
 
-    // Cari nominal pada baris yang sama
     const amount = shodAmountFromText(line);
 
     if (amount > 0) {
@@ -6009,8 +6286,6 @@ function shodParseTable(text) {
     }
   }
 
-  // Kalau TOTAL tidak terbaca OCR,
-  // hitung dari field yang dikenali.
   if (!result.total) {
     result.total =
       Number(result.susulan_ir || 0) +
@@ -6033,7 +6308,6 @@ async function prepareShodOcrImage(dataUrl, rotation = 0, threshold = false) {
       const originalW = img.naturalWidth;
       const originalH = img.naturalHeight;
 
-      // Batasi ukuran supaya OCR tidak terlalu berat
       const maxSide = 3000;
       const scale = Math.min(1, maxSide / Math.max(originalW, originalH));
 
@@ -6069,7 +6343,6 @@ async function prepareShodOcrImage(dataUrl, rotation = 0, threshold = false) {
         let gray =
           0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
 
-        // Contrast
         gray = (gray - 128) * 1.35 + 128;
 
         gray = Math.max(0, Math.min(255, gray));
@@ -6126,14 +6399,12 @@ function scoreShodOcrResult(text) {
     }
   });
 
-  // Beri nilai untuk nominal
   const numbers = n.match(/\d{3,}/g);
 
   if (numbers) {
     score += numbers.length * 3;
   }
 
-  // Beri nilai jika banyak baris
   const lines = text.split(/\r?\n/).filter((x) => x.trim());
 
   score += Math.min(lines.length, 20);
@@ -6205,10 +6476,6 @@ async function runShodOcrMultiPass(dataUrl) {
     throw new Error("Semua proses OCR gagal.");
   }
 
-  // Urutkan berdasarkan:
-  // 1. keyword yang berhasil ditemukan
-  // 2. jumlah angka
-  // 3. confidence
   candidates.sort((a, b) => {
     if (b.score !== a.score) {
       return b.score - a.score;
@@ -6259,7 +6526,7 @@ function detectShodField(text) {
     return "seribuan";
   }
 
-  if (n === "kf" || n === "kafan") {
+  if (n === "kf" || n.includes("kafan")) {
     return "kafan";
   }
 
@@ -6302,11 +6569,6 @@ async function extractShodaqohWithAI() {
     }
 
     const dataUrl = window.shodUploadedImage.dataUrl;
-
-    /*
-     * dataUrl:
-     * data:image/jpeg;base64,/9j/4AAQ...
-     */
 
     const result = await callShodaqohAI(dataUrl);
 
@@ -6376,18 +6638,12 @@ function applyShodaqohAIResult(data) {
     );
   });
 
-  /*
-   * Keterangan
-   */
   const keterangan = document.getElementById("shodKeterangan");
 
   if (keterangan && data?.keterangan) {
     keterangan.value = data.keterangan;
   }
 
-  /*
-   * Update kalkulasi/alokasi
-   */
   const total = document.getElementById("shodPaymentAmount");
 
   if (total) {
@@ -6404,6 +6660,7 @@ function applyShodaqohAIResult(data) {
     );
   }
 }
+
 async function callShodaqohAI(dataUrl) {
   const response = await fetch(CONFIG.WEB_APP_URL, {
     method: "POST",
