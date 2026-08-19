@@ -1815,7 +1815,7 @@ function renderShodaqohScreen() {
   renderShodaqohDashboard();
   renderShodaqohAllocation();
   renderShodaqohFilters();
-  renderShodaqohTabs(); // Ini sudah handle semuanya
+  renderShodaqohTabs();
 }
 
 function renderShodaqohDashboard() {
@@ -2002,162 +2002,228 @@ function renderShodaqohMembers() {
   const members = state.shodaqoh.members || [];
   const isAdmin = isAdminUser();
 
-  // Gunakan struktur dengan sticky header
-  const container = document.createElement("div");
-  container.className = "shod-members-container";
-  container.style.cssText = `
-    position: relative;
-    max-height: 400px;
-    overflow-y: auto;
-  `;
+  /*
+   * =========================================================
+   * CONTAINER UTAMA
+   * =========================================================
+   */
 
-  const headerHtml = `
-    <div class="shod-members-header" style="
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--surface);
-      padding: 8px 0 10px 0;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    ">
-      <span class="text-[10px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
-        Daftar Anggota
-      </span>
-      <div class="flex items-center gap-2">
-        <span class="text-[10px] text-[color:var(--ink-faint)]">
-          ${members.length} anggota
-        </span>
+  body.innerHTML = `
+    <div class="shod-members-container">
+
+      <div class="shod-members-header">
+
+        <div class="shod-members-title">
+          <span>
+            Daftar Anggota
+          </span>
+        </div>
+
+        <div class="shod-members-header-right">
+
+          <span class="shod-members-count">
+            ${members.length} anggota
+          </span>
+
+          ${
+            isAdmin
+              ? `
+            <button
+              type="button"
+              id="shodAddMemberBtn"
+              class="shod-members-add"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+
+              <span>Tambah</span>
+            </button>
+          `
+              : ""
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           SCROLL AREA
+           =================================================== -->
+
+      <div
+        class="shod-members-scroll"
+        id="shodMembersScroll"
+      >
+
         ${
-          isAdmin
+          members.length === 0
             ? `
-          <button type="button" id="shodAddMemberBtn" class="add-member-btn" style="
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border: none;
-            border-radius: 6px;
-            background: var(--brand);
-            color: #fff;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s ease;
-          ">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 5v14M5 12h14" />
+          <div class="shod-members-empty">
+
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <path d="M20 21a8 8 0 1 0-16 0" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
-            Tambah
-          </button>
-        `
-            : ""
-        }
-      </div>
-    </div>
-  `;
 
-  // Kosongkan body
-  body.innerHTML = "";
-
-  // Buat wrapper dengan scroll
-  const wrapper = document.createElement("div");
-  wrapper.style.cssText = `
-    max-height: 400px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  `;
-
-  if (members.length === 0) {
-    wrapper.innerHTML = `
-      ${headerHtml}
-      <div class="text-center py-8">
-        <svg class="mx-auto mb-3 text-[color:var(--ink-faint)]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M20 21a8 8 0 1 0-16 0" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-        <p class="text-xs text-[color:var(--ink-faint)]">Belum ada anggota.</p>
-        ${isAdmin ? `<button type="button" id="shodAddFirstMember" class="mt-2 text-xs font-bold" style="color:var(--brand);">+ Tambah anggota pertama</button>` : ""}
-      </div>
-    `;
-    body.appendChild(wrapper);
-
-    const addBtn = document.getElementById("shodAddFirstMember");
-    if (addBtn && isAdmin) {
-      addBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        if (typeof openShodMemberForm === "function") {
-          openShodMemberForm(null);
-        }
-      });
-    }
-
-    const addBtn2 = document.getElementById("shodAddMemberBtn");
-    if (addBtn2 && isAdmin) {
-      addBtn2.addEventListener("click", function (e) {
-        e.stopPropagation();
-        if (typeof openShodMemberForm === "function") {
-          openShodMemberForm(null);
-        }
-      });
-    }
-    return;
-  }
-
-  const membersHtml = members
-    .map(function (m) {
-      const statusClass =
-        m.status === "AKTIF" ? "status-active" : "status-inactive";
-      const statusLabel = m.status || "AKTIF";
-
-      return `
-        <button 
-          type="button" 
-          class="tx-card w-full text-left ${isAdmin ? "tx-card-clickable" : ""}" 
-          data-shod-member="${escapeHtml(m.member_id)}"
-          role="button"
-          tabindex="0"
-          aria-label="Detail anggota ${escapeHtml(m.nama)}"
-          style="padding: 10px 4px;"
-        >
-          <div class="flex-1 min-w-0">
-            <p class="tx-title">${escapeHtml(m.nama)}</p>
-            <p class="tx-meta flex items-center gap-2">
-              <span class="mono">${fmtRp(m.nominal_bulanan)}</span>
-              <span class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"></span>
-              <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;">
-                ${escapeHtml(statusLabel)}
-              </span>
+            <p>
+              Belum ada anggota.
             </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] text-[color:var(--ink-faint)] mono">
-              ${m.total_paid ? fmtRp(m.total_paid) : "Rp 0"}
-            </span>
-            ${isAdmin ? `<span class="tx-chevron" style="color:var(--ink-faint);">›</span>` : ""}
-          </div>
-        </button>
-      `;
-    })
-    .join("");
 
-  wrapper.innerHTML = `
-    ${headerHtml}
-    <div class="space-y-1 pt-2">
-      ${membersHtml}
+            ${
+              isAdmin
+                ? `
+              <button
+                type="button"
+                id="shodAddFirstMember"
+              >
+                + Tambah anggota pertama
+              </button>
+            `
+                : ""
+            }
+
+          </div>
+        `
+            : `
+          <div class="shod-members-items">
+
+            ${members
+              .map(function (m) {
+                const statusClass =
+                  m.status === "AKTIF" ? "status-active" : "status-inactive";
+
+                const statusLabel = m.status || "AKTIF";
+
+                return `
+                  <button
+                    type="button"
+                    class="tx-card w-full text-left ${
+                      isAdmin ? "tx-card-clickable" : ""
+                    }"
+                    data-shod-member="${escapeHtml(m.member_id)}"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Detail anggota ${escapeHtml(m.nama)}"
+                  >
+
+                    <div class="flex-1 min-w-0">
+
+                      <p class="tx-title">
+                        ${escapeHtml(m.nama)}
+                      </p>
+
+                      <p class="tx-meta flex items-center gap-2">
+
+                        <span class="mono">
+                          ${fmtRp(m.nominal_bulanan)}
+                        </span>
+
+                        <span
+                          class="w-1 h-1 rounded-full bg-[color:var(--ink-faint)]"
+                        ></span>
+
+                        <span
+                          class="status-pill ${statusClass}"
+                          style="
+                            font-size:8px;
+                            padding:2px 10px;
+                          "
+                        >
+                          ${escapeHtml(statusLabel)}
+                        </span>
+
+                      </p>
+
+                    </div>
+
+
+                    <div class="flex items-center gap-2">
+
+                      <span
+                        class="text-[10px] text-[color:var(--ink-faint)] mono"
+                      >
+                        ${m.total_paid ? fmtRp(m.total_paid) : "Rp 0"}
+                      </span>
+
+                      ${
+                        isAdmin
+                          ? `
+                        <span
+                          class="tx-chevron"
+                          aria-hidden="true"
+                        >
+                          ›
+                        </span>
+                      `
+                          : ""
+                      }
+
+                    </div>
+
+                  </button>
+                `;
+              })
+              .join("")}
+
+          </div>
+        `
+        }
+
+      </div>
+
     </div>
   `;
 
-  body.appendChild(wrapper);
+  /*
+   * =========================================================
+   * EVENT TAMBAH ANGGOTA
+   * =========================================================
+   */
 
-  // Event listener untuk tombol tambah anggota
-  const addBtn = document.getElementById("shodAddMemberBtn");
+  const addBtn = $("shodAddMemberBtn");
+
   if (addBtn && isAdmin) {
     addBtn.addEventListener("click", function (e) {
+      e.preventDefault();
       e.stopPropagation();
+
+      if (typeof openShodMemberForm === "function") {
+        openShodMemberForm(null);
+      }
+    });
+  }
+
+  /*
+   * =========================================================
+   * EVENT TAMBAH ANGGOTA PERTAMA
+   * =========================================================
+   */
+
+  const addFirstBtn = $("shodAddFirstMember");
+
+  if (addFirstBtn && isAdmin) {
+    addFirstBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
       if (typeof openShodMemberForm === "function") {
         openShodMemberForm(null);
       }
@@ -2179,7 +2245,7 @@ function renderShodaqohTabs() {
   );
   if (oldContentContainer) oldContentContainer.remove();
 
-  // Buat tabs container - LANGSUNG MENEMPEL DI BACKGROUND APP (tanpa card wrapper)
+  // Buat tabs container
   const tabsHtml = `
     <div class="shod-tabs-container" style="
       position: relative;
@@ -2257,13 +2323,13 @@ function renderShodaqohTabs() {
     }
   }
 
-  // Buat container untuk konten tab - SETIAP TAB PUNYA WRAPPER CARD SENDIRI
+  // Buat container untuk konten tab
   const tabsContainer = container.querySelector(".shod-tabs-container");
   const contentContainer = document.createElement("div");
   contentContainer.className = "shod-tabs-content-container";
   contentContainer.style.cssText = "margin-top:8px;";
 
-  // Buat 3 tab content dengan wrapper card masing-masing
+  // === TAB 1: Monitoring ===
   const monitoringContent = document.createElement("div");
   monitoringContent.className =
     "shod-tab-content shod-tab-content-shod-monitoring";
@@ -2271,7 +2337,6 @@ function renderShodaqohTabs() {
   monitoringContent.innerHTML = `
     <div class="card p-4">
       <div class="shod-monitoring-wrapper">
-        <!-- Header dengan judul dan statistik -->
         <div class="shod-monitoring-header" style="
           display: flex;
           align-items: center;
@@ -2291,16 +2356,10 @@ function renderShodaqohTabs() {
             </span>
           </div>
           <div class="flex items-center gap-3" id="shodStatsBadge">
-            <span class="text-[9px] text-[color:var(--pos)]">
-              ● 0 Lunas
-            </span>
-            <span class="text-[9px] text-[color:var(--neg)]">
-              ● 0 Belum
-            </span>
+            <span class="text-[9px] text-[color:var(--pos)]">● 0 Lunas</span>
+            <span class="text-[9px] text-[color:var(--neg)]">● 0 Belum</span>
           </div>
         </div>
-        
-        <!-- Tabel monitoring -->
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;font-size:11px;">
             <thead>
@@ -2320,6 +2379,7 @@ function renderShodaqohTabs() {
     </div>
   `;
 
+  // === TAB 2: Members ===
   const membersContent = document.createElement("div");
   membersContent.className = "shod-tab-content shod-tab-content-shod-members";
   membersContent.style.display = "none";
@@ -2329,12 +2389,14 @@ function renderShodaqohTabs() {
     </div>
   `;
 
+  // === TAB 3: Payments ===
   const paymentsContent = document.createElement("div");
   paymentsContent.className = "shod-tab-content shod-tab-content-shod-payments";
   paymentsContent.style.display = "none";
   paymentsContent.innerHTML = `
     <div class="card p-4">
-      <div id="shodPaymentsList">
+      <h2 class="font-display text-[13px] font-extrabold mb-3">Riwayat Pembayaran</h2>
+      <div id="shodPaymentsList" class="space-y-2">
         <p class="py-6 text-center text-xs text-[color:var(--ink-faint)]">Belum ada pembayaran.</p>
       </div>
     </div>
@@ -2349,7 +2411,6 @@ function renderShodaqohTabs() {
   // Event listener untuk tab
   container.querySelectorAll(".shod-tab").forEach((tab) => {
     tab.addEventListener("click", function () {
-      // Update active tab style
       container.querySelectorAll(".shod-tab").forEach((t) => {
         t.classList.remove("active");
         t.style.background = "var(--surface)";
@@ -2359,7 +2420,6 @@ function renderShodaqohTabs() {
       this.style.background = "var(--brand)";
       this.style.color = "#fff";
 
-      // Show/hide content
       const target = this.dataset.tab;
       container.querySelectorAll(".shod-tab-content").forEach((el) => {
         el.style.display = "none";
@@ -2368,7 +2428,6 @@ function renderShodaqohTabs() {
       const content = container.querySelector(`.shod-tab-content-${target}`);
       if (content) {
         content.style.display = "block";
-        // Render data sesuai tab yang aktif
         if (target === "shod-monitoring") {
           renderShodaqohMonitoring();
         } else if (target === "shod-members") {
@@ -4393,7 +4452,7 @@ async function openShodaqohMemberDetail(memberId) {
         <tr>
           <td colspan="5" class="py-8 text-center">
             <p class="text-xs text-[color:var(--neg)]">Gagal memuat data: ${escapeHtml(err.message)}</p>
-            <button type="button" id="btnRetryMemberDetail" class="mt-3 text-xs font-bold" style="color:var(--brand);">
+            <button type="button" id="btnRetryMemberDetail" class="mt-3 p-3 text-xs font-bold" style="color:var(--brand);">
               Coba lagi
             </button>
           </td>
