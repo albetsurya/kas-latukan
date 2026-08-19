@@ -16,6 +16,27 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el) el.classList.add("sheet-action");
   });
 
+  // Universal sheet backdrop close:
+  // clicking the overlay/backdrop closes the sheet, while clicks inside
+  // the actual sheet content are ignored.
+  document.querySelectorAll("body > .sheet-overlay").forEach((overlay) => {
+    overlay.addEventListener("click", (event) => {
+      if (event.target !== overlay) return;
+
+      overlay.classList.add("hidden");
+
+      if (overlay.id === "txActionOverlay") {
+        state.actionNo = null;
+      }
+
+      if (overlay.id === "shodMemberActionOverlay") {
+        if (typeof closeShodMemberActionSheet === "function") {
+          closeShodMemberActionSheet();
+        }
+      }
+    });
+  });
+
   initTheme();
 
   if ($("btnTheme")) {
@@ -331,21 +352,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if ($("btnActionCancel"))
     $("btnActionCancel").addEventListener("click", closeTxActionSheet);
 
-  const txActionOverlay = document.getElementById("txActionOverlay");
-  if (txActionOverlay) {
-    txActionOverlay.classList.add("sheet-action");
-    const sheet = txActionOverlay.querySelector(".sheet");
-    if (sheet) {
-      sheet.style.cssText = `
-        max-height: 58vh !important;
-        height: auto !important;
-        min-height: auto !important;
-        padding: 6px 16px 10px !important;
-        overflow: hidden !important;
-        border-radius: 18px 18px 0 0 !important;
-      `;
-    }
-  }
 
   if ($("btnActionEdit")) {
     $("btnActionEdit").addEventListener("click", () => {
@@ -708,41 +714,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const memberDetailOverlay = document.getElementById(
-    "shodMemberDetailOverlay",
-  );
-  if (memberDetailOverlay) {
-    memberDetailOverlay.classList.add("sheet-action");
-    const sheet = memberDetailOverlay.querySelector(".sheet");
-    if (sheet) {
-      sheet.style.cssText = `
-        max-height: 78dvh !important;
-        height: auto !important;
-        min-height: auto !important;
-        padding: 6px 16px 10px !important;
-        overflow: hidden !important;
-        border-radius: 18px 18px 0 0 !important;
-      `;
-    }
-  }
 
-  const paymentDetailOverlay = document.getElementById(
-    "shodPaymentDetailOverlay",
-  );
-  if (paymentDetailOverlay) {
-    paymentDetailOverlay.classList.add("sheet-action");
-    const sheet = paymentDetailOverlay.querySelector(".sheet");
-    if (sheet) {
-      sheet.style.cssText = `
-        max-height: 78dvh !important;
-        height: auto !important;
-        min-height: auto !important;
-        padding: 6px 16px 10px !important;
-        overflow: hidden !important;
-        border-radius: 18px 18px 0 0 !important;
-      `;
-    }
-  }
 
   const membersList = document.getElementById("shodMembersList");
   if (membersList) {
@@ -898,23 +870,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const memberActionOverlay = document.getElementById(
-    "shodMemberActionOverlay",
-  );
-  if (memberActionOverlay) {
-    memberActionOverlay.classList.add("sheet-action");
-    const sheet = memberActionOverlay.querySelector(".sheet");
-    if (sheet) {
-      sheet.style.cssText = `
-        max-height: 58vh !important;
-        height: auto !important;
-        min-height: auto !important;
-        padding: 6px 16px 10px !important;
-        overflow: hidden !important;
-        border-radius: 18px 18px 0 0 !important;
-      `;
-    }
-  }
 
   if ($("btnAddMember")) {
     $("btnAddMember").addEventListener("click", function () {

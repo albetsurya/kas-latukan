@@ -874,95 +874,176 @@ function renderChart() {
 
   if (!labels.length) {
     const now = new Date();
-
     const currentMonthKey =
       now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
-
     labels.push(getMonthShortLabel(currentMonthKey));
-
     data.push(state.saldoAwal);
   }
 
-  if ($("chartScopeLabel"))
-    $("chartScopeLabel").textContent = labels.length + " bulan tercatat";
+  // Update label periode
+  if ($("chartScopeLabel")) {
+    $("chartScopeLabel").textContent = labels.length + " bulan";
+  }
+
+  // Update nilai terakhir dan perubahan
+  const lastValue = data[data.length - 1] || 0;
+  const firstValue = data[0] || 0;
+  const change =
+    firstValue !== 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
+
+  if ($("chartLastValue")) {
+    $("chartLastValue").textContent = fmtRp(lastValue);
+  }
+
+  if ($("chartChange")) {
+    const changeEl = $("chartChange");
+    if (change > 0) {
+      changeEl.textContent = `▲ +${change.toFixed(1)}%`;
+      changeEl.style.color = "var(--pos)";
+    } else if (change < 0) {
+      changeEl.textContent = `▼ ${change.toFixed(1)}%`;
+      changeEl.style.color = "var(--neg)";
+    } else {
+      changeEl.textContent = `▬ 0%`;
+      changeEl.style.color = "var(--ink-soft)";
+    }
+  }
 
   const dark = currentTheme() === "dark";
 
-  const lineColor = dark ? "#1fd8a4" : "#0e9f6e";
+  // Warna modern - gradasi hijau/teal
+  const lineColor = "#10b981";
+  const gradientColor1 = dark
+    ? "rgba(16,185,129,0.25)"
+    : "rgba(16,185,129,0.15)";
+  const gradientColor2 = dark
+    ? "rgba(16,185,129,0.02)"
+    : "rgba(16,185,129,0.01)";
 
-  const fillColor = dark ? "rgba(31,216,164,0.14)" : "rgba(14,159,110,0.10)";
-
-  const tickColor = dark ? "#8b94a3" : "#626c7a";
+  const tickColor = dark ? "#475569" : "#94a3b8";
+  const gridColor = dark ? "rgba(71,85,105,0.15)" : "rgba(148,163,184,0.12)";
+  const textColor = dark ? "#94a3b8" : "#64748b";
 
   if (state.chart) state.chart.destroy();
 
+  // Buat gradient fill
+  const gradient = ctx.getContext("2d").createLinearGradient(0, 0, 0, 160);
+  gradient.addColorStop(0, gradientColor1);
+  gradient.addColorStop(1, gradientColor2);
+
   state.chart = new Chart(ctx, {
     type: "line",
-
     data: {
-      labels,
-
+      labels: labels,
       datasets: [
         {
           label: "Saldo Akhir Bulan",
-
-          data,
-
+          data: data,
           borderColor: lineColor,
-
-          backgroundColor: fillColor,
-
+          backgroundColor: gradient,
           fill: true,
-
-          tension: 0.35,
-
-          pointRadius: 2.5,
-
-          pointHoverRadius: 5,
-
+          tension: 0.4,
+          pointRadius: 3,
+          pointHoverRadius: 6,
           pointBackgroundColor: lineColor,
-
-          borderWidth: 2,
+          pointBorderColor: dark ? "#1e293b" : "#ffffff",
+          pointBorderWidth: 2,
+          borderWidth: 2.5,
         },
       ],
     },
-
     options: {
       responsive: true,
-
       maintainAspectRatio: false,
-
+      interaction: {
+        intersect: false,
+        mode: "index",
+      },
       plugins: {
         legend: {
           display: false,
         },
-
         tooltip: {
+          backgroundColor: dark
+            ? "rgba(30,41,59,0.92)"
+            : "rgba(255,255,255,0.92)",
+          titleColor: dark ? "#f1f5f9" : "#0f172a",
+          bodyColor: dark ? "#e2e8f0" : "#334155",
+          borderColor: dark ? "rgba(71,85,105,0.2)" : "rgba(148,163,184,0.2)",
+          borderWidth: 1,
+          cornerRadius: 8,
+          padding: 10,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           callbacks: {
-            label: (c) => fmtRp(c.parsed.y),
+            label: function (context) {
+              return fmtRp(context.parsed.y);
+            },
+            title: function (items) {
+              return items[0].label;
+            },
           },
         },
       },
-
       scales: {
         x: {
+          type: "category",
           ticks: {
             autoSkip: true,
+            maxTicksLimit: 8,
             maxRotation: 0,
             font: {
-              size: 9,
+              size: 8,
+              weight: "500",
             },
             color: tickColor,
+            padding: 4,
           },
-
           grid: {
+            display: false,
+            drawBorder: false,
+          },
+          border: {
             display: false,
           },
         },
-
         y: {
-          display: false,
+          display: true,
+          position: "right",
+          ticks: {
+            font: {
+              size: 8,
+              weight: "500",
+            },
+            color: tickColor,
+            padding: 6,
+            maxTicksLimit: 6,
+            callback: function (value) {
+              if (value >= 1000000) return (value / 1000000).toFixed(0) + "jt";
+              if (value >= 1000) return (value / 1000).toFixed(0) + "rb";
+              return value.toFixed(0);
+            },
+          },
+          grid: {
+            color: gridColor,
+            drawBorder: false,
+            lineWidth: 0.8,
+          },
+          border: {
+            display: false,
+          },
         },
+      },
+      elements: {
+        line: {
+          tension: 0.4,
+        },
+        point: {
+          hoverRadius: 6,
+        },
+      },
+      animation: {
+        duration: 800,
+        easing: "easeOutQuart",
       },
     },
   });

@@ -374,19 +374,60 @@
             </div>
           </div>
 
-          <div class="card p-5">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="font-display text-[13px] font-extrabold">
-                Tren Saldo Bulanan
-              </h2>
-              <span
-                class="text-[10px] mono text-[color:var(--ink-faint)]"
-                id="chartScopeLabel"
-                >seluruh periode</span
-              >
+          <div
+            class="card p-4"
+            style="
+              background: var(--surface);
+              border-radius: 12px;
+              overflow: hidden;
+            "
+          >
+            <!-- Header Chart -->
+            <div class="flex items-center justify-between mb-2 px-1">
+              <div>
+                <h2
+                  class="font-display text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]"
+                >
+                  Tren Saldo Bulanan
+                </h2>
+                <div class="flex items-center gap-3 mt-1">
+                  <span
+                    class="text-[18px] font-extrabold font-mono"
+                    id="chartLastValue"
+                    style="color: var(--ink)"
+                  >
+                    Rp 0
+                  </span>
+                  <span
+                    class="text-[10px] font-medium"
+                    id="chartChange"
+                    style="color: var(--ink-soft)"
+                  >
+                    ▬ 0%
+                  </span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span
+                  class="text-[9px] text-[color:var(--ink-faint)]"
+                  id="chartScopeLabel"
+                >
+                  seluruh periode
+                </span>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span
+                    class="w-2 h-2 rounded-full"
+                    style="background: var(--pos)"
+                  ></span>
+                  <span class="text-[8px] text-[color:var(--ink-faint)]"
+                    >Saldo</span
+                  >
+                </div>
+              </div>
             </div>
 
-            <div class="h-40 relative" id="chartWrapper">
+            <!-- Chart Container -->
+            <div class="relative" style="height: 160px; margin: -4px 0">
               <canvas id="saldoChart"></canvas>
             </div>
           </div>
@@ -1573,18 +1614,9 @@
             id="shodMemberActionOverlay"
             class="sheet-overlay sheet-action hidden"
           >
-            <div
-              class="sheet"
-              style="height: auto; max-height: 55vh; min-height: 0"
-            >
-              <div
-                class="sheet-header"
-                style="padding-top: 4px; padding-bottom: 6px"
-              >
-                <div
-                  class="sheet-handle"
-                  style="margin: 4px auto 8px; width: 32px; height: 3px"
-                ></div>
+            <div class="sheet">
+              <div class="sheet-header">
+                <div class="sheet-handle"></div>
                 <h3
                   class="font-display text-[15px] font-extrabold text-center"
                   id="shodMemberActionTitle"
@@ -1955,22 +1987,26 @@
             <div class="sheet">
               <div class="sheet-header sheet-header-action">
                 <div class="sheet-handle"></div>
+
                 <h3 class="sheet-title" id="shodPaymentDetailTitle">
                   Detail Pembayaran
                 </h3>
+
                 <p class="sheet-subtitle" id="shodPaymentDetailMeta">
                   Memuat...
                 </p>
               </div>
 
               <div class="sheet-scroll">
+                <!-- DETAIL PEMBAYARAN -->
                 <div id="shodPaymentDetailBody" class="space-y-2"></div>
 
-                <div class="card p-1 divide-y divide-[color:var(--line)] mt-4">
+                <!-- ACTION -->
+                <div class="action-list">
                   <button
                     type="button"
                     id="btnShodEditPayment"
-                    class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+                    class="action-item"
                   >
                     <span class="icon-btn" style="pointer-events: none">
                       <svg
@@ -1986,16 +2022,18 @@
                         />
                       </svg>
                     </span>
-                    <span class="font-display text-[13.5px] font-bold flex-1"
-                      >Edit Pembayaran</span
-                    >
+
+                    <span> Edit Pembayaran </span>
+
                     <svg
+                      class="action-chevron"
                       width="14"
                       height="14"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="var(--ink-faint)"
-                      stroke-width="1.5"
+                      stroke-width="1.7"
+                      aria-hidden="true"
                     >
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -2004,8 +2042,7 @@
                   <button
                     type="button"
                     id="btnShodReversePayment"
-                    class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-                    style="color: var(--neg)"
+                    class="action-item danger"
                   >
                     <span
                       class="icon-btn"
@@ -2020,36 +2057,38 @@
                         stroke-width="2"
                       >
                         <path
-                          d="M3 10h18M3 6h18M5 14h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 1 2-2z"
+                          d="M3 10h18M3 6h18M5 14h14a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 1 2-2v-3z"
                         />
                         <path d="M12 8v4" />
                         <path d="M12 16h.01" />
                       </svg>
                     </span>
-                    <span class="font-display text-[13.5px] font-bold flex-1"
-                      >Reversal Pembayaran</span
-                    >
+
+                    <span> Reversal Pembayaran </span>
+
                     <svg
+                      class="action-chevron"
                       width="14"
                       height="14"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="var(--neg)"
-                      stroke-width="1.5"
+                      stroke-width="1.7"
+                      aria-hidden="true"
                     >
                       <path d="M9 18l6-6-6-6" />
                     </svg>
                   </button>
                 </div>
-
-                <button
-                  type="button"
-                  id="btnCloseShodPaymentDetail"
-                  class="btn-ghost w-full mt-3"
-                >
-                  Tutup
-                </button>
               </div>
+
+              <button
+                type="button"
+                id="btnCloseShodPaymentDetail"
+                class="btn-ghost w-full mt-3"
+              >
+                Tutup
+              </button>
             </div>
           </div>
         </section>
@@ -2361,83 +2400,124 @@
             <p class="sheet-subtitle" id="txActionSubtitle"></p>
           </div>
 
-          <div class="card p-1 divide-y divide-[color:var(--line)]">
-            <button
-              type="button"
-              id="btnActionEdit"
-              class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-            >
-              <span class="icon-btn" style="pointer-events: none">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
-                  />
-                </svg>
-              </span>
-              <span class="font-display text-[13.5px] font-bold flex-1"
-                >Edit Transaksi</span
+          <div class="sheet-scroll">
+            <div class="action-list">
+              <button
+                type="button"
+                id="btnActionEdit"
+                class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
               >
-            </button>
+                <span class="icon-btn" style="pointer-events: none">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                    />
+                  </svg>
+                </span>
+                <span class="font-display text-[13.5px] font-bold flex-1"
+                  >Edit Transaksi</span
+                >
 
-            <button
-              type="button"
-              id="btnActionDuplicate"
-              class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-            >
-              <span class="icon-btn" style="pointer-events: none">
                 <svg
-                  width="15"
-                  height="15"
+                  class="action-chevron"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
+                  stroke="var(--ink-faint)"
+                  stroke-width="1.7"
+                  aria-hidden="true"
                 >
-                  <rect x="8" y="8" width="12" height="12" rx="2" />
-                  <path
-                    d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
-                  />
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
-              </span>
-              <span class="font-display text-[13.5px] font-bold flex-1"
-                >Duplikasi Transaksi</span
-              >
-            </button>
+              </button>
 
-            <button
-              type="button"
-              id="btnActionDelete"
-              class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
-              style="color: var(--neg)"
-            >
-              <span
-                class="icon-btn"
-                style="pointer-events: none; color: var(--neg)"
+              <button
+                type="button"
+                id="btnActionDuplicate"
+                class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
               >
+                <span class="icon-btn" style="pointer-events: none">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="8" y="8" width="12" height="12" rx="2" />
+                    <path
+                      d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
+                    />
+                  </svg>
+                </span>
+                <span class="font-display text-[13.5px] font-bold flex-1"
+                  >Duplikasi Transaksi</span
+                >
+
                 <svg
-                  width="15"
-                  height="15"
+                  class="action-chevron"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
+                  stroke="var(--ink-faint)"
+                  stroke-width="1.7"
+                  aria-hidden="true"
                 >
-                  <path
-                    d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
-                  />
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
-              </span>
-              <span class="font-display text-[13.5px] font-bold flex-1"
-                >Hapus Transaksi</span
+              </button>
+
+              <button
+                type="button"
+                id="btnActionDelete"
+                class="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+                style="color: var(--neg)"
               >
-            </button>
+                <span
+                  class="icon-btn"
+                  style="pointer-events: none; color: var(--neg)"
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
+                    />
+                  </svg>
+                </span>
+                <span class="font-display text-[13.5px] font-bold flex-1"
+                  >Hapus Transaksi</span
+                >
+
+                <svg
+                  class="action-chevron"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--ink-faint)"
+                  stroke-width="1.7"
+                  aria-hidden="true"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <button

@@ -3215,7 +3215,7 @@ html[data-theme="dark"] #shodMembersList .tx-card:active {
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
-  padding: 12px 4px !important;
+  padding: 4px 4px !important;
   border-bottom: 1px solid var(--line) !important;
 }
 
@@ -3731,5 +3731,651 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
   #carryForwardOverlay .modal-actions .btn-primary {
     font-size: 11px !important;
     padding: 10px 0 !important;
+  }
+}
+
+/* =========================================================
+   SHEET SYSTEM — FINAL CONSISTENT OVERRIDES
+   ========================================================= */
+
+/* All bottom-sheet overlays use the same backdrop behavior. */
+body > .sheet-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 500 !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.42) !important;
+  padding: 0 !important;
+}
+
+body > .sheet-overlay.hidden {
+  display: none !important;
+}
+
+/* One consistent base for all sheets. */
+body > .sheet-overlay > .sheet {
+  width: min(100%, 480px) !important;
+  margin: 0 auto !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+  border-bottom: 0 !important;
+  border-radius: 18px 18px 0 0 !important;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+/* Action sheets: Member Action + Transaction Action. */
+body > .sheet-overlay.sheet-action > .sheet {
+  max-height: 58vh !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 8px 16px calc(12px + env(safe-area-inset-bottom)) !important;
+}
+
+body > .sheet-overlay.sheet-action .sheet-header-action,
+body > .sheet-overlay.sheet-action .sheet-header:not(.sheet-header-payment) {
+  display: block !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 2px 0 10px !important;
+}
+
+body > .sheet-overlay.sheet-action .sheet-handle {
+  width: 32px !important;
+  height: 3px !important;
+  margin: 2px auto 8px !important;
+  border-radius: 999px !important;
+  background: var(--line) !important;
+}
+
+body > .sheet-overlay.sheet-action .sheet-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 15px !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--ink) !important;
+}
+
+body > .sheet-overlay.sheet-action .sheet-subtitle {
+  margin: 3px 0 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  font-weight: 500 !important;
+  color: var(--ink-soft) !important;
+}
+
+/* Keep action content spacing identical. */
+body > .sheet-overlay.sheet-action .sheet-scroll {
+  margin: 0 !important;
+  padding: 0 0 calc(4px + env(safe-area-inset-bottom)) !important;
+  overflow-y: auto !important;
+}
+
+body > .sheet-overlay.sheet-action .action-item {
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 8px 10px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+body > .sheet-overlay.sheet-action .action-item .action-icon {
+  width: 32px !important;
+  height: 32px !important;
+  flex: 0 0 32px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+}
+
+body > .sheet-overlay.sheet-action .action-item .action-label {
+  flex: 1 !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+}
+
+body > .sheet-overlay.sheet-action .btn-cancel {
+  width: 100% !important;
+  min-height: 42px !important;
+  margin: 6px 0 0 !important;
+  padding: 10px 0 !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+}
+
+/* Payment/Member detail sheets: same typography, only taller. */
+body > #shodPaymentDetailOverlay > .sheet,
+body > #shodMemberDetailOverlay > .sheet {
+  max-height: 78dvh !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 8px 16px calc(12px + env(safe-area-inset-bottom)) !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-header-payment,
+body > #shodMemberDetailOverlay .sheet-header-payment,
+body > #shodPaymentDetailOverlay .sheet-header,
+body > #shodMemberDetailOverlay .sheet-header {
+  margin: 0 !important;
+  padding: 2px 0 12px !important;
+  text-align: center !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-handle,
+body > #shodMemberDetailOverlay .sheet-handle {
+  width: 32px !important;
+  height: 3px !important;
+  margin: 2px auto 9px !important;
+  border-radius: 999px !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-title,
+body > #shodMemberDetailOverlay .sheet-title {
+  margin: 0 !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 15px !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--ink) !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-subtitle,
+body > #shodMemberDetailOverlay .sheet-subtitle {
+  margin: 3px 0 0 !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  color: var(--ink-soft) !important;
+}
+
+body > #shodPaymentDetailOverlay .sheet-scroll,
+body > #shodMemberDetailOverlay .sheet-scroll {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 480px) {
+  body > .sheet-overlay > .sheet {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+}
+
+@media (max-width: 380px) {
+  body > .sheet-overlay.sheet-action > .sheet {
+    max-height: 60vh !important;
+  }
+}
+
+/* =========================================================
+   MEMBER ACTION — FINAL COMPACT NORMALIZATION
+   ========================================================= */
+body > #shodMemberActionOverlay > .sheet {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  padding: 6px 16px 6px !important;
+  overflow: hidden !important;
+}
+
+body > #shodMemberActionOverlay .sheet-header {
+  padding: 2px 0 8px !important;
+  margin: 0 !important;
+}
+
+body > #shodMemberActionOverlay .sheet-handle {
+  width: 32px !important;
+  height: 3px !important;
+  margin: 2px auto 7px !important;
+}
+
+body > #shodMemberActionOverlay .sheet-title {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+body > #shodMemberActionOverlay .sheet-subtitle {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  font-weight: 500 !important;
+  margin: 3px 0 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+body > #shodMemberActionOverlay .sheet-scroll {
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body > #shodMemberActionOverlay .member-action-list {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 4px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: var(--surface) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+body > #shodMemberActionOverlay .member-action-list .action-item {
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  margin: 0 !important;
+  padding: 5px 10px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+}
+
+body
+  > #shodMemberActionOverlay
+  .member-action-list
+  .action-item
+  + .action-item {
+  border-top: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+}
+
+body > #shodMemberActionOverlay .member-action-list .action-item:hover {
+  background: var(--surface-alt) !important;
+}
+
+body > #shodMemberActionOverlay .member-action-list .action-item.danger {
+  color: var(--neg) !important;
+}
+
+body > #shodMemberActionOverlay .member-action-list .action-item .icon-btn {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  flex: 0 0 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
+body > #shodMemberActionOverlay .member-action-list .action-item .icon-btn svg {
+  width: 13px !important;
+  height: 13px !important;
+  display: block !important;
+}
+
+body
+  > #shodMemberActionOverlay
+  .member-action-list
+  .action-item
+  > span:nth-child(2) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  color: inherit !important;
+}
+
+body
+  > #shodMemberActionOverlay
+  .member-action-list
+  .action-item
+  > svg:last-child {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  margin: 0 !important;
+}
+
+body > #shodMemberActionOverlay .btn-cancel {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 9px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+}
+
+body > #shodMemberActionOverlay .btn-cancel:hover {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+@media (max-width: 480px) {
+  body > #shodMemberActionOverlay > .sheet {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-bottom: 6px !important;
+  }
+}
+
+/* =========================================================
+   V3 — ACTION BUTTON GEOMETRY
+   Member Action and Transaction Action use exactly the same
+   button box model, spacing, typography and right chevron.
+   ========================================================= */
+
+/* Same content area for both action sheets. */
+body > #shodMemberActionOverlay .sheet-scroll,
+body > #txActionOverlay .sheet-scroll {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+}
+
+/* Same action list box. */
+body > #shodMemberActionOverlay .member-action-list,
+body > #txActionOverlay .action-list {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 4px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: var(--surface) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* EXACT same button geometry. */
+body > #shodMemberActionOverlay .action-item,
+body > #txActionOverlay .action-item,
+body > #txActionOverlay .action-list > button {
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+  color: var(--ink) !important;
+}
+
+/* Equal vertical separators, no external margins. */
+body > #shodMemberActionOverlay .action-item + .action-item,
+body > #txActionOverlay .action-list > button + button {
+  border-top: 1px solid var(--line) !important;
+}
+
+/* Equal icon box. */
+body > #shodMemberActionOverlay .action-item .icon-btn,
+body > #txActionOverlay .action-list > button .icon-btn {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  flex: 0 0 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* Equal icon glyph. */
+body > #shodMemberActionOverlay .action-item .icon-btn svg,
+body > #txActionOverlay .action-list > button .icon-btn svg {
+  width: 13px !important;
+  height: 13px !important;
+  display: block !important;
+}
+
+/* Equal text column. */
+body > #shodMemberActionOverlay .action-item > span:nth-child(2),
+body > #txActionOverlay .action-list > button > span:nth-child(2) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  color: inherit !important;
+}
+
+/* Member already has SVG chevrons; normalize them. */
+body > #shodMemberActionOverlay .action-item > svg:last-child {
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+  flex: 0 0 14px !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+/* Transaction Action now gets the same chevron. */
+body > #txActionOverlay .action-chevron {
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+  flex: 0 0 14px !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+/* Delete action keeps the same geometry but red icon/arrow. */
+body > #shodMemberActionOverlay .action-item.danger,
+body > #txActionOverlay #btnActionDelete {
+  color: var(--neg) !important;
+}
+
+body > #shodMemberActionOverlay .action-item.danger > svg:last-child,
+body > #txActionOverlay #btnActionDelete .action-chevron {
+  color: var(--neg) !important;
+}
+
+/* Same cancel button geometry in both sheets. */
+body > #shodMemberActionOverlay #btnMemberActionCancel,
+body > #txActionOverlay #btnActionCancel {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 9px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+}
+
+/* Remove the old card's outer geometry from Transaction Action. */
+body > #txActionOverlay > .sheet > .card {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Keep the action sheet itself tight; no artificial bottom whitespace. */
+body > #shodMemberActionOverlay > .sheet,
+body > #txActionOverlay > .sheet {
+  padding-bottom: 10px !important;
+}
+
+@media (max-width: 480px) {
+  body > #shodMemberActionOverlay .action-item,
+  body > #txActionOverlay .action-list > button {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+
+  body > #shodMemberActionOverlay #btnMemberActionCancel,
+  body > #txActionOverlay #btnActionCancel {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    margin-top: 6px !important;
+    padding: 0 !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Chart Modern Styles */
+#saldoChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Tooltip custom */
+.chart-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.chart-tooltip .label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.chart-tooltip .value {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "JetBrains Mono", monospace;
+  margin-top: 2px;
+}
+
+/* Hover effect untuk chart */
+#saldoChart:hover {
+  cursor: crosshair;
+}
+
+/* Skeleton untuk chart */
+.chart-skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .chart-header .chart-value {
+    font-size: 15px;
   }
 }
