@@ -1656,7 +1656,7 @@ html[data-theme="dark"] #toast {
 #printArea th,
 #printArea td {
   border-bottom: 0.5px solid #cbd5e1;
-  padding: 4.5px 4px;
+  padding: 4px 4px;
   text-align: left;
   overflow: hidden;
   white-space: nowrap;
@@ -1682,13 +1682,12 @@ html[data-theme="dark"] #toast {
   background: #16a34a !important;
   color: #ffffff !important;
   border-bottom: 1px solid #16a34a;
-  border-top: 2px solid #1e293b;
 }
 
 #printArea tfoot tr.print-total-saldo td {
   background: #12833d !important;
   color: #ffffff !important;
-  border-top: 2px solid #1e293b;
+
   border-bottom: 2px solid #1e293b;
 }
 
