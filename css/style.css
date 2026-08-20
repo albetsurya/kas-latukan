@@ -2436,8 +2436,78 @@ html[data-theme="dark"] .filter-dropdown-menu {
   z-index: 310;
 }
 
+/* ============================================================
+   FIX: Dropdown tidak tertutup komponen lain
+   ============================================================ */
+
+/* Card filter harus memiliki stacking context yang lebih tinggi */
+#screen-shodaqoh .card:has(.filter-group) {
+  position: relative;
+  z-index: 50;
+  overflow: visible !important;
+}
+
+/* Setiap filter-group harus independent */
+#screen-shodaqoh .filter-group {
+  position: relative;
+  z-index: auto;
+}
+
+/* Setiap dropdown yang terbuka harus di atas segalanya */
+#screen-shodaqoh .filter-dropdown.open {
+  z-index: 100 !important;
+}
+
+/* Dropdown menu harus memiliki z-index yang sangat tinggi */
 #screen-shodaqoh .filter-dropdown-menu {
-  z-index: 320;
+  z-index: 300 !important;
+  position: absolute !important;
+}
+
+/* Pastikan menu tidak terpotong */
+#screen-shodaqoh .filter-dropdown.open .filter-dropdown-menu {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* Untuk dropdown yang berada di sebelah kanan, menu muncul ke kiri */
+#shodYearDropdown.open .filter-dropdown-menu,
+#shodMonthDropdown.open .filter-dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+/* Dropdown anggota dan status - biarkan di kiri */
+#shodMemberDropdown.open .filter-dropdown-menu,
+#shodStatusDropdown.open .filter-dropdown-menu {
+  left: 0;
+  right: auto;
+}
+
+/* Agar grid tidak memotong dropdown */
+#screen-shodaqoh .grid {
+  position: relative;
+  z-index: 1;
+}
+
+/* Setiap filter-group di grid harus bisa menampung dropdown */
+#screen-shodaqoh .grid .filter-group {
+  position: relative;
+  z-index: 1;
+}
+
+/* Saat dropdown terbuka, naikkan z-index */
+#screen-shodaqoh .grid .filter-group:has(.filter-dropdown.open) {
+  z-index: 200 !important;
+}
+
+/* Pastikan menu dropdown muncul di atas semua elemen lain */
+#screen-shodaqoh .filter-dropdown-menu {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-width: 180px;
 }
 
 #shodaqohPaymentOverlay {
