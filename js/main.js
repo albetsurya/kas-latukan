@@ -2506,7 +2506,7 @@ function renderShodaqohMonitoring() {
     return "—";
   }
 
-  // TAMPILAN TABLE - dengan kolom Total Paid
+  // TAMPILAN TABLE - dengan klik untuk buka detail pembayaran
   body.innerHTML = rows
     .map(function (r) {
       let formattedDate = "—";
@@ -2520,8 +2520,17 @@ function renderShodaqohMonitoring() {
       const badgeClass = getBadgeClass(r);
       const badgeLabel = getBadgeLabel(r);
       const totalPaid = r.total_paid || 0;
+      const paymentId = r.payment_id || "";
 
-      return `<tr class="border-t border-[color:var(--line)]">
+      // Jika ada payment_id, klik akan buka detail payment
+      // Jika tidak ada (BELUM), klik akan buka form input pembayaran
+      const clickAction = paymentId
+        ? `openShodaqohPaymentDetail('${escapeHtml(paymentId)}')`
+        : `showToast('Member ini belum melakukan pembayaran untuk bulan ini', 'warning')`;
+
+      return `<tr class="border-t border-[color:var(--line)] cursor-pointer hover:bg-[color:var(--surface-hover)] transition-colors" 
+              onclick="${clickAction}"
+              title="${paymentId ? "Klik untuk lihat detail pembayaran" : "Belum ada pembayaran"}">
         <td class="py-1.5 pr-2 font-semibold text-[10.5px] truncate max-w-[120px]">${escapeHtml(r.nama)}</td>
         <td class="py-1.5 mono text-[9.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(r.target)}</td>
         <td class="py-1.5 mono text-[9.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(totalPaid)}</td>
@@ -2537,6 +2546,19 @@ function renderShodaqohMonitoring() {
     })
     .join("");
 }
+
+// Tambahkan CSS untuk hover effect
+const hoverStyle = document.createElement("style");
+hoverStyle.textContent = `
+  #shodMonitoringBody tr:hover {
+    background-color: var(--surface-hover);
+    transition: background-color 0.15s ease;
+  }
+  #shodMonitoringBody tr {
+    cursor: pointer;
+  }
+`;
+document.head.appendChild(hoverStyle);
 
 function renderShodaqohMembers() {
   const body = $("shodMembersList");
@@ -4775,10 +4797,15 @@ async function openShodaqohMemberDetail(memberId) {
             () => `
           <tr class="skeleton-row border-t border-[color:var(--line)]">
             <td class="py-2"><div class="skeleton-line medium"></div></td>
-            <td class="py-2"><div class="skeleton-line long"></div></td>
-            <td class="py-2"><div class="skeleton-line short"></div></td>
             <td class="py-2"><div class="skeleton-line medium"></div></td>
-            <td class="py-2"><div class="skeleton-line short"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
+            <td class="py-2"><div class="skeleton-line long"></div></td>
           </tr>
         `,
           )
@@ -4833,12 +4860,19 @@ async function openShodaqohMemberDetail(memberId) {
       if (obligations.length === 0) {
         body.innerHTML = `
           <tr>
-            <td colspan="5" class="py-8 text-center text-xs text-[color:var(--ink-faint)]">
+            <td colspan="10" class="py-8 text-center text-xs text-[color:var(--ink-faint)]">
               Belum ada data kewajiban.
             </td>
           </tr>
         `;
       } else {
+        // Ambil data payments untuk mendapatkan rincian
+        const payments = d.payments || [];
+        const paymentMap = {};
+        payments.forEach(function (p) {
+          paymentMap[p.payment_id] = p;
+        });
+
         body.innerHTML = obligations
           .map(function (o) {
             let allocatedAt = o.allocated_at || "—";
@@ -4853,16 +4887,76 @@ async function openShodaqohMemberDetail(memberId) {
             const obStatusClass = isLunas ? "status-active" : "status-inactive";
             const obStatusLabel = isLunas ? "Lunas" : "Belum";
 
+            // Ambil rincian dari payment jika ada
+            let ir = 0;
+            let uangSambung = 0;
+            let jimpitan = 0;
+            let siarSiar = 0;
+            let seribuan = 0;
+            let kafan = 0;
+            let ukhroMt = 0;
+
+            if (o.payment_id && paymentMap[o.payment_id]) {
+              const p = paymentMap[o.payment_id];
+              // IR = susulan_ir × jumlah bulan susulan
+              const susulanBulan = p.susulan_bulan
+                ? p.susulan_bulan.split(",").filter(function (b) {
+                    return b.trim();
+                  })
+                : [];
+              const bulanCount =
+                susulanBulan.length > 0 ? susulanBulan.length : 1;
+              ir = (p.susulan_ir || 0) * bulanCount;
+              uangSambung = p.uang_sambung || 0;
+              jimpitan = p.jimpitan || 0;
+              siarSiar = p.siar_siar || 0;
+              seribuan = p.seribuan || 0;
+              kafan = p.kafan || 0;
+              ukhroMt = p.ukhro_mt || 0;
+            }
+
+            // Jika tidak ada payment_id tapi status Lunas (kemungkinan data dari monitoring)
+            if (!o.payment_id && isLunas) {
+              // Gunakan nominal target sebagai dasar
+              ir = o.nominal_target || 0;
+            }
+
+            // Hitung total
+            const total =
+              ir +
+              uangSambung +
+              jimpitan +
+              siarSiar +
+              seribuan +
+              kafan +
+              ukhroMt;
+
+            // Format angka dengan pemisah ribuan
+            const fmtNum = function (num) {
+              return num > 0 ? "Rp" + num.toLocaleString("id-ID") : "—";
+            };
+
+            // Warna khusus untuk total (highlight)
+            const totalColor = isLunas ? "var(--brand)" : "var(--ink-faint)";
+            const totalWeight = isLunas ? "bold" : "normal";
+
             return `<tr class="border-t border-[color:var(--line)]">
-              <td class="py-2 font-medium">${escapeHtml(fmtMonthYear(o.periode))}</td>
-              <td class="py-2 mono">${fmtRp(o.nominal_target)}</td>
+              <td class="py-2 font-medium whitespace-nowrap">${escapeHtml(fmtMonthYear(o.periode))}</td>
               <td class="py-2">
                 <span class="status-pill ${obStatusClass}" style="font-size:8px;padding:2px 10px;">
                   ${escapeHtml(obStatusLabel)}
                 </span>
               </td>
-              <td class="py-2 mono text-[color:var(--ink-soft)]">${escapeHtml(o.payment_id || "—")}</td>
-              <td class="py-2 text-[color:var(--ink-soft)]">${escapeHtml(allocatedAt)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(ir)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(uangSambung)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(jimpitan)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(siarSiar)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(seribuan)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(kafan)}</td>
+              <td class="py-2 mono text-right text-[color:var(--ink-soft)]" style="font-size:9px;">${fmtNum(ukhroMt)}</td>
+              <td class="py-2 mono text-right font-${totalWeight}" style="font-size:10px;color:${totalColor};">
+                ${total > 0 ? "Rp" + total.toLocaleString("id-ID") : "—"}
+              </td>
             </tr>`;
           })
           .join("");
@@ -4873,7 +4967,7 @@ async function openShodaqohMemberDetail(memberId) {
     if (body) {
       body.innerHTML = `
         <tr>
-          <td colspan="5" class="py-8 text-center">
+          <td colspan="10" class="py-8 text-center">
             <p class="text-xs text-[color:var(--neg)]">Gagal memuat data: ${escapeHtml(err.message)}</p>
             <button type="button" id="btnRetryMemberDetail" class="mt-3 p-3 text-xs font-bold" style="color:var(--brand);">
               Coba lagi
