@@ -21,6 +21,7 @@ let state = {
   carryForwardNextMonth: null,
   shodaqoh: {
     loaded: false,
+    loadingPromise: null,
     currentMonth: "",
     selectedMonth: "",
     dashboard: {},
@@ -1871,10 +1872,6 @@ function switchTab(tab) {
   document.querySelector("main")?.scrollTo({
     top: 0,
   });
-
-  if (tab === "shodaqoh" && !state.shodaqoh.loaded) {
-    loadShodaqohData();
-  }
 }
 
 function updateFabVisibility() {
@@ -2222,11 +2219,85 @@ function setAdminUI(isAdmin, nama) {
 
 function enterApp() {
   // Fungsi ini dipanggil setelah login berhasil
-  // Hanya refresh auth gate
+
+  // Inisialisasi router
+  if (typeof window.initRouter === "function") {
+    window.initRouter();
+  }
+
+  // Refresh auth gate
   if (window.__refreshAuthGate) {
     window.__refreshAuthGate();
   }
 }
+
+// ============================================================
+// NAVIGASI PROGRAMATIK (untuk digunakan di mana saja)
+// ============================================================
+
+// Fungsi navigasi global
+window.navigateTo = function (route) {
+  if (router && typeof router.navigateTo === "function") {
+    router.navigateTo(route);
+  }
+};
+
+// ============================================================
+// UPDATE switchTab - Gunakan Router jika tersedia
+// ============================================================
+
+// Simpan referensi ke switchTab asli
+const originalSwitchTab = switchTab;
+
+// Override switchTab untuk menggunakan router
+switchTab = function (tab) {
+  // Jika router tersedia dan belum dalam proses navigasi, gunakan router
+  if (router && router.initialized && !router._isNavigating) {
+    const currentRoute = router.getCurrentRoute();
+    if (currentRoute !== tab) {
+      router.navigateTo(tab);
+      return;
+    }
+  }
+
+  // Fallback ke implementasi asli
+  if (typeof originalSwitchTab === "function") {
+    originalSwitchTab(tab);
+  } else {
+    // Implementasi manual jika original tidak tersedia
+    state.activeTab = tab;
+
+    document
+      .querySelectorAll(".screen")
+      .forEach((s) => s.classList.remove("active"));
+
+    const targetScreen = $("screen-" + tab);
+    if (targetScreen) targetScreen.classList.add("active");
+
+    document
+      .querySelectorAll(".nav-btn")
+      .forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+
+    if ($("screenTitle")) {
+      const titles = {
+        home: "Beranda",
+        history: "Riwayat",
+        recap: "Rekap",
+        shodaqoh: "Shodaqoh",
+        profile: "Profil",
+      };
+      $("screenTitle").textContent = titles[tab] || tab;
+    }
+
+    updateFabVisibility();
+
+    document.querySelector("main")?.scrollTo({ top: 0 });
+
+    if (tab === "shodaqoh" && !state.shodaqoh.loaded) {
+      loadShodaqohData();
+    }
+  }
+};
 
 // ============================================================
 // INITIALIZE - Hanya event listener
@@ -2270,19 +2341,19 @@ async function loadShodaqohData(monthKey) {
       throw new Error(data.message || "Gagal memuat data");
     }
 
-    // HAPUS SKELETON DAN TAMPILKAN KONTEN ASLI
+    if (state.shodaqoh.loadingPromise) {
+      return state.shodaqoh.loadingPromise;
+    }
+
     const container = document.querySelector("#screen-shodaqoh");
     if (container) {
-      // Hapus wrapper skeleton
       container
         .querySelectorAll(".shod-skeleton-wrapper")
         .forEach((el) => el.remove());
 
-      // Tampilkan kembali semua konten asli
       const children = container.children;
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        // Hanya tampilkan yang bukan skeleton wrapper
         if (
           !child.classList ||
           !child.classList.contains("shod-skeleton-wrapper")
@@ -2446,7 +2517,6 @@ function renderShodaqohMonitoring() {
     return true;
   });
 
-  // Hitung statistik
   const totalMembers = state.shodaqoh.monitoring?.length || 0;
   const lunasCount = rows.filter((r) => r.status === "LUNAS").length;
   const belumCount = rows.filter(
@@ -2454,33 +2524,31 @@ function renderShodaqohMonitoring() {
   ).length;
   const filteredCount = rows.length;
 
-  // Update header
   const headerEl = document.querySelector(".shod-monitoring-header");
   if (headerEl) {
     headerEl.innerHTML = `
       <div>
-        <span class="text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
+        <span class="text-[12px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]">
           Monitoring
         </span>
-        <span class="text-[9px] text-[color:var(--ink-faint)] ml-2">
+        <span class="text-[10px] text-[color:var(--ink-faint)] ml-2">
           ${filteredCount} dari ${totalMembers} anggota
         </span>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-[9px] text-[color:var(--pos)]">● ${lunasCount} Lunas</span>
-        <span class="text-[9px] text-[color:var(--neg)]">● ${belumCount} Belum</span>
+        <span class="text-[10px] text-[color:var(--pos)]">● ${lunasCount} Lunas</span>
+        <span class="text-[10px] text-[color:var(--neg)]">● ${belumCount} Belum</span>
       </div>
     `;
   }
 
   if (rows.length === 0) {
-    body.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-[9px] text-[color:var(--ink-faint)]">
+    body.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-[11px] text-[color:var(--ink-faint)]">
       Tidak ada data sesuai filter.
     </td></tr>`;
     return;
   }
 
-  // Fungsi untuk menentukan warna badge berdasarkan status
   function getBadgeClass(r) {
     const totalPaid = r.total_paid || 0;
     const target = r.target || 0;
@@ -2493,7 +2561,6 @@ function renderShodaqohMonitoring() {
     return "badge-secondary";
   }
 
-  // Fungsi untuk label badge
   function getBadgeLabel(r) {
     const totalPaid = r.total_paid || 0;
     const target = r.target || 0;
@@ -2506,7 +2573,6 @@ function renderShodaqohMonitoring() {
     return "—";
   }
 
-  // TAMPILAN TABLE - dengan klik untuk buka detail pembayaran
   body.innerHTML = rows
     .map(function (r) {
       let formattedDate = "—";
@@ -2522,8 +2588,6 @@ function renderShodaqohMonitoring() {
       const totalPaid = r.total_paid || 0;
       const paymentId = r.payment_id || "";
 
-      // Jika ada payment_id, klik akan buka detail payment
-      // Jika tidak ada (BELUM), klik akan buka form input pembayaran
       const clickAction = paymentId
         ? `openShodaqohPaymentDetail('${escapeHtml(paymentId)}')`
         : `showToast('Member ini belum melakukan pembayaran untuk bulan ini', 'warning')`;
@@ -2531,15 +2595,15 @@ function renderShodaqohMonitoring() {
       return `<tr class="border-t border-[color:var(--line)] cursor-pointer hover:bg-[color:var(--surface-hover)] transition-colors" 
               onclick="${clickAction}"
               title="${paymentId ? "Klik untuk lihat detail pembayaran" : "Belum ada pembayaran"}">
-        <td class="py-1.5 pr-2 font-semibold text-[10.5px] truncate max-w-[120px]">${escapeHtml(r.nama)}</td>
-        <td class="py-1.5 mono text-[9.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(r.target)}</td>
-        <td class="py-1.5 mono text-[9.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(totalPaid)}</td>
-        <td class="py-1.5 text-center whitespace-nowrap">
-          <span class="badge-status ${badgeClass}" style="font-size:7px;padding:1.5px 7px;border-radius:999px;font-weight:600;white-space:nowrap;display:inline-block;">
+        <td class="py-2.5 pr-2 font-semibold text-[12px] truncate max-w-[80px]">${escapeHtml(r.nama)}</td>
+        <td class="py-2.5 mono text-[11.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(r.target)}</td>
+        <td class="py-2.5 mono text-[11.5px] text-right tabular-nums whitespace-nowrap">${fmtRp(totalPaid)}</td>
+        <td class="py-2.5 text-center whitespace-nowrap">
+          <span class="badge-status ${badgeClass}" style="font-size:8.5px;padding:2.5px 10px;border-radius:999px;font-weight:600;white-space:nowrap;display:inline-block;">
             ${badgeLabel}
           </span>
         </td>
-        <td class="py-1.5 text-[8.5px] text-[color:var(--ink-soft)] whitespace-nowrap">
+        <td class="py-2.5 text-[10px] text-[color:var(--ink-soft)] whitespace-nowrap">
           ${formattedDate}
         </td>
       </tr>`;

@@ -250,6 +250,39 @@ html.authenticated #shell:not(.hidden) {
   padding: 24px 20px;
 }
 
+.nav-btn.active {
+  color: var(--brand) !important;
+}
+
+.nav-btn.active .nav-pill {
+  background: var(--brand-soft) !important;
+}
+
+.nav-btn.active .nav-pill svg {
+  stroke: var(--brand) !important;
+}
+
+/* Animasi transisi screen */
+.screen {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 #shell {
   width: 100%;
   max-width: 480px;
@@ -5039,13 +5072,13 @@ body > #txActionOverlay > .sheet {
 /* Responsive */
 @media (max-width: 480px) {
   #shodMonitoringBody tr td {
-    padding: 3px 4px !important;
-    font-size: 8.5px !important;
+    padding: 5px 6px !important;
+    font-size: 10px !important;
   }
 
   .badge-status {
-    font-size: 6.5px !important;
-    padding: 1px 5px !important;
+    font-size: 7.5px !important;
+    padding: 2px 5px !important;
   }
 }
 

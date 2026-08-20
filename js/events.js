@@ -74,12 +74,48 @@ document.addEventListener("DOMContentLoaded", () => {
   if ($("searchInput"))
     $("searchInput").addEventListener("input", applyFilters);
 
-  if ($("btnSeeAll"))
-    $("btnSeeAll").addEventListener("click", () => switchTab("history"));
-
   document.querySelectorAll(".nav-btn").forEach((btn) => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      if (tab) {
+        router.navigateTo(tab);
+      }
+    });
   });
+
+  if ($("btnSeeAll")) {
+    $("btnSeeAll").addEventListener("click", () => {
+      router.navigateTo("history");
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const recapBtn = e.target.closest(".recap-open-history");
+    if (recapBtn) {
+      e.preventDefault();
+      const month = recapBtn.dataset.month;
+      if (month) {
+        state.selectedMonth = month;
+        renderAllMonthChipRows();
+        refreshScopedUI();
+        router.navigateTo("history");
+      }
+    }
+  });
+
+  window.initRouter = function () {
+    if (!router.initialized) {
+      router.on("routeChange", ({ tab }) => {
+        if (tab === "shodaqoh" && !state.shodaqoh.loaded) {
+          loadShodaqohData();
+        }
+
+        updateFabVisibility();
+      });
+
+      router.init();
+    }
+  };
 
   if ($("fabPrint")) {
     $("fabPrint").addEventListener("click", () => {
