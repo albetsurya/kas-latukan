@@ -486,6 +486,12 @@ async function manualSync() {
 // ============================================================
 
 async function loadData() {
+  // Cek apakah benar-benar authenticated
+  if (!document.documentElement.classList.contains("authenticated")) {
+    console.warn("loadData dipanggil tanpa authenticated");
+    return;
+  }
+
   if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
     if ($("configWarning")) $("configWarning").classList.remove("hidden");
     renderTxList([], "txList", "txEmpty");
@@ -496,10 +502,10 @@ async function loadData() {
   renderHistorySkeleton();
   renderRecapSkeleton();
 
-  await refreshAllData(); // Hanya refresh kas, bukan shodaqoh
-
-  // Update last sync
+  await refreshAllData();
   updateLastSyncTime();
+
+  // Shodaqoh akan di-load oleh switchTab jika diperlukan
 }
 
 function getMonthsDesc() {
@@ -2215,18 +2221,27 @@ function setAdminUI(isAdmin, nama) {
 }
 
 function enterApp() {
-  document.documentElement.classList.add("authenticated");
-
-  document.documentElement.classList.remove("auth-locked");
-
-  if ($("authScreen")) $("authScreen").classList.add("hidden");
-
-  if ($("shell")) $("shell").classList.remove("hidden");
-
-  switchTab("home");
-
-  loadData();
+  // Fungsi ini dipanggil setelah login berhasil
+  // Hanya refresh auth gate
+  if (window.__refreshAuthGate) {
+    window.__refreshAuthGate();
+  }
 }
+
+// ============================================================
+// INITIALIZE - Hanya event listener
+// ============================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Cek apakah sudah authenticated
+  if (!document.documentElement.classList.contains("authenticated")) {
+    // Jika belum, jangan jalankan apapun yang butuh auth
+    return;
+  }
+
+  // Hanya jalankan jika sudah authenticated
+  setupEventListeners();
+});
 
 function setTxJenis(jenis) {
   state.txJenis = jenis;

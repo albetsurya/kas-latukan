@@ -139,13 +139,101 @@ body,
     box-shadow 0.2s ease;
 }
 
+/* ============================================================
+   AUTH SCREEN - PASTIKAN TIDAK FLASH
+   ============================================================ */
+
 #authScreen {
+  display: none !important;
   min-height: 100dvh;
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
   background: var(--bg);
+}
+
+#authScreen:not(.hidden) {
+  display: flex !important;
+}
+
+#shell {
+  display: none !important;
+}
+
+#shell:not(.hidden) {
+  display: flex !important;
+}
+
+/* Auth locked state - pastikan priority */
+html.auth-locked #shell {
+  display: none !important;
+}
+
+html.auth-locked #authScreen:not(.hidden) {
+  display: flex !important;
+}
+
+html.authenticated #authScreen {
+  display: none !important;
+}
+
+html.authenticated #shell:not(.hidden) {
+  display: flex !important;
+}
+
+/* Loading screen */
+#appLoader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  z-index: 999999;
+  transition: opacity 0.3s ease;
+}
+
+#appLoader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#appLoader .loader-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--line);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 12px;
+}
+
+#appLoader .loader-text {
+  text-align: center;
+  color: var(--ink-soft);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark theme untuk loader */
+[data-theme="dark"] #appLoader {
+  background: var(--bg);
+}
+
+[data-theme="dark"] #appLoader .loader-spinner {
+  border-color: var(--line);
+  border-top-color: var(--brand);
+}
+
+[data-theme="dark"] #appLoader .loader-text {
+  color: var(--ink-soft);
 }
 
 #authScreen.hidden {

@@ -26,9 +26,74 @@
     />
 
     <link rel="stylesheet" href="css/style.css" />
+    <style>
+      /* Loading screen - tampil pertama */
+      #appLoader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        z-index: 999999;
+        transition: opacity 0.3s ease;
+      }
+
+      #appLoader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #appLoader .loader-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid var(--line);
+        border-top-color: var(--brand);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin: 0 auto 12px;
+      }
+
+      #appLoader .loader-text {
+        text-align: center;
+        color: var(--ink-soft);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Auth screen - hidden by default */
+      #authScreen {
+        display: none !important;
+      }
+
+      #authScreen:not(.hidden) {
+        display: flex !important;
+      }
+
+      /* Shell - hidden by default */
+      #shell {
+        display: none !important;
+      }
+
+      #shell:not(.hidden) {
+        display: flex !important;
+      }
+    </style>
   </head>
 
   <body>
+    <div id="appLoader">
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Memuat aplikasi...</div>
+      </div>
+    </div>
     <div id="authScreen">
       <div id="authCard">
         <div
