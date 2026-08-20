@@ -1540,341 +1540,6 @@ html[data-theme="dark"] #toast {
   box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6);
 }
 
-#printArea {
-  display: none;
-  width: 100%;
-  transform: none;
-}
-
-/* ===== Print layout: A4 portrait, 1cm margin on every side ===== */
-@page {
-  size: A4 portrait;
-  margin: 1cm;
-}
-
-/* ============================================================
-   PRINT STYLES - Full A4 with 1cm margins
-   ============================================================ */
-
-/* Print area - pastikan di atas semua */
-#printArea {
-  display: none !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: white !important;
-  z-index: 999999 !important;
-  overflow: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  color: #1e293b !important;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-/* Saat print, sembunyikan semua kecuali print area */
-@media print {
-  body * {
-    visibility: hidden !important;
-  }
-
-  #printArea,
-  #printArea * {
-    visibility: visible !important;
-  }
-
-  #printArea {
-    display: block !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: white !important;
-    z-index: 999999 !important;
-    overflow: visible !important;
-  }
-}
-
-/* Baseline text color for every cell */
-#printArea th,
-#printArea td {
-  color: #1e293b !important;
-}
-
-#printArea * {
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-/* TABLE - Full width */
-#printArea table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 10px;
-  line-height: 1.4;
-}
-
-/* Column widths */
-#printArea col.col-no {
-  width: 5%;
-}
-#printArea col.col-tgl {
-  width: 12%;
-}
-#printArea col.col-ket {
-  width: 48%;
-}
-#printArea col.col-debet,
-#printArea col.col-kredit,
-#printArea col.col-saldo {
-  width: 11.66%;
-}
-
-/* Header styles */
-#printArea thead {
-  display: table-header-group;
-}
-
-#printArea thead th {
-  padding: 4px 4px;
-  font-size: 8.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: #1e293b !important;
-  color: #ffffff !important;
-  border-bottom: 2px solid #1e293b;
-}
-
-/* Body rows */
-#printArea th,
-#printArea td {
-  border-bottom: 0.5px solid #cbd5e1;
-  padding: 4px 4px;
-  text-align: left;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  page-break-inside: avoid;
-  vertical-align: middle;
-}
-
-/* Alternating row colors */
-#printArea tbody tr:nth-child(even) {
-  background: #f4f6f8 !important;
-}
-
-/* TFOOT - Styling */
-#printArea tfoot {
-  display: table-row-group;
-}
-
-#printArea tfoot td {
-  font-weight: 800;
-  font-size: 9px;
-  padding: 4.5px 4px;
-  background: #16a34a !important;
-  color: #ffffff !important;
-  border-bottom: 1px solid #16a34a;
-}
-
-#printArea tfoot tr.print-total-saldo td {
-  background: #12833d !important;
-  color: #ffffff !important;
-
-  border-bottom: 2px solid #1e293b;
-}
-
-/* Right-align numbers */
-#printArea table td.num,
-#printArea table th.num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Font bold helper */
-#printArea .font-bold {
-  font-weight: 800 !important;
-}
-
-/* Header */
-#printArea .print-header {
-  text-align: center;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid #1e293b;
-}
-
-#printArea .print-header h1 {
-  font-size: 14px;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: 0.5px;
-}
-
-#printArea .print-header h2 {
-  font-size: 12px;
-  font-weight: 800;
-  margin: 2px 0 0;
-  letter-spacing: 0.3px;
-}
-
-#printArea .print-header p {
-  font-size: 10px;
-  font-weight: 600;
-  margin: 3px 0 0;
-  color: #334155;
-}
-
-/* ============================================================
-   PRINT MEDIA QUERY - A4 with 1cm margins
-   ============================================================ */
-@media print {
-  /* Sembunyikan semua body */
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-  }
-
-  /* Sembunyikan semua elemen di body kecuali printArea */
-  body * {
-    visibility: hidden !important;
-  }
-
-  #printArea,
-  #printArea * {
-    visibility: visible !important;
-  }
-
-  #printArea {
-    display: block !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-    z-index: 999999 !important;
-    overflow: visible !important;
-    box-sizing: border-box !important;
-  }
-
-  #printArea .print-wrapper {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 1cm !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-  }
-
-  #printArea .print-table-wrapper {
-    display: block !important;
-    width: 100% !important;
-    flex: 1 !important;
-    overflow: visible !important;
-  }
-
-  #printArea table {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100% !important;
-    font-size: 9.5px !important;
-    line-height: 1.3 !important;
-  }
-
-  #printArea .print-header {
-    margin-bottom: 6px !important;
-    padding-bottom: 4px !important;
-  }
-
-  #printArea .print-header h1 {
-    font-size: 13px !important;
-  }
-
-  #printArea .print-header h2 {
-    font-size: 11px !important;
-  }
-
-  #printArea .print-header p {
-    font-size: 9px !important;
-    margin-top: 2px !important;
-  }
-
-  #printArea th,
-  #printArea td {
-    padding: 4px 3px !important;
-    font-size: 9px !important;
-    line-height: 1.3 !important;
-  }
-
-  #printArea thead th {
-    padding: 3.5px 3px !important;
-    font-size: 8px !important;
-  }
-
-  #printArea tfoot td {
-    padding: 4px 3px !important;
-    font-size: 9px !important;
-  }
-
-  @page {
-    size: A4 portrait;
-    margin: 1cm !important;
-    padding: 0 !important;
-  }
-
-  #printArea tbody tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  #printArea tfoot {
-    display: table-footer-group !important;
-  }
-
-  ::-webkit-scrollbar {
-    display: none !important;
-  }
-
-  #printArea tbody tr:nth-child(even) {
-    background: #f4f6f8 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  #printArea thead th {
-    background: #1e293b !important;
-    color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  #printArea tfoot td {
-    background: #16a34a !important;
-    color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  #printArea tfoot tr.print-total-saldo td {
-    background: #12833d !important;
-    color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-}
-
 .status-pill {
   display: inline-block;
   padding: 3px 10px;
@@ -4198,6 +3863,176 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   border-color: var(--pos) !important;
 }
 
+/* ============================================================
+   PRINT BUTTON STYLES
+   ============================================================ */
+
+/* Copy Button - Existing */
+#btnCopyShodaqohRekap {
+  transition: all 0.2s ease;
+}
+
+#btnCopyShodaqohRekap:hover {
+  background: var(--surface) !important;
+  border-color: var(--ink-soft) !important;
+  color: var(--ink) !important;
+  transform: scale(1.05);
+}
+
+#btnCopyShodaqohRekap:active {
+  transform: scale(0.92);
+}
+
+#btnCopyShodaqohRekap.copied {
+  background: var(--pos-soft) !important;
+  color: var(--pos) !important;
+  border-color: var(--pos) !important;
+}
+
+/* Print Button Shodaqoh */
+#btnPrintShodaqoh {
+  transition: all 0.2s ease;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#btnPrintShodaqoh:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+#btnPrintShodaqoh:active {
+  transform: scale(0.92);
+}
+
+#btnPrintShodaqoh.printing {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+  border-color: var(--brand) !important;
+  animation: printPulse 0.6s ease-in-out;
+}
+
+/* Print Button Report (Laporan Keuangan) */
+#btnPrintReport {
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 9px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#btnPrintReport:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+#btnPrintReport:active {
+  transform: scale(0.92);
+}
+
+#btnPrintReport.printing {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+  border-color: var(--brand) !important;
+  animation: printPulse 0.6s ease-in-out;
+}
+
+/* Print Animation */
+@keyframes printPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] #btnPrintShodaqoh:hover,
+[data-theme="dark"] #btnPrintReport:hover {
+  border-color: var(--brand-dark) !important;
+  color: var(--brand) !important;
+  box-shadow: 0 2px 8px rgba(40, 199, 111, 0.2);
+}
+
+[data-theme="dark"] #btnPrintShodaqoh.printing,
+[data-theme="dark"] #btnPrintReport.printing {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+  border-color: var(--brand-dark) !important;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  #btnPrintShodaqoh {
+    width: 32px;
+    height: 32px;
+  }
+
+  #btnPrintShodaqoh svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  #btnPrintReport {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+
+  #btnPrintReport svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  #btnPrintShodaqoh {
+    width: 28px;
+    height: 28px;
+  }
+
+  #btnPrintShodaqoh svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  #btnPrintReport {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+
+  #btnPrintReport svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
 #carryForwardOverlay {
   position: fixed !important;
   inset: 0 !important;
@@ -5056,6 +4891,335 @@ body > #txActionOverlay > .sheet {
   }
 }
 
+/* Named Page */
+@page finance {
+  size: A4 portrait;
+  margin: 0.5cm 0.8cm;
+}
+
+@page shodaqoh {
+  size: A4 landscape;
+  margin: 0.5cm 0.8cm;
+}
+
+/* Area print */
+#printArea {
+  page: finance;
+}
+
+#printShodaqohArea {
+  page: shodaqoh;
+}
+
+/* ============================================================
+   PRINT LAPORAN KEUANGAN - PORTRAIT A4
+   ============================================================ */
+
+/* 1. SEMBUNYIKAN DARI LAYAR APLIKASI */
+#printArea {
+  display: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: white !important;
+  z-index: 999998 !important;
+  overflow: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #1e293b !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Baseline text color for every cell */
+#printArea th,
+#printArea td {
+  color: #1e293b !important;
+}
+
+#printArea * {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* TABLE - Full width */
+#printArea table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* Column widths */
+#printArea col.col-no {
+  width: 5%;
+}
+#printArea col.col-tgl {
+  width: 12%;
+}
+#printArea col.col-ket {
+  width: 48%;
+}
+#printArea col.col-debet,
+#printArea col.col-kredit,
+#printArea col.col-saldo {
+  width: 11.66%;
+}
+
+/* Header styles */
+#printArea thead {
+  display: table-header-group;
+}
+
+#printArea thead th {
+  padding: 4px 4px;
+  font-size: 8.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1e293b;
+  text-align: center !important;
+}
+
+/* Body rows */
+#printArea th,
+#printArea td {
+  border-bottom: 0.5px solid #cbd5e1;
+  padding: 4px 4px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  page-break-inside: avoid;
+  vertical-align: middle;
+}
+
+/* Alternating row colors */
+#printArea tbody tr:nth-child(even) {
+  background: #f4f6f8 !important;
+}
+
+/* TFOOT - Styling */
+#printArea tfoot {
+  display: table-row-group;
+}
+
+#printArea tfoot td {
+  font-weight: 800;
+  font-size: 9px;
+  padding: 4.5px 4px;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #16a34a;
+  border-top: 2px solid #1e293b;
+}
+
+#printArea tfoot tr.print-total-saldo td {
+  background: #12833d !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1e293b;
+}
+
+/* Right-align numbers */
+#printArea table td.num,
+#printArea table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Font bold helper */
+#printArea .font-bold {
+  font-weight: 800 !important;
+}
+
+/* Header */
+#printArea .print-header {
+  text-align: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #1e293b;
+}
+
+#printArea .print-header h1 {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+#printArea .print-header h2 {
+  font-size: 12px;
+  font-weight: 800;
+  margin: 2px 0 0;
+  letter-spacing: 0.3px;
+}
+
+#printArea .print-header p {
+  font-size: 10px;
+  font-weight: 600;
+  margin: 3px 0 0;
+  color: #334155;
+}
+
+/* ============================================================
+   PRINT MEDIA QUERY - KHUSUS SAAT PROSES PRINT
+   ============================================================ */
+@media print {
+  body.printing-finance * {
+    visibility: hidden !important;
+  }
+
+  body.printing-finance #printArea,
+  body.printing-finance #printArea * {
+    visibility: visible !important;
+  }
+
+  body.printing-finance #printArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* #printArea,
+  #printArea * {
+    visibility: visible !important;
+  }
+
+  #printArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    z-index: 999998 !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  } */
+
+  /* WRAPPER */
+  #printArea .print-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0.8cm !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  /* TABLE WRAPPER */
+  #printArea .print-table-wrapper {
+    display: block !important;
+    width: 100% !important;
+    flex: 1 !important;
+    overflow: visible !important;
+  }
+
+  /* TABLE OVERRIDE */
+  #printArea table {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 9.5px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* HEADER OVERRIDE */
+  #printArea .print-header {
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  #printArea .print-header h1 {
+    font-size: 13px !important;
+  }
+
+  #printArea .print-header h2 {
+    font-size: 11px !important;
+  }
+
+  #printArea .print-header p {
+    font-size: 9px !important;
+    margin-top: 2px !important;
+  }
+
+  /* CELL OVERRIDE */
+  #printArea th,
+  #printArea td {
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+  }
+
+  #printArea thead th {
+    padding: 3.5px 3px !important;
+    font-size: 8px !important;
+  }
+
+  #printArea tfoot td {
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+  }
+
+  /* PAGE BREAK */
+  #printArea tbody tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #printArea tfoot {
+    display: table-footer-group !important;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* COLOR ADJUSTMENT - PASTIKAN WARNA TETAP */
+  #printArea tbody tr:nth-child(even) {
+    background: #f4f6f8 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea thead th {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea tfoot td {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea tfoot tr.print-total-saldo td {
+    background: #12833d !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
 /* ============================================================
    PRINT SHODAQOH - LANDSCAPE A4 (ROW LEBIH TINGGI)
    ============================================================ */
@@ -5082,12 +5246,27 @@ body > #txActionOverlay > .sheet {
 
 /* 2. ATURAN KHUSUS SAAT PROSES PRINT BERLANGSUNG */
 @media print {
-  /* SEMBUNYIKAN SEMUA ELEMEN DI BODY KECUALI PRINT AREA */
-  body * {
+  body.printing-shodaqoh * {
     visibility: hidden !important;
   }
 
-  #printShodaqohArea,
+  body.printing-shodaqoh #printShodaqohArea,
+  body.printing-shodaqoh #printShodaqohArea * {
+    visibility: visible !important;
+  }
+
+  body.printing-shodaqoh #printShodaqohArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* #printShodaqohArea,
   #printShodaqohArea * {
     visibility: visible !important;
   }
@@ -5106,13 +5285,7 @@ body > #txActionOverlay > .sheet {
     padding: 0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-  }
-
-  /* PENGATURAN KERTAS LANDSCAPE */
-  @page {
-    size: A4 landscape !important;
-    margin: 0.5cm 0.8cm !important;
-  }
+  } */
 
   /* LAYOUT WRAPPER - MARGIN ATAS TETAP KECIL */
   #printShodaqohArea .print-wrapper {
@@ -5303,4 +5476,147 @@ body > #txActionOverlay > .sheet {
   #printShodaqohArea col.col-total {
     width: 9%;
   }
+}
+
+/* ============================================================
+   SYNC BUTTON STYLES
+   ============================================================ */
+
+#btnRefresh {
+  transition: all 0.2s ease;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+#btnRefresh:hover {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink);
+  transform: scale(1.05);
+}
+
+#btnRefresh:active {
+  transform: scale(0.92);
+}
+
+#btnRefresh.spin svg {
+  animation: spin 0.7s linear infinite;
+}
+
+#btnRefresh.syncing {
+  background: var(--brand-soft) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+/* Dark Theme */
+[data-theme="dark"] #btnRefresh:hover {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] #btnRefresh.syncing {
+  background: var(--brand-soft) !important;
+  border-color: var(--brand-dark) !important;
+  color: var(--brand) !important;
+}
+
+/* Chart Filter Dropdown */
+#chartFilterDropdown {
+  display: inline-block;
+  position: relative;
+  z-index: 20;
+}
+
+#chartFilterDropdown .filter-dropdown-trigger {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 9px;
+  border-radius: 6px;
+  min-width: 80px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#chartFilterDropdown .filter-dropdown-trigger:hover {
+  background: var(--surface);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+#chartFilterDropdown .filter-dropdown-menu {
+  min-width: 140px;
+  right: 0;
+  left: auto;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 30;
+}
+
+#chartFilterDropdown .filter-dropdown-option {
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 6px;
+  color: var(--ink-soft);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  border: none;
+  background: transparent;
+}
+
+#chartFilterDropdown .filter-dropdown-option:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+#chartFilterDropdown .filter-dropdown-option.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+#chartFilterDropdown .filter-dropdown-option.active::before {
+  content: "✓";
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+[data-theme="dark"] #chartFilterDropdown .filter-dropdown-menu {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] #chartFilterDropdown .filter-dropdown-option.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+[data-theme="dark"] #chartFilterDropdown .filter-dropdown-trigger:hover {
+  background: var(--surface);
+  border-color: var(--brand-dark);
 }

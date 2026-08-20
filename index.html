@@ -383,7 +383,7 @@
             "
           >
             <!-- Header Chart -->
-            <div class="flex items-center justify-between mb-2 px-1">
+            <div class="flex items-start justify-between mb-2 px-1">
               <div>
                 <h2
                   class="font-display text-[11px] font-bold uppercase tracking-wider text-[color:var(--ink-faint)]"
@@ -407,19 +407,153 @@
                   </span>
                 </div>
               </div>
-              <div class="text-right">
-                <span
-                  class="text-[9px] text-[color:var(--ink-faint)]"
-                  id="chartScopeLabel"
+
+              <div class="flex flex-col items-end gap-1 pt-0.5">
+                <!-- Dropdown Filter Chart -->
+                <div
+                  class="filter-dropdown"
+                  id="chartFilterDropdown"
+                  style="display: inline-block"
                 >
-                  seluruh periode
-                </span>
-                <div class="flex items-center gap-1.5 mt-0.5">
+                  <button
+                    type="button"
+                    id="chartFilterTrigger"
+                    class="filter-dropdown-trigger"
+                    style="
+                      height: 26px;
+                      padding: 0 10px;
+                      font-size: 9px;
+                      border-radius: 6px;
+                      min-width: 90px;
+                      background: var(--surface-alt);
+                      border: 1px solid var(--line);
+                      color: var(--ink-soft);
+                      display: flex;
+                      align-items: center;
+                      gap: 6px;
+                      cursor: pointer;
+                      transition: all 0.15s ease;
+                    "
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                  >
+                    <span
+                      id="chartFilterValue"
+                      class="filter-dropdown-value"
+                      style="font-size: 9px; font-weight: 600"
+                      >Saldo</span
+                    >
+                    <svg
+                      class="filter-dropdown-chevron"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <div
+                    id="chartFilterMenu"
+                    class="filter-dropdown-menu"
+                    role="listbox"
+                    style="min-width: 130px; right: 0; left: auto; padding: 4px"
+                  >
+                    <button
+                      type="button"
+                      class="filter-dropdown-option active"
+                      data-chart-type="saldo"
+                      role="option"
+                      aria-selected="true"
+                      style="
+                        padding: 5px 10px;
+                        font-size: 10px;
+                        font-weight: 600;
+                        border-radius: 4px;
+                        width: 100%;
+                        text-align: left;
+                        border: none;
+                        background: transparent;
+                        cursor: pointer;
+                      "
+                    >
+                      Saldo
+                    </button>
+                    <button
+                      type="button"
+                      class="filter-dropdown-option"
+                      data-chart-type="infak_ir"
+                      role="option"
+                      aria-selected="false"
+                      style="
+                        padding: 5px 10px;
+                        font-size: 10px;
+                        font-weight: 600;
+                        border-radius: 4px;
+                        width: 100%;
+                        text-align: left;
+                        border: none;
+                        background: transparent;
+                        cursor: pointer;
+                      "
+                    >
+                      Infak IR
+                    </button>
+                    <button
+                      type="button"
+                      class="filter-dropdown-option"
+                      data-chart-type="uang_sambung"
+                      role="option"
+                      aria-selected="false"
+                      style="
+                        padding: 5px 10px;
+                        font-size: 10px;
+                        font-weight: 600;
+                        border-radius: 4px;
+                        width: 100%;
+                        text-align: left;
+                        border: none;
+                        background: transparent;
+                        cursor: pointer;
+                      "
+                    >
+                      Uang Sambung
+                    </button>
+                    <button
+                      type="button"
+                      class="filter-dropdown-option"
+                      data-chart-type="ukhro_mt"
+                      role="option"
+                      aria-selected="false"
+                      style="
+                        padding: 5px 10px;
+                        font-size: 10px;
+                        font-weight: 600;
+                        border-radius: 4px;
+                        width: 100%;
+                        text-align: left;
+                        border: none;
+                        background: transparent;
+                        cursor: pointer;
+                      "
+                    >
+                      Ukhro MT
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="flex items-center gap-1.5">
                   <span
                     class="w-2 h-2 rounded-full"
+                    id="chartLegendDot"
                     style="background: var(--pos)"
                   ></span>
-                  <span class="text-[8px] text-[color:var(--ink-faint)]"
+                  <span
+                    class="text-[8px] text-[color:var(--ink-faint)]"
+                    id="chartLegendLabel"
                     >Saldo</span
                   >
                 </div>
@@ -590,17 +724,12 @@
 
             <div
               class="stat-chip p-4"
-              style="
-                background: var(--brand-dark);
-                border-color: var(--brand-dark);
-              "
+              style="border-color: var(--brand); background: var(--brand-soft)"
             >
-              <p class="eyebrow" style="color: rgba(255, 255, 255, 0.7)">
-                Saldo Akhir
-              </p>
+              <p class="eyebrow" style="color: var(--brand)">Saldo Akhir</p>
               <p
                 class="mono text-sm font-extrabold mt-1"
-                style="color: #06120d"
+                style="color: var(--brand)"
                 id="rySaldoAkhir"
               >
                 Rp 0
@@ -716,7 +845,11 @@
           <div class="card p-5">
             <p class="eyebrow mb-1.5">Sinkronisasi</p>
             <p class="text-[12.5px] text-[color:var(--ink-soft)]">
-              Data tersambung otomatis dari Google Spreadsheet setiap 20 detik.
+              Klik tombol <strong>Sinkron</strong> di pojok kanan atas untuk
+              memperbarui data dari Google Spreadsheet.
+            </p>
+            <p class="text-[11px] text-[color:var(--ink-faint)] mt-2">
+              Terakhir sinkron: <span id="lastSyncProfile">-</span>
             </p>
           </div>
         </section>
