@@ -6,30 +6,45 @@ class Router {
         title: "Beranda",
         screen: "screen-home",
         tab: "home",
+        showInNav: true,
       },
       history: {
         path: "/history",
         title: "Riwayat",
         screen: "screen-history",
         tab: "history",
+        showInNav: true,
       },
       recap: {
         path: "/recap",
         title: "Rekap",
         screen: "screen-recap",
         tab: "recap",
+        showInNav: true,
       },
       shodaqoh: {
         path: "/shodaqoh",
         title: "Shodaqoh",
         screen: "screen-shodaqoh",
         tab: "shodaqoh",
+        showInNav: true,
       },
       profile: {
         path: "/profile",
         title: "Profil",
         screen: "screen-profile",
         tab: "profile",
+        showInNav: true,
+      },
+      // ============================================================
+      // ZAKAT ROUTE - TIDAK MUNCUL DI BOTTOM NAV
+      // ============================================================
+      zakat: {
+        path: "/zakat",
+        title: "Manajemen Zakat",
+        screen: "screen-zakat",
+        tab: "zakat",
+        showInNav: false, // 👈 Tidak muncul di bottom navigation
       },
     };
 
@@ -47,16 +62,6 @@ class Router {
     });
 
     this.initialized = true;
-
-    const path = this.normalizePath(window.location.pathname);
-    const route = this.getRouteFromPath(path);
-
-    if (!route) {
-      window.history.replaceState({ route: "home" }, "", "/");
-
-      this.navigateTo("home", false);
-      return;
-    }
 
     this.handleRouteChange();
   }
@@ -84,23 +89,19 @@ class Router {
   }
 
   handleRouteChange() {
-    let path = window.location.pathname;
+    let path = this.normalizePath(window.location.pathname);
 
+    // Migrasi URL lama #/profile → /profile
     if (window.location.hash) {
       const hashPath = window.location.hash.replace(/^#/, "").trim();
 
       if (hashPath) {
         const normalizedHash = this.normalizePath(hashPath);
+
         const hashRoute = this.getRouteFromPath(normalizedHash);
 
         if (hashRoute) {
-          const query = window.location.hash.includes("?")
-            ? "?" + window.location.hash.split("?")[1]
-            : "";
-
-          const newUrl = normalizedHash + query;
-
-          window.history.replaceState({ route: hashRoute }, "", newUrl);
+          window.history.replaceState({ route: hashRoute }, "", normalizedHash);
 
           path = normalizedHash;
         }
@@ -110,6 +111,8 @@ class Router {
     const routeKey = this.getRouteFromPath(path);
 
     if (!routeKey) {
+      window.history.replaceState({ route: "home" }, "", "/");
+
       this.navigateTo("home", false);
       return;
     }
@@ -125,55 +128,47 @@ class Router {
       return;
     }
 
-    if (
-      updateHistory &&
-      this.currentRoute === routeKey &&
-      this.normalizePath(window.location.pathname) === route.path
-    ) {
-      return;
+    const currentPath = this.normalizePath(window.location.pathname);
+
+    if (updateHistory && currentPath !== route.path) {
+      window.history.pushState({ route: routeKey }, "", route.path);
     }
 
-    this._isNavigating = true;
+    this.currentRoute = routeKey;
 
-    try {
-      if (updateHistory) {
-        const currentPath = this.normalizePath(window.location.pathname);
+    // Router → UI
+    switchTab(route.tab);
 
-        if (currentPath !== route.path) {
-          window.history.pushState({ route: routeKey }, "", route.path);
-        }
-      }
+    document.title = `Kas · ${route.title}`;
 
-      this.currentRoute = routeKey;
+    const screenTitle = document.getElementById("screenTitle");
 
-      if (typeof switchTab === "function") {
-        switchTab(route.tab);
-      }
-
-      document.title = `Kas · ${route.title}`;
-
-      const screenTitle = document.getElementById("screenTitle");
-
-      if (screenTitle) {
-        screenTitle.textContent = route.title;
-      }
-
-      this.updateNavButtons(routeKey);
-
-      this.trigger("routeChange", {
-        route: routeKey,
-        screen: route.screen,
-        tab: route.tab,
-        path: route.path,
-      });
-    } finally {
-      this._isNavigating = false;
+    if (screenTitle) {
+      screenTitle.textContent = route.title;
     }
+
+    this.updateNavButtons(routeKey);
+
+    this.trigger("routeChange", {
+      route: routeKey,
+      screen: route.screen,
+      tab: route.tab,
+      path: route.path,
+    });
   }
 
   updateNavButtons(routeKey) {
+    // Hanya update tombol nav yang ada di bottom nav
+    // dan hanya untuk route yang showInNav = true
     document.querySelectorAll(".nav-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.tab === routeKey);
+      const tab = btn.dataset.tab;
+      // Cek apakah route ini ada dan showInNav = true
+      const route = this.routes[tab];
+      if (route && route.showInNav === false) {
+        // Jika route tidak muncul di nav, jangan toggle
+        return;
+      }
+      btn.classList.toggle("active", tab === routeKey);
     });
   }
 

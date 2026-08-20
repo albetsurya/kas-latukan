@@ -192,7 +192,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 012.122-.138c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21f-18-18"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 012.122-.138c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21l-18-18"
                   />
                 </svg>
               </button>
@@ -271,6 +271,757 @@
               <path d="M21 12a9 9 0 1 1-2.6-6.4M21 4v6h-6" />
             </svg>
           </button>
+        </div>
+      </div>
+      <section id="screen-zakat" class="screen screen-zakat-full">
+        <!-- Loader Overlay -->
+        <div id="zakatLoader" class="zakat-loader hidden">
+          <div class="zakat-loader-content">
+            <div class="zakat-loader-spinner"></div>
+            <p class="zakat-loader-text" id="zakatLoaderText">Memuat data...</p>
+          </div>
+        </div>
+
+        <!-- Header dengan Back Button (STICKY) -->
+        <div class="zakat-header">
+          <button
+            type="button"
+            id="btnZakatBack"
+            class="zakat-back-btn"
+            aria-label="Kembali ke Profil"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+            >
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h2 class="zakat-title" id="zakatScreenTitle">Manajemen Zakat</h2>
+          <div style="width: 44px"></div>
+        </div>
+
+        <!-- Main Content (SCROLLABLE) -->
+        <div class="zakat-content">
+          <!-- List Zakat -->
+          <div id="zakatListContainer" class="zakat-list-container">
+            <div id="zakatList" class="zakat-list"></div>
+          </div>
+
+          <!-- Detail Zakat -->
+          <div id="zakatDetailContainer" class="zakat-detail-container hidden">
+            <!-- Detail Header dengan Edit Button -->
+            <div class="zakat-detail-header">
+              <div class="zakat-detail-header-left">
+                <div class="zakat-detail-title-wrapper">
+                  <h3 class="zakat-detail-title" id="zakatDetailTitle">
+                    Judul Zakat
+                  </h3>
+                  <button
+                    type="button"
+                    id="btnEditZakatHeader"
+                    class="zakat-edit-header-btn"
+                    aria-label="Edit Zakat"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <p class="zakat-detail-meta" id="zakatDetailMeta">
+                  Tanggal · Tempat
+                </p>
+                <p class="zakat-detail-keterangan" id="zakatDetailKeterangan">
+                  Keterangan
+                </p>
+              </div>
+              <div class="zakat-detail-total" id="zakatDetailTotal">Rp 0</div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="zakat-tabs">
+              <button class="zakat-tab active" data-zakat-tab="muzaki">
+                Muzaki
+              </button>
+              <button class="zakat-tab" data-zakat-tab="rincian">
+                Rincian
+              </button>
+              <button class="zakat-tab" data-zakat-tab="mustahik">
+                Mustahik
+              </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="zakat-tab-content">
+              <div id="zakatTabMuzaki" class="zakat-tab-panel active">
+                <div class="zakat-tab-header">
+                  <div class="zakat-tab-title">
+                    <h4>Data Muzaki</h4>
+                    <span class="zakat-tab-count" id="zakatMuzakiCountDisplay"
+                      >0 orang</span
+                    >
+                  </div>
+                  <div class="zakat-tab-actions">
+                    <button
+                      type="button"
+                      id="zakatMuzakiEdit"
+                      class="btn-ghost"
+                      style="padding: 6px 14px; font-size: 11px"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                        />
+                      </svg>
+                      Edit
+                    </button>
+                  </div>
+                </div>
+
+                <div class="zakat-table-wrapper">
+                  <table class="zakat-table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th class="text-left">Nama Muzaki</th>
+                        <th class="text-right">Nominal</th>
+                      </tr>
+                    </thead>
+                    <tbody id="zakatMuzakiTableBody">
+                      <!-- Data akan di-render oleh JS -->
+                    </tbody>
+                    <tfoot>
+                      <tr class="zakat-table-total">
+                        <td colspan="2" class="text-right font-bold">Total</td>
+                        <td
+                          class="text-right font-bold"
+                          id="zakatMuzakiTableTotal"
+                        >
+                          Rp 0
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              <!-- TAB RINCIAN - Mode Lihat -->
+              <div id="zakatTabRincian" class="zakat-tab-panel hidden">
+                <div class="zakat-tab-header">
+                  <div class="zakat-tab-title">
+                    <h4>Rincian Zakat</h4>
+                    <span class="zakat-tab-status" id="zakatRincianStatus"
+                      >● Belum disimpan</span
+                    >
+                  </div>
+                  <div class="zakat-tab-actions">
+                    <button
+                      type="button"
+                      id="zakatRincianEdit"
+                      class="btn-ghost"
+                      style="padding: 6px 14px; font-size: 11px"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                        />
+                      </svg>
+                      Edit
+                    </button>
+                  </div>
+                </div>
+
+                <div class="zakat-rincian-view">
+                  <!-- Ringkasan Rincian -->
+                  <div class="zakat-rincian-summary">
+                    <div class="zakat-rincian-item">
+                      <span class="label">Mustahik</span>
+                      <span class="value" id="zakatRincianMustahik"
+                        >45% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-item sub">
+                      <span class="label">└ Mustahik Kelompok</span>
+                      <span class="value" id="zakatRincianMustahikKelompok"
+                        >80% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-item sub">
+                      <span class="label">└ Mustahik Daerah</span>
+                      <span class="value" id="zakatRincianMustahikDaerah"
+                        >20% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-divider"></div>
+                    <div class="zakat-rincian-item">
+                      <span class="label">Sabilillah</span>
+                      <span class="value" id="zakatRincianSabilillah"
+                        >40% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-divider"></div>
+                    <div class="zakat-rincian-item">
+                      <span class="label">Amil</span>
+                      <span class="value" id="zakatRincianAmil"
+                        >15% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-item sub">
+                      <span class="label">└ Amil Kelompok</span>
+                      <span class="value" id="zakatRincianAmilKelompok"
+                        >12% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-item sub">
+                      <span class="label">└ Amil Desa</span>
+                      <span class="value" id="zakatRincianAmilDesa"
+                        >2% · Rp 0</span
+                      >
+                    </div>
+                    <div class="zakat-rincian-item sub">
+                      <span class="label">└ Amil Daerah</span>
+                      <span class="value" id="zakatRincianAmilDaerah"
+                        >1% · Rp 0</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB MUSTAHIK - Mode Lihat -->
+              <div id="zakatTabMustahik" class="zakat-tab-panel hidden">
+                <div class="zakat-tab-header">
+                  <div class="zakat-tab-title">
+                    <h4>Data Mustahik</h4>
+                    <span class="zakat-tab-count" id="zakatMustahikCountDisplay"
+                      >0 orang</span
+                    >
+                  </div>
+                  <div class="zakat-tab-actions">
+                    <button
+                      type="button"
+                      id="zakatMustahikEdit"
+                      class="btn-ghost"
+                      style="padding: 6px 14px; font-size: 11px"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                        />
+                      </svg>
+                      Edit
+                    </button>
+                  </div>
+                </div>
+
+                <div class="zakat-mustahik-info-bar">
+                  <span
+                    >Dana Mustahik:
+                    <strong id="zakatMustahikDanaView">Rp 0</strong></span
+                  >
+                  <span
+                    >Sudah Dibagikan:
+                    <strong id="zakatMustahikTersalurkan">Rp 0</strong></span
+                  >
+                  <span
+                    >Sisa:
+                    <strong id="zakatMustahikSisaView">Rp 0</strong></span
+                  >
+                </div>
+
+                <div class="zakat-progress-container">
+                  <div
+                    class="zakat-progress-bar"
+                    id="zakatMustahikProgressView"
+                    style="width: 0%"
+                  ></div>
+                </div>
+
+                <div class="zakat-table-wrapper">
+                  <table class="zakat-table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th class="text-left">Nama Mustahik</th>
+                        <th class="text-right">Nominal</th>
+                      </tr>
+                    </thead>
+                    <tbody id="zakatMustahikTableBody">
+                      <!-- Data akan di-render oleh JS -->
+                    </tbody>
+                    <tfoot>
+                      <tr class="zakat-table-total">
+                        <td colspan="2" class="text-right font-bold">Total</td>
+                        <td
+                          class="text-right font-bold"
+                          id="zakatMustahikTableTotal"
+                        >
+                          Rp 0
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAB untuk Tambah Zakat -->
+        <button
+          id="fabZakat"
+          class="fab"
+          data-action="createZakat"
+          aria-label="Tambah Zakat"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          <span class="fab-label">Tambah Zakat</span>
+        </button>
+      </section>
+
+      <div id="zakatMuzakiSheet" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-header sheet-header-payment">
+            <div class="sheet-handle"></div>
+            <div
+              class="sheet-header-icon"
+              style="background: var(--brand-soft); color: var(--brand)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M20 21a8 8 0 1 0-16 0" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <h3 class="sheet-title" id="zakatMuzakiSheetTitle">Edit Muzaki</h3>
+            <p class="sheet-subtitle" id="zakatMuzakiSheetSubtitle">
+              Kelola data muzaki
+            </p>
+          </div>
+
+          <div class="sheet-scroll">
+            <div class="field-group">
+              <label class="field-label">Jumlah Muzaki</label>
+              <input
+                type="number"
+                id="zakatMuzakiSheetCount"
+                min="1"
+                max="20"
+                value="1"
+                class="field-input"
+                style="max-width: 120px"
+              />
+            </div>
+
+            <div id="zakatMuzakiSheetList" class="zakat-muzaki-list"></div>
+
+            <div class="zakat-total-ringkasan">
+              <span class="zakat-total-label">Total Zakat</span>
+              <span class="zakat-total-value" id="zakatMuzakiSheetTotal"
+                >Rp 0</span
+              >
+            </div>
+
+            <div class="flex gap-2.5 pt-3">
+              <button
+                type="button"
+                id="zakatMuzakiSheetCancel"
+                class="btn-ghost flex-1"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                id="zakatMuzakiSheetSubmit"
+                class="btn-primary flex-1"
+              >
+                Simpan Muzaki
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+     ZAKAT - RINCIAN EDIT SHEET
+     ============================================================ -->
+      <div id="zakatRincianSheet" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-header sheet-header-payment">
+            <div class="sheet-handle"></div>
+            <div
+              class="sheet-header-icon"
+              style="background: var(--brand-soft); color: var(--brand)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                />
+              </svg>
+            </div>
+            <h3 class="sheet-title">Edit Rincian Zakat</h3>
+            <p class="sheet-subtitle">Atur persentase alokasi zakat</p>
+          </div>
+
+          <div class="sheet-scroll">
+            <!-- Konten rincian sama seperti sebelumnya, tapi di dalam sheet -->
+            <div class="zakat-rincian-container">
+              <!-- MUSTAHIK -->
+              <div class="zakat-rincian-section">
+                <div class="zakat-rincian-header">
+                  <h4>Mustahik</h4>
+                  <div class="zakat-rincian-actions">
+                    <button
+                      type="button"
+                      class="zakat-default-btn"
+                      data-target="mustahik"
+                    >
+                      Set Default (45%)
+                    </button>
+                  </div>
+                </div>
+                <!-- ... input persentase ... -->
+              </div>
+              <!-- SABILILLAH -->
+              <div class="zakat-rincian-section">
+                <!-- ... -->
+              </div>
+              <!-- AMIL -->
+              <div class="zakat-rincian-section">
+                <!-- ... -->
+              </div>
+              <!-- Total Validasi -->
+              <div class="zakat-rincian-total">
+                <span
+                  >Total Persentase:
+                  <span id="zakatTotalPersenSheet">100</span>%</span
+                >
+                <span id="zakatTotalNominalSheet">Rp 0</span>
+              </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-3">
+              <button
+                type="button"
+                id="zakatRincianSheetCancel"
+                class="btn-ghost flex-1"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                id="zakatRincianSheetSubmit"
+                class="btn-primary flex-1"
+              >
+                Simpan Rincian
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="zakatMustahikSheet" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-header sheet-header-payment">
+            <div class="sheet-handle"></div>
+            <div
+              class="sheet-header-icon"
+              style="background: var(--brand-soft); color: var(--brand)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M20 21a8 8 0 1 0-16 0" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <h3 class="sheet-title" id="zakatMuzakiSheetTitle">Edit Muzaki</h3>
+            <p class="sheet-subtitle" id="zakatMuzakiSheetSubtitle">
+              Kelola data muzaki
+            </p>
+          </div>
+
+          <div class="sheet-scroll">
+            <div class="field-group">
+              <label class="field-label">Jumlah Muzaki</label>
+              <input
+                type="number"
+                id="zakatMuzakiSheetCount"
+                min="1"
+                max="20"
+                value="1"
+                class="field-input"
+                style="max-width: 120px"
+              />
+            </div>
+
+            <div id="zakatMuzakiSheetList" class="zakat-muzaki-list"></div>
+
+            <div class="zakat-total-ringkasan">
+              <span class="zakat-total-label">Total Zakat</span>
+              <span class="zakat-total-value" id="zakatMuzakiSheetTotal"
+                >Rp 0</span
+              >
+            </div>
+
+            <div class="flex gap-2.5 pt-3">
+              <button
+                type="button"
+                id="zakatMuzakiSheetCancel"
+                class="btn-ghost flex-1"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                id="zakatMuzakiSheetSubmit"
+                class="btn-primary flex-1"
+              >
+                Simpan Mustahik
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="zakatFormOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-header sheet-header-payment">
+            <div class="sheet-handle"></div>
+
+            <div
+              class="sheet-header-icon"
+              style="background: var(--brand-soft); color: var(--brand)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                />
+              </svg>
+            </div>
+
+            <h3 class="sheet-title" id="zakatFormSheetTitle">
+              Buat Zakat Baru
+            </h3>
+            <p class="sheet-subtitle" id="zakatFormSheetSubtitle">
+              Isi data kegiatan zakat
+            </p>
+          </div>
+
+          <div class="sheet-scroll">
+            <div class="field-group">
+              <label class="field-label">Judul Zakat</label>
+              <input
+                type="text"
+                id="zakatFormTitleInput"
+                class="field-input"
+                placeholder="Contoh: Zakat Fitrah 2024"
+                value=""
+              />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Keterangan</label>
+              <textarea
+                id="zakatFormKeterangan"
+                rows="2"
+                class="field-input"
+                placeholder="Deskripsi kegiatan zakat"
+              ></textarea>
+            </div>
+
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
+            >
+              <div class="field-group">
+                <label class="field-label">Tanggal Pelaksanaan</label>
+                <input type="date" id="zakatFormTanggal" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Tempat Pelaksanaan</label>
+                <input
+                  type="text"
+                  id="zakatFormTempat"
+                  class="field-input"
+                  placeholder="Masjid Al-Ikhlas"
+                />
+              </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-3">
+              <button
+                type="button"
+                id="zakatFormCancel"
+                class="btn-ghost flex-1"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                id="zakatFormSubmit"
+                class="btn-primary flex-1"
+              >
+                Simpan Zakat
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="zakatEditHeaderOverlay" class="sheet-overlay hidden">
+        <div class="sheet">
+          <div class="sheet-header sheet-header-payment">
+            <div class="sheet-handle"></div>
+            <div
+              class="sheet-header-icon"
+              style="background: var(--brand-soft); color: var(--brand)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                />
+              </svg>
+            </div>
+            <h3 class="sheet-title">Edit Zakat</h3>
+            <p class="sheet-subtitle">Ubah data kegiatan zakat</p>
+          </div>
+
+          <div class="sheet-scroll">
+            <div class="field-group">
+              <label class="field-label">Judul Zakat</label>
+              <input
+                type="text"
+                id="zakatEditHeaderTitle"
+                class="field-input"
+                placeholder="Contoh: Zakat Fitrah 2024"
+              />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Keterangan</label>
+              <textarea
+                id="zakatEditHeaderKeterangan"
+                rows="2"
+                class="field-input"
+                placeholder="Deskripsi kegiatan zakat"
+              ></textarea>
+            </div>
+
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
+            >
+              <div class="field-group">
+                <label class="field-label">Tanggal Pelaksanaan</label>
+                <input
+                  type="date"
+                  id="zakatEditHeaderTanggal"
+                  class="field-input"
+                />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Tempat Pelaksanaan</label>
+                <input
+                  type="text"
+                  id="zakatEditHeaderTempat"
+                  class="field-input"
+                  placeholder="Masjid Al-Ikhlas"
+                />
+              </div>
+            </div>
+
+            <div class="flex gap-2.5 pt-3">
+              <button
+                type="button"
+                id="zakatEditHeaderCancel"
+                class="btn-ghost flex-1"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                id="zakatEditHeaderSubmit"
+                class="btn-primary flex-1"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -911,6 +1662,42 @@
                   <path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11Z" />
                 </svg>
                 Gelap
+              </button>
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="eyebrow">Manajemen</p>
+                <p class="text-[13px] font-bold mt-0.5">Zakat & Infak</p>
+                <p class="text-[10px] text-[color:var(--ink-faint)] mt-0.5">
+                  Kelola data zakat dan infak
+                </p>
+              </div>
+              <button
+                id="btnOpenZakat"
+                class="btn-ghost"
+                onclick="openZakatScreen()"
+                style="
+                  padding: 8px 16px;
+                  font-size: 11px;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                "
+              >
+                <span>Kelola Zakat</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
               </button>
             </div>
           </div>

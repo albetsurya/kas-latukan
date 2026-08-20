@@ -37,7 +37,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  initTheme();
+  if (typeof initTheme === "function") {
+    initTheme();
+  } else if (typeof window.initTheme === "function") {
+    window.initTheme();
+  } else {
+    // Fallback: apply theme manually
+    console.warn("⚠️ initTheme not found, using fallback");
+    const saved = localStorage.getItem("kas_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+
+    // Coba panggil applyTheme jika ada
+    if (typeof applyTheme === "function") {
+      applyTheme(saved);
+    } else if (typeof window.applyTheme === "function") {
+      window.applyTheme(saved);
+    }
+  }
 
   if ($("btnTheme")) {
     $("btnTheme").addEventListener("click", () =>
@@ -104,16 +120,67 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.initRouter = function () {
+    if (typeof router === "undefined" || !router) {
+      console.warn("⚠️ Router not available");
+      return;
+    }
+
     if (!router.initialized) {
       router.on("routeChange", ({ tab }) => {
+        console.log("🔄 Route changed to:", tab);
+
+        // Handle Shodaqoh
         if (tab === "shodaqoh" && !state.shodaqoh.loaded) {
           loadShodaqohData();
+        }
+
+        // Handle Zakat
+        if (tab === "zakat") {
+          console.log("🔄 Zakat route activated");
+
+          // Sembunyikan bottom nav karena zakat full screen
+          const bottomNav = document.getElementById("bottomnav");
+          if (bottomNav) {
+            bottomNav.style.display = "none";
+          }
+
+          // Tampilkan screen zakat
+          const screen = document.getElementById("screen-zakat");
+          if (screen) {
+            screen.classList.add("active");
+          }
+
+          // Load data zakat jika belum
+          if (!state.zakat._loaded) {
+            showZakatLoader("Memuat data zakat...");
+            loadZakatData()
+              .then(() => {
+                state.zakat._loaded = true;
+                hideZakatLoader();
+              })
+              .catch(() => {
+                hideZakatLoader();
+              });
+          }
+        } else {
+          // Kembalikan bottom nav untuk route lain (kecuali zakat)
+          const bottomNav = document.getElementById("bottomnav");
+          if (bottomNav) {
+            bottomNav.style.display = "";
+          }
+
+          // Sembunyikan screen zakat jika aktif
+          const screen = document.getElementById("screen-zakat");
+          if (screen && screen.classList.contains("active")) {
+            screen.classList.remove("active");
+          }
         }
 
         updateFabVisibility();
       });
 
       router.init();
+      console.log("✅ Router initialized with zakat handler");
     }
   };
 
