@@ -1297,8 +1297,39 @@ async function apiGetShodaqohPaymentDetail(paymentId) {
 }
 
 async function openShodaqohPaymentDetail(paymentId) {
+  const body = $("shodPaymentDetailBody");
   try {
-    const body = $("shodPaymentDetailBody");
+    const currentRole = String(
+      state?.user?.role ||
+        state?.user?.level ||
+        state?.role ||
+        window.currentUser?.role ||
+        "",
+    )
+      .trim()
+      .toLowerCase();
+
+    const isAdmin = currentRole === "admin";
+
+    const adminActions = $("shodPaymentAdminActions");
+
+    if (adminActions) {
+      adminActions.classList.toggle("hidden", !isAdmin);
+    }
+
+    const editBtn = $("btnShodEditPayment");
+    const reverseBtn = $("btnShodReversePayment");
+
+    if (editBtn) {
+      editBtn.disabled = !isAdmin;
+      editBtn.dataset.paymentId = isAdmin ? paymentId : "";
+    }
+
+    if (reverseBtn) {
+      reverseBtn.disabled = !isAdmin;
+      reverseBtn.dataset.paymentId = isAdmin ? paymentId : "";
+    }
+
     if (body) {
       body.innerHTML = `
         <div class="space-y-3">
@@ -1477,12 +1508,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         }
       }
     }
-
-    if ($("btnShodEditPayment"))
-      $("btnShodEditPayment").dataset.paymentId = paymentId;
-
-    if ($("btnShodReversePayment"))
-      $("btnShodReversePayment").dataset.paymentId = paymentId;
   } catch (err) {
     console.error(err);
     if (body) {

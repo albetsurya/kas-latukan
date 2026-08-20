@@ -866,7 +866,14 @@
           <button
             id="btnLogout"
             class="btn-ghost w-full"
-            style="color: var(--neg); border-color: var(--neg-soft)"
+            style="
+              color: var(--neg);
+              border: 1.5px solid var(--neg);
+              background: transparent;
+              transition: all 0.2s;
+            "
+            onmouseover="this.style.background = 'var(--neg-soft)'"
+            onmouseout="this.style.background = 'transparent'"
           >
             Keluar
           </button>
@@ -2278,7 +2285,7 @@
                 <div id="shodPaymentDetailBody" class="space-y-2"></div>
 
                 <!-- ACTION -->
-                <div class="action-list">
+                <div id="shodPaymentAdminActions" class="action-list">
                   <button
                     type="button"
                     id="btnShodEditPayment"

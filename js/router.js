@@ -47,6 +47,17 @@ class Router {
     });
 
     this.initialized = true;
+
+    const path = this.normalizePath(window.location.pathname);
+    const route = this.getRouteFromPath(path);
+
+    if (!route) {
+      window.history.replaceState({ route: "home" }, "", "/");
+
+      this.navigateTo("home", false);
+      return;
+    }
+
     this.handleRouteChange();
   }
 
