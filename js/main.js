@@ -7114,10 +7114,6 @@ async function callShodaqohAI(dataUrl) {
   return result;
 }
 
-// ============================================================
-// CHART STATE
-// ============================================================
-
 let chartState = {
   type: "saldo", // 'saldo' | 'infak_ir' | 'uang_sambung' | 'ukhro_mt'
   labels: [],
@@ -7133,6 +7129,12 @@ let chartState = {
     infak_ir: "Infak IR",
     uang_sambung: "Uang Sambung",
     ukhro_mt: "Ukhro MT",
+  },
+  titlesMap: {
+    saldo: "Tren Saldo Bulanan",
+    infak_ir: "Tren Pemasukan Infak IR",
+    uang_sambung: "Tren Pemasukan Uang Sambung",
+    ukhro_mt: "Tren Pemasukan Ukhro MT",
   },
 };
 
@@ -7150,6 +7152,13 @@ function renderChart() {
   const data = chartData.data;
   const color = chartState.colors[chartState.type] || "#10b981";
   const label = chartState.labelsMap[chartState.type] || "Saldo";
+  const title = chartState.titlesMap[chartState.type] || "Tren Saldo Bulanan";
+
+  // Update judul chart
+  const titleEl = document.getElementById("chartTitle");
+  if (titleEl) {
+    titleEl.textContent = title;
+  }
 
   // Update legend
   const legendDot = document.getElementById("chartLegendDot");
@@ -7343,9 +7352,19 @@ function getChartData(type) {
   const data = [];
 
   const accountMap = {
-    infak_ir: ["INFAK IR", "PEMASUKAN INFAK IR", "INFAQ IR"],
-    uang_sambung: ["UANG SAMBUNG", "PEMASUKAN UANG SAMBUNG", "INFAK SAMBUNG"],
-    ukhro_mt: ["UKHRO MT", "PEMASUKAN UKHRO MT"],
+    infak_ir: [
+      "INFAK IR",
+      "PEMASUKAN INFAK IR",
+      "INFAQ IR",
+      "INFAK IR (SUSULAN)",
+    ],
+    uang_sambung: [
+      "UANG SAMBUNG",
+      "PEMASUKAN UANG SAMBUNG",
+      "INFAK SAMBUNG",
+      "PEMASUKAN INFAK SAMBUNG",
+    ],
+    ukhro_mt: ["UKHRO MT", "PEMASUKAN UKHRO MT", "UKHRO"],
   };
 
   months.forEach((m) => {
@@ -7358,7 +7377,8 @@ function getChartData(type) {
 
     if (type === "saldo") {
       // Saldo akhir bulan
-      value = monthTx[monthTx.length - 1].saldo || 0;
+      const lastTx = monthTx[monthTx.length - 1];
+      value = lastTx ? lastTx.saldo || 0 : 0;
     } else {
       // Filter berdasarkan account
       const accountList = accountMap[type] || [];
@@ -7450,7 +7470,6 @@ function initChartFilterDropdown() {
 // INITIALIZE
 // ============================================================
 
-// Panggil saat DOM ready
 document.addEventListener("DOMContentLoaded", function () {
   initChartFilterDropdown();
 });
