@@ -1,0 +1,120 @@
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+#shodDateDropdown .filter-dropdown-menu::-webkit-scrollbar,
+#txDateDropdown .filter-dropdown-menu::-webkit-scrollbar,
+#zakatDateDropdown .filter-dropdown-menu::-webkit-scrollbar,
+#zakatEditDateDropdown .filter-dropdown-menu::-webkit-scrollbar {
+  width: 3px;
+}
+
+#shodDateDropdown .filter-dropdown-menu::-webkit-scrollbar-track,
+#txDateDropdown .filter-dropdown-menu::-webkit-scrollbar-track,
+#zakatDateDropdown .filter-dropdown-menu::-webkit-scrollbar-track,
+#zakatEditDateDropdown .filter-dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#shodDateDropdown .filter-dropdown-menu::-webkit-scrollbar-thumb,
+#txDateDropdown .filter-dropdown-menu::-webkit-scrollbar-thumb,
+#zakatDateDropdown .filter-dropdown-menu::-webkit-scrollbar-thumb,
+#zakatEditDateDropdown .filter-dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes datePickerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#shodDateDropdown.open .filter-dropdown-menu,
+#txDateDropdown.open .filter-dropdown-menu,
+#zakatDateDropdown.open .filter-dropdown-menu,
+#zakatEditDateDropdown.open .filter-dropdown-menu {
+  animation: datePickerFadeIn 0.12s ease both;
+}
+
+/* ============================================================
+   SHEET OVERFLOW - PASTIKAN TIDAK TERPOTONG
+   ============================================================ */
+
+/* Shodaqoh & Transaksi */
+#shodaqohPaymentOverlay .sheet,
+#txOverlay .sheet {
+  overflow: visible !important;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll,
+#txOverlay .sheet-scroll {
+  overflow: visible !important;
+  padding-bottom: 20px !important;
+}
+
+#shodaqohPaymentOverlay .field-group,
+#txOverlay .field-group {
+  position: relative;
+  z-index: 1;
+}
+
+#shodaqohPaymentOverlay .field-group:has(.filter-dropdown.open),
+#txOverlay .field-group:has(.filter-dropdown.open) {
+  z-index: 99999 !important;
+}
+
+/* Zakat form - pastikan dropdown tidak terpotong */
+#zakatFormOverlay .sheet,
+#zakatEditHeaderOverlay .sheet {
+  overflow: visible !important;
+}
+
+#zakatFormOverlay .sheet-scroll,
+#zakatEditHeaderOverlay .sheet-scroll {
+  overflow: visible !important;
+  padding-bottom: 100px !important;
+}
+
+#zakatFormOverlay .field-group,
+#zakatEditHeaderOverlay .field-group {
+  position: relative;
+  z-index: 1;
+}
+
+#zakatFormOverlay .field-group:has(.filter-dropdown.open),
+#zakatEditHeaderOverlay .field-group:has(.filter-dropdown.open) {
+  z-index: 99999 !important;
+}
+
+/* ============================================================
+   DARK THEME
+   ============================================================ */
+
+[data-theme="dark"] #shodDateDropdown .filter-dropdown-menu,
+[data-theme="dark"] #txDateDropdown .filter-dropdown-menu,
+[data-theme="dark"] #zakatDateDropdown .filter-dropdown-menu,
+[data-theme="dark"] #zakatEditDateDropdown .filter-dropdown-menu {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .date-picker-day.selected {
+  color: #06120d !important;
+}
+
+[data-theme="dark"] .date-picker-day.today::after {
+  background: var(--brand);
+}
+
+[data-theme="dark"] .date-picker-manual-input {
+  background: var(--surface-alt);
+}

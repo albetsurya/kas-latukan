@@ -1355,31 +1355,26 @@ async function apiGetShodaqohPaymentDetail(paymentId) {
   const session = getSession();
   const payload = {
     action: "getShodaqohPaymentDetail",
+    token: session?.token || "",
     paymentId: paymentId,
   };
-  if (session && session.token) {
-    payload.token = session.token;
-  }
   return apiPost(payload);
 }
 
 async function openShodaqohPaymentDetail(paymentId) {
   const body = $("shodPaymentDetailBody");
   try {
-    const currentRole = String(
-      state?.user?.role ||
-        state?.user?.level ||
-        state?.role ||
-        window.currentUser?.role ||
-        "",
-    )
-      .trim()
-      .toLowerCase();
+    // ============================================================
+    // PERBAIKAN: Ambil role dari session atau state
+    // ============================================================
+    const session = getSession();
+    const role = session?.role || state?.role || state?.user?.role || "";
+    const isAdmin =
+      role === "admin" || state.isAdmin === true || state.isAdmin === "true";
 
-    const isAdmin = currentRole === "admin";
+    console.log("🔍 Role check:", { role, isAdmin, session });
 
     const adminActions = $("shodPaymentAdminActions");
-
     if (adminActions) {
       adminActions.classList.toggle("hidden", !isAdmin);
     }
@@ -1390,11 +1385,25 @@ async function openShodaqohPaymentDetail(paymentId) {
     if (editBtn) {
       editBtn.disabled = !isAdmin;
       editBtn.dataset.paymentId = isAdmin ? paymentId : "";
+      if (isAdmin) {
+        editBtn.style.display = "flex";
+        editBtn.style.opacity = "1";
+        editBtn.style.pointerEvents = "auto";
+      } else {
+        editBtn.style.display = "none";
+      }
     }
 
     if (reverseBtn) {
       reverseBtn.disabled = !isAdmin;
       reverseBtn.dataset.paymentId = isAdmin ? paymentId : "";
+      if (isAdmin) {
+        reverseBtn.style.display = "flex";
+        reverseBtn.style.opacity = "1";
+        reverseBtn.style.pointerEvents = "auto";
+      } else {
+        reverseBtn.style.display = "none";
+      }
     }
 
     if (body) {
@@ -1464,115 +1473,195 @@ async function openShodaqohPaymentDetail(paymentId) {
     }
 
     if (body) {
-      const allocations = d.allocations || [];
+      // ============================================================
+      // TAMPILKAN RINCIAN DENGAN SUSULAN BULAN
+      // ============================================================
+      const allocationItems = [];
 
-      if (allocations.length > 0) {
-        body.innerHTML = allocations
-          .map((a) => {
-            const nominal = Number(a.nominal_target) || Number(a.nominal) || 0;
+      // 1. Infak IR dengan rincian susulan
+      const susulanIR = Number(p.susulan_ir) || 0;
+      const susulanBulan = p.susulan_bulan || "";
+      const susulanRincian = p.susulan_rincian || "";
 
-            let allocationType = "Alokasi";
-            if (a.allocation_id) {
-              const idParts = a.allocation_id.split("_");
-              if (idParts.length > 0) {
-                const lastPart = idParts[idParts.length - 1];
-                const typeMap = {
-                  IR: "Infak IR",
-                  SAMBUNG: "Uang Sambung",
-                  JIMPITAN: "Jimpitan",
-                  SIAR: "Siar-siar",
-                  SERIBUAN: "Seribuan",
-                  KAFAN: "Kafan",
-                  UKHRO: "Ukhro MT",
-                };
-                allocationType = typeMap[lastPart] || lastPart;
-              }
-            }
+      if (susulanIR > 0) {
+        let rincianText = "";
+        let rincianParsed = {};
 
-            let periodLabel = a.periode || "Periode tidak diketahui";
-            if (periodLabel && periodLabel !== "Periode tidak diketahui") {
-              const [year, month] = periodLabel.split("-");
-              if (year && month) {
-                const monthNames = [
-                  "Januari",
-                  "Februari",
-                  "Maret",
-                  "April",
-                  "Mei",
-                  "Juni",
-                  "Juli",
-                  "Agustus",
-                  "September",
-                  "Oktober",
-                  "November",
-                  "Desember",
-                ];
-                periodLabel = `${monthNames[parseInt(month) - 1]} ${year}`;
-              }
-            }
+        // Parse susulan_rincian
+        if (susulanRincian) {
+          try {
+            rincianParsed = JSON.parse(susulanRincian);
+          } catch (e) {
+            rincianParsed = {};
+          }
+        }
+
+        // Jika ada rincian per bulan
+        if (Object.keys(rincianParsed).length > 0) {
+          const bulanList = Object.keys(rincianParsed).filter(function (key) {
+            return rincianParsed[key] > 0;
+          });
+
+          if (bulanList.length > 0) {
+            const bulanLabels = bulanList.map(function (key) {
+              const [y, m] = key.split("-");
+              const monthNames = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "Mei",
+                "Jun",
+                "Jul",
+                "Ags",
+                "Sep",
+                "Okt",
+                "Nov",
+                "Des",
+              ];
+              return monthNames[parseInt(m) - 1] + "'" + y.slice(2, 4);
+            });
+
+            const totalIR = Object.values(rincianParsed).reduce(function (
+              sum,
+              val,
+            ) {
+              return sum + val;
+            }, 0);
+
+            rincianText = `↻ ${bulanLabels.join(", ")}`;
+          }
+        } else if (susulanBulan) {
+          // Fallback: pakai susulan_bulan
+          const bulanArray = susulanBulan.split(",").filter(Boolean);
+          if (bulanArray.length > 1) {
+            const bulanLabels = bulanArray.map(function (key) {
+              const [y, m] = key.trim().split("-");
+              const monthNames = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "Mei",
+                "Jun",
+                "Jul",
+                "Ags",
+                "Sep",
+                "Okt",
+                "Nov",
+                "Des",
+              ];
+              return monthNames[parseInt(m) - 1] + "'" + y.slice(2, 4);
+            });
+            rincianText = `↻ ${bulanLabels.join(", ")}`;
+          }
+        }
+
+        allocationItems.push({
+          label: "Infak IR",
+          nominal: susulanIR,
+          detail: rincianText,
+          type: "ir",
+        });
+      }
+
+      // 2. Uang Sambung
+      const uangSambung = Number(p.uang_sambung) || 0;
+      if (uangSambung > 0) {
+        allocationItems.push({
+          label: "Uang Sambung",
+          nominal: uangSambung,
+          detail: "",
+          type: "sambung",
+        });
+      }
+
+      // 3. Jimpitan
+      const jimpitan = Number(p.jimpitan) || 0;
+      if (jimpitan > 0) {
+        allocationItems.push({
+          label: "Jimpitan",
+          nominal: jimpitan,
+          detail: "",
+          type: "jimpitan",
+        });
+      }
+
+      // 4. Siar-siar
+      const siarSiar = Number(p.siar_siar) || 0;
+      if (siarSiar > 0) {
+        allocationItems.push({
+          label: "Siar-siar",
+          nominal: siarSiar,
+          detail: "",
+          type: "siar",
+        });
+      }
+
+      // 5. Seribuan
+      const seribuan = Number(p.seribuan) || 0;
+      if (seribuan > 0) {
+        allocationItems.push({
+          label: "Seribuan",
+          nominal: seribuan,
+          detail: "",
+          type: "seribuan",
+        });
+      }
+
+      // 6. Kafan
+      const kafan = Number(p.kafan) || 0;
+      if (kafan > 0) {
+        allocationItems.push({
+          label: "Kafan",
+          nominal: kafan,
+          detail: "",
+          type: "kafan",
+        });
+      }
+
+      // 7. Ukhro MT
+      const ukhroMt = Number(p.ukhro_mt) || 0;
+      if (ukhroMt > 0) {
+        allocationItems.push({
+          label: "Ukhro MT",
+          nominal: ukhroMt,
+          detail: "",
+          type: "ukhro",
+        });
+      }
+
+      // Render
+      if (allocationItems.length > 0) {
+        body.innerHTML = allocationItems
+          .map(function (item) {
+            const isIR = item.type === "ir";
+            const amountColor = isIR ? "var(--brand)" : "var(--pos)";
+            const detailHtml = item.detail
+              ? `<span class="ir-susulan-detail" style="
+                display: block;
+                font-size: 7px;
+                color: var(--gold);
+                font-weight: 600;
+                margin-top: 1px;
+                letter-spacing: 0.3px;
+              ">${escapeHtml(item.detail)}</span>`
+              : "";
 
             return `<div class="tx-card">
               <div class="flex-1">
-                <p class="tx-title">${escapeHtml(allocationType)}</p>
-                <p class="tx-meta">${escapeHtml(periodLabel)}</p>
+                <p class="tx-title">${escapeHtml(item.label)}</p>
+                ${detailHtml}
               </div>
               <div class="text-right">
-                <p class="tx-amount mono" style="color:var(--pos);">${fmtRp(nominal)}</p>
+                <p class="tx-amount mono" style="color:${amountColor};">${fmtRp(item.nominal)}</p>
               </div>
             </div>`;
           })
           .join("");
       } else {
-        const allocationFields = [
-          { field: "susulan_ir", label: "Infak IR" },
-          { field: "uang_sambung", label: "Uang Sambung" },
-          { field: "jimpitan", label: "Jimpitan" },
-          { field: "siar_siar", label: "Siar-siar" },
-          { field: "seribuan", label: "Seribuan" },
-          { field: "kafan", label: "Kafan" },
-          { field: "ukhro_mt", label: "Ukhro MT" },
-        ];
-
-        let hasAllocation = false;
-        const allocFromPayment = [];
-        allocationFields.forEach(({ field, label }) => {
-          const value = Number(p[field]) || 0;
-          if (value > 0) {
-            hasAllocation = true;
-            allocFromPayment.push({
-              label: label,
-              nominal: value,
-              periode: p.tanggal || "Bulan berjalan",
-            });
-          }
-        });
-
-        if (hasAllocation) {
-          body.innerHTML = allocFromPayment
-            .map((a) => {
-              let periodLabel = "Bulan berjalan";
-              if (a.periode && a.periode !== "Bulan berjalan") {
-                const d = new Date(a.periode);
-                if (!isNaN(d.getTime())) {
-                  periodLabel = fmtDateShort(a.periode);
-                }
-              }
-
-              return `<div class="tx-card">
-                <div class="flex-1">
-                  <p class="tx-title">${escapeHtml(a.label)}</p>
-                  <p class="tx-meta">${escapeHtml(periodLabel)}</p>
-                </div>
-                <div class="text-right">
-                  <p class="tx-amount mono" style="color:var(--pos);">${fmtRp(a.nominal)}</p>
-                </div>
-              </div>`;
-            })
-            .join("");
-        } else {
-          body.innerHTML =
-            '<p class="text-xs text-[color:var(--ink-faint)] text-center py-6">Tidak ada alokasi.</p>';
-        }
+        body.innerHTML =
+          '<p class="text-xs text-[color:var(--ink-faint)] text-center py-6">Tidak ada alokasi.</p>';
       }
     }
   } catch (err) {

@@ -1,0 +1,954 @@
+/* Chart Modern Styles */
+#saldoChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Tooltip custom */
+.chart-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.chart-tooltip .label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.chart-tooltip .value {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "JetBrains Mono", monospace;
+  margin-top: 2px;
+}
+
+/* Hover effect untuk chart */
+#saldoChart:hover {
+  cursor: crosshair;
+}
+
+/* Skeleton untuk chart */
+.chart-skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .chart-header .chart-value {
+    font-size: 15px;
+  }
+}
+/* Monitoring table compact */
+#shodMonitoringBody tr td {
+  padding: 4px 6px !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+}
+
+#shodMonitoringBody tr td:first-child {
+  padding-left: 2px !important;
+}
+
+#shodMonitoringBody tr td:last-child {
+  padding-right: 2px !important;
+}
+
+/* Tabular numbers for alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Truncate long names */
+#shodMonitoringBody .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  #shodMonitoringBody tr td {
+    padding: 5px 6px !important;
+    font-size: 10px !important;
+  }
+
+  .badge-status {
+    font-size: 7.5px !important;
+    padding: 2px 5px !important;
+  }
+}
+
+/* Named Page */
+@page finance {
+  size: A4 portrait;
+  margin: 0.5cm 0.8cm;
+}
+
+@page shodaqoh {
+  size: A4 landscape;
+  margin: 0.5cm 0.8cm;
+}
+
+/* Area print */
+#printArea {
+  page: finance;
+}
+
+#printShodaqohArea {
+  page: shodaqoh;
+}
+
+/* ============================================================
+   PRINT LAPORAN KEUANGAN - PORTRAIT A4
+   ============================================================ */
+
+/* 1. SEMBUNYIKAN DARI LAYAR APLIKASI */
+#printArea {
+  display: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: white !important;
+  z-index: 999998 !important;
+  overflow: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #1e293b !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Baseline text color for every cell */
+#printArea th,
+#printArea td {
+  color: #1e293b !important;
+}
+
+#printArea * {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* TABLE - Full width */
+#printArea table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* Column widths */
+#printArea col.col-no {
+  width: 5%;
+}
+#printArea col.col-tgl {
+  width: 12%;
+}
+#printArea col.col-ket {
+  width: 48%;
+}
+#printArea col.col-debet,
+#printArea col.col-kredit,
+#printArea col.col-saldo {
+  width: 11.66%;
+}
+
+/* Header styles */
+#printArea thead {
+  display: table-header-group;
+}
+
+#printArea thead th {
+  padding: 4px 4px;
+  font-size: 8.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1e293b;
+  text-align: center !important;
+}
+
+/* Body rows */
+#printArea th,
+#printArea td {
+  border-bottom: 0.5px solid #cbd5e1;
+  padding: 4px 4px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  page-break-inside: avoid;
+  vertical-align: middle;
+}
+
+/* Alternating row colors */
+#printArea tbody tr:nth-child(even) {
+  background: #f4f6f8 !important;
+}
+
+/* TFOOT - Styling */
+#printArea tfoot {
+  display: table-row-group;
+}
+
+#printArea tfoot td {
+  font-weight: 800;
+  font-size: 9px;
+  padding: 4.5px 4px;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #16a34a;
+  border-top: 2px solid #1e293b;
+}
+
+#printArea tfoot tr.print-total-saldo td {
+  background: #12833d !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1e293b;
+}
+
+/* Right-align numbers */
+#printArea table td.num,
+#printArea table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Font bold helper */
+#printArea .font-bold {
+  font-weight: 800 !important;
+}
+
+/* Header */
+#printArea .print-header {
+  text-align: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #1e293b;
+}
+
+#printArea .print-header h1 {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+#printArea .print-header h2 {
+  font-size: 12px;
+  font-weight: 800;
+  margin: 2px 0 0;
+  letter-spacing: 0.3px;
+}
+
+#printArea .print-header p {
+  font-size: 10px;
+  font-weight: 600;
+  margin: 3px 0 0;
+  color: #334155;
+}
+
+/* ============================================================
+   PRINT MEDIA QUERY - KHUSUS SAAT PROSES PRINT
+   ============================================================ */
+@media print {
+  body.printing-finance * {
+    visibility: hidden !important;
+  }
+
+  body.printing-finance #printArea,
+  body.printing-finance #printArea * {
+    visibility: visible !important;
+  }
+
+  body.printing-finance #printArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* #printArea,
+  #printArea * {
+    visibility: visible !important;
+  }
+
+  #printArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    z-index: 999998 !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  } */
+
+  /* WRAPPER */
+  #printArea .print-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0.8cm !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  /* TABLE WRAPPER */
+  #printArea .print-table-wrapper {
+    display: block !important;
+    width: 100% !important;
+    flex: 1 !important;
+    overflow: visible !important;
+  }
+
+  /* TABLE OVERRIDE */
+  #printArea table {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 9.5px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* HEADER OVERRIDE */
+  #printArea .print-header {
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  #printArea .print-header h1 {
+    font-size: 13px !important;
+  }
+
+  #printArea .print-header h2 {
+    font-size: 11px !important;
+  }
+
+  #printArea .print-header p {
+    font-size: 9px !important;
+    margin-top: 2px !important;
+  }
+
+  /* CELL OVERRIDE */
+  #printArea th,
+  #printArea td {
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+  }
+
+  #printArea thead th {
+    padding: 3.5px 3px !important;
+    font-size: 8px !important;
+  }
+
+  #printArea tfoot td {
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+  }
+
+  /* PAGE BREAK */
+  #printArea tbody tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #printArea tfoot {
+    display: table-footer-group !important;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* COLOR ADJUSTMENT - PASTIKAN WARNA TETAP */
+  #printArea tbody tr:nth-child(even) {
+    background: #f4f6f8 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea thead th {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea tfoot td {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printArea tfoot tr.print-total-saldo td {
+    background: #12833d !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* ============================================================
+   PRINT SHODAQOH - LANDSCAPE A4 (ROW LEBIH TINGGI)
+   ============================================================ */
+
+/* 1. SEMBUNYIKAN DARI LAYAR APLIKASI */
+#printShodaqohArea {
+  display: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: white !important;
+  z-index: 999999 !important;
+  overflow: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #1e293b !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* 2. ATURAN KHUSUS SAAT PROSES PRINT BERLANGSUNG */
+@media print {
+  body.printing-shodaqoh * {
+    visibility: hidden !important;
+  }
+
+  body.printing-shodaqoh #printShodaqohArea,
+  body.printing-shodaqoh #printShodaqohArea * {
+    visibility: visible !important;
+  }
+
+  body.printing-shodaqoh #printShodaqohArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* #printShodaqohArea,
+  #printShodaqohArea * {
+    visibility: visible !important;
+  }
+
+  #printShodaqohArea {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    z-index: 999999 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  } */
+
+  /* LAYOUT WRAPPER - MARGIN ATAS TETAP KECIL */
+  #printShodaqohArea .print-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0.4cm 0.4cm 0.2cm 0.4cm !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  /* HEADER - Margin bawah tetap kecil */
+  #printShodaqohArea .print-header {
+    text-align: center;
+    margin-bottom: 6px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #1e293b;
+    width: 100%;
+  }
+
+  #printShodaqohArea .print-header h1 {
+    font-size: 15px; /* Dinaikkan */
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  #printShodaqohArea .print-header h2 {
+    font-size: 13px; /* Dinaikkan */
+    font-weight: 800;
+    margin: 2px 0 0;
+    letter-spacing: 0.3px;
+  }
+
+  #printShodaqohArea .print-header p {
+    font-size: 11px; /* Dinaikkan */
+    font-weight: 600;
+    margin: 3px 0 0;
+    color: #334155;
+  }
+
+  /* TABEL - Full width */
+  #printShodaqohArea table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 10px; /* Dinaikkan dari 9px */
+    line-height: 1.6; /* Jarak antar baris lebih lega */
+  }
+
+  /* HEADER TABEL - 2 BARIS */
+  #printShodaqohArea thead {
+    display: table-header-group;
+  }
+
+  #printShodaqohArea thead th {
+    padding: 6px 4px !important; /* Dinaikkan dari 3px */
+    font-size: 9px !important; /* Dinaikkan dari 7.5px */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #1e293b;
+    vertical-align: middle !important;
+  }
+
+  /* No dan Nama - RATA KIRI */
+  #printShodaqohArea thead th:first-child,
+  #printShodaqohArea thead th:nth-child(2) {
+    text-align: left !important;
+  }
+
+  /* Semua header lainnya - RATA KANAN */
+  #printShodaqohArea thead th:not(:first-child):not(:nth-child(2)) {
+    text-align: right !important;
+  }
+
+  /* Kecuali header Infak IR yang di tengah */
+  #printShodaqohArea thead tr:first-child th[colspan] {
+    text-align: center !important;
+  }
+
+  /* Kolom sub-header bulan - RATA KANAN */
+  #printShodaqohArea thead tr:last-child th {
+    text-align: right !important;
+    font-size: 8.5px !important; /* Dinaikkan */
+    padding: 4px 4px !important;
+  }
+
+  /* BODY ROWS - TINGGI ROW DITINGGIKAN */
+  #printShodaqohArea th,
+  #printShodaqohArea td {
+    border: 0.5px solid #cbd5e1;
+    padding: 6px 4px !important; /* Dinaikkan dari 3px */
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    page-break-inside: avoid;
+    vertical-align: middle;
+    line-height: 1.5; /* Dinaikkan */
+    font-size: 9.5px; /* Dinaikkan */
+  }
+
+  /* Khusus untuk kolom No dan Nama */
+  #printShodaqohArea td:first-child,
+  #printShodaqohArea td:nth-child(2) {
+    font-size: 9.5px;
+    padding: 6px 4px !important;
+  }
+
+  /* Alternating row colors */
+  #printShodaqohArea tbody tr:nth-child(even) {
+    background: #f4f6f8 !important;
+  }
+
+  /* TFOOT */
+  #printShodaqohArea tfoot td {
+    font-weight: 800;
+    font-size: 9.5px !important; /* Dinaikkan */
+    padding: 6px 4px !important; /* Dinaikkan */
+    background: #16a34a !important;
+    color: #ffffff !important;
+    border: 1px solid #16a34a;
+    line-height: 1.5;
+  }
+
+  #printShodaqohArea tfoot tr.print-total-saldo td {
+    background: #12833d !important;
+    color: #ffffff !important;
+    border-top: 2px solid #1e293b;
+    border-bottom: 2px solid #1e293b;
+    padding: 6px 4px !important;
+  }
+
+  /* Grand Total IR */
+  #printShodaqohArea .print-grand-total-ir td {
+    background: #e8f5e9 !important;
+    color: #1e293b !important;
+    font-weight: 800;
+    border-top: 2px solid #16a34a;
+    padding: 6px 4px !important;
+    font-size: 9.5px !important;
+  }
+
+  /* Angka rata kanan */
+  #printShodaqohArea table td.num,
+  #printShodaqohArea table th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Font bold helper */
+  #printShodaqohArea .font-bold {
+    font-weight: 800 !important;
+  }
+
+  /* Kolom widths yang lebih proporsional */
+  #printShodaqohArea col.col-no {
+    width: 3%;
+  }
+  #printShodaqohArea col.col-nama {
+    width: 16%;
+  }
+  #printShodaqohArea col.col-ir {
+    width: 12%;
+  }
+  #printShodaqohArea col.col-sambung {
+    width: 8%;
+  }
+  #printShodaqohArea col.col-jimpitan {
+    width: 8%;
+  }
+  #printShodaqohArea col.col-siar {
+    width: 8%;
+  }
+  #printShodaqohArea col.col-seribuan {
+    width: 8%;
+  }
+  #printShodaqohArea col.col-kafan {
+    width: 8%;
+  }
+  #printShodaqohArea col.col-ukhro {
+    width: 8%;
+  }
+  #printShodaqohArea col.col-total {
+    width: 9%;
+  }
+}
+
+/* ============================================================
+   SYNC BUTTON STYLES
+   ============================================================ */
+
+#btnRefresh {
+  transition: all 0.2s ease;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+#btnRefresh:hover {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink);
+  transform: scale(1.05);
+}
+
+#btnRefresh:active {
+  transform: scale(0.92);
+}
+
+#btnRefresh.spin svg {
+  animation: spin 0.7s linear infinite;
+}
+
+#btnRefresh.syncing {
+  background: var(--brand-soft) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+/* Dark Theme */
+[data-theme="dark"] #btnRefresh:hover {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+[data-theme="dark"] #btnRefresh.syncing {
+  background: var(--brand-soft) !important;
+  border-color: var(--brand-dark) !important;
+  color: var(--brand) !important;
+}
+
+/* ============================================================
+   CHART FILTER DROPDOWN - UKURAN FONT BESAR
+   ============================================================ */
+
+#chartFilterDropdown {
+  display: inline-block;
+  position: relative;
+  z-index: 20;
+}
+
+#chartFilterDropdown .filter-dropdown-trigger {
+  height: 32px !important;
+  padding: 0 14px !important;
+  font-size: 12px !important;
+  border-radius: 8px !important;
+  min-width: 110px !important;
+  background: var(--surface-alt) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink-soft) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+#chartFilterDropdown .filter-dropdown-trigger:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand) !important;
+  color: var(--ink) !important;
+}
+
+#chartFilterDropdown .filter-dropdown-value {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+#chartFilterDropdown .filter-dropdown-chevron {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+#chartFilterDropdown .filter-dropdown-menu {
+  min-width: 150px !important;
+  right: 0 !important;
+  left: auto !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  z-index: 30 !important;
+}
+
+#chartFilterDropdown .filter-dropdown-option {
+  padding: 8px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  width: 100% !important;
+  text-align: left !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  color: var(--ink-soft) !important;
+}
+
+#chartFilterDropdown .filter-dropdown-option:hover {
+  background: var(--surface-alt) !important;
+  color: var(--ink) !important;
+}
+
+#chartFilterDropdown .filter-dropdown-option.active {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+}
+
+#chartFilterDropdown .filter-dropdown-option.active::before {
+  content: "✓";
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  margin-right: 6px;
+}
+
+/* Dark theme */
+[data-theme="dark"] #chartFilterDropdown .filter-dropdown-menu {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] #chartFilterDropdown .filter-dropdown-option.active {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+}
+
+[data-theme="dark"] #chartFilterDropdown .filter-dropdown-trigger:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand-dark) !important;
+}
+
+/* ============================================================
+   CHART LEGEND - UKURAN FONT BESAR
+   ============================================================ */
+
+#chartLegendDot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+#chartLegendLabel {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink-soft) !important;
+}
+
+/* ============================================================
+   ZAKAT SCREEN - FULL SCREEN OVERLAY
+   ============================================================ */
+
+#screen-zakat {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  background: var(--bg) !important;
+  display: none !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+#screen-zakat.active {
+  display: flex !important;
+}
+/* ============================================================
+   ZAKAT HEADER
+   ============================================================ */
+
+.zakat-header {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px 12px 12px !important;
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+  flex-shrink: 0 !important;
+  min-height: 60px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.zakat-back-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.zakat-back-btn:hover {
+  background: var(--surface-alt);
+}
+
+.zakat-back-btn:active {
+  transform: scale(0.92);
+}
+
+.zakat-title {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+/* ============================================================
+   ZAKAT CONTENT
+   ============================================================ */
+
+.zakat-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 16px !important;
+  padding-bottom: 90px !important;
+  -webkit-overflow-scrolling: touch !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
