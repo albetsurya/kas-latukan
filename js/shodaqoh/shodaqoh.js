@@ -371,7 +371,7 @@ function renderShodaqohMembers() {
           ${
             isAdmin
               ? `
-            <button type="button" id="shodAddMemberBtn" class="shod-members-add">
+            <button type="button" id="shodAddMemberBtn" class="shod-members-add btn-outline-brand">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg>
@@ -396,7 +396,7 @@ function renderShodaqohMembers() {
             ${
               isAdmin
                 ? `
-              <button type="button" id="shodAddFirstMember">+ Tambah anggota pertama</button>
+              <button type="button" id="shodAddFirstMember" class="btn-outline-brand">+ Tambah anggota pertama</button>
             `
                 : ""
             }
@@ -477,66 +477,34 @@ function renderShodaqohTabs() {
 
   // Buat tabs container
   const tabsHtml = `
-    <div class="shod-tabs-container" style="
-      position: relative;
-      z-index: 1;
-      background: transparent;
-      padding: 12px 0 10px 0;
-      margin: 0;
-    ">
-      <div class="shod-tabs" style="
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 6px;
-      ">
-        <button class="shod-tab active" data-tab="shod-monitoring" style="
-          padding: 8px 0;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: var(--brand);
-          color: #fff;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          text-align: center;
-        ">
-          Monitoring
-        </button>
-        <button class="shod-tab" data-tab="shod-members" style="
-          padding: 8px 0;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: var(--surface);
-          color: var(--ink-soft);
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          text-align: center;
-        ">
-          Anggota
-        </button>
-        <button class="shod-tab" data-tab="shod-payments" style="
-          padding: 8px 0;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: var(--surface);
-          color: var(--ink-soft);
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          text-align: center;
-        ">
-          Riwayat
-        </button>
-      </div>
+  <div class="shod-tabs-container">
+    <div class="shod-tabs">
+      <button class="shod-tab active" data-tab="shod-monitoring">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="9" y1="9" x2="15" y2="9" />
+          <line x1="9" y1="15" x2="15" y2="15" />
+          <line x1="9" y1="12" x2="15" y2="12" />
+        </svg>
+        Monitoring
+      </button>
+      <button class="shod-tab" data-tab="shod-members">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        Anggota
+      </button>
+      <button class="shod-tab" data-tab="shod-payments">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="14" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
+        </svg>
+        Riwayat
+      </button>
     </div>
-  `;
+  </div>
+`;
 
   // Cari card filter atau allocation untuk menempatkan tabs
   const filterCard = container.querySelector(".card:has(.filter-group)");

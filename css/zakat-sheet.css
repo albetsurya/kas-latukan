@@ -1,0 +1,1026 @@
+/* ============================================================
+   ZAKAT SHEET - CLASS YANG HILANG
+   ============================================================ */
+
+/* ============================================================
+   SHEET OVERLAY - OVERRIDE UNTUK ZAKAT
+   ============================================================ */
+
+#zakatMuzakiSheet,
+#zakatRincianSheet,
+#zakatMustahikSheet,
+#zakatFormOverlay,
+#zakatEditHeaderOverlay {
+  z-index: 99999 !important;
+}
+
+#zakatMuzakiSheet .sheet,
+#zakatRincianSheet .sheet,
+#zakatMustahikSheet .sheet,
+#zakatFormOverlay .sheet,
+#zakatEditHeaderOverlay .sheet {
+  max-height: 85dvh !important;
+  padding: 8px 16px 12px 16px !important;
+  border-radius: 20px 20px 0 0 !important;
+}
+
+#zakatMuzakiSheet .sheet-scroll,
+#zakatRincianSheet .sheet-scroll,
+#zakatMustahikSheet .sheet-scroll,
+#zakatFormOverlay .sheet-scroll,
+#zakatEditHeaderOverlay .sheet-scroll {
+  padding: 4px 0 12px 0 !important;
+  overflow-y: auto !important;
+  max-height: calc(85dvh - 120px) !important;
+}
+
+/* ============================================================
+   SHEET HEADER - KONSISTEN
+   ============================================================ */
+
+#zakatMuzakiSheet .sheet-header,
+#zakatRincianSheet .sheet-header,
+#zakatMustahikSheet .sheet-header,
+#zakatFormOverlay .sheet-header,
+#zakatEditHeaderOverlay .sheet-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 4px 0 16px 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  margin-bottom: 16px !important;
+  gap: 4px !important;
+}
+
+#zakatMuzakiSheet .sheet-handle,
+#zakatRincianSheet .sheet-handle,
+#zakatMustahikSheet .sheet-handle,
+#zakatFormOverlay .sheet-handle,
+#zakatEditHeaderOverlay .sheet-handle {
+  width: 36px !important;
+  height: 4px !important;
+  margin: 0 auto 10px auto !important;
+  border-radius: 999px !important;
+  background: var(--line) !important;
+}
+
+#zakatMuzakiSheet .sheet-header-icon,
+#zakatRincianSheet .sheet-header-icon,
+#zakatMustahikSheet .sheet-header-icon,
+#zakatFormOverlay .sheet-header-icon,
+#zakatEditHeaderOverlay .sheet-header-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 8px auto !important;
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+}
+
+#zakatMuzakiSheet .sheet-title,
+#zakatRincianSheet .sheet-title,
+#zakatMustahikSheet .sheet-title,
+#zakatFormOverlay .sheet-title,
+#zakatEditHeaderOverlay .sheet-title {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+}
+
+#zakatMuzakiSheet .sheet-subtitle,
+#zakatRincianSheet .sheet-subtitle,
+#zakatMustahikSheet .sheet-subtitle,
+#zakatFormOverlay .sheet-subtitle,
+#zakatEditHeaderOverlay .sheet-subtitle {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: var(--ink-soft) !important;
+  margin: 2px 0 0 0 !important;
+}
+
+/* ============================================================
+   ZAKAT - FORM STYLE
+   ============================================================ */
+
+#zakatFormOverlay .create-form,
+#zakatEditHeaderOverlay .create-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+#zakatFormOverlay .field-group,
+#zakatEditHeaderOverlay .field-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+#zakatFormOverlay .field-label,
+#zakatEditHeaderOverlay .field-label {
+  display: block !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+  margin: 0 !important;
+}
+
+#zakatFormOverlay .field-input,
+#zakatEditHeaderOverlay .field-input {
+  width: 100% !important;
+  min-height: 40px !important;
+  padding: 8px 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  outline: none !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+
+#zakatFormOverlay .field-input::placeholder,
+#zakatEditHeaderOverlay .field-input::placeholder {
+  color: var(--ink-faint) !important;
+  font-weight: 400 !important;
+}
+
+#zakatFormOverlay .field-input:hover,
+#zakatEditHeaderOverlay .field-input:hover {
+  border-color: var(--brand-soft) !important;
+  background: var(--surface-alt) !important;
+}
+
+#zakatFormOverlay .field-input:focus,
+#zakatEditHeaderOverlay .field-input:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+  background: var(--surface) !important;
+}
+
+#zakatFormOverlay textarea.field-input,
+#zakatEditHeaderOverlay textarea.field-input {
+  min-height: 70px !important;
+  resize: vertical !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  line-height: 1.5 !important;
+}
+
+/* ============================================================
+   ZAKAT - FILTER DROPDOWN (DATE PICKER)
+   ============================================================ */
+
+#zakatFormOverlay .filter-dropdown,
+#zakatEditHeaderOverlay .filter-dropdown {
+  position: relative !important;
+  width: 100% !important;
+}
+
+#zakatFormOverlay .filter-dropdown-trigger,
+#zakatEditHeaderOverlay .filter-dropdown-trigger {
+  width: 100% !important;
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all 0.15s ease !important;
+}
+
+#zakatFormOverlay .filter-dropdown-trigger:hover,
+#zakatEditHeaderOverlay .filter-dropdown-trigger:hover {
+  border-color: var(--brand-soft) !important;
+  background: var(--surface-alt) !important;
+}
+
+#zakatFormOverlay .filter-dropdown.open .filter-dropdown-trigger,
+#zakatEditHeaderOverlay .filter-dropdown.open .filter-dropdown-trigger {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+}
+
+#zakatFormOverlay .filter-dropdown-value,
+#zakatEditHeaderOverlay .filter-dropdown-value {
+  flex: 1 !important;
+  text-align: left !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#zakatFormOverlay .filter-dropdown-chevron,
+#zakatEditHeaderOverlay .filter-dropdown-chevron {
+  flex-shrink: 0 !important;
+  color: var(--ink-faint) !important;
+  transition: transform 0.2s ease !important;
+}
+
+#zakatFormOverlay .filter-dropdown.open .filter-dropdown-chevron,
+#zakatEditHeaderOverlay .filter-dropdown.open .filter-dropdown-chevron {
+  transform: rotate(180deg) !important;
+}
+
+#zakatFormOverlay .filter-dropdown-menu,
+#zakatEditHeaderOverlay .filter-dropdown-menu {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 999999 !important;
+  max-height: 280px !important;
+  overflow-y: auto !important;
+  padding: 8px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: var(--surface) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(-4px) !important;
+  transition: all 0.15s ease !important;
+}
+
+#zakatFormOverlay .filter-dropdown.open .filter-dropdown-menu,
+#zakatEditHeaderOverlay .filter-dropdown.open .filter-dropdown-menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+/* ============================================================
+   ZAKAT - BUTTONS
+   ============================================================ */
+
+#zakatMuzakiSheet .flex.gap-2\.5,
+#zakatRincianSheet .flex.gap-2\.5,
+#zakatMustahikSheet .flex.gap-2\.5,
+#zakatFormOverlay .flex.gap-2\.5,
+#zakatEditHeaderOverlay .flex.gap-2\.5 {
+  display: flex !important;
+  gap: 10px !important;
+  padding-top: 4px !important;
+}
+
+#zakatMuzakiSheet .btn-ghost,
+#zakatRincianSheet .btn-ghost,
+#zakatMustahikSheet .btn-ghost,
+#zakatFormOverlay .btn-ghost,
+#zakatEditHeaderOverlay .btn-ghost {
+  flex: 1 !important;
+  padding: 10px 0 !important;
+  min-height: 40px !important;
+  border-radius: 8px !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+  border: 1px solid var(--line) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  text-align: center !important;
+}
+
+#zakatMuzakiSheet .btn-ghost:hover,
+#zakatRincianSheet .btn-ghost:hover,
+#zakatMustahikSheet .btn-ghost:hover,
+#zakatFormOverlay .btn-ghost:hover,
+#zakatEditHeaderOverlay .btn-ghost:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+#zakatMuzakiSheet .btn-primary,
+#zakatRincianSheet .btn-primary,
+#zakatMustahikSheet .btn-primary,
+#zakatFormOverlay .btn-primary,
+#zakatEditHeaderOverlay .btn-primary {
+  flex: 1 !important;
+  padding: 10px 0 !important;
+  min-height: 40px !important;
+  border-radius: 8px !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  text-align: center !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2) !important;
+}
+
+#zakatMuzakiSheet .btn-primary:hover,
+#zakatRincianSheet .btn-primary:hover,
+#zakatMustahikSheet .btn-primary:hover,
+#zakatFormOverlay .btn-primary:hover,
+#zakatEditHeaderOverlay .btn-primary:hover {
+  background: var(--brand-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3) !important;
+}
+
+#zakatMuzakiSheet .btn-primary:active,
+#zakatRincianSheet .btn-primary:active,
+#zakatMustahikSheet .btn-primary:active,
+#zakatFormOverlay .btn-primary:active,
+#zakatEditHeaderOverlay .btn-primary:active {
+  transform: scale(0.97) !important;
+}
+
+/* ============================================================
+   ZAKAT - RINCIAN SHEET
+   ============================================================ */
+
+#zakatRincianSheet .zakat-rincian-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 2px 0 !important;
+}
+
+#zakatRincianSheet .zakat-rincian-section {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  padding: 14px 16px !important;
+  transition: border-color 0.15s ease !important;
+}
+
+#zakatRincianSheet .zakat-rincian-section:hover {
+  border-color: var(--brand-soft) !important;
+}
+
+#zakatRincianSheet .zakat-rincian-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+#zakatRincianSheet .zakat-rincian-header h4 {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+#zakatRincianSheet .zakat-default-btn {
+  padding: 4px 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 6px !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  white-space: nowrap !important;
+}
+
+#zakatRincianSheet .zakat-default-btn:hover {
+  background: var(--brand-soft) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+#zakatRincianSheet .zakat-default-btn:active {
+  transform: scale(0.95) !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink-soft) !important;
+  min-width: 80px !important;
+  margin: 0 !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub {
+  padding-left: 20px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub .field-label {
+  font-size: 10px !important;
+  color: var(--ink-faint) !important;
+  min-width: 70px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-input {
+  flex: 1 !important;
+  min-height: 32px !important;
+  padding: 4px 10px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 6px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-align: right !important;
+  outline: none !important;
+  max-width: 100px !important;
+  transition: all 0.15s ease !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-input:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 2px var(--brand-soft) !important;
+}
+
+/* ============================================================
+   ZAKAT - RINCIAN TOTAL
+   ============================================================ */
+
+#zakatRincianSheet .zakat-rincian-total {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  padding: 12px 14px !important;
+  background: var(--surface-alt) !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--line) !important;
+  margin-top: 4px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-total-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 2px !important;
+  padding: 4px 0 !important;
+}
+
+#zakatRincianSheet .zakat-rincian-total-item .label {
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+}
+
+#zakatRincianSheet .zakat-rincian-total-item .value {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================================
+   ZAKAT - TOTAL RINGKASAN
+   ============================================================ */
+
+.zakat-total-ringkasan {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 14px !important;
+  background: var(--surface-alt) !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--line) !important;
+  margin-top: 12px !important;
+}
+
+.zakat-total-ringkasan .zakat-total-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink-soft) !important;
+}
+
+.zakat-total-ringkasan .zakat-total-value {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--brand) !important;
+}
+
+/* ============================================================
+   ZAKAT - RINCIAN SHEET (DESKRIPSI & SUFFIX)
+   ============================================================ */
+
+#zakatRincianSheet .zakat-rincian-desc {
+  font-size: 10px;
+  color: var(--ink-faint);
+  margin: -4px 0 8px 0;
+  font-weight: 500;
+  font-style: italic;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink-soft) !important;
+  min-width: 80px !important;
+  margin: 0 !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+  flex: 0 0 auto !important;
+  min-height: 32px !important;
+  padding: 4px 10px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 6px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-align: right !important;
+  outline: none !important;
+  max-width: 80px !important;
+  transition: all 0.15s ease !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-suffix {
+  font-size: 10px;
+  color: var(--ink-faint);
+  font-weight: 500;
+  min-width: 90px;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub {
+  padding-left: 20px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub .field-label {
+  font-size: 10px !important;
+  color: var(--ink-faint) !important;
+  min-width: 70px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub .field-suffix {
+  font-size: 9px;
+  color: var(--ink-faint);
+  min-width: 80px;
+}
+
+/* ============================================================
+   ZAKAT - MUZAKI/MUSTAHIK LIST
+   ============================================================ */
+
+#zakatMuzakiSheet .zakat-muzaki-list,
+#zakatMustahikSheet .zakat-mustahik-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin: 8px 0 4px 0 !important;
+  max-height: 280px !important;
+  overflow-y: auto !important;
+  padding: 2px 2px 4px 2px !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-list::-webkit-scrollbar,
+#zakatMustahikSheet .zakat-mustahik-list::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-list::-webkit-scrollbar-thumb,
+#zakatMustahikSheet .zakat-mustahik-list::-webkit-scrollbar-thumb {
+  background: var(--line) !important;
+  border-radius: 999px !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row,
+#zakatMustahikSheet .zakat-muzaki-row {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  padding: 4px 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row:last-child,
+#zakatMustahikSheet .zakat-muzaki-row:last-child {
+  border-bottom: none !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .zakat-name-wrapper,
+#zakatMustahikSheet .zakat-muzaki-row .zakat-name-wrapper {
+  flex: 1 !important;
+  position: relative !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .field-input,
+#zakatMustahikSheet .zakat-muzaki-row .field-input {
+  width: 100% !important;
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .zakat-name-badge,
+#zakatMustahikSheet .zakat-muzaki-row .zakat-name-badge {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 10px !important;
+  color: var(--pos) !important;
+  pointer-events: none !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+#zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+  max-width: 140px !important;
+  font-variant-numeric: tabular-nums !important;
+  text-align: right !important;
+}
+
+/* ============================================================
+   ZAKAT SHEET RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  #zakatMuzakiSheet .sheet,
+  #zakatRincianSheet .sheet,
+  #zakatMustahikSheet .sheet,
+  #zakatFormOverlay .sheet,
+  #zakatEditHeaderOverlay .sheet {
+    max-height: 88dvh !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-total {
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-total-item {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    padding: 4px 0 !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 6px 0 !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row .field-input,
+  #zakatMustahikSheet .zakat-muzaki-row .field-input {
+    max-width: 100% !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+  #zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+    max-width: 100% !important;
+    text-align: left !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-header {
+    flex-direction: column !important;
+    gap: 6px !important;
+    align-items: flex-start !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+    min-width: 60px !important;
+    font-size: 10px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group.sub {
+    padding-left: 12px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-input {
+    max-width: 80px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #zakatMuzakiSheet .sheet-title,
+  #zakatRincianSheet .sheet-title,
+  #zakatMustahikSheet .sheet-title,
+  #zakatFormOverlay .sheet-title,
+  #zakatEditHeaderOverlay .sheet-title {
+    font-size: 15px !important;
+  }
+
+  #zakatMuzakiSheet .sheet-subtitle,
+  #zakatRincianSheet .sheet-subtitle,
+  #zakatMustahikSheet .sheet-subtitle,
+  #zakatFormOverlay .sheet-subtitle,
+  #zakatEditHeaderOverlay .sheet-subtitle {
+    font-size: 11px !important;
+  }
+
+  #zakatMuzakiSheet .sheet-header-icon,
+  #zakatRincianSheet .sheet-header-icon,
+  #zakatMustahikSheet .sheet-header-icon,
+  #zakatFormOverlay .sheet-header-icon,
+  #zakatEditHeaderOverlay .sheet-header-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+  }
+
+  #zakatMuzakiSheet .sheet-header-icon svg,
+  #zakatRincianSheet .sheet-header-icon svg,
+  #zakatMustahikSheet .sheet-header-icon svg,
+  #zakatFormOverlay .sheet-header-icon svg,
+  #zakatEditHeaderOverlay .sheet-header-icon svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  .zakat-total-ringkasan {
+    flex-direction: column !important;
+    gap: 4px !important;
+    align-items: flex-start !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-section {
+    padding: 10px 12px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-total {
+    padding: 10px 12px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+    max-width: 70px !important;
+    font-size: 11px !important;
+    min-height: 28px !important;
+    padding: 2px 8px !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-list,
+  #zakatMustahikSheet .zakat-mustahik-list {
+    max-height: 200px !important;
+  }
+
+  #zakatFormOverlay .field-input,
+  #zakatEditHeaderOverlay .field-input {
+    font-size: 12px !important;
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+  }
+
+  #zakatFormOverlay .filter-dropdown-trigger,
+  #zakatEditHeaderOverlay .filter-dropdown-trigger {
+    min-height: 36px !important;
+    font-size: 12px !important;
+    padding: 0 10px !important;
+  }
+
+  #zakatMuzakiSheet .btn-ghost,
+  #zakatRincianSheet .btn-ghost,
+  #zakatMustahikSheet .btn-ghost,
+  #zakatFormOverlay .btn-ghost,
+  #zakatEditHeaderOverlay .btn-ghost,
+  #zakatMuzakiSheet .btn-primary,
+  #zakatRincianSheet .btn-primary,
+  #zakatMustahikSheet .btn-primary,
+  #zakatFormOverlay .btn-primary,
+  #zakatEditHeaderOverlay .btn-primary {
+    font-size: 12px !important;
+    min-height: 36px !important;
+    padding: 8px 0 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #zakatMuzakiSheet .sheet,
+  #zakatRincianSheet .sheet,
+  #zakatMustahikSheet .sheet,
+  #zakatFormOverlay .sheet,
+  #zakatEditHeaderOverlay .sheet {
+    max-height: 92dvh !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    padding-bottom: 8px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+    font-size: 9px !important;
+    min-width: 50px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+    max-width: 60px !important;
+    font-size: 10px !important;
+  }
+
+  #zakatMuzakiSheet .btn-ghost,
+  #zakatRincianSheet .btn-ghost,
+  #zakatMustahikSheet .btn-ghost,
+  #zakatFormOverlay .btn-ghost,
+  #zakatEditHeaderOverlay .btn-ghost,
+  #zakatMuzakiSheet .btn-primary,
+  #zakatRincianSheet .btn-primary,
+  #zakatMustahikSheet .btn-primary,
+  #zakatFormOverlay .btn-primary,
+  #zakatEditHeaderOverlay .btn-primary {
+    font-size: 11px !important;
+    min-height: 32px !important;
+    padding: 6px 0 !important;
+  }
+
+  #zakatFormOverlay .field-input,
+  #zakatEditHeaderOverlay .field-input {
+    font-size: 11px !important;
+    min-height: 32px !important;
+    padding: 4px 8px !important;
+  }
+
+  #zakatFormOverlay .filter-dropdown-trigger,
+  #zakatEditHeaderOverlay .filter-dropdown-trigger {
+    min-height: 32px !important;
+    font-size: 11px !important;
+    padding: 0 8px !important;
+  }
+
+  #zakatFormOverlay .create-form,
+  #zakatEditHeaderOverlay .create-form {
+    gap: 10px !important;
+  }
+
+  .zakat-total-ringkasan .zakat-total-label {
+    font-size: 10px !important;
+  }
+
+  .zakat-total-ringkasan .zakat-total-value {
+    font-size: 14px !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  #zakatRincianSheet .zakat-rincian-fields .field-group {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+    min-width: 60px !important;
+    font-size: 10px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+    max-width: 70px !important;
+    font-size: 12px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-suffix {
+    font-size: 9px;
+    min-width: 70px;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group.sub {
+    padding-left: 12px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-desc {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+    max-width: 60px !important;
+    font-size: 11px !important;
+    min-height: 28px !important;
+    padding: 2px 8px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-suffix {
+    font-size: 8px;
+    min-width: 60px;
+  }
+
+  #zakatRincianSheet .zakat-rincian-desc {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+    font-size: 9px !important;
+    min-width: 50px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+    max-width: 50px !important;
+    font-size: 10px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-suffix {
+    font-size: 7px;
+    min-width: 50px;
+  }
+}
+
+/* ============================================================
+   ZAKAT - DARK THEME SUPPORT
+   ============================================================ */
+
+[data-theme="dark"] #zakatRincianSheet .zakat-rincian-section {
+  background: var(--surface) !important;
+}
+
+[data-theme="dark"] #zakatRincianSheet .zakat-rincian-section:hover {
+  border-color: var(--brand-soft) !important;
+}
+
+[data-theme="dark"] #zakatRincianSheet .zakat-default-btn {
+  background: var(--surface-alt) !important;
+}
+
+[data-theme="dark"] #zakatRincianSheet .zakat-default-btn:hover {
+  background: var(--brand-soft) !important;
+}
+
+[data-theme="dark"] .zakat-total-ringkasan {
+  background: var(--surface-alt) !important;
+}
+
+[data-theme="dark"] #zakatRincianSheet .zakat-rincian-total {
+  background: var(--surface-alt) !important;
+}
+
+[data-theme="dark"]
+  #zakatMuzakiSheet
+  .zakat-muzaki-list::-webkit-scrollbar-thumb,
+[data-theme="dark"]
+  #zakatMustahikSheet
+  .zakat-mustahik-list::-webkit-scrollbar-thumb {
+  background: var(--line) !important;
+}
+
+[data-theme="dark"] #zakatFormOverlay .field-input,
+[data-theme="dark"] #zakatEditHeaderOverlay .field-input {
+  background: var(--surface) !important;
+}
+
+[data-theme="dark"] #zakatFormOverlay .field-input:hover,
+[data-theme="dark"] #zakatEditHeaderOverlay .field-input:hover {
+  background: var(--surface-alt) !important;
+}
+
+[data-theme="dark"] #zakatFormOverlay .filter-dropdown-trigger,
+[data-theme="dark"] #zakatEditHeaderOverlay .filter-dropdown-trigger {
+  background: var(--surface) !important;
+}
+
+[data-theme="dark"] #zakatFormOverlay .filter-dropdown-trigger:hover,
+[data-theme="dark"] #zakatEditHeaderOverlay .filter-dropdown-trigger:hover {
+  background: var(--surface-alt) !important;
+}
+
+[data-theme="dark"] #zakatFormOverlay .filter-dropdown-menu,
+[data-theme="dark"] #zakatEditHeaderOverlay .filter-dropdown-menu {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+}

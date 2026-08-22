@@ -1,0 +1,51 @@
+/* button.css */
+.btn-outline-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  border: 1.5px solid var(--brand) !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--brand) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-outline-brand:hover {
+  background: var(--brand) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+.btn-outline-brand:active {
+  transform: scale(0.95) !important;
+  box-shadow: none !important;
+}
+
+.btn-outline-brand svg {
+  stroke: currentColor !important;
+  transition: stroke 0.2s ease !important;
+}
+
+[data-theme="dark"] .btn-outline-brand {
+  border-color: var(--brand-dark) !important;
+  color: var(--brand) !important;
+}
+
+[data-theme="dark"] .btn-outline-brand:hover {
+  background: var(--brand-dark) !important;
+  color: #fff !important;
+  border-color: var(--brand-dark) !important;
+}

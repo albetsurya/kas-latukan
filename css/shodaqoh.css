@@ -1948,42 +1948,55 @@ html[data-theme="dark"] #shodSusulanBulan {
 
 #shodMembersList .shod-members-add {
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
-
   gap: 5px !important;
-
   height: 28px !important;
   min-height: 28px !important;
-
-  padding: 0 9px !important;
+  padding: 0 12px !important;
   margin: 0 !important;
-
-  border: 1px solid var(--line) !important;
+  border: 1.5px solid var(--brand) !important;
   border-radius: 8px !important;
-
-  background: var(--surface-alt) !important;
-
-  color: var(--ink-soft) !important;
-
-  font-family: inherit !important;
+  background: transparent !important;
+  color: var(--brand) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
   font-size: 10px !important;
   font-weight: 700 !important;
-
   line-height: 1 !important;
-
   white-space: nowrap !important;
-
   box-sizing: border-box !important;
-
   cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+#shodMembersList .shod-members-add:hover {
+  background: var(--brand) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+#shodMembersList .shod-members-add:active {
+  transform: scale(0.95) !important;
+  box-shadow: none !important;
 }
 
 #shodMembersList .shod-members-add svg {
   display: block !important;
-
   flex: 0 0 12px !important;
+  stroke: currentColor !important;
+  transition: stroke 0.2s ease !important;
+}
+
+[data-theme="dark"] #shodMembersList .shod-members-add {
+  border-color: var(--brand-dark) !important;
+  color: var(--brand) !important;
+}
+
+[data-theme="dark"] #shodMembersList .shod-members-add:hover {
+  background: var(--brand-dark) !important;
+  color: #fff !important;
+  border-color: var(--brand-dark) !important;
 }
 
 /* =========================================================
@@ -2210,20 +2223,30 @@ html[data-theme="dark"] #shodMembersList .tx-card:active {
   background: var(--surface-alt);
 }
 
-/* Tambahkan di style.css */
+/* ============================================================
+   SHODAQOH - TABS
+   ============================================================ */
+
 .shod-tabs-container {
   position: relative;
   z-index: 1;
+  background: transparent;
+  padding: 12px 0 10px 0;
+  margin: 0;
 }
 
 .shod-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
 
 .shod-tab {
-  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -2236,15 +2259,55 @@ html[data-theme="dark"] #shodMembersList .tx-card:active {
   text-align: center;
 }
 
+.shod-tab svg {
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
 .shod-tab.active {
   background: var(--brand);
   color: #fff;
   border-color: var(--brand);
 }
 
+.shod-tab.active svg {
+  stroke: #fff;
+}
+
 .shod-tab:hover:not(.active) {
   background: var(--surface-alt);
   border-color: var(--brand-soft);
+  color: var(--brand);
+}
+
+.shod-tab:active:not(.active) {
+  transform: scale(0.97);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .shod-tab {
+    font-size: 10px;
+    padding: 8px 0;
+  }
+
+  .shod-tab svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .shod-tab {
+    font-size: 9px;
+    padding: 6px 0;
+    gap: 4px;
+  }
+
+  .shod-tab svg {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 #shodPaymentDetailBody .tx-card {

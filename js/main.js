@@ -2604,7 +2604,7 @@ function renderShodaqohMembers() {
           ${
             isAdmin
               ? `
-            <button type="button" id="shodAddMemberBtn" class="shod-members-add">
+            <button type="button" id="shodAddMemberBtn" class="shod-members-add btn-outline-brand">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg>
@@ -2629,7 +2629,7 @@ function renderShodaqohMembers() {
             ${
               isAdmin
                 ? `
-              <button type="button" id="shodAddFirstMember">+ Tambah anggota pertama</button>
+              <button type="button" id="shodAddFirstMember" class="btn-outline-brand">+ Tambah anggota pertama</button>
             `
                 : ""
             }

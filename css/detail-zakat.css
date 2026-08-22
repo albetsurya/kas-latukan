@@ -1,0 +1,774 @@
+/* ============================================================
+   ZAKAT - UI/UX IMPROVED (Warna sesuai tema)
+   ============================================================ */
+
+/* Detail Container */
+.zakat-detail-container {
+  padding: 4px 0;
+}
+
+/* ============================================================
+   ZAKAT - DETAIL HEADER (Actions sejajar title)
+   ============================================================ */
+
+.zakat-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 8px 0 4px 0;
+  gap: 16px;
+}
+
+.zakat-detail-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.zakat-detail-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zakat-detail-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.zakat-edit-header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.zakat-edit-header-btn:hover {
+  background: var(--surface-alt);
+  color: var(--brand);
+}
+
+.zakat-edit-header-btn:active {
+  transform: scale(0.92);
+}
+
+.zakat-detail-meta {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 6px 0 2px 0;
+  font-weight: 500;
+}
+
+.zakat-detail-keterangan {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0;
+  display: none;
+}
+
+.zakat-detail-keterangan:not(:empty) {
+  display: block;
+}
+
+/* ============================================================
+   ZAKAT - ACTIONS (Sejajar title - pojok kanan atas)
+   ============================================================ */
+
+.zakat-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* ============================================================
+   ZAKAT - ACTION BUTTONS
+   ============================================================ */
+
+.zakat-action-btn {
+  transition: all 0.2s ease;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.zakat-action-btn:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+.zakat-action-btn:active {
+  transform: scale(0.92);
+}
+
+.zakat-action-btn.danger:hover {
+  border-color: var(--neg) !important;
+  color: var(--neg) !important;
+  box-shadow: 0 2px 8px rgba(224, 82, 82, 0.15);
+}
+
+.zakat-action-btn svg {
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   ZAKAT - TOTAL (Di bawah header, full width)
+   ============================================================ */
+
+.zakat-detail-total-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 0 14px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.zakat-detail-total {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--brand);
+}
+
+/* ============================================================
+   ZAKAT - TABS
+   ============================================================ */
+
+.zakat-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.zakat-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.zakat-tab svg {
+  flex-shrink: 0;
+}
+
+.zakat-tab.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.zakat-tab.active svg {
+  stroke: #fff;
+}
+
+.zakat-tab:hover:not(.active) {
+  background: var(--surface-alt);
+  border-color: var(--brand-soft);
+}
+
+/* ============================================================
+   ZAKAT - TAB CONTENT
+   ============================================================ */
+
+.zakat-tab-content {
+  margin-top: 2px;
+}
+
+.zakat-tab-panel {
+  display: none;
+}
+
+.zakat-tab-panel.active {
+  display: block;
+}
+
+/* ============================================================
+   ZAKAT - TAB HEADER (GABUNGAN - TIDAK DUPLIKAT)
+   ============================================================ */
+
+.zakat-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 12px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.zakat-tab-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.zakat-tab-title h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  white-space: nowrap;
+}
+
+.zakat-tab-count {
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-weight: 600;
+  background: var(--surface-alt);
+  padding: 3px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.zakat-tab-status {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.zakat-tab-status.saved {
+  color: var(--pos);
+}
+
+.zakat-tab-status.unsaved {
+  color: var(--ink-faint);
+}
+
+.zakat-tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   ZAKAT - BUTTON SMALL
+   ============================================================ */
+
+.btn-sm {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 7px 16px !important;
+  font-size: 12px !important;
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--line) !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.btn-sm:hover {
+  background: var(--surface) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+.btn-sm:active {
+  transform: scale(0.95) !important;
+}
+
+.btn-sm svg {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   ZAKAT - TABLE
+   ============================================================ */
+
+.zakat-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.zakat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+}
+
+.zakat-table thead th {
+  padding: 12px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-faint);
+  border-bottom: 2px solid var(--line);
+  white-space: nowrap;
+  background: var(--surface);
+}
+
+.zakat-table tbody td {
+  padding: 12px 10px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+.zakat-table tbody tr:hover td {
+  background-color: var(--surface-alt);
+}
+
+.zakat-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.zakat-table-total td {
+  padding: 14px 12px !important;
+  border-top: 2px solid var(--line) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+}
+
+.zakat-table-total td:last-child {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--brand) !important;
+  text-align: right !important;
+  letter-spacing: 0.3px;
+}
+
+/* Pastikan total selalu terlihat */
+#zakatMuzakiTableTotal,
+#zakatMustahikTableTotal {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--brand) !important;
+}
+
+/* ============================================================
+   ZAKAT - RINCIAN GRID
+   ============================================================ */
+
+.zakat-rincian-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.zakat-rincian-group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.zakat-rincian-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+
+.zakat-rincian-group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.zakat-rincian-group-icon svg {
+  stroke: currentColor;
+}
+
+.zakat-rincian-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.zakat-rincian-group-total {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.zakat-rincian-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.zakat-rincian-group-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 4px 0;
+  color: var(--ink-soft);
+}
+
+.zakat-rincian-group-item span:last-child {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ============================================================
+   ZAKAT - RINCIAN PROGRESS
+   ============================================================ */
+
+.zakat-rincian-progress {
+  margin-top: 6px;
+}
+
+.zakat-rincian-progress-bar {
+  display: flex;
+  height: 28px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-alt);
+}
+
+.zakat-rincian-progress-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  transition: width 0.5s ease;
+}
+
+.zakat-rincian-progress-segment.mustahik {
+  background: var(--brand);
+}
+
+[data-theme="dark"] .zakat-rincian-progress-segment.mustahik {
+  background: var(--brand-dark);
+}
+
+.zakat-rincian-progress-segment.sabilillah {
+  background: var(--gold);
+}
+
+[data-theme="dark"] .zakat-rincian-progress-segment.sabilillah {
+  background: var(--gold-dark);
+}
+
+.zakat-rincian-progress-segment.amil {
+  background: var(--pos);
+}
+
+[data-theme="dark"] .zakat-rincian-progress-segment.amil {
+  background: var(--pos-dark);
+}
+
+.zakat-rincian-progress-segment span {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================
+   ZAKAT - MUSTAHIK INFO BAR
+   ============================================================ */
+
+.zakat-mustahik-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.zakat-mustahik-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zakat-mustahik-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.zakat-mustahik-info-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.zakat-mustahik-info-value.success {
+  color: var(--pos);
+}
+
+.zakat-mustahik-info-value.warning {
+  color: var(--gold);
+}
+
+.zakat-mustahik-info-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--line);
+}
+
+/* ============================================================
+   ZAKAT - PROGRESS CONTAINER
+   ============================================================ */
+
+.zakat-progress-container {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.zakat-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand);
+  transition: width 0.5s ease;
+}
+
+/* ============================================================
+   ZAKAT - RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .zakat-rincian-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .zakat-mustahik-info-bar {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .zakat-mustahik-info-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .zakat-detail-header {
+    flex-direction: flex;
+    gap: 8px;
+  }
+
+  .zakat-detail-actions {
+    padding-top: 0;
+    align-self: flex-start;
+  }
+
+  .zakat-detail-total-wrapper {
+    justify-content: flex-start;
+    padding: 4px 0 12px 0;
+  }
+
+  .zakat-detail-total {
+    font-size: 17px;
+  }
+
+  .zakat-tab-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .zakat-tab-title {
+    flex: 1;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .zakat-tab-title h4 {
+    font-size: 13px;
+  }
+
+  .btn-sm {
+    padding: 5px 12px !important;
+    font-size: 11px !important;
+    min-height: 30px !important;
+  }
+
+  .zakat-mustahik-info-item {
+    flex-wrap: wrap;
+  }
+
+  .zakat-mustahik-info-label {
+    font-size: 10px;
+  }
+
+  .zakat-mustahik-info-value {
+    font-size: 13px;
+  }
+
+  .zakat-table {
+    font-size: 13px;
+  }
+
+  .zakat-table thead th {
+    font-size: 10px;
+    padding: 10px 8px;
+  }
+
+  .zakat-table tbody td {
+    font-size: 13px;
+    padding: 10px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .zakat-detail-title {
+    font-size: 15px;
+  }
+
+  .zakat-detail-total {
+    font-size: 15px;
+  }
+
+  .zakat-tabs {
+    gap: 4px;
+  }
+
+  .zakat-tab {
+    font-size: 11px;
+    padding: 8px 0;
+  }
+
+  .zakat-tab svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .zakat-tab-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .zakat-tab-title {
+    flex: 1;
+    gap: 4px;
+  }
+
+  .zakat-tab-title h4 {
+    font-size: 12px;
+  }
+
+  .zakat-tab-count {
+    font-size: 10px;
+    padding: 2px 10px;
+  }
+
+  .zakat-table {
+    font-size: 12px;
+    min-width: 350px;
+  }
+
+  .zakat-table thead th {
+    font-size: 9px;
+    padding: 8px 6px;
+  }
+
+  .zakat-table tbody td {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  .zakat-mustahik-info-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .zakat-rincian-group {
+    padding: 12px 14px;
+  }
+
+  .zakat-rincian-group-item {
+    font-size: 12px;
+  }
+
+  .zakat-action-btn {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+  }
+
+  .zakat-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Cek di CSS */
+#zakatTabMuzaki {
+  display: block !important;
+}
+
+#zakatTabMuzaki.hidden {
+  display: none !important;
+}
