@@ -4391,18 +4391,6 @@ function clearZakatDate(dropdown, valueDisplay, hiddenInput, state) {
   closeZakatDatePicker(dropdown);
 }
 
-function truncateNameToThreeWords(name) {
-  if (!name) return "";
-
-  // Split nama menjadi array kata
-  const words = name.trim().split(/\s+/);
-
-  // Ambil 3 kata pertama
-  const firstThree = words.slice(0, 3);
-
-  // Gabungkan kembali
-  return firstThree.join(" ");
-}
 // ============================================================
 // ZAKAT - UPDATE LAST SYNC (Tambahan)
 // ============================================================

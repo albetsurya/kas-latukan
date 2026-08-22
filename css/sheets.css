@@ -208,30 +208,104 @@ body > #shodMemberDetailOverlay .sheet-scroll {
    SHODAQOH MEMBER DETAIL - STICKY PERIODE & FONT SERAGAM
    ============================================================ */
 
-/* Container untuk scroll */
+#shodMemberDetailOverlay thead th {
+  padding: 10px 8px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+  border-bottom: 2px solid var(--line) !important;
+  white-space: nowrap !important;
+  background: var(--surface) !important;
+  text-align: left !important;
+}
+
+/* ============================================================
+   SHODAQOH MEMBER DETAIL - SEMUA DARI CSS, BUKAN INLINE
+   ============================================================ */
+
+/* Container scroll */
 #shodMemberDetailOverlay .sheet-scroll {
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch !important;
 }
 
-/* Tabel wrapper */
-#shodMemberDetailOverlay .overflow-x-auto {
-  position: relative;
-  overflow-x: auto;
-}
-
-/* Tabel */
-#shodMemberDetailOverlay table {
-  width: 100%;
-  min-width: 900px;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 13px;
-  table-layout: fixed;
+/* ============================================================
+   HEADER PERIODE - STICKY
+   ============================================================ */
+#shodMemberDetailOverlay .shod-member-detail-header-period {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 20 !important;
+  background: var(--surface) !important;
+  min-width: 110px !important;
+  max-width: 130px !important;
+  width: 12% !important;
+  padding: 10px 8px !important;
+  border-right: 2px solid var(--line) !important;
+  border-bottom: 2px solid var(--line) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+  text-align: left !important;
+  white-space: nowrap !important;
 }
 
 /* ============================================================
-   KOLOM PERIODE - STICKY
+   HEADER STATUS - CENTER
+   ============================================================ */
+#shodMemberDetailOverlay .shod-member-detail-header-status {
+  padding: 10px 8px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+  border-bottom: 2px solid var(--line) !important;
+  white-space: nowrap !important;
+  background: var(--surface) !important;
+  text-align: center !important;
+  width: 8% !important;
+}
+
+/* ============================================================
+   HEADER ANGKA - RIGHT
+   ============================================================ */
+#shodMemberDetailOverlay .shod-member-detail-header-number {
+  padding: 10px 8px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+  border-bottom: 2px solid var(--line) !important;
+  white-space: nowrap !important;
+  background: var(--surface) !important;
+  text-align: right !important;
+}
+
+/* ============================================================
+   HEADER TOTAL - BRAND COLOR
+   ============================================================ */
+#shodMemberDetailOverlay .shod-member-detail-header-total {
+  padding: 10px 8px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--brand) !important;
+  border-bottom: 2px solid var(--line) !important;
+  white-space: nowrap !important;
+  background: var(--surface) !important;
+  text-align: right !important;
+  width: 12% !important;
+}
+
+/* ============================================================
+   KOLOM PERIODE - STICKY (BODY)
    ============================================================ */
 #shodMemberDetailOverlay .shod-member-detail-period {
   position: sticky !important;
@@ -244,61 +318,30 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   font-size: 13px !important;
   font-weight: 700;
   padding: 10px 8px !important;
-  border-right: 2px solid var(--line);
+  border-right: 2px solid var(--line) !important;
+  border-bottom: 1px solid var(--line) !important;
   white-space: nowrap;
-}
-
-/* Header periode juga sticky */
-#shodMemberDetailOverlay thead th:first-child {
-  position: sticky !important;
-  left: 0 !important;
-  z-index: 20 !important;
-  background: var(--surface) !important;
-  min-width: 110px !important;
-  max-width: 130px !important;
-  width: 12% !important;
-  padding: 10px 8px !important;
-  border-right: 2px solid var(--line);
-  border-bottom: 2px solid var(--line);
-  font-size: 10px !important;
-}
-
-/* Shadow effect untuk sticky column */
-#shodMemberDetailOverlay .shod-member-detail-period::after,
-#shodMemberDetailOverlay thead th:first-child::after {
-  content: "";
-  position: absolute;
-  right: -8px;
-  top: 0;
-  bottom: 0;
-  width: 8px;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
-  pointer-events: none;
-}
-
-[data-theme="dark"] #shodMemberDetailOverlay .shod-member-detail-period::after,
-[data-theme="dark"] #shodMemberDetailOverlay thead th:first-child::after {
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.06), transparent);
-}
-
-/* Hover effect untuk sticky column */
-#shodMemberDetailOverlay tbody tr:hover .shod-member-detail-period {
-  background-color: var(--surface-alt) !important;
+  text-align: left !important;
 }
 
 /* ============================================================
-   KOLOM LAINNYA - FONT SERAGAM (tanpa monospace)
+   BODY CELLS - DEFAULT
    ============================================================ */
-
-/* Status */
-#shodMemberDetailOverlay .shod-member-detail-status {
+#shodMemberDetailOverlay tbody td {
   padding: 10px 8px !important;
-  text-align: center;
   font-size: 13px !important;
-  min-width: 80px;
-  max-width: 100px;
-  width: 8% !important;
-  white-space: nowrap;
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--ink);
+  vertical-align: middle;
+  line-height: 1.4;
+  background: var(--surface);
+}
+
+/* ============================================================
+   STATUS - CENTER
+   ============================================================ */
+#shodMemberDetailOverlay .shod-member-detail-status {
+  text-align: center !important;
 }
 
 #shodMemberDetailOverlay .shod-member-detail-status .status-pill {
@@ -311,17 +354,26 @@ body > #shodMemberDetailOverlay .sheet-scroll {
 }
 
 /* ============================================================
-   KOLOM IR - LEBAR DITAMBAH
+   ANGKA - RIGHT
+   ============================================================ */
+#shodMemberDetailOverlay .shod-member-detail-ir,
+#shodMemberDetailOverlay .shod-member-detail-sambung,
+#shodMemberDetailOverlay .shod-member-detail-jimpitan,
+#shodMemberDetailOverlay .shod-member-detail-siar,
+#shodMemberDetailOverlay .shod-member-detail-seribuan,
+#shodMemberDetailOverlay .shod-member-detail-kafan,
+#shodMemberDetailOverlay .shod-member-detail-mt,
+#shodMemberDetailOverlay .shod-member-detail-total {
+  text-align: right !important;
+}
+
+/* ============================================================
+   KOLOM WIDTHS
    ============================================================ */
 #shodMemberDetailOverlay .shod-member-detail-ir {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
   min-width: 160px !important;
   max-width: 190px !important;
   width: 16% !important;
-  white-space: nowrap;
 }
 
 #shodMemberDetailOverlay .shod-member-detail-ir .ir-value {
@@ -330,12 +382,44 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   font-size: 13px !important;
 }
 
+#shodMemberDetailOverlay .shod-member-detail-sambung {
+  min-width: 120px !important;
+  max-width: 140px !important;
+  width: 11% !important;
+  color: var(--ink-soft);
+}
+
+#shodMemberDetailOverlay .shod-member-detail-jimpitan,
+#shodMemberDetailOverlay .shod-member-detail-siar,
+#shodMemberDetailOverlay .shod-member-detail-seribuan,
+#shodMemberDetailOverlay .shod-member-detail-kafan {
+  min-width: 100px !important;
+  max-width: 120px !important;
+  width: 9% !important;
+  color: var(--ink-soft);
+}
+
+#shodMemberDetailOverlay .shod-member-detail-mt {
+  min-width: 120px !important;
+  max-width: 140px !important;
+  width: 11% !important;
+  color: var(--ink-soft);
+}
+
+#shodMemberDetailOverlay .shod-member-detail-total {
+  min-width: 130px !important;
+  max-width: 150px !important;
+  width: 12% !important;
+  font-weight: 700 !important;
+  color: var(--brand) !important;
+}
+
 /* ============================================================
-   IR SUSULAN TOOLTIP - FONT DIPERBESAR
+   IR SUSULAN TOOLTIP
    ============================================================ */
 #shodMemberDetailOverlay .ir-susulan-tooltip {
   display: block;
-  font-size: 9.5px !important; /* DIPERBESAR dari 8px */
+  font-size: 9.5px !important;
   color: var(--gold);
   font-weight: 600;
   text-align: right;
@@ -345,162 +429,58 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   line-height: 1.4;
 }
 
-/* ============================================================
-   KOLOM UANG SAMBUNG - LEBAR DITAMBAH
-   ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-sambung {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
-  min-width: 120px !important;
-  max-width: 140px !important;
-  width: 11% !important;
-  white-space: nowrap;
-  color: var(--ink-soft);
+#shodMemberDetailOverlay .shod-member-detail-period::after,
+#shodMemberDetailOverlay .shod-member-detail-header-period::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="dark"] #shodMemberDetailOverlay .shod-member-detail-period::after,
+[data-theme="dark"]
+  #shodMemberDetailOverlay
+  .shod-member-detail-header-period::after {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* ============================================================
-   KOLOM JIMPITAN - LEBAR STANDAR
+   HOVER EFFECT
    ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-jimpitan {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
-  min-width: 100px !important;
-  max-width: 120px !important;
-  width: 9% !important;
-  white-space: nowrap;
-  color: var(--ink-soft);
+#shodMemberDetailOverlay tbody tr:hover .shod-member-detail-period {
+  background-color: var(--surface-alt) !important;
+}
+
+#shodMemberDetailOverlay tbody tr:hover td:not(.shod-member-detail-period) {
+  background-color: var(--surface-alt);
 }
 
 /* ============================================================
-   KOLOM SIAR-SIAR - LEBAR STANDAR
+   LAST ROW - NO BORDER
    ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-siar {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
-  min-width: 100px !important;
-  max-width: 120px !important;
-  width: 9% !important;
-  white-space: nowrap;
-  color: var(--ink-soft);
-}
-
-/* ============================================================
-   KOLOM SERIBUAN - LEBAR STANDAR
-   ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-seribuan {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
-  min-width: 100px !important;
-  max-width: 120px !important;
-  width: 9% !important;
-  white-space: nowrap;
-  color: var(--ink-soft);
-}
-
-/* ============================================================
-   KOLOM KAFAN - LEBAR STANDAR
-   ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-kafan {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
-  min-width: 100px !important;
-  max-width: 120px !important;
-  width: 9% !important;
-  white-space: nowrap;
-  color: var(--ink-soft);
-}
-
-/* ============================================================
-   KOLOM MT - LEBAR DITAMBAH
-   ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-mt {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 600;
-  text-align: right;
-  min-width: 120px !important;
-  max-width: 140px !important;
-  width: 11% !important;
-  white-space: nowrap;
-  color: var(--ink-soft);
-}
-
-/* ============================================================
-   KOLOM TOTAL - LEBAR DITAMBAH
-   ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-total {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  font-weight: 700;
-  text-align: right;
-  min-width: 130px !important;
-  max-width: 150px !important;
-  width: 12% !important;
-  white-space: nowrap;
-}
-
-/* ============================================================
-   HEADER TABEL
-   ============================================================ */
-
-#shodMemberDetailOverlay thead th:not(:first-child) {
-  padding: 10px 8px !important;
-  font-size: 10px !important;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--ink-faint);
-  border-bottom: 2px solid var(--line);
-  text-align: left;
-  white-space: nowrap;
-  background: var(--surface);
-}
-
-#shodMemberDetailOverlay thead th:nth-child(3),
-#shodMemberDetailOverlay thead th:nth-child(4),
-#shodMemberDetailOverlay thead th:nth-child(5),
-#shodMemberDetailOverlay thead th:nth-child(6),
-#shodMemberDetailOverlay thead th:nth-child(7),
-#shodMemberDetailOverlay thead th:nth-child(8),
-#shodMemberDetailOverlay thead th:nth-child(9),
-#shodMemberDetailOverlay thead th:nth-child(10) {
-  text-align: right;
-}
-
-#shodMemberDetailOverlay thead th:nth-child(2) {
-  text-align: center;
+#shodMemberDetailOverlay tbody tr:last-child td {
+  border-bottom: none !important;
 }
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-
 @media (max-width: 640px) {
   #shodMemberDetailOverlay table {
     min-width: 800px;
     font-size: 12px;
   }
 
-  #shodMemberDetailOverlay .shod-member-detail-period {
+  #shodMemberDetailOverlay .shod-member-detail-period,
+  #shodMemberDetailOverlay .shod-member-detail-header-period {
     min-width: 90px !important;
     max-width: 110px !important;
     font-size: 12px !important;
-    padding: 8px 6px !important;
-  }
-
-  #shodMemberDetailOverlay thead th:first-child {
-    min-width: 90px !important;
-    max-width: 110px !important;
     padding: 8px 6px !important;
   }
 
@@ -511,56 +491,14 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     padding: 8px 6px !important;
   }
 
-  #shodMemberDetailOverlay .shod-member-detail-ir .ir-value {
-    font-size: 12px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-sambung {
-    font-size: 12px !important;
-    min-width: 100px !important;
-    max-width: 120px !important;
-    padding: 8px 6px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-jimpitan {
-    font-size: 12px !important;
-    min-width: 85px !important;
-    max-width: 100px !important;
-    padding: 8px 6px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-siar {
-    font-size: 12px !important;
-    min-width: 85px !important;
-    max-width: 100px !important;
-    padding: 8px 6px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-seribuan {
-    font-size: 12px !important;
-    min-width: 85px !important;
-    max-width: 100px !important;
-    padding: 8px 6px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-kafan {
-    font-size: 12px !important;
-    min-width: 85px !important;
-    max-width: 100px !important;
-    padding: 8px 6px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-mt {
-    font-size: 12px !important;
-    min-width: 100px !important;
-    max-width: 120px !important;
-    padding: 8px 6px !important;
-  }
-
+  #shodMemberDetailOverlay .shod-member-detail-sambung,
+  #shodMemberDetailOverlay .shod-member-detail-jimpitan,
+  #shodMemberDetailOverlay .shod-member-detail-siar,
+  #shodMemberDetailOverlay .shod-member-detail-seribuan,
+  #shodMemberDetailOverlay .shod-member-detail-kafan,
+  #shodMemberDetailOverlay .shod-member-detail-mt,
   #shodMemberDetailOverlay .shod-member-detail-total {
     font-size: 12px !important;
-    min-width: 110px !important;
-    max-width: 130px !important;
     padding: 8px 6px !important;
   }
 
@@ -574,7 +512,7 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     padding: 2px 10px !important;
   }
 
-  #shodMemberDetailOverlay thead th:not(:first-child) {
+  #shodMemberDetailOverlay thead th {
     font-size: 9px !important;
     padding: 8px 6px !important;
   }
@@ -590,16 +528,11 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     font-size: 11px;
   }
 
-  #shodMemberDetailOverlay .shod-member-detail-period {
+  #shodMemberDetailOverlay .shod-member-detail-period,
+  #shodMemberDetailOverlay .shod-member-detail-header-period {
     min-width: 75px !important;
     max-width: 90px !important;
     font-size: 11px !important;
-    padding: 6px 4px !important;
-  }
-
-  #shodMemberDetailOverlay thead th:first-child {
-    min-width: 75px !important;
-    max-width: 90px !important;
     padding: 6px 4px !important;
   }
 
@@ -610,49 +543,13 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     padding: 6px 4px !important;
   }
 
-  #shodMemberDetailOverlay .shod-member-detail-ir .ir-value {
-    font-size: 11px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-sambung {
-    font-size: 11px !important;
-    min-width: 85px !important;
-    max-width: 100px !important;
-    padding: 6px 4px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-jimpitan {
-    font-size: 11px !important;
-    min-width: 75px !important;
-    max-width: 85px !important;
-    padding: 6px 4px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-siar {
-    font-size: 11px !important;
-    min-width: 75px !important;
-    max-width: 85px !important;
-    padding: 6px 4px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-seribuan {
-    font-size: 11px !important;
-    min-width: 75px !important;
-    max-width: 85px !important;
-    padding: 6px 4px !important;
-  }
-
-  #shodMemberDetailOverlay .shod-member-detail-kafan {
-    font-size: 11px !important;
-    min-width: 75px !important;
-    max-width: 85px !important;
-    padding: 6px 4px !important;
-  }
-
+  #shodMemberDetailOverlay .shod-member-detail-sambung,
+  #shodMemberDetailOverlay .shod-member-detail-jimpitan,
+  #shodMemberDetailOverlay .shod-member-detail-siar,
+  #shodMemberDetailOverlay .shod-member-detail-seribuan,
+  #shodMemberDetailOverlay .shod-member-detail-kafan,
   #shodMemberDetailOverlay .shod-member-detail-mt {
     font-size: 11px !important;
-    min-width: 85px !important;
-    max-width: 100px !important;
     padding: 6px 4px !important;
   }
 
@@ -673,7 +570,7 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     padding: 2px 8px !important;
   }
 
-  #shodMemberDetailOverlay thead th:not(:first-child) {
+  #shodMemberDetailOverlay thead th {
     font-size: 8px !important;
     padding: 6px 4px !important;
   }
@@ -681,6 +578,52 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   #shodMemberDetailOverlay .ir-susulan-tooltip {
     font-size: 8px !important;
   }
+}
+
+#shodMemberDetailBody td {
+  padding: 8px 4px !important;
+  font-size: 11px !important;
+}
+
+#shodMemberDetailBody .status-pill {
+  font-size: 8px !important;
+  padding: 2px 10px !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+#shodPaymentDetailBody .tx-card.skeleton-loading {
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+#shodPaymentDetailBody .tx-card.skeleton-loading:last-child {
+  border-bottom: none;
+}
+
+#shodMemberDetailBody .skeleton-row td {
+  padding: 10px 4px;
+}
+
+#shodMemberDetailBody .skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--line);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+#shodMemberDetailBody .skeleton-line.short {
+  width: 40%;
+}
+
+#shodMemberDetailBody .skeleton-line.medium {
+  width: 60%;
+}
+
+#shodMemberDetailBody .skeleton-line.long {
+  width: 80%;
 }
 
 /* =========================================================
@@ -1063,4 +1006,3 @@ body > #txActionOverlay > .sheet {
     font-size: 13px !important;
   }
 }
-

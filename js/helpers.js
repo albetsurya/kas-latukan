@@ -2288,3 +2288,19 @@ let chartState = {
   },
 };
 
+function truncateNameToThreeWords(name) {
+  if (!name) return "";
+
+  // Cari posisi kata "dan" (case insensitive)
+  const danIndex = name.toLowerCase().indexOf(" dan ");
+
+  // Jika ada kata "dan", ambil teks sebelum "dan"
+  if (danIndex !== -1) {
+    return name.substring(0, danIndex).trim();
+  }
+
+  // Jika tidak ada "dan", ambil 3 kata pertama (fallback)
+  const words = name.trim().split(/\s+/);
+  const firstThree = words.slice(0, 3);
+  return firstThree.join(" ");
+}

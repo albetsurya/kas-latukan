@@ -391,7 +391,7 @@ html.authenticated #shell {
 #shell main {
   position: fixed;
   top: 64px;
-  bottom: 70px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   width: min(100%, 480px);
@@ -1690,4 +1690,3 @@ html[data-theme="dark"] #toast {
   background: var(--neg-soft);
   color: var(--neg);
 }
-

@@ -1326,7 +1326,7 @@
                 </h2>
                 <div class="flex items-center gap-3 mt-1">
                   <span
-                    class="text-[18px] font-extrabold font-mono"
+                    class="text-[18px] font-extrabold"
                     id="chartLastValue"
                     style="color: var(--ink)"
                   >
@@ -2972,60 +2972,67 @@
               </div>
 
               <div class="sheet-scroll">
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs">
+                <div
+                  style="overflow-x: auto; -webkit-overflow-scrolling: touch"
+                >
+                  <table
+                    style="
+                      width: 100%;
+                      min-width: 700px;
+                      border-collapse: collapse;
+                      font-size: 13px;
+                      table-layout: fixed;
+                    "
+                  >
                     <thead>
-                      <tr class="border-b border-[color:var(--line)]">
-                        <th
-                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
-                        >
+                      <tr style="border-bottom: 2px solid var(--line)">
+                        <th class="shod-member-detail-header-period">
                           Periode
                         </th>
+                        <th class="shod-member-detail-header-status">Status</th>
                         <th
-                          class="py-2 text-left font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
-                        >
-                          Status
-                        </th>
-                        <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 12%"
                         >
                           Infak IR
                         </th>
                         <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 11%"
                         >
                           Sambung
                         </th>
                         <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 9%"
                         >
                           Jimpitan
                         </th>
                         <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 9%"
                         >
                           Siar-siar
                         </th>
                         <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 9%"
                         >
                           Seribuan
                         </th>
                         <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 9%"
                         >
                           Kafan
                         </th>
                         <th
-                          class="py-2 text-right font-bold text-[color:var(--ink-faint)] text-[9px] uppercase tracking-wider whitespace-nowrap"
+                          class="shod-member-detail-header-number"
+                          style="width: 11%"
                         >
                           Ukhro MT
                         </th>
-                        <th
-                          class="py-2 text-right font-bold text-[color:var(--brand)] text-[9px] uppercase tracking-wider whitespace-nowrap"
-                        >
-                          Total
-                        </th>
+                        <th class="shod-member-detail-header-total">Total</th>
                       </tr>
                     </thead>
                     <tbody id="shodMemberDetailBody"></tbody>

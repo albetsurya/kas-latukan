@@ -593,7 +593,7 @@ function renderShodaqohTabs() {
       <div style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
         <table style="
           width: 100%;
-          min-width: 600px;
+          min-width: 500px;
           border-collapse: collapse;
           font-size: 13px;
           table-layout: fixed;
@@ -618,7 +618,7 @@ function renderShodaqohTabs() {
                 letter-spacing: 0.5px;
                 color: var(--ink-faint);
                 text-align: right;
-                width: 15%;
+                width: 10%;
               ">Target</th>
               <th style="
                 padding: 10px 8px;
@@ -628,7 +628,7 @@ function renderShodaqohTabs() {
                 letter-spacing: 0.5px;
                 color: var(--ink-faint);
                 text-align: right;
-                width: 15%;
+                width: 12%;
               ">Dibayar</th>
               <th style="
                 padding: 10px 8px;
@@ -638,7 +638,7 @@ function renderShodaqohTabs() {
                 letter-spacing: 0.5px;
                 color: var(--ink-faint);
                 text-align: center;
-                width: 13%;
+                width: 11%;
               ">Status</th>
               <th style="
                 padding: 10px 8px;
@@ -648,7 +648,7 @@ function renderShodaqohTabs() {
                 letter-spacing: 0.5px;
                 color: var(--ink-faint);
                 text-align: center;
-                width: 15%;
+                width: 11%;
               ">Tgl Bayar</th>
             </tr>
           </thead>
@@ -2996,7 +2996,7 @@ async function openShodaqohMemberDetail(memberId) {
         ${[1, 2, 3, 4, 5]
           .map(
             () => `
-          <tr class="skeleton-row border-t border-[color:var(--line)]">
+          <tr class="skeleton-row ">
             <td class="py-2"><div class="skeleton-line medium"></div></td>
             <td class="py-2"><div class="skeleton-line medium"></div></td>
             <td class="py-2"><div class="skeleton-line long"></div></td>
@@ -3290,4 +3290,3 @@ async function openShodaqohMemberDetail(memberId) {
     showToast(err.message, "error");
   }
 }
-

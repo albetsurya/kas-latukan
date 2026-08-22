@@ -148,11 +148,6 @@
   white-space: nowrap;
 }
 
-/* Untuk header kolom IR */
-#shodMemberDetailOverlay th:nth-child(3) {
-  min-width: 110px;
-}
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1034,7 +1029,7 @@ html[data-theme="dark"] .filter-dropdown-menu {
   background: var(--surface) !important;
   min-width: 70px !important;
   max-width: 90px !important;
-  width: 12% !important;
+  width: 15% !important;
   padding: 10px 4px !important;
   border-right: 2px solid var(--line);
   border-bottom: 2px solid var(--line);
@@ -1045,12 +1040,13 @@ html[data-theme="dark"] .filter-dropdown-menu {
 #screen-shodaqoh .shod-monitoring-wrapper th:first-child::after {
   content: "";
   position: absolute;
-  right: -8px;
+  right: -2px;
   top: 0;
   bottom: 0;
-  width: 8px;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  width: 4px;
+  background: rgba(0, 0, 0, 0.05);
   pointer-events: none;
+  z-index: 1;
 }
 
 /* Dark theme shadow */
@@ -1062,7 +1058,7 @@ html[data-theme="dark"] .filter-dropdown-menu {
   #screen-shodaqoh
   .shod-monitoring-wrapper
   th:first-child::after {
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.06), transparent);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* === KOLOM LAINNYA === */
@@ -1070,7 +1066,7 @@ html[data-theme="dark"] .filter-dropdown-menu {
 /* Header lainnya */
 #screen-shodaqoh .shod-monitoring-wrapper thead th:not(:first-child) {
   padding: 10px 8px !important;
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1097,6 +1093,24 @@ html[data-theme="dark"] .filter-dropdown-menu {
 #screen-shodaqoh .shod-monitoring-wrapper tbody td:not(:first-child) {
   padding: 10px 8px !important;
   font-size: 14px !important;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+  line-height: 1.4;
+  background: var(--surface);
+}
+
+/* === BODY ROW - Kolom Sticky (Anggota) === */
+#screen-shodaqoh .shod-monitoring-wrapper tbody td:first-child {
+  border-bottom: 1px solid var(--line) !important;
+  text-overflow: clip !important;
+}
+
+/* === BODY ROW - Kolom Non-Sticky === */
+#screen-shodaqoh .shod-monitoring-wrapper tbody td:not(:first-child) {
+  padding: 10px 8px !important;
+  font-size: 14px !important;
+  /* ✅ Sudah ada border-bottom */
   border-bottom: 1px solid var(--line);
   color: var(--ink);
   vertical-align: middle;
@@ -1272,7 +1286,7 @@ html[data-theme="dark"] .filter-dropdown-menu {
 
   #screen-shodaqoh .shod-monitoring-wrapper thead th:not(:first-child) {
     padding: 8px 4px !important;
-    font-size: 8px !important;
+    font-size: 12px !important;
   }
 
   #screen-shodaqoh .shod-monitoring-wrapper td:first-child,
@@ -2261,52 +2275,6 @@ html[data-theme="dark"] #shodMembersList .tx-card:active {
   white-space: nowrap !important;
 }
 
-#shodMemberDetailBody td {
-  padding: 8px 4px !important;
-  font-size: 11px !important;
-}
-
-#shodMemberDetailBody .status-pill {
-  font-size: 8px !important;
-  padding: 2px 10px !important;
-  border-radius: 999px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
-}
-
-#shodPaymentDetailBody .tx-card.skeleton-loading {
-  padding: 14px 4px;
-  border-bottom: 1px solid var(--line);
-}
-
-#shodPaymentDetailBody .tx-card.skeleton-loading:last-child {
-  border-bottom: none;
-}
-
-#shodMemberDetailBody .skeleton-row td {
-  padding: 10px 4px;
-}
-
-#shodMemberDetailBody .skeleton-line {
-  height: 12px;
-  border-radius: 4px;
-  background: var(--line);
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-}
-
-#shodMemberDetailBody .skeleton-line.short {
-  width: 40%;
-}
-
-#shodMemberDetailBody .skeleton-line.medium {
-  width: 60%;
-}
-
-#shodMemberDetailBody .skeleton-line.long {
-  width: 80%;
-}
-
 .stat-chip .skeleton-line {
   background: var(--line);
   border-radius: 4px;
@@ -2925,4 +2893,3 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
     padding: 10px 0 !important;
   }
 }
-
