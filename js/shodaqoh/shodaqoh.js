@@ -2989,6 +2989,10 @@ function closeShodMemberDeleteConfirm() {
 }
 
 async function openShodaqohMemberDetail(memberId) {
+  const overlay = document.getElementById("shodMemberDetailOverlay");
+  overlay?.classList.add("loading");
+  overlay?.classList.remove("hidden");
+
   try {
     const body = $("shodMemberDetailBody");
     if (body) {
@@ -2996,7 +3000,7 @@ async function openShodaqohMemberDetail(memberId) {
         ${[1, 2, 3, 4, 5]
           .map(
             () => `
-          <tr class="skeleton-row ">
+          <tr class="skeleton-row">
             <td class="py-2"><div class="skeleton-line medium"></div></td>
             <td class="py-2"><div class="skeleton-line medium"></div></td>
             <td class="py-2"><div class="skeleton-line long"></div></td>
@@ -3024,8 +3028,6 @@ async function openShodaqohMemberDetail(memberId) {
       $("shodMemberDetailTitle").textContent = "Memuat...";
     }
 
-    $("shodMemberDetailOverlay")?.classList.remove("hidden");
-
     const session = getSession();
     const d = await apiPost({
       action: "getShodaqohMemberDetail",
@@ -3034,6 +3036,8 @@ async function openShodaqohMemberDetail(memberId) {
     });
 
     if (!d.success) throw new Error(d.message || "Gagal memuat detail anggota");
+
+    overlay?.classList.remove("loading");
 
     const m = d.member;
 
@@ -3067,13 +3071,11 @@ async function openShodaqohMemberDetail(memberId) {
           </tr>
         `;
       } else {
-        // Ambil data payments untuk mendapatkan rincian
         const payments = d.payments || [];
         const paymentMap = {};
         payments.forEach(function (p) {
           paymentMap[p.payment_id] = p;
 
-          // Parse susulan_rincian jika ada
           if (p.susulan_rincian) {
             try {
               p.susulan_rincian_parsed = JSON.parse(p.susulan_rincian);
@@ -3084,7 +3086,6 @@ async function openShodaqohMemberDetail(memberId) {
             p.susulan_rincian_parsed = {};
           }
 
-          // Simpan informasi susulan untuk referensi
           p.susulan_bulan_array = p.susulan_bulan
             ? String(p.susulan_bulan)
                 .split(",")
@@ -3102,7 +3103,7 @@ async function openShodaqohMemberDetail(memberId) {
               const d = new Date(o.allocated_at);
               if (!isNaN(d.getTime())) {
                 allocatedAt = fmtDateShort(o.allocated_at);
-                paymentDate = o.allocated_at.slice(0, 7); // YYYY-MM
+                paymentDate = o.allocated_at.slice(0, 7);
               }
             }
 
@@ -3110,9 +3111,6 @@ async function openShodaqohMemberDetail(memberId) {
             const obStatusClass = isLunas ? "status-active" : "status-inactive";
             const obStatusLabel = isLunas ? "Lunas" : "Belum";
 
-            // ============================================================
-            // AMBIL RINCIAN DARI PAYMENT
-            // ============================================================
             let ir = 0;
             let uangSambung = 0;
             let jimpitan = 0;
@@ -3120,15 +3118,12 @@ async function openShodaqohMemberDetail(memberId) {
             let seribuan = 0;
             let kafan = 0;
             let ukhroMt = 0;
-
-            // Informasi tambahan untuk IR
             let susulanInfo = "";
-            let hasSusulanRincian = false; // Flag apakah ada susulan rincian
+            let hasSusulanRincian = false;
 
             if (o.payment_id && paymentMap[o.payment_id]) {
               const p = paymentMap[o.payment_id];
 
-              // Cek apakah ada susulan rincian
               const rincianKeys = Object.keys(p.susulan_rincian_parsed).filter(
                 function (key) {
                   return p.susulan_rincian_parsed[key] > 0;
@@ -3136,20 +3131,13 @@ async function openShodaqohMemberDetail(memberId) {
               );
               hasSusulanRincian = rincianKeys.length > 0;
 
-              // ============================================================
-              // IR: Ambil dari susulan_rincian
-              // ============================================================
               if (hasSusulanRincian) {
-                // TOTAL IR yang dibayarkan pada bulan pembayaran (paymentDate)
                 const totalIRPayment = rincianKeys.reduce(function (sum, key) {
                   return sum + p.susulan_rincian_parsed[key];
                 }, 0);
 
-                // Jika bulan ini adalah bulan pembayaran, tampilkan total IR
                 if (paymentDate === o.periode) {
                   ir = totalIRPayment;
-
-                  // Buat keterangan susulan jika ada lebih dari 1 bulan
                   if (rincianKeys.length > 1) {
                     const monthLabels = rincianKeys
                       .map(getShortMonthLabel)
@@ -3159,13 +3147,12 @@ async function openShodaqohMemberDetail(memberId) {
                     susulanInfo = "";
                   }
                 } else {
-                  // Bulan susulan: cek apakah periode ini ada di rincian
                   const isInRincian = rincianKeys.some(function (key) {
                     return key === o.periode;
                   });
 
                   if (isInRincian) {
-                    ir = 0; // Tidak tampil di sini, karena sudah tampil di bulan pembayaran
+                    ir = 0;
                     susulanInfo = `✓ Dibayar di ${getShortMonthLabel(paymentDate)}`;
                   } else {
                     ir = 0;
@@ -3173,11 +3160,8 @@ async function openShodaqohMemberDetail(memberId) {
                   }
                 }
               } else {
-                // Fallback: jika tidak ada rincian, gunakan metode lama
                 const susulanBulan = p.susulan_bulan_array || [];
                 const totalIR = Number(p.susulan_ir) || 0;
-                const bulanCount =
-                  susulanBulan.length > 0 ? susulanBulan.length : 1;
 
                 const isPaymentMonth = paymentDate === o.periode;
                 const isInSusulan = susulanBulan.some(function (b) {
@@ -3200,7 +3184,6 @@ async function openShodaqohMemberDetail(memberId) {
                 }
               }
 
-              // Ambil nilai lainnya (langsung dari payment)
               uangSambung = p.uang_sambung || 0;
               jimpitan = p.jimpitan || 0;
               siarSiar = p.siar_siar || 0;
@@ -3209,13 +3192,11 @@ async function openShodaqohMemberDetail(memberId) {
               ukhroMt = p.ukhro_mt || 0;
             }
 
-            // Jika tidak ada payment_id tapi status Lunas (kemungkinan data dari monitoring)
             if (!o.payment_id && isLunas) {
               ir = o.nominal_target || 0;
               susulanInfo = "";
             }
 
-            // Hitung total
             const total =
               ir +
               uangSambung +
@@ -3225,19 +3206,12 @@ async function openShodaqohMemberDetail(memberId) {
               kafan +
               ukhroMt;
 
-            // Format angka dengan pemisah ribuan
             const fmtNum = function (num) {
               return num > 0 ? "Rp" + num.toLocaleString("id-ID") : "—";
             };
 
-            // Warna khusus untuk total (highlight)
             const totalColor = isLunas ? "var(--brand)" : "var(--ink-faint)";
             const totalWeight = isLunas ? "bold" : "normal";
-
-            // ============================================================
-            // FONT SIZE DIPERBESAR & KOLOM PERIODE STICKY
-            // ============================================================
-            // Di bagian row, gunakan class khusus untuk setiap kolom:
 
             return `<tr class="border-t border-[color:var(--line)]">
                       <td class="shod-member-detail-period">${escapeHtml(fmtMonthYear(o.periode))}</td>

@@ -205,8 +205,21 @@ body > #shodMemberDetailOverlay .sheet-scroll {
 }
 
 /* ============================================================
-   SHODAQOH MEMBER DETAIL - STICKY PERIODE & FONT SERAGAM
+   SHODAQOH MEMBER DETAIL - CSS LENGKAP
    ============================================================ */
+
+#shodMemberDetailOverlay .sheet-scroll {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+#shodMemberDetailOverlay table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: fixed;
+}
 
 #shodMemberDetailOverlay thead th {
   padding: 10px 8px !important;
@@ -219,21 +232,9 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   white-space: nowrap !important;
   background: var(--surface) !important;
   text-align: left !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
 }
 
-/* ============================================================
-   SHODAQOH MEMBER DETAIL - SEMUA DARI CSS, BUKAN INLINE
-   ============================================================ */
-
-/* Container scroll */
-#shodMemberDetailOverlay .sheet-scroll {
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-}
-
-/* ============================================================
-   HEADER PERIODE - STICKY
-   ============================================================ */
 #shodMemberDetailOverlay .shod-member-detail-header-period {
   position: sticky !important;
   left: 0 !important;
@@ -243,7 +244,6 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   max-width: 130px !important;
   width: 12% !important;
   padding: 10px 8px !important;
-  border-right: 2px solid var(--line) !important;
   border-bottom: 2px solid var(--line) !important;
   font-size: 10px !important;
   font-weight: 800 !important;
@@ -252,61 +252,57 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   color: var(--ink-faint) !important;
   text-align: left !important;
   white-space: nowrap !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
 }
 
-/* ============================================================
-   HEADER STATUS - CENTER
-   ============================================================ */
-#shodMemberDetailOverlay .shod-member-detail-header-status {
-  padding: 10px 8px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  color: var(--ink-faint) !important;
-  border-bottom: 2px solid var(--line) !important;
-  white-space: nowrap !important;
-  background: var(--surface) !important;
-  text-align: center !important;
-  width: 8% !important;
+/* Border kanan hanya muncul saat TIDAK loading */
+#shodMemberDetailOverlay:not(.loading) .shod-member-detail-header-period {
+  border-right: 2px solid var(--line) !important;
 }
 
-/* ============================================================
-   HEADER ANGKA - RIGHT
-   ============================================================ */
+/* Saat loading, hilangkan sticky dan border */
+#shodMemberDetailOverlay.loading .shod-member-detail-header-period {
+  position: static !important;
+  border-right: none !important;
+  z-index: auto !important;
+  box-shadow: none !important;
+}
+
 #shodMemberDetailOverlay .shod-member-detail-header-number {
-  padding: 10px 8px !important;
+  text-align: right !important;
   font-size: 10px !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
   color: var(--ink-faint) !important;
-  border-bottom: 2px solid var(--line) !important;
-  white-space: nowrap !important;
-  background: var(--surface) !important;
-  text-align: right !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
 }
 
 /* ============================================================
-   HEADER TOTAL - BRAND COLOR
+   HEADER TOTAL - WARNA BRAND
    ============================================================ */
+
 #shodMemberDetailOverlay .shod-member-detail-header-total {
-  padding: 10px 8px !important;
+  text-align: right !important;
+  color: var(--brand) !important;
+  width: 12% !important;
   font-size: 10px !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
-  color: var(--brand) !important;
-  border-bottom: 2px solid var(--line) !important;
-  white-space: nowrap !important;
-  background: var(--surface) !important;
-  text-align: right !important;
-  width: 12% !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
 }
 
-/* ============================================================
-   KOLOM PERIODE - STICKY (BODY)
-   ============================================================ */
+#shodMemberDetailOverlay tbody td {
+  padding: 10px 8px !important;
+  font-size: 13px !important;
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--ink);
+  vertical-align: middle;
+  line-height: 1.4;
+  background: var(--surface);
+}
+
 #shodMemberDetailOverlay .shod-member-detail-period {
   position: sticky !important;
   left: 0 !important;
@@ -324,24 +320,12 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   text-align: left !important;
 }
 
-/* ============================================================
-   BODY CELLS - DEFAULT
-   ============================================================ */
-#shodMemberDetailOverlay tbody td {
-  padding: 10px 8px !important;
-  font-size: 13px !important;
-  border-bottom: 1px solid var(--line) !important;
-  color: var(--ink);
-  vertical-align: middle;
-  line-height: 1.4;
-  background: var(--surface);
-}
-
-/* ============================================================
-   STATUS - CENTER
-   ============================================================ */
 #shodMemberDetailOverlay .shod-member-detail-status {
   text-align: center !important;
+  width: 8% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+  white-space: nowrap;
 }
 
 #shodMemberDetailOverlay .shod-member-detail-status .status-pill {
@@ -353,9 +337,6 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   letter-spacing: 0.04em !important;
 }
 
-/* ============================================================
-   ANGKA - RIGHT
-   ============================================================ */
 #shodMemberDetailOverlay .shod-member-detail-ir,
 #shodMemberDetailOverlay .shod-member-detail-sambung,
 #shodMemberDetailOverlay .shod-member-detail-jimpitan,
@@ -364,12 +345,14 @@ body > #shodMemberDetailOverlay .sheet-scroll {
 #shodMemberDetailOverlay .shod-member-detail-kafan,
 #shodMemberDetailOverlay .shod-member-detail-mt,
 #shodMemberDetailOverlay .shod-member-detail-total {
+  padding: 10px 8px !important;
+  font-size: 13px !important;
+  font-weight: 600;
   text-align: right !important;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line) !important;
 }
 
-/* ============================================================
-   KOLOM WIDTHS
-   ============================================================ */
 #shodMemberDetailOverlay .shod-member-detail-ir {
   min-width: 160px !important;
   max-width: 190px !important;
@@ -414,9 +397,6 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   color: var(--brand) !important;
 }
 
-/* ============================================================
-   IR SUSULAN TOOLTIP
-   ============================================================ */
 #shodMemberDetailOverlay .ir-susulan-tooltip {
   display: block;
   font-size: 9.5px !important;
@@ -449,9 +429,6 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* ============================================================
-   HOVER EFFECT
-   ============================================================ */
 #shodMemberDetailOverlay tbody tr:hover .shod-member-detail-period {
   background-color: var(--surface-alt) !important;
 }
@@ -460,16 +437,10 @@ body > #shodMemberDetailOverlay .sheet-scroll {
   background-color: var(--surface-alt);
 }
 
-/* ============================================================
-   LAST ROW - NO BORDER
-   ============================================================ */
 #shodMemberDetailOverlay tbody tr:last-child td {
   border-bottom: none !important;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
 @media (max-width: 640px) {
   #shodMemberDetailOverlay table {
     min-width: 800px;
@@ -489,6 +460,10 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     min-width: 140px !important;
     max-width: 160px !important;
     padding: 8px 6px !important;
+  }
+
+  #shodMemberDetailOverlay .shod-member-detail-ir .ir-value {
+    font-size: 12px !important;
   }
 
   #shodMemberDetailOverlay .shod-member-detail-sambung,
@@ -543,6 +518,10 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     padding: 6px 4px !important;
   }
 
+  #shodMemberDetailOverlay .shod-member-detail-ir .ir-value {
+    font-size: 11px !important;
+  }
+
   #shodMemberDetailOverlay .shod-member-detail-sambung,
   #shodMemberDetailOverlay .shod-member-detail-jimpitan,
   #shodMemberDetailOverlay .shod-member-detail-siar,
@@ -579,7 +558,6 @@ body > #shodMemberDetailOverlay .sheet-scroll {
     font-size: 8px !important;
   }
 }
-
 #shodMemberDetailBody td {
   padding: 8px 4px !important;
   font-size: 11px !important;
