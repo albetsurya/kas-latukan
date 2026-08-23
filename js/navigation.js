@@ -20,8 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
       printShodaqohReport();
     });
   }
-
-  console.log("✅ Print buttons initialized");
 });
 
 function applyFilters() {
@@ -434,4 +432,3 @@ function enterApp() {
     window.__refreshAuthGate();
   }
 }
-

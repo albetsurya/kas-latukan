@@ -225,7 +225,6 @@ function setButtonLoading(btn, isLoading) {
 }
 
 function initShodMemberDropdown() {
-  console.log("initShodMemberDropdown dipanggil");
   const dropdown = document.getElementById("shodPaymentMemberDropdown");
   const trigger = document.getElementById("shodPaymentMemberTrigger");
   const valueDisplay = document.getElementById("shodPaymentMemberValue");
@@ -233,23 +232,13 @@ function initShodMemberDropdown() {
   const hiddenInput = document.getElementById("shodPaymentMember");
 
   if (!dropdown || !trigger || !valueDisplay || !menu || !hiddenInput) {
-    console.log("Element tidak ditemukan:", {
-      dropdown,
-      trigger,
-      valueDisplay,
-      menu,
-      hiddenInput,
-    });
     return;
   }
-
-  console.log("Element ditemukan, merender dropdown...");
 
   renderMemberDropdownMenu();
 
   trigger.addEventListener("click", function (e) {
     e.stopPropagation();
-    console.log("Trigger diklik");
     toggleMemberDropdown();
   });
 
@@ -305,8 +294,6 @@ function renderMemberDropdownMenu() {
   const members = state.shodaqoh.members || [];
   const selectedId = hiddenInput?.value || "";
 
-  console.log("Merender anggota:", members.length, "selected:", selectedId);
-
   if (members.length === 0) {
     menu.innerHTML = `
       <button type="button" class="filter-dropdown-option" disabled style="opacity:0.5;cursor:not-allowed;">
@@ -337,7 +324,6 @@ function renderMemberDropdownMenu() {
       e.stopPropagation();
       const memberId = this.dataset.memberId;
       const memberName = this.dataset.memberName;
-      console.log("Memilih anggota:", memberId, memberName);
       selectMember(memberId, memberName);
     });
   });
@@ -367,7 +353,6 @@ let datePickerState = {
 };
 
 function initShodDatePicker() {
-  console.log("initShodDatePicker dipanggil");
   const dropdown = document.getElementById("shodDateDropdown");
   const trigger = document.getElementById("shodDateDropdownTrigger");
   const valueDisplay = document.getElementById("shodDateDropdownValue");
@@ -375,11 +360,8 @@ function initShodDatePicker() {
   const hiddenInput = document.getElementById("shodPaymentDate");
 
   if (!dropdown || !trigger || !valueDisplay || !menu || !hiddenInput) {
-    console.log("Date picker element tidak ditemukan");
     return;
   }
-
-  console.log("Date picker element ditemukan");
 
   const today = new Date();
   valueDisplay.textContent = formatDateDisplay(today);
@@ -765,7 +747,6 @@ let txDatePickerState = {
 };
 
 function initTxDatePicker() {
-  console.log("initTxDatePicker dipanggil");
   const dropdown = document.getElementById("txDateDropdown");
   const trigger = document.getElementById("txDateDropdownTrigger");
   const valueDisplay = document.getElementById("txDateDropdownValue");
@@ -773,11 +754,8 @@ function initTxDatePicker() {
   const hiddenInput = document.getElementById("txTanggal");
 
   if (!dropdown || !trigger || !valueDisplay || !menu || !hiddenInput) {
-    console.log("TX Date picker element tidak ditemukan");
     return;
   }
-
-  console.log("TX Date picker element ditemukan");
 
   const today = new Date();
   valueDisplay.textContent = formatDateDisplay(today);
@@ -1163,7 +1141,6 @@ const ACCOUNT_CATEGORIES = [
 ];
 
 function initTxAccountDropdown() {
-  console.log("initTxAccountDropdown dipanggil");
   const dropdown = document.getElementById("txAccountDropdown");
   const trigger = document.getElementById("txAccountDropdownTrigger");
   const valueDisplay = document.getElementById("txAccountDropdownValue");
@@ -1171,11 +1148,8 @@ function initTxAccountDropdown() {
   const hiddenInput = document.getElementById("txAccount");
 
   if (!dropdown || !trigger || !valueDisplay || !menu || !hiddenInput) {
-    console.log("Account dropdown element tidak ditemukan");
     return;
   }
-
-  console.log("Account dropdown element ditemukan");
 
   renderTxAccountDropdownMenu();
 
@@ -2001,8 +1975,6 @@ async function runShodOcrMultiPass(dataUrl) {
 
   for (const rotation of rotations) {
     for (const threshold of thresholds) {
-      console.log(`OCR mencoba rotasi ${rotation}°, threshold=${threshold}`);
-
       try {
         const processed = await prepareShodOcrImage(
           dataUrl,
@@ -2059,10 +2031,6 @@ async function runShodOcrMultiPass(dataUrl) {
 
     return b.confidence - a.confidence;
   });
-
-  console.log("SEMUA HASIL OCR:", candidates);
-
-  console.log("HASIL OCR TERBAIK:", candidates[0]);
 
   return candidates[0];
 }
@@ -2148,15 +2116,11 @@ async function extractShodaqohWithAI() {
 
     const result = await callShodaqohAI(dataUrl);
 
-    console.log("HASIL AI GEMINI:", result);
-
     if (!result || !result.success) {
       throw new Error(result?.message || "AI gagal membaca foto.");
     }
 
     const data = result.data;
-
-    console.log("DATA SHODAQOH:", data);
 
     applyShodaqohAIResult(data);
 
@@ -2254,8 +2218,6 @@ async function callShodaqohAI(dataUrl) {
   }
 
   const result = await response.json();
-
-  console.log("RESPONSE AI SHODAQOH:", result);
 
   if (!result.success) {
     throw new Error(result.message || "Gagal mengekstrak data dari foto.");

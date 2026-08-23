@@ -127,8 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!router.initialized) {
       router.on("routeChange", ({ tab }) => {
-        console.log("🔄 Route changed to:", tab);
-
         // Handle Shodaqoh
         if (tab === "shodaqoh" && !state.shodaqoh.loaded) {
           loadShodaqohData();
@@ -136,8 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Handle Zakat
         if (tab === "zakat") {
-          console.log("🔄 Zakat route activated");
-
           // Sembunyikan bottom nav karena zakat full screen
           const bottomNav = document.getElementById("bottomnav");
           if (bottomNav) {
@@ -180,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       router.init();
-      console.log("✅ Router initialized with zakat handler");
     }
   };
 
@@ -1371,8 +1366,6 @@ async function openShodaqohPaymentDetail(paymentId) {
     const role = session?.role || state?.role || state?.user?.role || "";
     const isAdmin =
       role === "admin" || state.isAdmin === true || state.isAdmin === "true";
-
-    console.log("🔍 Role check:", { role, isAdmin, session });
 
     const adminActions = $("shodPaymentAdminActions");
     if (adminActions) {

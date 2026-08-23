@@ -3,24 +3,20 @@
 // ============================================================
 
 function showLoader(message) {
-  console.log("🔍 showLoader called:", message);
   var loader = document.getElementById("appLoader");
   var text = document.getElementById("loaderText");
   if (loader) {
     loader.classList.remove("hidden");
     if (text) text.textContent = message || "Memuat...";
-    console.log("✅ Loader shown");
   } else {
     console.warn("⚠️ appLoader element not found!");
   }
 }
 
 function hideLoader() {
-  console.log("🔍 hideLoader called");
   var loader = document.getElementById("appLoader");
   if (loader) {
     loader.classList.add("hidden");
-    console.log("✅ Loader hidden");
   }
 }
 
