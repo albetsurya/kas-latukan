@@ -297,3 +297,57 @@ function getExistingMustahikNames() {
 
   return Array.from(names).sort();
 }
+
+function getZakatStatusBadge(status) {
+  var statusKey = status || "ACTIVE";
+  var label = ZAKAT_STATUS_LABELS[statusKey] || statusKey;
+  var className = ZAKAT_STATUS_CLASSES[statusKey] || "active";
+
+  return {
+    label: label,
+    className: className,
+    isCompleted: statusKey === "COMPLETED" || statusKey === "SELESAI",
+    isActive: statusKey === "ACTIVE",
+  };
+}
+
+function isZakatCompleted(zakat) {
+  var status = zakat.status || "ACTIVE";
+  return status === "COMPLETED" || status === "SELESAI";
+}
+
+function isZakatActive(zakat) {
+  var status = zakat.status || "ACTIVE";
+  return status === "ACTIVE";
+}
+async function apiCompleteZakat(data) {
+  try {
+    const session = getSession();
+    const payload = {
+      action: "completeZakat",
+      token: session?.token || "",
+      id: data.id,
+    };
+    console.log("📡 apiCompleteZakat payload:", payload);
+    return await apiPost(payload);
+  } catch (err) {
+    console.error("❌ apiCompleteZakat error:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+async function apiCancelCompleteZakat(data) {
+  try {
+    const session = getSession();
+    const payload = {
+      action: "cancelCompleteZakat",
+      token: session?.token || "",
+      id: data.id,
+    };
+    console.log("📡 apiCancelCompleteZakat payload:", payload);
+    return await apiPost(payload);
+  } catch (err) {
+    console.error("❌ apiCancelCompleteZakat error:", err);
+    return { success: false, message: err.message };
+  }
+}

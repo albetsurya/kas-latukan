@@ -1,6 +1,239 @@
 /* ============================================================
-   ZAKAT LIST
+   ZAKAT SCREEN - FULL SCREEN OVERLAY
    ============================================================ */
+
+#screen-zakat {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  background: var(--bg) !important;
+  display: none !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+#screen-zakat.active {
+  display: flex !important;
+}
+/* ============================================================
+   ZAKAT HEADER
+   ============================================================ */
+
+.zakat-header {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px 12px 12px !important;
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+  flex-shrink: 0 !important;
+  min-height: 60px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.zakat-back-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.zakat-back-btn:hover {
+  background: var(--surface-alt);
+}
+
+.zakat-back-btn:active {
+  transform: scale(0.92);
+}
+
+.zakat-header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.zakat-title {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.zakat-filter-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  min-height: 28px;
+  margin-left: auto;
+}
+
+.zakat-filter-trigger:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.zakat-filter-trigger:active {
+  transform: scale(0.95);
+}
+
+.zakat-filter-trigger svg {
+  stroke: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.zakat-filter-trigger:hover svg {
+  stroke: var(--brand);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: #fff;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 8px;
+  min-width: 14px;
+  height: 14px;
+}
+
+.filter-badge.hidden {
+  display: none;
+}
+
+.zakat-active-filters {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  padding-top: 2px;
+  padding-left: 44px;
+}
+
+.zakat-active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 6px 1px 8px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.zakat-active-filter-chip .remove-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--brand);
+  cursor: pointer;
+  padding: 0;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.zakat-active-filter-chip .remove-filter:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-active {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.status-selesai,
+.status-completed {
+  background: var(--ink-faint);
+  color: #fff;
+}
+
+.status-unknown {
+  background: var(--surface-alt);
+  color: var(--ink-faint);
+}
+
+/* ============================================================
+   ZAKAT CONTENT
+   ============================================================ */
+
+.zakat-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 16px 90px 16px !important;
+  padding-bottom: 90px !important;
+  -webkit-overflow-scrolling: touch !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.zakat-list-container {
+  padding: 0 4px 80px 4px;
+  flex: 1;
+  overflow-y: auto;
+}
 
 .zakat-list {
   display: flex;
@@ -9,15 +242,23 @@
 }
 
 .zakat-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
   text-align: center;
-  padding: 40px 16px;
-  color: var(--ink-faint);
-  font-size: 13px;
+  color: var(--ink-soft);
 }
 
 .zakat-list-empty svg {
   color: var(--ink-faint);
   margin-bottom: 12px;
+}
+
+.zakat-list-empty p {
+  margin: 0;
+  font-size: 13px;
 }
 
 .zakat-item {
@@ -39,105 +280,182 @@
   transform: scale(0.98);
 }
 
+.zakat-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
 .zakat-item-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: var(--ink);
-  margin-bottom: 3px;
+  flex: 1;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
-.zakat-item-meta {
-  font-size: 11.5px;
-  color: var(--ink-soft);
+/* ============================================================
+   ZAKAT ITEM STATUS - DI ATAS TITLE
+   ============================================================ */
+
+.zakat-item-status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.zakat-item-status .zakat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Status Active */
+.zakat-item-status .status-active {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.zakat-item-status .status-active svg {
+  stroke: var(--pos);
+}
+
+/* Status Completed */
+.zakat-item-status .status-completed {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.zakat-item-status .status-completed svg {
+  stroke: var(--gold-dark);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .zakat-item-status .status-active {
+  background: rgba(40, 199, 111, 0.18);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .zakat-item-status .status-active svg {
+  stroke: #4ade80;
+}
+
+[data-theme="dark"] .zakat-item-status .status-completed {
+  background: rgba(233, 173, 56, 0.18);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .zakat-item-status .status-completed svg {
+  stroke: #fbbf24;
 }
 
 .zakat-item-total {
-  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 15px;
   font-weight: 800;
   color: var(--brand);
-  margin-top: 6px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
-.zakat-item-delete {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--ink-faint);
-  cursor: pointer;
-  transition: all 0.15s ease;
+.zakat-item-meta {
+  font-size: 11px;
+  color: var(--ink-soft);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-bottom: 6px;
 }
 
-.zakat-item-delete:hover {
+.zakat-item-meta span {
+  display: inline-block;
+}
+
+.zakat-item-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.zakat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.zakat-badge svg {
+  flex-shrink: 0;
+  stroke-width: 2.5;
+}
+
+.zakat-badge-success {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.zakat-badge-success svg {
+  stroke: var(--pos);
+}
+
+.zakat-badge-warning {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.zakat-badge-warning svg {
+  stroke: var(--gold-dark);
+}
+
+.zakat-badge-danger {
   background: var(--neg-soft);
   color: var(--neg);
 }
 
-.zakat-item-delete:active {
-  transform: scale(0.9);
+.zakat-badge-danger svg {
+  stroke: var(--neg);
 }
 
-/* ============================================================
-   ZAKAT FORM
-   ============================================================ */
-
-.zakat-form-container {
-  animation: fadeIn 0.2s ease;
-  width: 100%;
+[data-theme="dark"] .zakat-badge-success {
+  background: rgba(40, 199, 111, 0.18);
+  color: #4ade80;
 }
 
-.zakat-form-container.hidden {
-  display: none !important;
+[data-theme="dark"] .zakat-badge-success svg {
+  stroke: #4ade80;
 }
 
-.zakat-form-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 20px 16px;
-  width: 100%;
+[data-theme="dark"] .zakat-badge-warning {
+  background: rgba(233, 173, 56, 0.18);
+  color: #fbbf24;
 }
 
-.zakat-form-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--ink);
-  margin: 0 0 16px 0;
-  text-align: center;
+[data-theme="dark"] .zakat-badge-warning svg {
+  stroke: #fbbf24;
 }
 
-/* ============================================================
-   ZAKAT LIST - ACTION BUTTONS
-   ============================================================ */
-
-.zakat-item {
-  position: relative;
-  padding: 14px 16px;
-  padding-right: 80px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  transition: all 0.15s ease;
-  cursor: default;
+[data-theme="dark"] .zakat-badge-danger {
+  background: rgba(255, 102, 102, 0.18);
+  color: #f87171;
 }
 
-.zakat-item:hover {
-  border-color: var(--brand);
-  background: var(--surface-alt);
+[data-theme="dark"] .zakat-badge-danger svg {
+  stroke: #f87171;
 }
 
 .zakat-item-content {
@@ -186,64 +504,31 @@
   transform: scale(0.9);
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 480px) {
-  .zakat-loader-content {
-    padding: 28px 24px 24px;
-  }
-  .zakat-loader-spinner {
-    width: 32px;
-    height: 32px;
-  }
-  .zakat-loader-text {
-    font-size: 13px;
-  }
-  .zakat-form-card {
-    padding: 16px 14px;
-  }
-  .zakat-form-title {
-    font-size: 14px;
-  }
+.zakat-form-container {
+  animation: fadeIn 0.2s ease;
+  width: 100%;
 }
 
-@media (max-width: 380px) {
-  .zakat-loader-content {
-    padding: 24px 18px 20px;
-  }
-  .zakat-loader-spinner {
-    width: 28px;
-    height: 28px;
-  }
-  .zakat-loader-text {
-    font-size: 12px;
-  }
+.zakat-form-container.hidden {
+  display: none !important;
 }
 
-@media (max-width: 380px) {
-  #fabZakat {
-    width: 46px !important;
-    height: 46px !important;
-    right: 14px !important;
-  }
-  #fabZakat svg {
-    width: 20px !important;
-    height: 20px !important;
-  }
-  .zakat-header {
-    padding: 8px 12px 8px 8px !important;
-    min-height: 48px !important;
-  }
-  .zakat-title {
-    font-size: 14px !important;
-  }
+.zakat-form-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 16px;
+  width: 100%;
 }
 
-/* ============================================================
-   ZAKAT NAME WRAPPER (Auto-suggest)
-   ============================================================ */
+.zakat-form-title {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 16px 0;
+  text-align: center;
+}
 
 .zakat-name-wrapper {
   position: relative;
@@ -269,10 +554,6 @@
   border-color: var(--brand);
   box-shadow: 0 0 0 2px var(--brand-soft);
 }
-
-/* ============================================================
-   FAB ZAKAT
-   ============================================================ */
 
 #fabZakat {
   position: fixed !important;
@@ -310,15 +591,6 @@
 #fabZakat.hidden {
   display: none !important;
 }
-
-.zakat-list-container {
-  width: 100% !important;
-  min-height: 200px !important;
-}
-
-/* ============================================================
-   ZAKAT LOADER
-   ============================================================ */
 
 .zakat-loader {
   position: fixed !important;
@@ -394,40 +666,6 @@
   margin: 0;
 }
 
-/* ============================================================
-   RESPONSIVE UNTUK LOADER
-   ============================================================ */
-
-@media (max-width: 480px) {
-  .zakat-loader-content {
-    padding: 28px 24px 24px;
-  }
-  .zakat-loader-spinner {
-    width: 32px;
-    height: 32px;
-  }
-  .zakat-loader-text {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 380px) {
-  .zakat-loader-content {
-    padding: 24px 18px 20px;
-  }
-  .zakat-loader-spinner {
-    width: 28px;
-    height: 28px;
-  }
-  .zakat-loader-text {
-    font-size: 12px;
-  }
-}
-
-/* ============================================================
-   DARK THEME SUPPORT UNTUK LOADER
-   ============================================================ */
-
 [data-theme="dark"] .zakat-loader {
   background: rgba(0, 0, 0, 0.7);
 }
@@ -446,10 +684,6 @@
   color: var(--ink-soft);
 }
 
-/* ============================================================
-   OVERRIDE - PASTIKAN TIDAK ADA YANG MENUTUPI LOADER
-   ============================================================ */
-
 .zakat-loader {
   pointer-events: auto !important;
 }
@@ -462,14 +696,6 @@
   pointer-events: auto !important;
 }
 
-/* ============================================================
-   DATE PICKER - SERAGAM DENGAN POSISI DINAMIS
-   ============================================================ */
-
-/* ============================================================
-   RESET & BASE - HAPUS BACKDROP
-   ============================================================ */
-
 #shodaqohPaymentOverlay #datePickerBackdrop,
 #txOverlay #datePickerBackdrop,
 #zakatDatePickerBackdrop {
@@ -478,11 +704,6 @@
   pointer-events: none !important;
 }
 
-/* ============================================================
-   ALL DATE PICKER DROPDOWN - SERAGAM
-   ============================================================ */
-
-/* Semua date picker dropdown */
 #shodDateDropdown .filter-dropdown-menu,
 #txDateDropdown .filter-dropdown-menu,
 #zakatDateDropdown .filter-dropdown-menu,
@@ -513,7 +734,6 @@
     visibility 0.15s ease;
 }
 
-/* Saat terbuka */
 #shodDateDropdown.open .filter-dropdown-menu,
 #txDateDropdown.open .filter-dropdown-menu,
 #zakatDateDropdown.open .filter-dropdown-menu,
@@ -524,11 +744,6 @@
   transform: translateY(0) scale(1) !important;
 }
 
-/* ============================================================
-   RESPONSIVE - UKURAN MENYESUAIKAN
-   ============================================================ */
-
-/* Desktop & Tablet */
 @media (min-width: 769px) {
   #shodDateDropdown .filter-dropdown-menu,
   #txDateDropdown .filter-dropdown-menu,
@@ -541,7 +756,6 @@
   }
 }
 
-/* Mobile Landscape */
 @media (max-width: 768px) and (min-height: 500px) {
   #shodDateDropdown .filter-dropdown-menu,
   #txDateDropdown .filter-dropdown-menu,
@@ -554,7 +768,6 @@
   }
 }
 
-/* Mobile Portrait */
 @media (max-width: 480px) {
   #shodDateDropdown .filter-dropdown-menu,
   #txDateDropdown .filter-dropdown-menu,
@@ -567,7 +780,6 @@
   }
 }
 
-/* Small Mobile */
 @media (max-width: 380px) {
   #shodDateDropdown .filter-dropdown-menu,
   #txDateDropdown .filter-dropdown-menu,
@@ -580,9 +792,113 @@
   }
 }
 
-/* ============================================================
-   DATE PICKER - COMPONENTS (UKURAN KOMPAK)
-   ============================================================ */
+#zakatEditDateDropdown {
+  position: relative !important;
+  width: 100% !important;
+  z-index: 99999 !important;
+}
+
+#zakatEditDateDropdown .filter-dropdown-trigger {
+  width: 100% !important;
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all 0.15s ease !important;
+}
+
+#zakatEditDateDropdown .filter-dropdown-trigger:hover {
+  border-color: var(--brand-soft) !important;
+  background: var(--surface-alt) !important;
+}
+
+#zakatEditDateDropdown.open .filter-dropdown-trigger {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+}
+
+#zakatEditDateDropdown .filter-dropdown-value {
+  flex: 1 !important;
+  text-align: left !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#zakatEditDateDropdown .filter-dropdown-chevron {
+  flex-shrink: 0 !important;
+  color: var(--ink-faint) !important;
+  transition: transform 0.2s ease !important;
+}
+
+#zakatEditDateDropdown.open .filter-dropdown-chevron {
+  transform: rotate(180deg) !important;
+}
+
+#zakatEditDateDropdown .filter-dropdown-menu {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  right: auto !important;
+  z-index: 999999 !important;
+  min-width: 260px !important;
+  max-width: 320px !important;
+  max-height: 360px !important;
+  padding: 12px 14px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(6px) scale(0.96) !important;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease !important;
+}
+
+#zakatEditDateDropdown.open .filter-dropdown-menu {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+[data-theme="dark"] #zakatEditDateDropdown .filter-dropdown-menu {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+#zakatEditHeaderOverlay .sheet {
+  overflow: visible !important;
+}
+
+#zakatEditHeaderOverlay .sheet-scroll {
+  overflow: visible !important;
+  padding-bottom: 120px !important;
+}
+
+#zakatEditHeaderOverlay .field-group {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#zakatEditHeaderOverlay .field-group:has(.filter-dropdown.open) {
+  z-index: 99999 !important;
+}
 
 .date-picker-input-wrap {
   display: flex;
@@ -834,4 +1150,189 @@
 .date-picker-clear:hover {
   background: var(--neg-soft);
   color: var(--neg);
+}
+
+@media (max-width: 480px) {
+  .zakat-loader-content {
+    padding: 28px 24px 24px;
+  }
+  .zakat-loader-spinner {
+    width: 32px;
+    height: 32px;
+  }
+  .zakat-loader-text {
+    font-size: 13px;
+  }
+  .zakat-form-card {
+    padding: 16px 14px;
+  }
+  .zakat-form-title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .zakat-loader-content {
+    padding: 24px 18px 20px;
+  }
+  .zakat-loader-spinner {
+    width: 28px;
+    height: 28px;
+  }
+  .zakat-loader-text {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  #fabZakat {
+    width: 46px !important;
+    height: 46px !important;
+    right: 14px !important;
+  }
+  #fabZakat svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .zakat-header {
+    padding: 8px 12px 8px 8px !important;
+    min-height: 48px !important;
+  }
+  .zakat-title {
+    font-size: 14px !important;
+  }
+}
+/* Filter Chip Trigger */
+.filter-chip-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.filter-chip-trigger:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.filter-chip-trigger:active {
+  transform: scale(0.95);
+}
+
+.filter-chip-trigger svg {
+  stroke: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.filter-chip-trigger:hover svg {
+  stroke: var(--brand);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 0 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  height: 16px;
+}
+
+.filter-badge.hidden {
+  display: none;
+}
+
+/* Active Filters Display */
+.zakat-active-filters {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.zakat-active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px 2px 10px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.zakat-active-filter-chip .remove-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--brand);
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.zakat-active-filter-chip .remove-filter:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Filter Chip Options (di dalam sheet) */
+.filter-chip-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 30px;
+}
+
+.filter-chip-option:hover {
+  border-color: var(--brand-soft);
+  background: var(--brand-soft);
+}
+
+.filter-chip-option.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.filter-chip-option:active {
+  transform: scale(0.95);
+}
+
+[data-theme="dark"] .filter-chip-option.active {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
 }

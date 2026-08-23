@@ -34,3 +34,24 @@ const ZAKAT_SUGGESTIONS = {
     "Bp Yakop",
   ],
 };
+
+const ZAKAT_STATUS = {
+  ACTIVE: "ACTIVE",
+  COMPLETED: "COMPLETED",
+  DELETED: "DELETED",
+  CANCELLED: "CANCELLED",
+};
+
+const ZAKAT_STATUS_LABELS = {
+  ACTIVE: "Aktif",
+  COMPLETED: "Selesai",
+  DELETED: "Dihapus",
+  CANCELLED: "Dibatalkan",
+};
+
+const ZAKAT_STATUS_CLASSES = {
+  ACTIVE: "active",
+  COMPLETED: "completed",
+  DELETED: "deleted",
+  CANCELLED: "cancelled",
+};

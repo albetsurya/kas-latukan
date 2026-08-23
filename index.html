@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id" data-theme="dark">
+<html lang="id" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -34,65 +34,6 @@
     <link rel="stylesheet" href="css/chart-print.css" />
     <link rel="stylesheet" href="css/overrides.css" />
     <link rel="stylesheet" href="css/button.css" />
-    <style>
-      /* Loading screen - tampil pertama */
-      #appLoader {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--bg);
-        z-index: 999999;
-        transition: opacity 0.3s ease;
-      }
-
-      #appLoader.hidden {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      #appLoader .loader-spinner {
-        width: 36px;
-        height: 36px;
-        border: 3px solid var(--line);
-        border-top-color: var(--brand);
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-        margin: 0 auto 12px;
-      }
-
-      #appLoader .loader-text {
-        text-align: center;
-        color: var(--ink-soft);
-        font-family: "Plus Jakarta Sans", sans-serif;
-        font-size: 13px;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* Auth screen - hidden by default */
-      #authScreen {
-        display: none !important;
-      }
-
-      #authScreen:not(.hidden) {
-        display: flex !important;
-      }
-
-      /* Shell - hidden by default */
-      #shell {
-        display: none !important;
-      }
-
-      #shell:not(.hidden) {
-        display: flex !important;
-      }
-    </style>
   </head>
 
   <body>
@@ -290,7 +231,7 @@
           </div>
         </div>
 
-        <!-- Header dengan Back Button (STICKY) -->
+        <!-- Header dengan Back Button & Filter (STICKY) -->
         <div class="zakat-header">
           <button
             type="button"
@@ -310,12 +251,214 @@
               <path d="M12 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 class="zakat-title" id="zakatScreenTitle">Manajemen Zakat</h2>
-          <div style="width: 44px"></div>
+
+          <div class="zakat-header-center">
+            <h2 class="zakat-title" id="zakatScreenTitle">Manajemen Zakat</h2>
+
+            <!-- Filter Chip Trigger di Header -->
+            <button id="btnOpenZakatFilter" class="zakat-filter-trigger">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 6h18M6 12h12M10 18h4" />
+              </svg>
+              <span id="zakatFilterBadge" class="filter-badge hidden">0</span>
+            </button>
+          </div>
+
+          <!-- Active filters display di header -->
+          <div id="zakatActiveFilters" class="zakat-active-filters"></div>
         </div>
 
         <!-- Main Content (SCROLLABLE) -->
         <div class="zakat-content">
+          <!-- Zakat Filter Sheet -->
+          <div id="zakatFilterSheet" class="sheet-overlay hidden">
+            <div class="sheet" style="padding: 12px 16px 20px">
+              <div class="sheet-header sheet-header-payment">
+                <div class="sheet-handle"></div>
+                <div
+                  class="sheet-header-icon"
+                  style="background: var(--brand-soft); color: var(--brand)"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M3 6h18M6 12h12M10 18h4" />
+                  </svg>
+                </div>
+                <h3 class="sheet-title">Filter Zakat</h3>
+                <p class="sheet-subtitle">
+                  Pilih filter untuk menyaring daftar zakat
+                </p>
+              </div>
+
+              <div class="sheet-scroll">
+                <!-- Tahun -->
+                <div style="margin-bottom: 16px">
+                  <label
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--ink-faint);
+                      text-transform: uppercase;
+                      display: block;
+                      margin-bottom: 6px;
+                      letter-spacing: 0.05em;
+                    "
+                    >Tahun</label
+                  >
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap">
+                    <button
+                      class="filter-chip-option active"
+                      data-filter="tahun"
+                      data-value="semua"
+                    >
+                      Semua
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="tahun"
+                      data-value="2026"
+                    >
+                      2026
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="tahun"
+                      data-value="2025"
+                    >
+                      2025
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="tahun"
+                      data-value="2024"
+                    >
+                      2024
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="tahun"
+                      data-value="2023"
+                    >
+                      2023
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Status -->
+                <div style="margin-bottom: 16px">
+                  <label
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--ink-faint);
+                      text-transform: uppercase;
+                      display: block;
+                      margin-bottom: 6px;
+                      letter-spacing: 0.05em;
+                    "
+                    >Status</label
+                  >
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap">
+                    <button
+                      class="filter-chip-option active"
+                      data-filter="status"
+                      data-value="semua"
+                    >
+                      Semua
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="selesai"
+                    >
+                      Selesai
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="muzaki_belum"
+                    >
+                      Muzaki Belum
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="muzaki_sudah"
+                    >
+                      Muzaki Sudah
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="rincian_belum"
+                    >
+                      Rincian Belum
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="rincian_sudah"
+                    >
+                      Rincian Sudah
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="mustahik_belum"
+                    >
+                      Mustahik Belum
+                    </button>
+                    <button
+                      class="filter-chip-option"
+                      data-filter="status"
+                      data-value="mustahik_sudah"
+                    >
+                      Mustahik Sudah
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div
+                  style="
+                    display: flex;
+                    gap: 8px;
+                    padding-top: 8px;
+                    border-top: 1px solid var(--line);
+                  "
+                >
+                  <button
+                    id="btnResetZakatFilter"
+                    class="btn-ghost flex-1"
+                    style="min-height: 42px; font-size: 13px"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    id="btnApplyZakatFilter"
+                    class="btn-primary flex-1"
+                    style="min-height: 42px; font-size: 13px"
+                  >
+                    Terapkan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- List Zakat -->
           <div id="zakatListContainer" class="zakat-list-container">
             <div id="zakatList" class="zakat-list"></div>
@@ -348,6 +491,14 @@
                       />
                     </svg>
                   </button>
+
+                  <!-- ✅ STATUS BADGE -->
+                  <span
+                    class="zakat-detail-status-badge active"
+                    id="zakatDetailStatus"
+                  >
+                    ● Aktif
+                  </span>
                 </div>
                 <p class="zakat-detail-meta" id="zakatDetailMeta">
                   Tanggal · Tempat
@@ -359,6 +510,51 @@
 
               <!-- Actions sejajar dengan title (pojok kanan atas) -->
               <div class="zakat-detail-actions">
+                <!-- ✅ TOMBOL COMPLETE / CANCEL COMPLETE (Dinamis) -->
+                <button
+                  id="btnCompleteZakat"
+                  type="button"
+                  class="zakat-action-btn complete"
+                  title="Tandai Zakat Selesai"
+                  aria-label="Tandai Zakat Selesai"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </button>
+
+                <button
+                  id="btnCancelCompleteZakat"
+                  type="button"
+                  class="zakat-action-btn cancel-complete hidden"
+                  title="Batalkan Status Selesai"
+                  aria-label="Batalkan Status Selesai"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+
                 <button
                   id="btnPrintZakat"
                   type="button"
@@ -385,6 +581,7 @@
                     <path d="M18 13h.01" />
                   </svg>
                 </button>
+
                 <button
                   id="btnDeleteZakat"
                   type="button"
@@ -541,14 +738,15 @@
                 </div>
               </div>
 
-              <!-- TAB RINCIAN -->
               <div id="zakatTabRincian" class="zakat-tab-panel hidden">
                 <div class="zakat-tab-header">
                   <div class="zakat-tab-title">
                     <h4>Rincian Zakat</h4>
-                    <span class="zakat-tab-status" id="zakatRincianStatus"
-                      >● Belum disimpan</span
-                    >
+                    <!-- ✅ Kosongkan, JavaScript akan mengisi -->
+                    <span
+                      class="zakat-tab-status"
+                      id="zakatRincianStatus"
+                    ></span>
                   </div>
                   <button
                     type="button"
@@ -735,7 +933,7 @@
                   </button>
                 </div>
 
-                <!-- Mustahik Info Bar -->
+                <!-- Mustahik Info Bar - VALIDASI -->
                 <div class="zakat-mustahik-info-bar">
                   <div class="zakat-mustahik-info-item">
                     <span class="zakat-mustahik-info-label">Dana Mustahik</span>
@@ -763,14 +961,38 @@
                       >Rp 0</span
                     >
                   </div>
+                  <div class="zakat-mustahik-info-divider"></div>
+                  <div class="zakat-mustahik-info-item">
+                    <span class="zakat-mustahik-info-label">Status</span>
+                    <span
+                      class="zakat-mustahik-info-value"
+                      id="zakatMustahikStatusView"
+                      style="font-size: 13px"
+                      >● Belum diatur</span
+                    >
+                  </div>
                 </div>
 
+                <!-- Progress Bar -->
                 <div class="zakat-progress-container">
                   <div
                     class="zakat-progress-bar"
                     id="zakatMustahikProgressView"
                     style="width: 0%"
                   ></div>
+                </div>
+                <div
+                  class="zakat-progress-label"
+                  id="zakatMustahikProgressLabel"
+                  style="
+                    text-align: right;
+                    font-size: 10px;
+                    color: var(--ink-faint);
+                    margin-top: 2px;
+                    margin-bottom: 12px;
+                  "
+                >
+                  0% dari dana mustahik
                 </div>
 
                 <div class="zakat-table-wrapper">
@@ -779,7 +1001,7 @@
                       <tr>
                         <th style="width: 8%; text-align: center">No</th>
                         <th style="text-align: left">Nama Mustahik</th>
-                        <th style="text-align: right; width: 25%">Nominal</th>
+                        <th style="text-align: right; width: 40%">Nominal</th>
                       </tr>
                     </thead>
                     <tbody id="zakatMustahikTableBody">
@@ -789,7 +1011,12 @@
                       <tr class="zakat-table-total">
                         <td
                           colspan="2"
-                          style="text-align: right; font-weight: 700"
+                          style="
+                            text-align: right;
+                            font-weight: 700;
+                            font-size: 14px;
+                            padding: 12px 10px;
+                          "
                         >
                           Total
                         </td>
@@ -950,7 +1177,9 @@
                 <p class="zakat-rincian-desc">Persentase dari total zakat</p>
                 <div class="zakat-rincian-fields">
                   <div class="field-group">
-                    <label class="field-label">Mustahik</label>
+                    <label class="field-label" style="font-size: 12px"
+                      >Mustahik</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenMustahikSheet"
@@ -958,11 +1187,14 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">%</span>
+                    <span class="field-suffix" style="font-size: 12px">%</span>
                   </div>
                   <div class="field-group sub">
-                    <label class="field-label">└ Kelompok</label>
+                    <label class="field-label" style="font-size: 11px"
+                      >└ Kelompok</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenMustahikKelompokSheet"
@@ -970,11 +1202,16 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">% dari Mustahik</span>
+                    <span class="field-suffix" style="font-size: 11px"
+                      >% dari Mustahik</span
+                    >
                   </div>
                   <div class="field-group sub">
-                    <label class="field-label">└ Daerah</label>
+                    <label class="field-label" style="font-size: 11px"
+                      >└ Daerah</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenMustahikDaerahSheet"
@@ -982,8 +1219,11 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">% dari Mustahik</span>
+                    <span class="field-suffix" style="font-size: 11px"
+                      >% dari Mustahik</span
+                    >
                   </div>
                 </div>
               </div>
@@ -1003,7 +1243,9 @@
                 <p class="zakat-rincian-desc">Persentase dari total zakat</p>
                 <div class="zakat-rincian-fields">
                   <div class="field-group">
-                    <label class="field-label">Sabilillah</label>
+                    <label class="field-label" style="font-size: 12px"
+                      >Sabilillah</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenSabilillahSheet"
@@ -1011,8 +1253,9 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">%</span>
+                    <span class="field-suffix" style="font-size: 12px">%</span>
                   </div>
                 </div>
               </div>
@@ -1032,7 +1275,9 @@
                 <p class="zakat-rincian-desc">Persentase dari total zakat</p>
                 <div class="zakat-rincian-fields">
                   <div class="field-group">
-                    <label class="field-label">Amil</label>
+                    <label class="field-label" style="font-size: 12px"
+                      >Amil</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenAmilSheet"
@@ -1040,11 +1285,14 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">%</span>
+                    <span class="field-suffix" style="font-size: 12px">%</span>
                   </div>
                   <div class="field-group sub">
-                    <label class="field-label">└ Kelompok</label>
+                    <label class="field-label" style="font-size: 11px"
+                      >└ Kelompok</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenAmilKelompokSheet"
@@ -1052,11 +1300,16 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">% dari total</span>
+                    <span class="field-suffix" style="font-size: 11px"
+                      >% dari total</span
+                    >
                   </div>
                   <div class="field-group sub">
-                    <label class="field-label">└ Desa</label>
+                    <label class="field-label" style="font-size: 11px"
+                      >└ Desa</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenAmilDesaSheet"
@@ -1064,11 +1317,16 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">% dari total</span>
+                    <span class="field-suffix" style="font-size: 11px"
+                      >% dari total</span
+                    >
                   </div>
                   <div class="field-group sub">
-                    <label class="field-label">└ Daerah</label>
+                    <label class="field-label" style="font-size: 11px"
+                      >└ Daerah</label
+                    >
                     <input
                       type="number"
                       id="zakatPersenAmilDaerahSheet"
@@ -1076,8 +1334,11 @@
                       min="0"
                       max="100"
                       value="0"
+                      style="font-size: 14px; min-height: 38px"
                     />
-                    <span class="field-suffix">% dari total</span>
+                    <span class="field-suffix" style="font-size: 11px"
+                      >% dari total</span
+                    >
                   </div>
                 </div>
               </div>
@@ -1085,29 +1346,33 @@
               <!-- VALIDASI -->
               <div class="zakat-rincian-total">
                 <div class="zakat-rincian-total-item">
-                  <span class="label">Total Persentase</span>
+                  <span class="label" style="font-size: 10px"
+                    >Total Persentase</span
+                  >
                   <span
                     class="value"
                     id="zakatTotalPersenSheet"
-                    style="color: var(--pos)"
+                    style="color: var(--pos); font-size: 16px"
                     >0%</span
                   >
                 </div>
                 <div class="zakat-rincian-total-item">
-                  <span class="label">Total Nominal</span>
+                  <span class="label" style="font-size: 10px"
+                    >Total Nominal</span
+                  >
                   <span
                     class="value"
                     id="zakatTotalNominalSheet"
-                    style="color: var(--brand)"
+                    style="color: var(--brand); font-size: 16px"
                     >Rp 0</span
                   >
                 </div>
                 <div class="zakat-rincian-total-item">
-                  <span class="label">Status</span>
+                  <span class="label" style="font-size: 10px">Status</span>
                   <span
                     class="value"
                     id="zakatRincianStatusSheet"
-                    style="color: var(--ink-faint)"
+                    style="color: var(--ink-faint); font-size: 14px"
                     >● Belum diatur</span
                   >
                 </div>
@@ -1119,6 +1384,7 @@
                 type="button"
                 id="zakatRincianSheetCancel"
                 class="btn-ghost flex-1"
+                style="font-size: 13px; min-height: 42px"
               >
                 Batal
               </button>
@@ -1126,6 +1392,7 @@
                 type="button"
                 id="zakatRincianSheetSubmit"
                 class="btn-primary flex-1"
+                style="font-size: 13px; min-height: 42px"
               >
                 Simpan Rincian
               </button>
@@ -1176,6 +1443,64 @@
             </div>
 
             <div id="zakatMustahikSheetList" class="zakat-mustahik-list"></div>
+
+            <!-- VALIDASI SHEET -->
+            <div class="zakat-sheet-validation">
+              <div class="zakat-sheet-validation-item">
+                <span class="zakat-sheet-validation-label">Dana Mustahik</span>
+                <span
+                  class="zakat-sheet-validation-value"
+                  id="zakatMustahikSheetDana"
+                  >Rp 0</span
+                >
+              </div>
+              <div class="zakat-sheet-validation-item">
+                <span class="zakat-sheet-validation-label">Dialokasikan</span>
+                <span
+                  class="zakat-sheet-validation-value"
+                  id="zakatMustahikSheetDialokasikan"
+                  >Rp 0</span
+                >
+              </div>
+              <div class="zakat-sheet-validation-item">
+                <span class="zakat-sheet-validation-label">Sisa</span>
+                <span
+                  class="zakat-sheet-validation-value"
+                  id="zakatMustahikSheetSisa"
+                  >Rp 0</span
+                >
+              </div>
+              <div class="zakat-sheet-validation-item">
+                <span class="zakat-sheet-validation-label">Status</span>
+                <span
+                  class="zakat-sheet-validation-value"
+                  id="zakatMustahikSheetStatus"
+                  style="font-weight: 700"
+                  >● Belum diatur</span
+                >
+              </div>
+            </div>
+
+            <!-- Progress Bar di Sheet -->
+            <div class="zakat-sheet-progress-container">
+              <div
+                class="zakat-sheet-progress-bar"
+                id="zakatMustahikSheetProgress"
+                style="width: 0%"
+              ></div>
+            </div>
+            <div
+              class="zakat-sheet-progress-label"
+              id="zakatMustahikSheetProgressLabel"
+              style="
+                text-align: right;
+                font-size: 9px;
+                color: var(--ink-faint);
+                margin-top: 2px;
+              "
+            >
+              0%
+            </div>
 
             <div class="zakat-total-ringkasan">
               <span class="zakat-total-label">Total Mustahik</span>
@@ -1450,6 +1775,116 @@
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- MODAL KONFIRMASI COMPLETE ZAKAT                               -->
+      <!-- ============================================================ -->
+      <div id="completeZakatConfirmOverlay" class="modal-overlay hidden">
+        <div class="card modal-box p-5">
+          <div
+            class="modal-icon"
+            style="background: var(--gold-soft); color: var(--gold-dark)"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+
+          <h3
+            class="font-display text-[15.5px] font-extrabold text-center mt-3"
+          >
+            Tandai Zakat Selesai?
+          </h3>
+          <p
+            class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5"
+            id="completeZakatConfirmDesc"
+          >
+            Zakat akan ditandai sebagai selesai dan tidak dapat diedit lagi.
+          </p>
+
+          <div class="flex gap-2.5 pt-4">
+            <button
+              type="button"
+              id="btnCompleteZakatCancel"
+              class="btn-ghost flex-1"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              id="btnCompleteZakatConfirm"
+              class="btn-primary flex-1"
+              style="background: var(--gold); color: #fff"
+            >
+              Tandai Selesai
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- MODAL KONFIRMASI CANCEL COMPLETE ZAKAT                        -->
+      <!-- ============================================================ -->
+      <div id="cancelCompleteZakatConfirmOverlay" class="modal-overlay hidden">
+        <div class="card modal-box p-5">
+          <div
+            class="modal-icon"
+            style="background: var(--neg-soft); color: var(--neg)"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </div>
+
+          <h3
+            class="font-display text-[15.5px] font-extrabold text-center mt-3"
+          >
+            Batalkan Status Selesai?
+          </h3>
+          <p
+            class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5"
+            id="cancelCompleteZakatConfirmDesc"
+          >
+            Zakat akan dikembalikan ke status Aktif dan dapat diedit kembali.
+          </p>
+
+          <div class="flex gap-2.5 pt-4">
+            <button
+              type="button"
+              id="btnCancelCompleteZakatCancel"
+              class="btn-ghost flex-1"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              id="btnCancelCompleteZakatConfirm"
+              class="btn-primary flex-1"
+              style="background: var(--neg)"
+            >
+              Batalkan Selesai
+            </button>
           </div>
         </div>
       </div>
@@ -4188,8 +4623,7 @@
     <script src="js/chart.js"></script>
     <script src="js/init.js"></script>
 
-    // zakat
-    <script src="js/zakat/zakat-constants.js"></script>
+    <script src="js/zakat/zakat-constans.js"></script>
     <script src="js/zakat/zakat-helpers.js"></script>
     <script src="js/zakat/zakat.js"></script>
 

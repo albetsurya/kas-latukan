@@ -24,6 +24,17 @@
   border-radius: 999px;
 }
 
+#zakatEditDateDropdown .filter-dropdown-menu {
+  z-index: 999999 !important;
+}
+
+#zakatEditDateDropdown.open .filter-dropdown-menu {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) scale(1) !important;
+}
+
 /* ============================================================
    ANIMATIONS
    ============================================================ */

@@ -1,15 +1,10 @@
 /* ============================================================
-   ZAKAT - UI/UX IMPROVED (Warna sesuai tema)
+   ZAKAT - UI/UX IMPROVED
    ============================================================ */
 
-/* Detail Container */
 .zakat-detail-container {
   padding: 4px 0;
 }
-
-/* ============================================================
-   ZAKAT - DETAIL HEADER (Actions sejajar title)
-   ============================================================ */
 
 .zakat-detail-header {
   display: flex;
@@ -82,10 +77,6 @@
   display: block;
 }
 
-/* ============================================================
-   ZAKAT - ACTIONS (Sejajar title - pojok kanan atas)
-   ============================================================ */
-
 .zakat-detail-actions {
   display: flex;
   align-items: center;
@@ -93,10 +84,6 @@
   flex-shrink: 0;
   padding-top: 2px;
 }
-
-/* ============================================================
-   ZAKAT - ACTION BUTTONS
-   ============================================================ */
 
 .zakat-action-btn {
   transition: all 0.2s ease;
@@ -137,10 +124,6 @@
   flex-shrink: 0;
 }
 
-/* ============================================================
-   ZAKAT - TOTAL (Di bawah header, full width)
-   ============================================================ */
-
 .zakat-detail-total-wrapper {
   display: flex;
   justify-content: flex-end;
@@ -154,10 +137,6 @@
   font-weight: 800;
   color: var(--brand);
 }
-
-/* ============================================================
-   ZAKAT - TABS
-   ============================================================ */
 
 .zakat-tabs {
   display: grid;
@@ -203,25 +182,17 @@
   border-color: var(--brand-soft);
 }
 
-/* ============================================================
-   ZAKAT - TAB CONTENT
-   ============================================================ */
-
 .zakat-tab-content {
   margin-top: 2px;
 }
 
 .zakat-tab-panel {
-  display: none;
+  display: none !important;
 }
 
 .zakat-tab-panel.active {
-  display: block;
+  display: block !important;
 }
-
-/* ============================================================
-   ZAKAT - TAB HEADER (GABUNGAN - TIDAK DUPLIKAT)
-   ============================================================ */
 
 .zakat-tab-header {
   display: flex;
@@ -284,10 +255,6 @@
   flex-shrink: 0;
 }
 
-/* ============================================================
-   ZAKAT - BUTTON SMALL
-   ============================================================ */
-
 .btn-sm {
   display: inline-flex !important;
   align-items: center !important;
@@ -320,10 +287,6 @@
 .btn-sm svg {
   flex-shrink: 0;
 }
-
-/* ============================================================
-   ZAKAT - TABLE
-   ============================================================ */
 
 .zakat-table-wrapper {
   overflow-x: auto;
@@ -383,17 +346,12 @@
   letter-spacing: 0.3px;
 }
 
-/* Pastikan total selalu terlihat */
 #zakatMuzakiTableTotal,
 #zakatMustahikTableTotal {
   font-size: 16px !important;
   font-weight: 800 !important;
   color: var(--brand) !important;
 }
-
-/* ============================================================
-   ZAKAT - RINCIAN GRID
-   ============================================================ */
 
 .zakat-rincian-grid {
   display: grid;
@@ -407,6 +365,12 @@
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 14px 16px;
+  transition: all 0.2s ease;
+}
+
+.zakat-rincian-group:hover {
+  border-color: var(--brand-soft);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .zakat-rincian-group-header {
@@ -432,6 +396,8 @@
 
 .zakat-rincian-group-icon svg {
   stroke: currentColor;
+  width: 18px;
+  height: 18px;
 }
 
 .zakat-rincian-group-title {
@@ -447,6 +413,7 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--brand);
+  white-space: nowrap;
 }
 
 .zakat-rincian-group-items {
@@ -461,16 +428,23 @@
   font-size: 13px;
   padding: 4px 0;
   color: var(--ink-soft);
+  border-bottom: 1px solid transparent;
+}
+
+.zakat-rincian-group-item:last-child {
+  border-bottom: none;
+}
+
+.zakat-rincian-group-item span:first-child {
+  color: var(--ink-soft);
+  font-weight: 500;
 }
 
 .zakat-rincian-group-item span:last-child {
   font-weight: 600;
   color: var(--ink);
+  font-size: 12px;
 }
-
-/* ============================================================
-   ZAKAT - RINCIAN PROGRESS
-   ============================================================ */
 
 .zakat-rincian-progress {
   margin-top: 6px;
@@ -478,7 +452,7 @@
 
 .zakat-rincian-progress-bar {
   display: flex;
-  height: 28px;
+  height: 35px;
   border-radius: 8px;
   overflow: hidden;
   background: var(--surface-alt);
@@ -492,6 +466,8 @@
   font-weight: 700;
   color: #fff;
   transition: width 0.5s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  min-width: 20px;
 }
 
 .zakat-rincian-progress-segment.mustahik {
@@ -519,12 +495,9 @@
 }
 
 .zakat-rincian-progress-segment span {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  font-size: 9px;
 }
-
-/* ============================================================
-   ZAKAT - MUSTAHIK INFO BAR
-   ============================================================ */
 
 .zakat-mustahik-info-bar {
   display: flex;
@@ -572,10 +545,6 @@
   background: var(--line);
 }
 
-/* ============================================================
-   ZAKAT - PROGRESS CONTAINER
-   ============================================================ */
-
 .zakat-progress-container {
   width: 100%;
   height: 8px;
@@ -592,9 +561,247 @@
   transition: width 0.5s ease;
 }
 
-/* ============================================================
-   ZAKAT - RESPONSIVE
-   ============================================================ */
+#zakatMustahikStatusView {
+  font-weight: 700;
+  font-size: 13px;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+#zakatMustahikStatusView.valid {
+  color: var(--pos);
+  background: var(--pos-soft);
+}
+
+#zakatMustahikStatusView.invalid {
+  color: var(--neg);
+  background: var(--neg-soft);
+}
+
+#zakatMustahikStatusView.warning {
+  color: var(--gold);
+  background: var(--gold-soft);
+}
+
+#zakatMustahikStatusView.idle {
+  color: var(--ink-faint);
+  background: var(--surface-alt);
+}
+
+.zakat-progress-label {
+  text-align: right;
+  font-size: 10px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+  margin-bottom: 12px;
+}
+
+.zakat-sheet-validation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  margin: 12px 0 8px 0;
+}
+
+.zakat-sheet-validation-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zakat-sheet-validation-item .zakat-sheet-validation-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--ink-faint);
+}
+
+.zakat-sheet-validation-item .zakat-sheet-validation-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.zakat-sheet-validation-item .zakat-sheet-validation-value.valid {
+  color: var(--pos);
+}
+
+.zakat-sheet-validation-item .zakat-sheet-validation-value.invalid {
+  color: var(--neg);
+}
+
+.zakat-sheet-validation-item .zakat-sheet-validation-value.warning {
+  color: var(--gold);
+}
+
+.zakat-sheet-progress-container {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.zakat-sheet-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand);
+  transition: width 0.5s ease;
+}
+
+.zakat-sheet-progress-label {
+  text-align: right;
+  font-size: 9px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+.zakat-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  line-height: 1.4;
+}
+
+.zakat-status-badge svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.zakat-status-badge.saved {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.zakat-status-badge.saved svg {
+  stroke: var(--pos);
+}
+
+.zakat-status-badge.warning {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.zakat-status-badge.warning svg {
+  stroke: var(--gold);
+}
+
+.zakat-status-badge.invalid {
+  background: var(--neg-soft);
+  color: var(--neg);
+}
+
+.zakat-status-badge.invalid svg {
+  stroke: var(--neg);
+}
+
+.zakat-status-badge.idle {
+  background: var(--surface-alt);
+  color: var(--ink-faint);
+}
+
+.zakat-status-badge.idle svg {
+  stroke: var(--ink-faint);
+}
+
+[data-theme="dark"] .zakat-status-badge.saved {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+[data-theme="dark"] .zakat-status-badge.saved svg {
+  stroke: #34d399;
+}
+
+[data-theme="dark"] .zakat-status-badge.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .zakat-status-badge.warning svg {
+  stroke: #fbbf24;
+}
+
+[data-theme="dark"] .zakat-status-badge.invalid {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+[data-theme="dark"] .zakat-status-badge.invalid svg {
+  stroke: #f87171;
+}
+
+[data-theme="dark"] .zakat-status-badge.idle {
+  background: rgba(100, 116, 139, 0.15);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .zakat-status-badge.idle svg {
+  stroke: #94a3b8;
+}
+
+#zakatMustahikSheet .zakat-mustahik-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0 4px 0;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 2px 2px 4px 2px;
+}
+
+#zakatMustahikSheet .zakat-mustahik-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#zakatMustahikSheet .zakat-mustahik-list::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+#zakatMustahikSheet .zakat-muzaki-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+#zakatMustahikSheet .zakat-muzaki-row:last-child {
+  border-bottom: none;
+}
+
+#zakatMustahikSheet .zakat-muzaki-row .zakat-name-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+#zakatMustahikSheet .zakat-muzaki-row .field-input {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+#zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+  max-width: 140px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
 
 @media (max-width: 768px) {
   .zakat-rincian-grid {
@@ -609,6 +816,18 @@
 
   .zakat-mustahik-info-divider {
     display: none;
+  }
+
+  .zakat-rincian-progress-bar {
+    height: 35px;
+  }
+
+  .zakat-rincian-progress-segment {
+    font-size: 12px;
+  }
+
+  .zakat-rincian-progress-segment span {
+    font-size: 12px;
   }
 }
 
@@ -762,13 +981,669 @@
     width: 14px;
     height: 14px;
   }
+
+  .zakat-rincian-progress-bar {
+    height: 30px;
+  }
+
+  .zakat-rincian-progress-segment {
+    font-size: 10px;
+  }
+
+  .zakat-rincian-progress-segment span {
+    font-size: 10px;
+  }
+
+  .zakat-sheet-validation {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .zakat-sheet-validation-item .zakat-sheet-validation-value {
+    font-size: 12px;
+  }
 }
 
-/* Cek di CSS */
-#zakatTabMuzaki {
-  display: block !important;
+@media (max-width: 380px) {
+  .zakat-rincian-group {
+    padding: 8px 10px;
+  }
+
+  .zakat-rincian-group-header {
+    gap: 6px;
+  }
+
+  .zakat-rincian-group-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .zakat-rincian-group-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .zakat-rincian-group-title {
+    font-size: 9px;
+  }
+
+  .zakat-rincian-group-total {
+    font-size: 11px;
+  }
+
+  .zakat-rincian-group-item {
+    font-size: 11px;
+  }
+
+  .zakat-rincian-progress-bar {
+    height: 18px;
+  }
+
+  .zakat-rincian-progress-segment {
+    font-size: 8px;
+    min-width: 15px;
+  }
+
+  .zakat-rincian-progress-segment span {
+    font-size: 8px;
+  }
+
+  .zakat-sheet-validation {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
 }
 
-#zakatTabMuzaki.hidden {
+[data-theme="dark"] .zakat-rincian-group {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .zakat-rincian-group:hover {
+  border-color: var(--brand-soft);
+}
+
+[data-theme="dark"] .zakat-rincian-group-header {
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .zakat-rincian-group-icon {
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+}
+
+[data-theme="dark"] .zakat-rincian-group-item span:last-child {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .zakat-rincian-progress-bar {
+  background: var(--surface-alt);
+}
+
+/* ============================================================
+   ZAKAT - RINCIAN SHEET FONT SIZE
+   ============================================================ */
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--ink-soft) !important;
+  min-width: 80px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+  font-size: 14px !important;
+  min-height: 38px !important;
+  padding: 6px 12px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group .field-suffix {
+  font-size: 12px !important;
+  color: var(--ink-faint) !important;
+  font-weight: 500 !important;
+  min-width: 70px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub .field-label {
+  font-size: 11px !important;
+  color: var(--ink-faint) !important;
+  min-width: 70px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-fields .field-group.sub .field-suffix {
+  font-size: 11px !important;
+  min-width: 60px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-total .label {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ink-faint) !important;
+}
+
+#zakatRincianSheet .zakat-rincian-total .value {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+#zakatRincianSheet .btn-ghost,
+#zakatRincianSheet .btn-primary {
+  font-size: 13px !important;
+  min-height: 42px !important;
+}
+
+#zakatRincianSheet .zakat-rincian-desc {
+  font-size: 11px !important;
+  color: var(--ink-faint) !important;
+  margin: -4px 0 8px 0 !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-label {
+    font-size: 11px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-input {
+    font-size: 13px !important;
+    min-height: 34px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-fields .field-group .field-suffix {
+    font-size: 11px !important;
+  }
+
+  #zakatRincianSheet .zakat-rincian-total .value {
+    font-size: 14px !important;
+  }
+}
+
+/* ============================================================
+   ZAKAT - SHEET ROW LABEL
+   ============================================================ */
+
+#zakatMuzakiSheet .zakat-muzaki-row,
+#zakatMustahikSheet .zakat-muzaki-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row:last-child,
+#zakatMustahikSheet .zakat-muzaki-row:last-child {
+  border-bottom: none;
+}
+
+.zakat-row-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.zakat-name-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.zakat-nominal-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.zakat-nominal-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding: 0 2px;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .field-input,
+#zakatMustahikSheet .zakat-muzaki-row .field-input {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .field-input:focus,
+#zakatMustahikSheet .zakat-muzaki-row .field-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+#zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+  max-width: 140px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .zakat-row-label {
+    min-width: 20px;
+    font-size: 12px;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+  #zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+    max-width: 100% !important;
+  }
+
+  .zakat-nominal-wrapper {
+    width: 100%;
+  }
+
+  .zakat-nominal-wrapper input {
+    flex: 1;
+  }
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row,
+#zakatMustahikSheet .zakat-muzaki-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 14px !important;
+  align-items: center !important;
+  padding: 10px 0 !important;
+  border-bottom: 1px solid var(--line);
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row:last-child,
+#zakatMustahikSheet .zakat-muzaki-row:last-child {
+  border-bottom: none;
+}
+
+.zakat-row-label {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--ink-soft);
+  min-width: 28px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.zakat-name-wrapper {
+  flex: 1 !important;
+  min-width: 180px !important;
+  position: relative;
+}
+
+.zakat-nominal-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+  min-width: 160px !important;
+}
+
+.zakat-nominal-label {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--ink-soft);
+  padding: 0 4px;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .field-input,
+#zakatMustahikSheet .zakat-muzaki-row .field-input {
+  width: 100% !important;
+  min-width: 180px !important;
+  min-height: 40px !important;
+  padding: 8px 14px !important;
+  font-size: 14px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  outline: none !important;
+  transition: border-color 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+#zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+  min-width: 120px !important;
+  max-width: 160px !important;
+  min-height: 40px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  font-variant-numeric: tabular-nums !important;
+  text-align: right !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  outline: none !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .field-input:focus,
+#zakatMustahikSheet .zakat-muzaki-row .field-input:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+}
+
+@media (max-width: 640px) {
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    gap: 10px !important;
+    padding: 8px 0 !important;
+  }
+
+  .zakat-row-label {
+    font-size: 13px !important;
+    min-width: 22px !important;
+  }
+
+  .zakat-name-wrapper {
+    min-width: 140px !important;
+  }
+
+  .zakat-nominal-wrapper {
+    min-width: 130px !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row .field-input,
+  #zakatMustahikSheet .zakat-muzaki-row .field-input {
+    min-width: 140px !important;
+    min-height: 36px !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+  #zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+    min-width: 100px !important;
+    max-width: 130px !important;
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+  }
+
+  .zakat-nominal-label {
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    gap: 8px !important;
+    padding: 6px 0 !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .zakat-row-label {
+    font-size: 12px !important;
+    min-width: 18px !important;
+  }
+
+  .zakat-name-wrapper {
+    min-width: 100px !important;
+    flex: 1 !important;
+  }
+
+  .zakat-nominal-wrapper {
+    min-width: 100px !important;
+    flex-shrink: 0 !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row .field-input,
+  #zakatMustahikSheet .zakat-muzaki-row .field-input {
+    min-width: 100px !important;
+    min-height: 32px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+  #zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+    min-width: 80px !important;
+    max-width: 110px !important;
+    min-height: 32px !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .zakat-nominal-label {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    gap: 6px !important;
+    padding: 4px 0 !important;
+  }
+
+  .zakat-row-label {
+    font-size: 11px !important;
+    min-width: 16px !important;
+  }
+
+  .zakat-name-wrapper {
+    min-width: 70px !important;
+  }
+
+  .zakat-nominal-wrapper {
+    min-width: 80px !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row .field-input,
+  #zakatMustahikSheet .zakat-muzaki-row .field-input {
+    min-width: 70px !important;
+    min-height: 28px !important;
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+  }
+
+  #zakatMuzakiSheet .zakat-muzaki-row input[type="number"],
+  #zakatMustahikSheet .zakat-muzaki-row input[type="number"] {
+    min-width: 65px !important;
+    max-width: 90px !important;
+    min-height: 28px !important;
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+  }
+
+  .zakat-nominal-label {
+    font-size: 11px !important;
+  }
+}
+/* ============================================================
+   ZAKAT ACTION BUTTON - COMPLETE & CANCEL COMPLETE
+   ============================================================ */
+
+.zakat-action-btn.complete {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  border-color: var(--gold);
+}
+
+.zakat-action-btn.complete:hover {
+  background: var(--gold);
+  color: #fff;
+}
+
+.zakat-action-btn.complete svg {
+  stroke: var(--gold-dark);
+}
+
+.zakat-action-btn.complete:hover svg {
+  stroke: #fff;
+}
+
+.zakat-action-btn.cancel-complete {
+  background: var(--neg-soft);
+  color: var(--neg);
+  border-color: var(--neg);
+}
+
+.zakat-action-btn.cancel-complete:hover {
+  background: var(--neg);
+  color: #fff;
+}
+
+.zakat-action-btn.cancel-complete svg {
+  stroke: var(--neg);
+}
+
+.zakat-action-btn.cancel-complete:hover svg {
+  stroke: #fff;
+}
+
+.zakat-action-btn.cancel-complete.hidden {
   display: none !important;
+}
+
+/* ============================================================
+   MODAL BOX - OVERRIDE UNTUK KONSISTENSI
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 8, 7, 0.55);
+  z-index: 99999;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-overlay.hidden {
+  display: none !important;
+}
+
+.modal-box {
+  max-width: 340px;
+  width: 100%;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="dark"] .modal-box {
+  border-color: var(--line);
+}
+/* ============================================================
+   ZAKAT STATUS BADGE - LIST & DETAIL
+   ============================================================ */
+
+/* Status Active */
+.zakat-badge.status-active,
+.zakat-detail-status-badge.active {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.zakat-badge.status-active svg,
+.zakat-detail-status-badge.active svg {
+  stroke: var(--pos);
+}
+
+/* Status Completed */
+.zakat-badge.status-completed,
+.zakat-detail-status-badge.completed {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.zakat-badge.status-completed svg,
+.zakat-detail-status-badge.completed svg {
+  stroke: var(--gold-dark);
+}
+
+/* Status Cancelled */
+.zakat-badge.status-cancelled,
+.zakat-detail-status-badge.cancelled {
+  background: var(--neg-soft);
+  color: var(--neg);
+}
+
+.zakat-badge.status-cancelled svg,
+.zakat-detail-status-badge.cancelled svg {
+  stroke: var(--neg);
+}
+
+/* Status Deleted */
+.zakat-badge.status-deleted,
+.zakat-detail-status-badge.deleted {
+  background: var(--surface-alt);
+  color: var(--ink-faint);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .zakat-badge.status-active,
+[data-theme="dark"] .zakat-detail-status-badge.active {
+  background: rgba(40, 199, 111, 0.18);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .zakat-badge.status-active svg,
+[data-theme="dark"] .zakat-detail-status-badge.active svg {
+  stroke: #4ade80;
+}
+
+[data-theme="dark"] .zakat-badge.status-completed,
+[data-theme="dark"] .zakat-detail-status-badge.completed {
+  background: rgba(233, 173, 56, 0.18);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .zakat-badge.status-completed svg,
+[data-theme="dark"] .zakat-detail-status-badge.completed svg {
+  stroke: #fbbf24;
 }
