@@ -306,33 +306,6 @@ document
     showZakatDeleteConfirm(zakatId);
   });
 
-document
-  .getElementById("btnPrintZakat")
-  ?.addEventListener("click", function () {
-    var zakatId = state.zakat.currentId;
-    if (!zakatId) {
-      showToast("Zakat tidak ditemukan.", "error");
-      return;
-    }
-
-    var zakat = getZakatById(zakatId);
-    if (!zakat) {
-      showToast("Zakat tidak ditemukan.", "error");
-      return;
-    }
-
-    printZakatReport(zakatId);
-  });
-
-function printZakatReport(zakatId) {
-  var zakat = getZakatById(zakatId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-  showToast("Fitur print sedang dalam pengembangan.", "info");
-}
-
 let zakatEditingId = null;
 
 function openZakatForm(zakatId) {
