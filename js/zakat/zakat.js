@@ -1024,7 +1024,9 @@ async function completeZakat(zakatId) {
 
   renderZakatList(state.zakat.list);
   if (state.zakat.isViewOpen) {
-    openZakatDetail(zakatId);
+    renderZakatDetailDirect(zakatId);
+  } else {
+    renderZakatList(state.zakat.list);
   }
   updateZakatDetailActions(zakat);
 
@@ -1049,7 +1051,9 @@ async function completeZakat(zakatId) {
 
       renderZakatList(state.zakat.list);
       if (state.zakat.isViewOpen) {
-        openZakatDetail(zakatId);
+        renderZakatDetailDirect(zakatId);
+      } else {
+        renderZakatList(state.zakat.list);
       }
       updateZakatDetailActions(zakat);
 
@@ -1069,7 +1073,9 @@ async function completeZakat(zakatId) {
 
     renderZakatList(state.zakat.list);
     if (state.zakat.isViewOpen) {
-      openZakatDetail(zakatId);
+      renderZakatDetailDirect(zakatId);
+    } else {
+      renderZakatList(state.zakat.list);
     }
     updateZakatDetailActions(zakat);
 
@@ -1109,7 +1115,9 @@ async function cancelCompleteZakat(zakatId) {
 
   renderZakatList(state.zakat.list);
   if (state.zakat.isViewOpen) {
-    openZakatDetail(zakatId);
+    renderZakatDetailDirect(zakatId);
+  } else {
+    renderZakatList(state.zakat.list);
   }
   updateZakatDetailActions(zakat);
 
@@ -1137,7 +1145,9 @@ async function cancelCompleteZakat(zakatId) {
 
       renderZakatList(state.zakat.list);
       if (state.zakat.isViewOpen) {
-        openZakatDetail(zakatId);
+        renderZakatDetailDirect(zakatId);
+      } else {
+        renderZakatList(state.zakat.list);
       }
       updateZakatDetailActions(zakat);
 
@@ -1157,7 +1167,9 @@ async function cancelCompleteZakat(zakatId) {
 
     renderZakatList(state.zakat.list);
     if (state.zakat.isViewOpen) {
-      openZakatDetail(zakatId);
+      renderZakatDetailDirect(zakatId);
+    } else {
+      renderZakatList(state.zakat.list);
     }
     updateZakatDetailActions(zakat);
 
@@ -1212,6 +1224,30 @@ function openZakatDetail(id) {
   renderZakatDetailDirect(id);
 }
 
+async function initZakatDetailRoute(id) {
+  if (!id) return;
+
+  state.zakat.currentId = id;
+  state.zakat.isViewOpen = true;
+
+  // Ambil data jika belum ada
+  if (!state.zakat.list || state.zakat.list.length === 0) {
+    await loadZakatData();
+  }
+
+  var zakat = getZakatById(id);
+
+  if (!zakat) {
+    showToast("Zakat tidak ditemukan.", "error");
+    return;
+  }
+
+  renderZakatDetailDirect(id);
+
+  // Pastikan visibility filter benar
+  updateZakatFilterVisibility();
+}
+
 function renderZakatDetailDirect(id) {
   var zakat = getZakatById(id);
   if (!zakat) {
@@ -1221,6 +1257,11 @@ function renderZakatDetailDirect(id) {
 
   state.zakat.currentId = id;
   state.zakat.isViewOpen = true;
+
+  var zakatScreen = document.getElementById("screen-zakat");
+  if (zakatScreen) {
+    zakatScreen.classList.add("active");
+  }
 
   closeZakatFilterSheet();
   updateZakatFilterVisibility();
@@ -2845,38 +2886,28 @@ document.addEventListener("DOMContentLoaded", function () {
   if (typeof router !== "undefined" && router) {
     router.on("routeChange", function (data) {
       if (data.route === "zakat") {
-        // Reset state sebelum apapun
         state.zakat.isViewOpen = false;
         state.zakat.currentId = null;
 
-        // Tutup detail
         closeZakatDetailDirect();
 
-        // Render list
-        renderZakatList(state.zakat.list);
+        if (!router || !router.isZakatDetailRoute()) {
+          renderZakatList(state.zakat.list);
+        }
 
         setTimeout(function () {
           initZakatFilters();
           applyZakatFilters();
         }, 100);
+
+        return;
       }
 
       if (data.route === "zakat-detail" && data.params && data.params.id) {
-        renderZakatList(state.zakat.list);
-        setTimeout(function () {
-          renderZakatDetailDirect(data.params.id);
-        }, 100);
+        renderZakatDetailDirect(data.params.id);
+        return;
       }
     });
-
-    if (router.isZakatDetailRoute()) {
-      var id = router.getZakatIdFromRoute();
-      if (id) {
-        setTimeout(function () {
-          renderZakatDetailDirect(id);
-        }, 200);
-      }
-    }
   }
 
   renderZakatList(state.zakat.list);

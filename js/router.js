@@ -136,8 +136,7 @@ class Router {
       return;
     }
 
-    this.currentParams = params || {};
-    this.navigateTo(routeKey, false);
+    this.navigateTo(routeKey, false, params); // ✅ params sekarang ikut dikirim
   }
 
   navigateTo(routeKey, updateHistory = true, params = null) {
