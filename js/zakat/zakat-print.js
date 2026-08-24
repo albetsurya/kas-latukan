@@ -209,22 +209,22 @@ function updateZakatPrintRincian(zakat) {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="row-penerimaan">
               <td style="text-align:center;">1</td>
               <td>JUMLAH PENERIMAAN ZAKAT FITRAH (100%)</td>
               <td class="num">${fmtRp(fitrah.penerimaan || 0)}</td>
             </tr>
-            <tr>
+            <tr class="row-utama">
               <td style="text-align:center;">2</td>
               <td>MUSTAHIQ (${fitrah.mustahiq?.persen || 45}%)</td>
               <td class="num">${fmtRp(fitrah.mustahiq?.nominal || 0)}</td>
             </tr>
-            <tr>
+            <tr class="row-utama">
               <td style="text-align:center;">3</td>
               <td>SABILILLAH (${fitrah.sabilillah?.persen || 40}%)</td>
               <td class="num">${fmtRp(fitrah.sabilillah?.nominal || 0)}</td>
             </tr>
-            <tr>
+            <tr class="row-utama">
               <td style="text-align:center;">4</td>
               <td>AMIL (${fitrah.amil?.persen || 15}%)</td>
               <td class="num">${fmtRp(fitrah.amil?.nominal || 0)}</td>
@@ -260,12 +260,12 @@ function updateZakatPrintRincian(zakat) {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="row-penerimaan">
               <td style="text-align:center;">1</td>
               <td>JUMLAH PENERIMAAN ZAKAT MAAL & TIJAROH, ZURU' DAN TERNAK (100%)</td>
               <td class="num">${fmtRp(totalMaal)}</td>
             </tr>
-            <tr>
+            <tr class="row-utama">
               <td style="text-align:center;">2</td>
               <td>MUSTAHIQ (${maal.mustahiq.persen}%)</td>
               <td class="num">${fmtRp(maal.mustahiq.nominal)}</td>
@@ -280,12 +280,12 @@ function updateZakatPrintRincian(zakat) {
               <td style="padding-left:20px;">* MUSTAHIQ SE-DAERAH (${maal.mustahiq.daerah.persen}% dari MUSTAHIQ)</td>
               <td class="num">${fmtRp(maal.mustahiq.daerah.nominal)}</td>
             </tr>
-            <tr>
+            <tr class="row-utama">
               <td style="text-align:center;">3</td>
               <td>SABILILLAH (${maal.sabilillah.persen}%)</td>
               <td class="num">${fmtRp(maal.sabilillah.nominal)}</td>
             </tr>
-            <tr>
+            <tr class="row-utama">
               <td style="text-align:center;">4</td>
               <td>AMIL (${maal.amil.persen}%)</td>
               <td class="num">${fmtRp(maal.amil.nominal)}</td>
@@ -321,7 +321,7 @@ function updateZakatPrintRincian(zakat) {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="row-setor-desa">
               <td style="text-align:center;">1</td>
               <td>AMIL DESA (2%)</td>
               <td class="num">${fmtRp(totalSetorDesa)}</td>
@@ -336,7 +336,7 @@ function updateZakatPrintRincian(zakat) {
               <td style="padding-left:20px;">* % AMIL ZAKAT MAAL & TIJAROH, ZURU' DAN TERNAK</td>
               <td class="num">${fmtRp(setorDesa.amilDesa.maal || 0)}</td>
             </tr>
-            <tr>
+            <tr class="row-setor-desa">
               <td></td>
               <td style="padding-left:20px;font-weight:700;">JUMLAH</td>
               <td class="num" style="font-weight:700;">${fmtRp(totalSetorDesa)}</td>
@@ -357,22 +357,22 @@ function updateZakatPrintRincian(zakat) {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="row-setor-daerah">
               <td style="text-align:center;">1</td>
               <td>MUSTAHIQ SE-DAERAH (20% dari MUSTAHIQ)</td>
               <td class="num">${fmtRp(setorDaerah.mustahiqDaerah)}</td>
             </tr>
-            <tr>
+            <tr class="row-setor-daerah">
               <td style="text-align:center;">2</td>
               <td>SABILILLAH (40%)</td>
               <td class="num">${fmtRp(setorDaerah.sabilillah)}</td>
             </tr>
-            <tr>
+            <tr class="row-setor-daerah">
               <td style="text-align:center;">3</td>
               <td>AMIL DAERAH (1%)</td>
               <td class="num">${fmtRp(setorDaerah.amilDaerah)}</td>
             </tr>
-            <tr>
+            <tr class="row-setor-daerah">
               <td></td>
               <td style="padding-left:20px;font-weight:700;">JUMLAH</td>
               <td class="num" style="font-weight:700;">${fmtRp(totalSetorDaerah)}</td>
@@ -382,25 +382,24 @@ function updateZakatPrintRincian(zakat) {
       </div>
 
       <!-- TANDA TANGAN -->
-        <div class="print-rincian-signature">
+      <div class="print-rincian-signature">
         <!-- TANGGAL - Di luar row -->
         <div class="print-signature-date-wrapper">
             ${getFormattedDate()}
         </div>
         <div class="print-signature-row">
             <div class="print-signature-item">
-            <div class="print-signature-wrapper">
+              <div class="print-signature-wrapper">
                 <p class="print-signature-label">KYAI KELOMPOK</p>
                 <p class="print-signature-line">( ......................... )</p>
-            </div>
+              </div>
             </div>
             <div class="print-signature-item">
-            <div class="print-signature-wrapper">
+              <div class="print-signature-wrapper">
                 <p class="print-signature-label">KU KELOMPOK</p>
                 <p class="print-signature-line">( ......................... )</p>
+              </div>
             </div>
-            </div>
-        </div>
         </div>
       </div>
     </div>

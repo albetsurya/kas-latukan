@@ -175,6 +175,38 @@
   font-size: 11px;
 }
 
+/* ============================================================
+   WARNA KHUSUS UNTUK KOLOM JUMLAH
+   ============================================================ */
+
+/* Warna Kuning MENYALA untuk row JUMLAH PENERIMAAN ZAKAT */
+#printZakatArea .print-rincian-table .row-penerimaan td.num {
+  background: #fde047 !important;
+  color: #713f12 !important;
+  font-weight: 700;
+}
+
+/* Warna Abu-abu LEBIH GELAP untuk row MUSTAHIQ, SABILILLAH, AMIL (turunan pertama) */
+#printZakatArea .print-rincian-table .row-utama td.num {
+  background: #cbd5e1 !important;
+  color: #1e293b !important;
+  font-weight: 600;
+}
+
+/* Warna Hijau untuk row SETOR KE DESA - JUMLAH */
+#printZakatArea .print-rincian-table .row-setor-desa td.num {
+  background: #dcfce7 !important;
+  color: #14532d !important;
+  font-weight: 700;
+}
+
+/* Warna Biru untuk row SETOR KE DAERAH - JUMLAH */
+#printZakatArea .print-rincian-table .row-setor-daerah td.num {
+  background: #dbeafe !important;
+  color: #1e3a5f !important;
+  font-weight: 700;
+}
+
 #printZakatArea .print-rincian-table td[style*="padding-left:20px"] {
   padding-left: 20px !important;
 }
@@ -217,7 +249,6 @@
 #printZakatArea .print-signature-item {
   text-align: center;
   min-width: 250px;
-  gap: 200px;
 }
 
 #printZakatArea .print-signature-label {
@@ -255,7 +286,6 @@
   font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif !important;
   font-size: 10px;
   color: #1e293b;
-  gap: 200px;
 }
 
 /* ============================================================
@@ -339,6 +369,31 @@
 
   #printZakatArea .print-rincian-table .num {
     font-size: 10px !important;
+  }
+
+  /* Print colors for special rows */
+  #printZakatArea .print-rincian-table .row-penerimaan td.num {
+    background: #fde047 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printZakatArea .print-rincian-table .row-utama td.num {
+    background: #cbd5e1 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printZakatArea .print-rincian-table .row-setor-desa td.num {
+    background: #dcfce7 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printZakatArea .print-rincian-table .row-setor-daerah td.num {
+    background: #dbeafe !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* SIGNATURE PRINT - Jarak Lebih */
