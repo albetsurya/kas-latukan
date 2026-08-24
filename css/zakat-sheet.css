@@ -688,6 +688,17 @@
     gap: 4px !important;
   }
 
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    flex-wrap: wrap !important;
+  }
+  .zakat-row-label {
+    display: none !important; /* nomor urut disembunyikan di layar kecil biar hemat ruang */
+  }
+  .zakat-row-delete-btn {
+    margin-left: auto !important;
+  }
+
   #zakatRincianSheet .zakat-rincian-total-item {
     flex-direction: row !important;
     justify-content: space-between !important;
@@ -772,6 +783,18 @@
   #zakatEditHeaderOverlay .sheet-header-icon svg {
     width: 17px !important;
     height: 17px !important;
+  }
+
+  .zakat-nominal-wrapper {
+    width: 84px !important;
+  }
+  .zakat-nominal-wrapper input[type="number"] {
+    font-size: 11px !important;
+    padding: 5px 4px !important;
+  }
+  .zakat-row-delete-btn {
+    width: 28px !important;
+    height: 28px !important;
   }
 
   .zakat-total-ringkasan {
@@ -1023,4 +1046,161 @@
   background: var(--surface) !important;
   border-color: var(--line) !important;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+}
+.zakat-count-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.btn-apply-count {
+  min-height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 8px !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-apply-count:hover {
+  background: var(--brand-dark) !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-apply-count:active {
+  transform: scale(0.96) !important;
+}
+
+/* Tombol hapus baris (ikon sampah) */
+.zakat-row-delete-btn {
+  flex-shrink: 0 !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--neg-soft) !important;
+  color: var(--neg) !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.zakat-row-delete-btn:hover {
+  background: var(--neg) !important;
+  color: #fff !important;
+  border-color: var(--neg) !important;
+}
+
+.zakat-row-delete-btn:active {
+  transform: scale(0.92) !important;
+}
+
+@media (max-width: 640px) {
+  #zakatMuzakiSheet .zakat-muzaki-row,
+  #zakatMustahikSheet .zakat-muzaki-row {
+    flex-wrap: wrap !important;
+  }
+  .zakat-row-delete-btn {
+    flex-shrink: 0 !important; /* pastikan tidak ikut mengecil/hilang saat ruang sempit */
+  }
+}
+
+/* Label nomor urut baris (1. 2. 3. dst) */
+.zakat-row-label {
+  flex-shrink: 0 !important;
+  width: 18px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--ink-faint) !important;
+  text-align: center !important;
+}
+
+/* Wrapper nominal (Rp + input angka) */
+.zakat-nominal-wrapper {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.zakat-nominal-label {
+  flex-shrink: 0 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--ink-faint) !important;
+}
+/* Cegah scroll horizontal di list & row */
+#zakatMuzakiSheet .zakat-muzaki-list,
+#zakatMustahikSheet .zakat-mustahik-list {
+  overflow-x: hidden !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row,
+#zakatMustahikSheet .zakat-muzaki-row {
+  gap: 6px !important;
+  overflow: hidden !important;
+}
+
+/* Nama: fleksibel tapi wajib boleh menyusut (min-width:0 kunci utamanya) */
+#zakatMuzakiSheet .zakat-muzaki-row .zakat-name-wrapper,
+#zakatMustahikSheet .zakat-muzaki-row .zakat-name-wrapper {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+#zakatMuzakiSheet .zakat-muzaki-row .zakat-name-wrapper .field-input,
+#zakatMustahikSheet .zakat-muzaki-row .zakat-name-wrapper .field-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Label nomor urut */
+.zakat-row-label {
+  flex: 0 0 auto !important;
+  width: 16px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--ink-faint) !important;
+  text-align: center !important;
+}
+
+/* Wrapper nominal: lebar tetap & pasti, tidak ikut melebar */
+.zakat-nominal-wrapper {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  width: 100px !important;
+}
+
+.zakat-nominal-label {
+  flex: 0 0 auto !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--ink-faint) !important;
+}
+
+.zakat-nominal-wrapper input[type="number"] {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  padding: 6px 6px !important;
+  font-size: 12px !important;
+}
+
+/* Tombol hapus: lebar tetap, dempet ke input nominal */
+.zakat-row-delete-btn {
+  flex: 0 0 auto !important;
+  width: 30px !important;
+  height: 30px !important;
 }

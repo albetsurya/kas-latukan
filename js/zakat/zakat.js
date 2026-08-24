@@ -3214,6 +3214,26 @@ document.addEventListener("DOMContentLoaded", function () {
       printZakatReport(zakatId);
     });
 
+  // Delegasi klik tombol hapus — Muzaki
+  document
+    .getElementById("zakatMuzakiSheetList")
+    ?.addEventListener("click", function (e) {
+      var delBtn = e.target.closest(".zakat-row-delete-btn");
+      if (!delBtn) return;
+      var idx = parseInt(delBtn.dataset.index);
+      deleteMuzakiSheetRow(idx);
+    });
+
+  // Delegasi klik tombol hapus — Mustahik
+  document
+    .getElementById("zakatMustahikSheetList")
+    ?.addEventListener("click", function (e) {
+      var delBtn = e.target.closest(".zakat-row-delete-btn");
+      if (!delBtn) return;
+      var idx = parseInt(delBtn.dataset.index);
+      deleteMustahikSheetRow(idx);
+    });
+
   document
     .getElementById("btnEditZakatHeader")
     ?.addEventListener("click", function () {
@@ -3674,45 +3694,50 @@ function renderMuzakiSheetRows(zakat) {
     var rowNumber = i + 1;
 
     rows.push(`
-      <div class="zakat-muzaki-row" data-sheet-index="${i}">
-        <div class="zakat-row-label">${rowNumber}.</div>
-        <div class="zakat-name-wrapper" style="position:relative;flex:1;">
-          <input type="text" class="field-input zakat-muzaki-sheet-name" 
-                 placeholder="Nama Muzaki ${rowNumber}" 
-                 value="${escapeHtml(existing.nama || "")}" 
-                 data-index="${i}"
-                 list="sheet-suggest-muzaki-${i}"
-                 autocomplete="off"
-                 style="width:100%;">
-          <datalist id="sheet-suggest-muzaki-${i}">
-            ${allNames
-              .filter(function (n) {
-                var lower = n.toLowerCase().trim();
-                return !muzakiList.some(function (m) {
-                  return (
-                    m.nama &&
-                    m.nama.toLowerCase().trim() === lower &&
-                    m !== existing
-                  );
-                });
-              })
-              .map(function (n) {
-                return '<option value="' + escapeHtml(n) + '">';
-              })
-              .join("")}
-          </datalist>
-        </div>
-        <div class="zakat-nominal-wrapper">
-          <span class="zakat-nominal-label">Rp</span>
-          <input type="number" class="field-input zakat-muzaki-sheet-nominal" 
-                 placeholder="0" 
-                 value="${existing.nominal || ""}" 
-                 data-index="${i}" 
-                 min="0" step="1000"
-                 style="max-width:140px;">
-        </div>
-      </div>
-    `);
+  <div class="zakat-muzaki-row" data-sheet-index="${i}">
+    <div class="zakat-row-label">${rowNumber}.</div>
+    <div class="zakat-name-wrapper" style="position:relative;flex:1;">
+      <input type="text" class="field-input zakat-muzaki-sheet-name" 
+             placeholder="Nama Muzaki ${rowNumber}" 
+             value="${escapeHtml(existing.nama || "")}" 
+             data-index="${i}"
+             list="sheet-suggest-muzaki-${i}"
+             autocomplete="off"
+             style="width:100%;">
+      <datalist id="sheet-suggest-muzaki-${i}">
+        ${allNames
+          .filter(function (n) {
+            var lower = n.toLowerCase().trim();
+            return !muzakiList.some(function (m) {
+              return (
+                m.nama &&
+                m.nama.toLowerCase().trim() === lower &&
+                m !== existing
+              );
+            });
+          })
+          .map(function (n) {
+            return '<option value="' + escapeHtml(n) + '">';
+          })
+          .join("")}
+      </datalist>
+    </div>
+    <div class="zakat-nominal-wrapper">
+      <span class="zakat-nominal-label">Rp</span>
+      <input type="number" class="field-input zakat-muzaki-sheet-nominal" 
+             placeholder="0" 
+             value="${existing.nominal || ""}" 
+             data-index="${i}" 
+             min="0" step="1000"
+             style="max-width:140px;">
+    </div>
+    <button type="button" class="zakat-row-delete-btn" data-index="${i}" title="Hapus Muzaki ${rowNumber}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+      </svg>
+    </button>
+  </div>
+`);
   }
 
   container.innerHTML = rows.join("");
@@ -4174,45 +4199,50 @@ function renderMustahikSheetRows(zakat) {
     var rowNumber = i + 1;
 
     rows.push(`
-      <div class="zakat-muzaki-row" data-sheet-index="${i}">
-        <div class="zakat-row-label">${rowNumber}.</div>
-        <div class="zakat-name-wrapper" style="position:relative;flex:1;">
-          <input type="text" class="field-input zakat-mustahik-sheet-name" 
-                 placeholder="Nama Mustahik ${rowNumber}" 
-                 value="${escapeHtml(existing.nama || "")}" 
-                 data-index="${i}"
-                 list="sheet-suggest-mustahik-${i}"
-                 autocomplete="off"
-                 style="width:100%;">
-          <datalist id="sheet-suggest-mustahik-${i}">
-            ${allNames
-              .filter(function (n) {
-                var lower = n.toLowerCase().trim();
-                return !mustahikList.some(function (m) {
-                  return (
-                    m.nama &&
-                    m.nama.toLowerCase().trim() === lower &&
-                    m !== existing
-                  );
-                });
-              })
-              .map(function (n) {
-                return '<option value="' + escapeHtml(n) + '">';
-              })
-              .join("")}
-          </datalist>
-        </div>
-        <div class="zakat-nominal-wrapper">
-          <span class="zakat-nominal-label">Rp</span>
-          <input type="number" class="field-input zakat-mustahik-sheet-nominal" 
-                 placeholder="0" 
-                 value="${existing.nominal || ""}" 
-                 data-index="${i}" 
-                 min="0" step="1000"
-                 style="max-width:140px;">
-        </div>
-      </div>
-    `);
+  <div class="zakat-muzaki-row" data-sheet-index="${i}">
+    <div class="zakat-row-label">${rowNumber}.</div>
+    <div class="zakat-name-wrapper" style="position:relative;flex:1;">
+      <input type="text" class="field-input zakat-mustahik-sheet-name" 
+             placeholder="Nama Mustahik ${rowNumber}" 
+             value="${escapeHtml(existing.nama || "")}" 
+             data-index="${i}"
+             list="sheet-suggest-mustahik-${i}"
+             autocomplete="off"
+             style="width:100%;">
+      <datalist id="sheet-suggest-mustahik-${i}">
+        ${allNames
+          .filter(function (n) {
+            var lower = n.toLowerCase().trim();
+            return !mustahikList.some(function (m) {
+              return (
+                m.nama &&
+                m.nama.toLowerCase().trim() === lower &&
+                m !== existing
+              );
+            });
+          })
+          .map(function (n) {
+            return '<option value="' + escapeHtml(n) + '">';
+          })
+          .join("")}
+      </datalist>
+    </div>
+    <div class="zakat-nominal-wrapper">
+      <span class="zakat-nominal-label">Rp</span>
+      <input type="number" class="field-input zakat-mustahik-sheet-nominal" 
+             placeholder="0" 
+             value="${existing.nominal || ""}" 
+             data-index="${i}" 
+             min="0" step="1000"
+             style="max-width:140px;">
+    </div>
+    <button type="button" class="zakat-row-delete-btn" data-index="${i}" title="Hapus Mustahik ${rowNumber}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+      </svg>
+    </button>
+  </div>
+`);
   }
 
   container.innerHTML = rows.join("");
@@ -4343,6 +4373,195 @@ function updateMustahikSheetTotal(zakat) {
           : "var(--ink-faint)";
   }
 }
+
+// ============================================================
+// MUZAKI - APPLY COUNT & DELETE ROW
+// ============================================================
+
+function syncMuzakiSheetRowsToData(zakat) {
+  var container = document.getElementById("zakatMuzakiSheetList");
+  if (!container) return;
+
+  var rows = container.querySelectorAll(".zakat-muzaki-row");
+  var updated = [];
+
+  rows.forEach(function (row, i) {
+    var nameInput = row.querySelector(".zakat-muzaki-sheet-name");
+    var nominalInput = row.querySelector(".zakat-muzaki-sheet-nominal");
+    var existing = (zakat.muzaki && zakat.muzaki[i]) || {};
+
+    updated.push({
+      id:
+        existing.id ||
+        "MZ" +
+          Date.now().toString(36).toUpperCase() +
+          Math.random().toString(36).substring(2, 5),
+      nama: nameInput ? nameInput.value.trim() : existing.nama || "",
+      nominal: nominalInput
+        ? Number(nominalInput.value) || 0
+        : existing.nominal || 0,
+      createdAt: existing.createdAt || new Date().toISOString(),
+    });
+  });
+
+  zakat.muzaki = updated;
+}
+
+function applyMuzakiSheetCount() {
+  var zakat = getZakatById(state.zakat.currentId);
+  if (!zakat) {
+    showToast("Zakat tidak ditemukan.", "error");
+    return;
+  }
+
+  // Simpan dulu data yang sudah diketik sebelum jumlah berubah
+  syncMuzakiSheetRowsToData(zakat);
+
+  var countInput = document.getElementById("zakatMuzakiSheetCount");
+  var newCount = parseInt(countInput.value) || 1;
+  newCount = Math.max(1, Math.min(20, newCount));
+  countInput.value = newCount;
+
+  if (!zakat.muzaki) zakat.muzaki = [];
+
+  while (zakat.muzaki.length < newCount) {
+    zakat.muzaki.push({
+      id:
+        "MZ" +
+        Date.now().toString(36).toUpperCase() +
+        Math.random().toString(36).substring(2, 5),
+      nama: "",
+      nominal: 0,
+      createdAt: new Date().toISOString(),
+    });
+  }
+  if (zakat.muzaki.length > newCount) {
+    zakat.muzaki = zakat.muzaki.slice(0, newCount);
+  }
+
+  renderMuzakiSheetRows(zakat);
+  updateMuzakiSheetTotal(zakat);
+  showToast("Jumlah muzaki diterapkan: " + newCount, "info");
+}
+
+function deleteMuzakiSheetRow(idx) {
+  var zakat = getZakatById(state.zakat.currentId);
+  if (!zakat) return;
+
+  syncMuzakiSheetRowsToData(zakat);
+
+  if (!zakat.muzaki || zakat.muzaki.length <= 1) {
+    showToast("Minimal harus ada 1 Muzaki.", "warning");
+    return;
+  }
+
+  zakat.muzaki.splice(idx, 1);
+
+  var countInput = document.getElementById("zakatMuzakiSheetCount");
+  if (countInput) countInput.value = zakat.muzaki.length;
+
+  renderMuzakiSheetRows(zakat);
+  updateMuzakiSheetTotal(zakat);
+  showToast("Baris muzaki dihapus.", "info");
+}
+
+document
+  .getElementById("zakatMuzakiSheetApplyCount")
+  ?.addEventListener("click", applyMuzakiSheetCount);
+
+// ============================================================
+// MUSTAHIK - APPLY COUNT & DELETE ROW
+// ============================================================
+
+function syncMustahikSheetRowsToData(zakat) {
+  var container = document.getElementById("zakatMustahikSheetList");
+  if (!container) return;
+
+  var rows = container.querySelectorAll(".zakat-muzaki-row");
+  var updated = [];
+
+  rows.forEach(function (row, i) {
+    var nameInput = row.querySelector(".zakat-mustahik-sheet-name");
+    var nominalInput = row.querySelector(".zakat-mustahik-sheet-nominal");
+    var existing = (zakat.mustahik && zakat.mustahik[i]) || {};
+
+    updated.push({
+      id:
+        existing.id ||
+        "MS" +
+          Date.now().toString(36).toUpperCase() +
+          Math.random().toString(36).substring(2, 5),
+      nama: nameInput ? nameInput.value.trim() : existing.nama || "",
+      nominal: nominalInput
+        ? Number(nominalInput.value) || 0
+        : existing.nominal || 0,
+      createdAt: existing.createdAt || new Date().toISOString(),
+    });
+  });
+
+  zakat.mustahik = updated;
+}
+
+function applyMustahikSheetCount() {
+  var zakat = getZakatById(state.zakat.currentId);
+  if (!zakat) {
+    showToast("Zakat tidak ditemukan.", "error");
+    return;
+  }
+
+  syncMustahikSheetRowsToData(zakat);
+
+  var countInput = document.getElementById("zakatMustahikSheetCount");
+  var newCount = parseInt(countInput.value) || 1;
+  newCount = Math.max(1, Math.min(20, newCount));
+  countInput.value = newCount;
+
+  if (!zakat.mustahik) zakat.mustahik = [];
+
+  while (zakat.mustahik.length < newCount) {
+    zakat.mustahik.push({
+      id:
+        "MS" +
+        Date.now().toString(36).toUpperCase() +
+        Math.random().toString(36).substring(2, 5),
+      nama: "",
+      nominal: 0,
+      createdAt: new Date().toISOString(),
+    });
+  }
+  if (zakat.mustahik.length > newCount) {
+    zakat.mustahik = zakat.mustahik.slice(0, newCount);
+  }
+
+  renderMustahikSheetRows(zakat);
+  updateMustahikSheetTotal(zakat);
+  showToast("Jumlah mustahik diterapkan: " + newCount, "info");
+}
+
+function deleteMustahikSheetRow(idx) {
+  var zakat = getZakatById(state.zakat.currentId);
+  if (!zakat) return;
+
+  syncMustahikSheetRowsToData(zakat);
+
+  if (!zakat.mustahik || zakat.mustahik.length <= 1) {
+    showToast("Minimal harus ada 1 Mustahik.", "warning");
+    return;
+  }
+
+  zakat.mustahik.splice(idx, 1);
+
+  var countInput = document.getElementById("zakatMustahikSheetCount");
+  if (countInput) countInput.value = zakat.mustahik.length;
+
+  renderMustahikSheetRows(zakat);
+  updateMustahikSheetTotal(zakat);
+  showToast("Baris mustahik dihapus.", "info");
+}
+
+document
+  .getElementById("zakatMustahikSheetApplyCount")
+  ?.addEventListener("click", applyMustahikSheetCount);
 
 async function submitZakatMustahikSheet() {
   var zakat = getZakatById(state.zakat.currentId);
