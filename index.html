@@ -27,6 +27,8 @@
 
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/sheets.css" />
+    <link rel="stylesheet" href="/css/tx-sheet.css" />
+    <link rel="stylesheet" href="/css/shodaqoh-sheet.css" />
     <link rel="stylesheet" href="/css/shodaqoh.css" />
     <link rel="stylesheet" href="/css/zakat-screen.css" />
     <link rel="stylesheet" href="/css/zakat-sheet.css" />
@@ -1061,6 +1063,8 @@
             fill="none"
             stroke="currentColor"
             stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
             <path d="M12 5v14M5 12h14" />
           </svg>
@@ -3104,200 +3108,192 @@
               <div class="sheet-header sheet-header-payment">
                 <div class="sheet-handle"></div>
 
-                <div
-                  style="
-                    display: flex;
-                    justify-content: center;
-                    margin-bottom: 8px;
-                  "
-                >
-                  <div
-                    style="
-                      width: 40px;
-                      height: 40px;
-                      border-radius: 12px;
-                      background: var(--brand-soft);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      color: var(--brand);
-                    "
+                <div class="sheet-header-icon">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
                   >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                    >
-                      <path
-                        d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
-                      />
-                    </svg>
-                  </div>
+                    <path
+                      d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                    />
+                  </svg>
                 </div>
 
-                <h3 class="font-display text-[16px] font-extrabold text-center">
-                  Pembayaran Infak Bulanan
-                </h3>
-
-                <p
-                  class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1"
-                >
-                  Pilih metode input data
-                </p>
+                <h3 class="sheet-title">Pembayaran Infak Bulanan</h3>
+                <p class="sheet-subtitle">Pilih metode input data</p>
               </div>
 
               <div class="sheet-scroll">
-                <div class="field-group">
-                  <label class="field-label">Metode Input</label>
-                  <div class="seg-toggle">
-                    <button
-                      type="button"
-                      id="shodMethodManual"
-                      class="seg-btn active-debet"
-                    >
-                      Manual
-                    </button>
-                    <button type="button" id="shodMethodUpload" class="seg-btn">
-                      Upload Foto
-                    </button>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3" style="margin: 12px 0">
-                  <div class="field-group">
-                    <label class="field-label">Nama Anggota</label>
-                    <div class="filter-dropdown" id="shodPaymentMemberDropdown">
+                <form id="shodaqohPaymentForm" class="shod-payment-form">
+                  <!-- Metode Input -->
+                  <div class="field-group field-group-full">
+                    <label class="field-label">Metode Input</label>
+                    <div class="seg-toggle">
                       <button
                         type="button"
-                        id="shodPaymentMemberTrigger"
-                        class="filter-dropdown-trigger"
-                        aria-haspopup="listbox"
-                        aria-expanded="false"
+                        id="shodMethodManual"
+                        class="seg-btn active-debet"
                       >
-                        <span
-                          id="shodPaymentMemberValue"
-                          class="filter-dropdown-value"
-                          >Pilih anggota</span
-                        >
                         <svg
-                          class="filter-dropdown-chevron"
                           width="14"
                           height="14"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="2"
+                          stroke-width="2.5"
                         >
-                          <path d="m6 9 6 6 6-6" />
+                          <path d="M12 5v14M5 12h14" />
                         </svg>
+                        Manual
                       </button>
-                      <div
-                        id="shodPaymentMemberMenu"
-                        class="filter-dropdown-menu"
-                        role="listbox"
-                        aria-label="Pilih anggota"
-                      ></div>
-                    </div>
-                    <input type="hidden" id="shodPaymentMember" value="" />
-                  </div>
-
-                  <div class="field-group">
-                    <label class="field-label">Tanggal</label>
-                    <div class="filter-dropdown" id="shodDateDropdown">
                       <button
                         type="button"
-                        id="shodDateDropdownTrigger"
-                        class="filter-dropdown-trigger"
-                        aria-haspopup="listbox"
-                        aria-expanded="false"
+                        id="shodMethodUpload"
+                        class="seg-btn"
                       >
-                        <span
-                          id="shodDateDropdownValue"
-                          class="filter-dropdown-value"
-                          >Pilih tanggal</span
-                        >
                         <svg
-                          class="filter-dropdown-chevron"
                           width="14"
                           height="14"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="2"
+                          stroke-width="2.5"
                         >
-                          <path d="m6 9 6 6 6-6" />
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
                         </svg>
+                        Upload Foto
                       </button>
-                      <div
-                        id="shodDateDropdownMenu"
-                        class="filter-dropdown-menu"
-                        role="listbox"
-                        aria-label="Pilih tanggal"
-                      ></div>
                     </div>
-                    <input type="hidden" id="shodPaymentDate" value="" />
                   </div>
-                </div>
 
-                <form id="shodaqohPaymentForm" class="create-form space-y-3">
-                  <div class="field-group">
+                  <!-- Nama Anggota + Data Terakhir -->
+                  <div class="shod-payment-row">
+                    <div class="field-group">
+                      <label class="field-label">Nama Anggota</label>
+                      <div class="shod-member-wrapper">
+                        <div
+                          class="filter-dropdown"
+                          id="shodPaymentMemberDropdown"
+                        >
+                          <button
+                            type="button"
+                            id="shodPaymentMemberTrigger"
+                            class="filter-dropdown-trigger"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                          >
+                            <span
+                              id="shodPaymentMemberValue"
+                              class="filter-dropdown-value"
+                              >Pilih anggota</span
+                            >
+                            <svg
+                              class="filter-dropdown-chevron"
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                            >
+                              <path d="m6 9 6 6 6-6" />
+                            </svg>
+                          </button>
+                          <div
+                            id="shodPaymentMemberMenu"
+                            class="filter-dropdown-menu"
+                            role="listbox"
+                            aria-label="Pilih anggota"
+                          ></div>
+                        </div>
+                        <button
+                          type="button"
+                          id="btnLoadLastNominals"
+                          class="btn-load-last"
+                          title="Pilih anggota terlebih dahulu"
+                          disabled
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path d="M3 12a9 9 0 1 0 3-6.7M3 5v5h5" />
+                            <path d="M12 8v4l3 2" />
+                          </svg>
+                          Data Terakhir
+                        </button>
+                      </div>
+                      <input type="hidden" id="shodPaymentMember" value="" />
+                    </div>
+
+                    <div class="field-group">
+                      <label class="field-label">Tanggal</label>
+                      <div class="filter-dropdown" id="shodDateDropdown">
+                        <button
+                          type="button"
+                          id="shodDateDropdownTrigger"
+                          class="filter-dropdown-trigger"
+                          aria-haspopup="listbox"
+                          aria-expanded="false"
+                        >
+                          <span
+                            id="shodDateDropdownValue"
+                            class="filter-dropdown-value"
+                            >Pilih tanggal</span
+                          >
+                          <svg
+                            class="filter-dropdown-chevron"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </button>
+                        <div
+                          id="shodDateDropdownMenu"
+                          class="filter-dropdown-menu"
+                          role="listbox"
+                          aria-label="Pilih tanggal"
+                        ></div>
+                      </div>
+                      <input type="hidden" id="shodPaymentDate" value="" />
+                    </div>
+                  </div>
+
+                  <!-- Total Pembayaran -->
+                  <div class="field-group field-group-full">
                     <label class="field-label">Total Pembayaran</label>
-                    <div style="display: flex; gap: 8px; align-items: center">
-                      <input
-                        id="shodPaymentAmount"
-                        type="number"
-                        min="1"
-                        step="1"
-                        required
-                        class="field-input mono"
-                        style="flex: 1"
-                        placeholder="500000"
-                      />
-                      <button
-                        type="button"
-                        id="btnLoadLastNominals"
-                        class="btn-ghost"
-                        style="
-                          padding: 8px 12px;
-                          font-size: 11px;
-                          white-space: nowrap;
-                          min-height: 42px;
-                          flex-shrink: 0;
-                          opacity: 0.5;
-                          cursor: not-allowed;
-                          pointer-events: none;
-                        "
-                        title="Pilih anggota terlebih dahulu"
-                        disabled
-                      >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          style="
-                            display: inline-block;
-                            vertical-align: middle;
-                            margin-right: 4px;
-                          "
-                        >
-                          <path d="M3 12a9 9 0 1 0 3-6.7M3 5v5h5" />
-                          <path d="M12 8v4l3 2" />
-                        </svg>
-                        Data Terakhir
-                      </button>
-                    </div>
+                    <input
+                      id="shodPaymentAmount"
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      class="field-input mono"
+                      placeholder="500000"
+                    />
                   </div>
 
-                  <div class="field-group">
+                  <!-- Alokasi Pembayaran -->
+                  <div class="field-group field-group-full">
                     <label class="field-label">Alokasi Pembayaran</label>
 
                     <div class="allocation-items">
+                      <!-- Infak IR -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Infak IR</span>
                         <input
@@ -3305,73 +3301,42 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
 
-                      <!-- ========================================================== -->
-                      <!-- BAGIAN SUSULAN IR DENGAN INPUT NOMINAL PER BULAN             -->
-                      <!-- ========================================================== -->
-                      <div
-                        style="
-                          margin-top: 6px;
-                          padding: 12px;
-                          background: var(--surface-2);
-                          border-radius: 9px;
-                          border: 1px solid var(--border);
-                        "
-                      >
-                        <div
-                          style="
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                            margin-bottom: 10px;
-                          "
-                        >
-                          <div
-                            style="
-                              font-size: 10px;
-                              font-weight: 700;
-                              color: var(--ink-soft);
-                            "
+                      <!-- Bulan Susulan IR - 3 CHECKBOX KE SAMPING -->
+                      <div class="shod-susulan-container">
+                        <div class="shod-susulan-header">
+                          <span class="shod-susulan-title"
+                            >Bulan Susulan IR</span
                           >
-                            Bulan Susulan IR
-                          </div>
-                          <div style="font-size: 9px; color: var(--ink-faint)">
+                          <span class="shod-susulan-total">
                             Total:
-                            <span
-                              id="shodSusulanTotalDisplay"
-                              style="font-weight: 700; color: var(--brand)"
-                              >Rp 0</span
-                            >
-                          </div>
+                            <span id="shodSusulanTotalDisplay">Rp 0</span>
+                          </span>
                         </div>
 
-                        <!-- Container untuk checkbox + input nominal per bulan -->
                         <div
                           id="shodSusulanBulan"
-                          class="grid grid-cols-2 gap-2"
+                          class="shod-susulan-checkboxes"
                         >
                           <!-- Akan di-render oleh JavaScript -->
                         </div>
 
-                        <!-- Info validasi rincian -->
                         <div
                           id="shodSusulanValidation"
-                          style="
-                            margin-top: 8px;
-                            font-size: 9px;
-                            color: var(--ink-faint);
-                          "
+                          class="shod-susulan-validation"
                         >
+                          <span class="validation-icon">✓</span>
                           <span id="shodSusulanStatus"
-                            >✓ Centang bulan dan isi nominal masing-masing</span
+                            >Pilih bulan dan isi nominal masing-masing</span
                           >
                         </div>
                       </div>
 
+                      <!-- Uang Sambung -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Uang Sambung</span>
                         <input
@@ -3379,11 +3344,12 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
 
+                      <!-- Jimpitan -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Jimpitan</span>
                         <input
@@ -3391,11 +3357,12 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
 
+                      <!-- Siar-siar -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Siar-siar</span>
                         <input
@@ -3403,11 +3370,12 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
 
+                      <!-- Seribuan -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Seribuan</span>
                         <input
@@ -3415,11 +3383,12 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
 
+                      <!-- Kafan -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Kafan</span>
                         <input
@@ -3427,11 +3396,12 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
 
+                      <!-- Ukhro MT -->
                       <div class="allocation-grid">
                         <span class="allocation-label">Ukhro MT</span>
                         <input
@@ -3439,22 +3409,21 @@
                           type="number"
                           min="0"
                           step="1"
-                          class="field-input mono col-span-2"
+                          class="field-input mono allocation-input"
                           placeholder="0"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div
-                    class="flex items-center justify-between p-3 bg-[color:var(--surface-2)] rounded-xl"
-                  >
-                    <span class="text-xs font-bold text-[color:var(--ink-soft)]"
+                  <!-- Status Alokasi -->
+                  <div class="shod-allocation-status">
+                    <span class="shod-allocation-status-label"
                       >Status Alokasi</span
                     >
                     <span
                       id="shodAllocationStatus"
-                      class="text-xs font-bold flex items-center gap-1.5"
+                      class="shod-allocation-status-value"
                     >
                       <svg
                         id="shodAllocationIcon"
@@ -3473,7 +3442,8 @@
                     </span>
                   </div>
 
-                  <div class="field-group">
+                  <!-- Keterangan -->
+                  <div class="field-group field-group-full">
                     <label class="field-label">Keterangan</label>
                     <textarea
                       id="shodPaymentNote"
@@ -3483,18 +3453,19 @@
                     ></textarea>
                   </div>
 
-                  <div class="flex gap-2.5 pt-1">
+                  <!-- Tombol Aksi -->
+                  <div class="shod-payment-actions">
                     <button
                       type="button"
                       id="btnCancelShodaqohPayment"
-                      class="btn-ghost flex-1"
+                      class="btn-ghost"
                     >
                       Batal
                     </button>
                     <button
                       type="submit"
                       id="btnSubmitShodaqohPayment"
-                      class="btn-primary flex-1"
+                      class="btn-primary"
                       disabled
                     >
                       Simpan
@@ -3503,13 +3474,12 @@
                 </form>
 
                 <!-- Upload Section -->
-                <div id="shodUploadSection" class="hidden space-y-3 mt-3">
+                <div id="shodUploadSection" class="shod-upload-section hidden">
                   <!-- ... konten upload sama seperti sebelumnya ... -->
                 </div>
               </div>
             </div>
           </div>
-
           <div
             id="shodMemberActionOverlay"
             class="sheet-overlay sheet-action hidden"
@@ -4214,8 +4184,9 @@
           </div>
 
           <div class="sheet-scroll">
-            <form id="txForm" class="space-y-3 create-form">
-              <div class="field-group">
+            <form id="txForm" class="tx-form">
+              <!-- Jenis Transaksi - FULL WIDTH -->
+              <div class="field-group field-group-full">
                 <label class="field-label">Jenis Transaksi</label>
                 <div class="seg-toggle">
                   <button
@@ -4223,17 +4194,36 @@
                     id="segDebet"
                     class="seg-btn active-debet"
                   >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
                     Pemasukan
                   </button>
                   <button type="button" id="segKredit" class="seg-btn">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <path d="M5 12h14" />
+                    </svg>
                     Pengeluaran
                   </button>
                 </div>
               </div>
 
-              <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
-              >
+              <!-- Tanggal & Kategori - 2 KOLOM -->
+              <div class="tx-form-row">
                 <div class="field-group">
                   <label class="field-label">Tanggal</label>
                   <div class="filter-dropdown" id="txDateDropdown">
@@ -4309,7 +4299,8 @@
                 </div>
               </div>
 
-              <div class="field-group">
+              <!-- Keterangan - FULL WIDTH -->
+              <div class="field-group field-group-full">
                 <label class="field-label">Keterangan</label>
                 <textarea
                   required
@@ -4320,7 +4311,8 @@
                 ></textarea>
               </div>
 
-              <div class="field-group">
+              <!-- Jumlah Nominal - FULL WIDTH -->
+              <div class="field-group field-group-full">
                 <label class="field-label">Jumlah Nominal (Rp)</label>
                 <input
                   required
@@ -4333,21 +4325,19 @@
                 />
               </div>
 
+              <!-- Error -->
               <p
                 id="txError"
-                class="hidden text-xs px-3 py-2.5 form-error"
+                class="hidden tx-error"
                 style="color: var(--neg); background: var(--neg-soft)"
               ></p>
 
-              <div class="flex gap-2.5 pt-1">
-                <button type="button" id="btnCancelTx" class="btn-ghost flex-1">
+              <!-- Tombol Aksi - FULL WIDTH -->
+              <div class="tx-form-actions">
+                <button type="button" id="btnCancelTx" class="btn-ghost">
                   Batal
                 </button>
-                <button
-                  type="submit"
-                  id="btnSubmitTx"
-                  class="btn-primary flex-1"
-                >
+                <button type="submit" id="btnSubmitTx" class="btn-primary">
                   Simpan
                 </button>
               </div>

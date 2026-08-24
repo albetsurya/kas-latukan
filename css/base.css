@@ -640,9 +640,12 @@ h3 {
   font-weight: 600;
 }
 
+/* ============================================================
+   FAB BASE STYLES
+   ============================================================ */
+
 .fab {
   position: fixed;
-  z-index: 40;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -650,7 +653,6 @@ h3 {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   user-select: none;
@@ -678,6 +680,10 @@ h3 {
   transform: scale(0.85);
 }
 
+/* ============================================================
+   FAB ADD - POSISI BAWAH (DI ATAS BOTTOMNAV)
+   ============================================================ */
+
 #fabAdd {
   position: fixed !important;
   width: 56px !important;
@@ -687,21 +693,21 @@ h3 {
   background: var(--brand) !important;
   color: #fff !important;
   box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35) !important;
-  z-index: 40 !important;
+  z-index: 50 !important;
 }
 
 #fabAdd svg {
-  width: 24px;
-  height: 24px;
+  width: 24px !important;
+  height: 24px !important;
 }
 
 #fabAdd:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 36px rgba(22, 163, 74, 0.45);
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 36px rgba(22, 163, 74, 0.45) !important;
 }
 
 #fabAdd:active {
-  transform: scale(0.92);
+  transform: scale(0.92) !important;
 }
 
 #fabAdd:not(:hover) {
@@ -726,55 +732,8 @@ h3 {
   }
 }
 
-#fabPostToKas {
-  width: 48px;
-  height: 48px;
-  right: max(24px, calc((100vw - 480px) / 2 + 24px));
-  bottom: calc(150px + env(safe-area-inset-bottom));
-  background: var(--gold);
-  color: #fff;
-  box-shadow: 0 6px 24px rgba(199, 154, 68, 0.3);
-}
-
-#fabPostToKas svg {
-  width: 20px;
-  height: 20px;
-}
-
-#fabPostToKas:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 10px 32px rgba(199, 154, 68, 0.4);
-}
-
-#fabPostToKas:active {
-  transform: scale(0.92);
-}
-
-#fabPrint {
-  width: 48px;
-  height: 48px;
-  right: max(24px, calc((100vw - 480px) / 2 + 24px));
-  bottom: calc(150px + env(safe-area-inset-bottom));
-  background: var(--ink-soft);
-  color: #fff;
-  box-shadow: 0 6px 24px rgba(23, 25, 28, 0.3);
-}
-
-#fabPrint svg {
-  width: 19px;
-  height: 19px;
-}
-
-#fabPrint:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 10px 32px rgba(23, 25, 28, 0.4);
-}
-
-#fabPrint:active {
-  transform: scale(0.92);
-}
-
-.fab-label {
+/* Label untuk FAB Add - muncul di kiri */
+#fabAdd .fab-label {
   position: absolute;
   right: calc(100% + 12px);
   top: 50%;
@@ -795,79 +754,396 @@ h3 {
   transition: all 0.2s ease;
 }
 
-.fab:hover .fab-label,
-.fab:focus .fab-label {
+#fabAdd:hover .fab-label,
+#fabAdd:focus .fab-label {
   opacity: 1;
   transform: translateY(-50%) translateX(-4px);
 }
 
+/* ============================================================
+   FAB POST KE KAS - POSISI ATAS (DI ATAS FAB ADD)
+   ============================================================ */
+
+#fabPostToKas {
+  position: fixed !important;
+  width: 56px !important;
+  height: 56px !important;
+  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
+  background: var(--gold) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35) !important;
+  z-index: 50 !important;
+}
+
+#fabPostToKas svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+#fabPostToKas:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 36px rgba(199, 154, 68, 0.45) !important;
+}
+
+#fabPostToKas:active {
+  transform: scale(0.92) !important;
+}
+
+#fabPostToKas:not(:hover) {
+  animation: fabGoldPulse 3s ease-in-out infinite;
+}
+
+#fabPostToKas:hover {
+  animation: none;
+}
+
+@keyframes fabGoldPulse {
+  0% {
+    box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(199, 154, 68, 0.55),
+      0 0 0 8px rgba(199, 154, 68, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35);
+  }
+}
+
+/* Label untuk FAB Post - muncul di kiri */
+#fabPostToKas .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+#fabPostToKas:hover .fab-label,
+#fabPostToKas:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* ============================================================
+   FAB ZAKAT
+   ============================================================ */
+
+#fabZakat {
+  position: fixed !important;
+  z-index: 10000 !important;
+  width: 60px !important;
+  height: 60px !important;
+  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+  bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 50% !important;
+  box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+  user-select: none !important;
+}
+
+#fabZakat svg {
+  width: 28px !important;
+  height: 28px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.3s ease !important;
+}
+
+#fabZakat:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 36px rgba(22, 163, 74, 0.45) !important;
+}
+
+#fabZakat:hover svg {
+  transform: scale(1.05) !important;
+}
+
+#fabZakat:active {
+  transform: scale(0.92) !important;
+}
+
+#fabZakat:active svg {
+  transform: scale(0.85) !important;
+}
+
+#fabZakat:not(:hover) {
+  animation: fabZakatPulse 3s ease-in-out infinite;
+}
+
+#fabZakat:hover {
+  animation: none;
+}
+
+@keyframes fabZakatPulse {
+  0% {
+    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(22, 163, 74, 0.55),
+      0 0 0 8px rgba(22, 163, 74, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
+  }
+}
+
+#fabZakat.hidden {
+  display: none !important;
+}
+
+#fabZakat .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+#fabZakat:hover .fab-label,
+#fabZakat:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* ============================================================
+   FAB PRINT
+   ============================================================ */
+
+#fabPrint {
+  position: fixed !important;
+  width: 48px !important;
+  height: 48px !important;
+  right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  bottom: calc(150px + env(safe-area-inset-bottom)) !important;
+  background: var(--ink-soft) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 24px rgba(23, 25, 28, 0.3) !important;
+  z-index: 40 !important;
+}
+
+#fabPrint svg {
+  width: 19px !important;
+  height: 19px !important;
+}
+
+#fabPrint:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 10px 32px rgba(23, 25, 28, 0.4) !important;
+}
+
+#fabPrint:active {
+  transform: scale(0.92) !important;
+}
+
+#fabPrint .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+#fabPrint:hover .fab-label,
+#fabPrint:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* ============================================================
+   DARK THEME - FAB
+   ============================================================ */
+
+html[data-theme="dark"] .fab {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] #fabAdd {
+  box-shadow: 0 8px 28px rgba(40, 199, 111, 0.3) !important;
+}
+
+html[data-theme="dark"] #fabAdd:hover {
+  box-shadow: 0 12px 36px rgba(40, 199, 111, 0.4) !important;
+}
+
+html[data-theme="dark"] #fabPostToKas {
+  box-shadow: 0 8px 28px rgba(233, 173, 56, 0.25) !important;
+}
+
+html[data-theme="dark"] #fabPostToKas:hover {
+  box-shadow: 0 12px 36px rgba(233, 173, 56, 0.35) !important;
+}
+
+html[data-theme="dark"] #fabZakat {
+  box-shadow: 0 8px 28px rgba(40, 199, 111, 0.3) !important;
+}
+
+html[data-theme="dark"] #fabZakat:hover {
+  box-shadow: 0 12px 36px rgba(40, 199, 111, 0.4) !important;
+}
+
+html[data-theme="dark"] #fabPrint {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* ============================================================
+   RESPONSIVE - FAB
+   ============================================================ */
+
 @media (max-width: 480px) {
   #fabAdd {
-    width: 50px;
-    height: 50px;
-    right: 16px;
-    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: 50px !important;
+    height: 50px !important;
+    right: 16px !important;
+    bottom: calc(80px + env(safe-area-inset-bottom)) !important;
   }
   #fabAdd svg {
-    width: 22px;
-    height: 22px;
+    width: 22px !important;
+    height: 22px !important;
   }
+  #fabAdd .fab-label {
+    display: none !important;
+  }
+
   #fabPostToKas {
-    width: 44px;
-    height: 44px;
-    right: 20px;
-    bottom: calc(144px + env(safe-area-inset-bottom));
+    width: 50px !important;
+    height: 50px !important;
+    right: 16px !important;
+    bottom: calc(140px + env(safe-area-inset-bottom)) !important;
   }
   #fabPostToKas svg {
-    width: 18px;
-    height: 18px;
+    width: 22px !important;
+    height: 22px !important;
   }
+  #fabPostToKas .fab-label {
+    display: none !important;
+  }
+
   #fabPrint {
-    width: 44px;
-    height: 44px;
-    right: 20px;
-    bottom: calc(144px + env(safe-area-inset-bottom));
+    width: 44px !important;
+    height: 44px !important;
+    right: 20px !important;
+    bottom: calc(144px + env(safe-area-inset-bottom)) !important;
   }
   #fabPrint svg {
-    width: 17px;
-    height: 17px;
+    width: 17px !important;
+    height: 17px !important;
   }
-  .fab-label {
-    display: none;
+  #fabPrint .fab-label {
+    display: none !important;
+  }
+
+  #fabZakat {
+    width: 56px !important;
+    height: 56px !important;
+    right: 16px !important;
+    bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabZakat svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+  #fabZakat .fab-label {
+    display: none !important;
   }
 }
 
 @media (max-width: 380px) {
   #fabAdd {
-    width: 46px;
-    height: 46px;
-    right: 14px;
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    width: 46px !important;
+    height: 46px !important;
+    right: 14px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
   }
   #fabAdd svg {
-    width: 20px;
-    height: 20px;
+    width: 20px !important;
+    height: 20px !important;
   }
+
   #fabPostToKas {
-    width: 40px;
-    height: 40px;
-    right: 18px;
-    bottom: calc(136px + env(safe-area-inset-bottom));
+    width: 46px !important;
+    height: 46px !important;
+    right: 14px !important;
+    bottom: calc(132px + env(safe-area-inset-bottom)) !important;
   }
   #fabPostToKas svg {
-    width: 16px;
-    height: 16px;
+    width: 20px !important;
+    height: 20px !important;
   }
+
   #fabPrint {
-    width: 40px;
-    height: 40px;
-    right: 18px;
-    bottom: calc(136px + env(safe-area-inset-bottom));
+    width: 40px !important;
+    height: 40px !important;
+    right: 18px !important;
+    bottom: calc(136px + env(safe-area-inset-bottom)) !important;
   }
   #fabPrint svg {
-    width: 15px;
-    height: 15px;
+    width: 15px !important;
+    height: 15px !important;
   }
+
+  #fabZakat {
+    width: 52px !important;
+    height: 52px !important;
+    right: 14px !important;
+    bottom: calc(68px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabZakat svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
   #shell main {
     padding-left: 13px;
     padding-right: 13px;
@@ -884,21 +1160,24 @@ h3 {
   }
 }
 
-html[data-theme="dark"] .fab {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+@media (min-width: 481px) {
+  #fabAdd {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabPostToKas {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabPrint {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabZakat {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
 }
 
-html[data-theme="dark"] #fabAdd {
-  box-shadow: 0 8px 28px rgba(40, 199, 111, 0.3);
-}
-
-html[data-theme="dark"] #fabPostToKas {
-  box-shadow: 0 6px 24px rgba(233, 173, 56, 0.25);
-}
-
-html[data-theme="dark"] #fabPrint {
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
-}
+/* ============================================================
+   CONTINUE SHEET STYLES...
+   ============================================================ */
 
 .sheet-overlay {
   position: fixed;

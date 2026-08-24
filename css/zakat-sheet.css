@@ -1315,3 +1315,256 @@
   gap: 10px !important;
   padding-top: 4px !important;
 }
+
+/* ============================================================
+   FIX: FIELD-GROUP UNTUK ZAKAT FORM
+   ============================================================ */
+
+#zakatFormOverlay .field-group,
+#zakatEditHeaderOverlay .field-group {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 4px !important;
+  margin-bottom: 12px !important;
+}
+
+#zakatFormOverlay .field-group .field-label,
+#zakatEditHeaderOverlay .field-group .field-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink-soft) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  margin: 0 !important;
+}
+
+#zakatFormOverlay .field-group .field-input,
+#zakatEditHeaderOverlay .field-group .field-input {
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-size: 14px !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  outline: none !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+
+#zakatFormOverlay .field-group .field-input:focus,
+#zakatEditHeaderOverlay .field-group .field-input:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 2px var(--brand-soft) !important;
+}
+
+#zakatFormOverlay .field-group textarea.field-input,
+#zakatEditHeaderOverlay .field-group textarea.field-input {
+  min-height: 70px !important;
+  resize: vertical !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+#zakatFormOverlay .field-group input[type="date"].field-input,
+#zakatEditHeaderOverlay .field-group input[type="date"].field-input {
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* ============================================================
+   FIX: BUTTON DI ZAKAT FORM
+   ============================================================ */
+
+#zakatFormOverlay .flex.gap-2\.5,
+#zakatEditHeaderOverlay .flex.gap-2\.5 {
+  display: flex !important;
+  gap: 10px !important;
+  padding-top: 8px !important;
+}
+
+#zakatFormOverlay .flex-1,
+#zakatEditHeaderOverlay .flex-1 {
+  flex: 1 !important;
+}
+
+#zakatFormOverlay .btn-ghost,
+#zakatEditHeaderOverlay .btn-ghost {
+  padding: 11px 0 !important;
+  min-height: 44px !important;
+  border-radius: 8px !important;
+  background: var(--surface-alt) !important;
+  color: var(--ink-soft) !important;
+  border: 1px solid var(--line) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+#zakatFormOverlay .btn-primary,
+#zakatEditHeaderOverlay .btn-primary {
+  padding: 11px 0 !important;
+  min-height: 44px !important;
+  border-radius: 8px !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  text-align: center !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+}
+
+#zakatFormOverlay .btn-primary:hover,
+#zakatEditHeaderOverlay .btn-primary:hover {
+  background: var(--brand-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3) !important;
+}
+
+#zakatFormOverlay .btn-primary:active,
+#zakatEditHeaderOverlay .btn-primary:active {
+  transform: scale(0.98) !important;
+}
+
+/* ============================================================
+   FIX: DATE INPUT STYLING
+   ============================================================ */
+
+#zakatFormOverlay input[type="date"].field-input,
+#zakatEditHeaderOverlay input[type="date"].field-input {
+  color-scheme: light dark !important;
+}
+
+#zakatFormOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator,
+#zakatEditHeaderOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator {
+  filter: var(--date-picker-icon-filter, none) !important;
+  opacity: 0.6 !important;
+  padding: 4px !important;
+  cursor: pointer !important;
+}
+
+[data-theme="dark"] #zakatFormOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator,
+[data-theme="dark"] #zakatEditHeaderOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator {
+  filter: invert(1) !important;
+}
+
+/* ============================================================
+   FIX: ZAKAT SHEET OVERLAY POSITION
+   ============================================================ */
+
+#zakatMuzakiSheet,
+#zakatRincianSheet,
+#zakatMustahikSheet,
+#zakatFormOverlay,
+#zakatEditHeaderOverlay {
+  z-index: 99999 !important;
+}
+
+#zakatMuzakiSheet .sheet,
+#zakatRincianSheet .sheet,
+#zakatMustahikSheet .sheet,
+#zakatFormOverlay .sheet,
+#zakatEditHeaderOverlay .sheet {
+  max-height: 85dvh !important;
+  padding: 8px 16px 12px !important;
+  border-radius: 20px 20px 0 0 !important;
+  width: min(100vw, 480px) !important;
+  max-width: 480px !important;
+  margin: 0 auto !important;
+}
+
+#zakatMuzakiSheet .sheet-scroll,
+#zakatRincianSheet .sheet-scroll,
+#zakatMustahikSheet .sheet-scroll,
+#zakatFormOverlay .sheet-scroll,
+#zakatEditHeaderOverlay .sheet-scroll {
+  padding: 4px 0 12px !important;
+  overflow-y: auto !important;
+  max-height: calc(85dvh - 140px) !important;
+}
+
+/* ============================================================
+   FIX: SHEET HEADER UNTUK ZAKAT
+   ============================================================ */
+
+#zakatMuzakiSheet .sheet-header,
+#zakatRincianSheet .sheet-header,
+#zakatMustahikSheet .sheet-header,
+#zakatFormOverlay .sheet-header,
+#zakatEditHeaderOverlay .sheet-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 4px 0 14px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  margin-bottom: 12px !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+#zakatMuzakiSheet .sheet-handle,
+#zakatRincianSheet .sheet-handle,
+#zakatMustahikSheet .sheet-handle,
+#zakatFormOverlay .sheet-handle,
+#zakatEditHeaderOverlay .sheet-handle {
+  width: 36px !important;
+  height: 4px !important;
+  margin: 0 auto 8px !important;
+  border-radius: 999px !important;
+  background: var(--line) !important;
+}
+
+#zakatMuzakiSheet .sheet-header-icon,
+#zakatRincianSheet .sheet-header-icon,
+#zakatMustahikSheet .sheet-header-icon,
+#zakatFormOverlay .sheet-header-icon,
+#zakatEditHeaderOverlay .sheet-header-icon {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 6px !important;
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+}
+
+#zakatMuzakiSheet .sheet-title,
+#zakatRincianSheet .sheet-title,
+#zakatMustahikSheet .sheet-title,
+#zakatFormOverlay .sheet-title,
+#zakatEditHeaderOverlay .sheet-title {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+}
+
+#zakatMuzakiSheet .sheet-subtitle,
+#zakatRincianSheet .sheet-subtitle,
+#zakatMustahikSheet .sheet-subtitle,
+#zakatFormOverlay .sheet-subtitle,
+#zakatEditHeaderOverlay .sheet-subtitle {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--ink-soft) !important;
+  margin: 0 !important;
+}
+

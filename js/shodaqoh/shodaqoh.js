@@ -1343,15 +1343,21 @@ function renderShodSusulanBulan(selectedMonths = {}) {
             />
             <span>${m.shortLabel} ${m.year}</span>
           </label>
+          <span class="shod-susulan-status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </span>
           <div class="shod-susulan-nominal-wrap" style="${hasValue ? "" : "display: none;"}">
             <input 
               type="number" 
               class="shod-susulan-nominal" 
-              placeholder="Nominal"
+              placeholder="0"
               min="0"
               step="1000"
               data-bulan="${m.key}"
               value="${existingValue}"
+              ${hasValue ? "" : "disabled"}
             />
           </div>
         </div>
@@ -1359,24 +1365,38 @@ function renderShodSusulanBulan(selectedMonths = {}) {
     })
     .join("");
 
-  // Event listener: toggle visibility input nominal
-  container.querySelectorAll(".shod-susulan-checkbox").forEach(function (cb) {
-    cb.addEventListener("change", function () {
-      const parent = this.closest(".shod-susulan-item");
-      const nominalWrap = parent.querySelector(".shod-susulan-nominal-wrap");
-      const nominalInput = parent.querySelector(".shod-susulan-nominal");
+  // Event listener: toggle pada item (bukan checkbox)
+  container.querySelectorAll(".shod-susulan-item").forEach(function (item) {
+    // Click handler untuk toggle
+    item.addEventListener("click", function (e) {
+      // Jika yang diklik adalah input nominal, jangan toggle
+      if (e.target.classList.contains("shod-susulan-nominal")) return;
+      if (e.target.closest(".shod-susulan-nominal")) return;
 
-      if (this.checked) {
-        parent.classList.add("checked");
+      const cb = this.querySelector(".shod-susulan-checkbox");
+      const nominalWrap = this.querySelector(".shod-susulan-nominal-wrap");
+      const nominalInput = this.querySelector(".shod-susulan-nominal");
+
+      // Toggle checkbox
+      cb.checked = !cb.checked;
+
+      if (cb.checked) {
+        this.classList.add("checked");
         nominalWrap.style.display = "block";
+        nominalInput.disabled = false;
         setTimeout(function () {
           if (nominalInput) nominalInput.focus();
-        }, 100);
+        }, 150);
       } else {
-        parent.classList.remove("checked");
+        this.classList.remove("checked");
         nominalWrap.style.display = "none";
-        if (nominalInput) nominalInput.value = "";
+        nominalInput.disabled = true;
+        nominalInput.value = "";
+        nominalInput.classList.remove("valid", "invalid");
       }
+
+      // Trigger change event untuk JS yang sudah ada
+      cb.dispatchEvent(new Event("change", { bubbles: true }));
 
       validateShodSusulanRincian();
       updateShodAllocationStatus();
@@ -1391,15 +1411,27 @@ function renderShodSusulanBulan(selectedMonths = {}) {
       const val = Number(this.value) || 0;
 
       if (val > 0) {
-        if (cb) cb.checked = true;
-        parent.classList.add("checked");
-        parent.querySelector(".shod-susulan-nominal-wrap").style.display =
-          "block";
+        if (!cb.checked) {
+          cb.checked = true;
+          parent.classList.add("checked");
+          parent.querySelector(".shod-susulan-nominal-wrap").style.display =
+            "block";
+          this.disabled = false;
+        }
         this.classList.remove("invalid");
         this.classList.add("valid");
       } else {
         this.classList.remove("valid");
         this.classList.add("invalid");
+        // Jika value 0 dan checkbox checked, uncheck
+        if (cb.checked) {
+          cb.checked = false;
+          parent.classList.remove("checked");
+          parent.querySelector(".shod-susulan-nominal-wrap").style.display =
+            "none";
+          this.disabled = true;
+          this.value = "";
+        }
       }
 
       validateShodSusulanRincian();

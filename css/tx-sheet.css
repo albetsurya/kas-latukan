@@ -1,0 +1,588 @@
+/* ============================================================
+   TX OVERLAY - KONSISTEN DENGAN FILE KEDUA
+   ============================================================ */
+
+/* ========== OVERLAY ========== */
+#txOverlay {
+  z-index: 500 !important;
+}
+
+#txOverlay > .sheet {
+  height: auto !important;
+  max-height: 82dvh !important;
+  overflow: hidden !important;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+}
+
+#txOverlay .sheet-header {
+  padding-bottom: 10px !important;
+}
+
+#txOverlay .sheet-header .sheet-handle {
+  margin-bottom: 9px !important;
+}
+
+#txOverlay .sheet-header .sheet-subtitle {
+  margin-top: 3px !important;
+}
+
+#txOverlay .sheet-scroll {
+  max-height: calc(82dvh - 100px) !important;
+  overflow-y: auto !important;
+  padding-bottom: 12px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* ========== FORM ========== */
+#txOverlay .tx-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ========== FIELD GROUP ========== */
+#txOverlay .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+/* Field group FULL WIDTH - untuk elemen yang harus full */
+#txOverlay .field-group-full {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+#txOverlay .field-label {
+  display: block;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  width: 100% !important;
+}
+
+/* ========== FORM ROW (2 KOLOM) ========== */
+#txOverlay .tx-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#txOverlay .tx-form-row .field-group {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+/* ========== SEG TOGGLE - FULL WIDTH ========== */
+#txOverlay .seg-toggle {
+  display: flex;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-alt);
+  margin-top: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#txOverlay .seg-btn {
+  flex: 1;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  width: 100%;
+}
+
+#txOverlay .seg-btn:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+#txOverlay .seg-btn.active-debet {
+  background: var(--pos-soft);
+  color: var(--pos);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+#txOverlay .seg-btn.active-kredit {
+  background: var(--neg-soft);
+  color: var(--neg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+#txOverlay .seg-btn svg {
+  flex-shrink: 0;
+}
+
+/* ========== FIELD INPUT - FULL WIDTH ========== */
+#txOverlay .field-input,
+#txOverlay select.field-input,
+#txOverlay textarea.field-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 42px;
+  margin-top: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.16s ease;
+  box-sizing: border-box;
+  display: block;
+}
+
+#txOverlay textarea.field-input {
+  min-height: 82px;
+  resize: vertical;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#txOverlay .field-input::placeholder {
+  color: var(--ink-faint);
+  opacity: 1;
+}
+
+#txOverlay .field-input:hover {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--line));
+  background: var(--surface-alt);
+}
+
+#txOverlay .field-input:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+#txOverlay .field-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+#txOverlay input[type="number"] {
+  font-variant-numeric: tabular-nums;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ========== FILTER DROPDOWN - FULL WIDTH ========== */
+#txOverlay .filter-dropdown {
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  z-index: 10;
+}
+
+#txOverlay .filter-dropdown.open {
+  z-index: 100;
+}
+
+#txOverlay .filter-dropdown-trigger {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.16s ease;
+  box-sizing: border-box;
+}
+
+#txOverlay .filter-dropdown-trigger:hover {
+  background: var(--surface-alt);
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+}
+
+#txOverlay .filter-dropdown-trigger:active {
+  transform: scale(0.985);
+}
+
+#txOverlay .filter-dropdown.open .filter-dropdown-trigger {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 11%, transparent);
+}
+
+#txOverlay .filter-dropdown-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+#txOverlay .filter-dropdown-chevron {
+  flex: 0 0 auto;
+  color: var(--ink-faint);
+  transition: all 0.18s ease;
+}
+
+#txOverlay .filter-dropdown.open .filter-dropdown-chevron {
+  transform: rotate(180deg);
+  color: var(--brand);
+}
+
+#txOverlay .filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(18, 24, 31, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.985);
+  transform-origin: top left;
+  transition: all 0.14s ease;
+  z-index: 200;
+  box-sizing: border-box;
+}
+
+#txOverlay .filter-dropdown.open .filter-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+#txOverlay .filter-dropdown-option {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.13s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+#txOverlay .filter-dropdown-option:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+#txOverlay .filter-dropdown-option.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 800;
+}
+
+#txOverlay .filter-dropdown-option:active {
+  background: color-mix(in srgb, var(--brand-soft) 75%, var(--surface));
+}
+
+#txOverlay .filter-dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+#txOverlay .filter-dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+/* ========== ERROR ========== */
+#txOverlay .tx-error {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: none;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+#txOverlay .tx-error:not(.hidden) {
+  display: block;
+}
+
+/* ========== FORM ACTIONS - FULL WIDTH ========== */
+#txOverlay .tx-form-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#txOverlay .btn-ghost,
+#txOverlay .btn-primary {
+  flex: 1;
+  min-height: 40px;
+  border-radius: 9px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+#txOverlay .btn-ghost {
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+#txOverlay .btn-ghost:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--brand) 25%, var(--line));
+}
+
+#txOverlay .btn-ghost:active {
+  transform: scale(0.98);
+}
+
+#txOverlay .btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
+#txOverlay .btn-primary:hover {
+  background: var(--brand-dark);
+}
+
+#txOverlay .btn-primary:active {
+  transform: scale(0.98);
+}
+
+#txOverlay .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* ============================================================
+   DARK THEME - KONSISTEN DENGAN FILE KEDUA
+   ============================================================ */
+
+[data-theme="dark"] #txOverlay .filter-dropdown-menu {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.34);
+}
+
+[data-theme="dark"] #txOverlay .field-input {
+  background: var(--surface);
+}
+
+[data-theme="dark"] #txOverlay .btn-ghost {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+[data-theme="dark"] #txOverlay .btn-ghost:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--brand-dark) 25%, var(--line));
+}
+
+[data-theme="dark"] #txOverlay .btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] #txOverlay .btn-primary:hover {
+  background: var(--brand-dark);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  #txOverlay > .sheet {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  #txOverlay .tx-form-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  #txOverlay .seg-btn {
+    font-size: 10px;
+    min-height: 30px;
+    padding: 6px 8px;
+  }
+
+  #txOverlay .field-input,
+  #txOverlay select.field-input,
+  #txOverlay textarea.field-input {
+    min-height: 36px;
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  #txOverlay textarea.field-input {
+    min-height: 60px;
+  }
+
+  #txOverlay .filter-dropdown-trigger {
+    height: 30px;
+    font-size: 10.5px;
+    padding: 0 8px;
+  }
+
+  #txOverlay .filter-dropdown-option {
+    min-height: 28px;
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  #txOverlay .btn-ghost,
+  #txOverlay .btn-primary {
+    min-height: 36px;
+    font-size: 11px;
+  }
+
+  #txOverlay .tx-form-actions {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  #txOverlay > .sheet {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  #txOverlay .seg-btn {
+    font-size: 9px;
+    min-height: 28px;
+    padding: 4px 6px;
+  }
+
+  #txOverlay .seg-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  #txOverlay .field-input,
+  #txOverlay select.field-input,
+  #txOverlay textarea.field-input {
+    min-height: 32px;
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  #txOverlay textarea.field-input {
+    min-height: 50px;
+  }
+
+  #txOverlay .filter-dropdown-trigger {
+    height: 28px;
+    font-size: 10px;
+    padding: 0 6px;
+  }
+
+  #txOverlay .btn-ghost,
+  #txOverlay .btn-primary {
+    min-height: 32px;
+    font-size: 10px;
+  }
+}
+
+/* ============================================================
+   PASTIKAN TIDAK ADA YANG MEMBATASI LEBAR
+   ============================================================ */
+
+#txOverlay .sheet-scroll * {
+  max-width: 100% !important;
+}
+
+#txOverlay .sheet-scroll .field-group,
+#txOverlay .sheet-scroll .field-group-full,
+#txOverlay .sheet-scroll .tx-form-row,
+#txOverlay .sheet-scroll .tx-form-actions {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+#txOverlay .sheet-scroll input,
+#txOverlay .sheet-scroll textarea,
+#txOverlay .sheet-scroll select,
+#txOverlay .sheet-scroll .filter-dropdown,
+#txOverlay .sheet-scroll .filter-dropdown-trigger,
+#txOverlay .sheet-scroll .filter-dropdown-menu {
+  max-width: 100% !important;
+  width: 100% !important;
+}

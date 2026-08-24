@@ -1,0 +1,1419 @@
+/* ============================================================
+   SHODAQOH PAYMENT OVERLAY - MODERN STYLE
+   ============================================================ */
+
+#shodaqohPaymentOverlay {
+  z-index: 500 !important;
+}
+
+#shodaqohPaymentOverlay > .sheet {
+  height: min(92dvh, 760px) !important;
+  max-height: 92dvh !important;
+  overflow: hidden !important;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  border-radius: 24px 24px 0 0 !important;
+  background: var(--app-bg) !important;
+}
+
+#shodaqohPaymentOverlay .sheet-header {
+  padding: 6px 0 12px !important;
+  background: var(--app-bg) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+#shodaqohPaymentOverlay .sheet-header .sheet-handle {
+  width: 42px !important;
+  height: 4px !important;
+  margin: 4px auto 10px !important;
+  border-radius: 999px !important;
+  background: var(--line) !important;
+  transition: background 0.2s ease;
+}
+
+#shodaqohPaymentOverlay .sheet-header .sheet-title {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  color: var(--ink) !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+#shodaqohPaymentOverlay .sheet-header .sheet-subtitle {
+  font-size: 12px !important;
+  color: var(--ink-soft) !important;
+  text-align: center !important;
+  margin-top: 4px !important;
+  font-weight: 500 !important;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 4px 0 36px !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+/* ===== FORM CONTAINER ===== */
+#shodaqohPaymentOverlay .shod-payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 2px !important;
+  margin: 0 !important;
+}
+
+/* ===== FIELD GROUP ===== */
+#shodaqohPaymentOverlay .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .field-group-full {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .field-label .label-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--ink-faint);
+}
+
+#shodaqohPaymentOverlay .field-label .label-required {
+  color: var(--neg);
+  margin-left: 2px;
+}
+
+/* ===== ROW LAYOUT ===== */
+#shodaqohPaymentOverlay .shod-payment-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .shod-payment-row .field-group {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ===== MEMBER WRAPPER ===== */
+#shodaqohPaymentOverlay .shod-member-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .shod-member-wrapper .filter-dropdown {
+  flex: 1;
+  min-width: 0;
+}
+
+#shodaqohPaymentOverlay .shod-member-wrapper .btn-load-last {
+  padding: 0 14px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  min-height: 38px;
+  flex-shrink: 0;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 38px;
+}
+
+#shodaqohPaymentOverlay
+  .shod-member-wrapper
+  .btn-load-last:hover:not(:disabled) {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  transform: translateY(-1px);
+}
+
+#shodaqohPaymentOverlay
+  .shod-member-wrapper
+  .btn-load-last:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+#shodaqohPaymentOverlay .shod-member-wrapper .btn-load-last:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===== SEGMENTED TOGGLE ===== */
+#shodaqohPaymentOverlay .seg-toggle {
+  display: flex;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-alt);
+  margin-top: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 44px;
+  transition: border-color 0.2s ease;
+}
+
+#shodaqohPaymentOverlay .seg-toggle:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+#shodaqohPaymentOverlay .seg-btn {
+  flex: 1;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 100%;
+  position: relative;
+}
+
+#shodaqohPaymentOverlay .seg-btn:hover:not(.active-debet):not(.active-kredit) {
+  color: var(--ink);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+#shodaqohPaymentOverlay .seg-btn:active {
+  transform: scale(0.96);
+}
+
+#shodaqohPaymentOverlay .seg-btn.active-debet {
+  background: var(--pos-soft);
+  color: var(--pos);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.12);
+}
+
+#shodaqohPaymentOverlay .seg-btn.active-kredit {
+  background: var(--neg-soft);
+  color: var(--neg);
+  box-shadow: 0 2px 8px rgba(224, 82, 82, 0.12);
+}
+
+#shodaqohPaymentOverlay .seg-btn svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* ===== AMOUNT WRAPPER ===== */
+#shodaqohPaymentOverlay .shod-payment-amount-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .shod-payment-amount-wrapper .field-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  padding: 12px 14px !important;
+  height: 48px !important;
+}
+
+/* ===== ALLOCATION ===== */
+#shodaqohPaymentOverlay .allocation-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .allocation-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px 14px;
+  align-items: center;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 8px 4px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+#shodaqohPaymentOverlay .allocation-grid:hover {
+  background: var(--surface-alt);
+}
+
+#shodaqohPaymentOverlay .allocation-label {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+#shodaqohPaymentOverlay .allocation-input {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+#shodaqohPaymentOverlay .allocation-input:hover {
+  border-color: color-mix(in srgb, var(--brand) 30%, var(--line));
+  background: var(--surface-alt);
+}
+
+#shodaqohPaymentOverlay .allocation-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+  background: var(--surface);
+}
+
+#shodaqohPaymentOverlay .allocation-input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+/* ===== SUSULAN IR ===== */
+#shodaqohPaymentOverlay .shod-susulan-container {
+  margin-top: 4px;
+  padding: 14px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-container:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-total {
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-total span {
+  font-weight: 800;
+  color: var(--brand);
+  font-size: 11px;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 8px 4px 6px !important;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-height: 52px !important;
+  cursor: pointer;
+  position: relative;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item:hover {
+  border-color: var(--brand);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item:active {
+  transform: scale(0.97);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-label {
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  color: var(--ink-soft) !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  display: block !important;
+  width: 100% !important;
+  order: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  transition: color 0.2s ease;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.selected .shod-susulan-label {
+  color: var(--brand) !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item input[type="checkbox"] {
+  width: 15px !important;
+  height: 15px !important;
+  accent-color: var(--brand) !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  margin: 2px 0 !important;
+  order: 1 !important;
+  transition: transform 0.15s ease;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal {
+  width: 100% !important;
+  max-width: 48px !important;
+  padding: 2px 3px !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  font-size: 7.5px !important;
+  font-weight: 700 !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+  text-align: center !important;
+  order: 2 !important;
+  margin: 0 !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  box-sizing: border-box;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal:focus {
+  border-color: var(--brand) !important;
+  background: var(--surface) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+  transform: scale(1.02);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal::placeholder {
+  color: var(--ink-faint) !important;
+  font-weight: 400 !important;
+  font-size: 5px !important;
+  text-align: center !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal:disabled {
+  opacity: 0.25 !important;
+  cursor: not-allowed !important;
+}
+
+#shodaqohPaymentOverlay
+  .shod-susulan-item
+  input[type="checkbox"]:checked
+  ~ .shod-susulan-nominal {
+  border-color: var(--brand) !important;
+  background: var(--surface) !important;
+  opacity: 1 !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-validation {
+  margin-top: 10px;
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+/* ===== ALLOCATION STATUS ===== */
+#shodaqohPaymentOverlay .shod-allocation-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+#shodaqohPaymentOverlay .shod-allocation-status:hover {
+  border-color: color-mix(in srgb, var(--brand) 20%, var(--line));
+}
+
+#shodaqohPaymentOverlay .shod-allocation-status-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+#shodaqohPaymentOverlay .shod-allocation-status-value {
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--brand);
+}
+
+#shodaqohPaymentOverlay .shod-allocation-status-value .status-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+/* ===== FIELD INPUT ===== */
+#shodaqohPaymentOverlay .field-input,
+#shodaqohPaymentOverlay select.field-input,
+#shodaqohPaymentOverlay textarea.field-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 11px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-sizing: border-box;
+  display: block;
+}
+
+#shodaqohPaymentOverlay textarea.field-input {
+  min-height: 86px;
+  resize: vertical;
+  width: 100% !important;
+  max-width: 100% !important;
+  line-height: 1.6;
+}
+
+#shodaqohPaymentOverlay .field-input::placeholder {
+  color: var(--ink-faint);
+  opacity: 1;
+  font-weight: 400;
+}
+
+#shodaqohPaymentOverlay .field-input:hover {
+  border-color: color-mix(in srgb, var(--brand) 30%, var(--line));
+  background: var(--surface-alt);
+}
+
+#shodaqohPaymentOverlay .field-input:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0 0 4px var(--brand-soft);
+  transform: translateY(-1px);
+}
+
+#shodaqohPaymentOverlay .field-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#shodaqohPaymentOverlay input[type="number"] {
+  font-variant-numeric: tabular-nums;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay select.field-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%236b7178' stroke-width='1.5' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* ===== FILTER DROPDOWN ===== */
+#shodaqohPaymentOverlay .filter-dropdown {
+  position: relative;
+  width: 100% !important;
+  max-width: 100% !important;
+  z-index: 10;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown.open {
+  z-index: 100;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-trigger {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-sizing: border-box;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-trigger:hover {
+  background: var(--surface-alt);
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--line));
+  transform: translateY(-1px);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-trigger:active {
+  transform: scale(0.97);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown.open .filter-dropdown-trigger {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-soft);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-chevron {
+  flex: 0 0 auto;
+  color: var(--ink-faint);
+  transition: all 0.3s ease;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown.open .filter-dropdown-chevron {
+  transform: rotate(180deg);
+  color: var(--brand);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 40px rgba(18, 24, 31, 0.14);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px) scale(0.97);
+  transform-origin: top left;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 200;
+  box-sizing: border-box;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown.open .filter-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-option {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-option:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+  transform: translateX(2px);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-option.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 800;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-option:active {
+  transform: scale(0.97);
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#shodaqohPaymentOverlay .filter-dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+#shodaqohPaymentOverlay .shod-payment-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 6px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .btn-ghost,
+#shodaqohPaymentOverlay .btn-primary {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 11px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: none;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+#shodaqohPaymentOverlay .btn-ghost {
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  border: 1.5px solid var(--line);
+}
+
+#shodaqohPaymentOverlay .btn-ghost:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--brand) 30%, var(--line));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+#shodaqohPaymentOverlay .btn-ghost:active {
+  transform: scale(0.97);
+}
+
+#shodaqohPaymentOverlay .btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+#shodaqohPaymentOverlay .btn-primary:hover {
+  background: var(--brand-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+#shodaqohPaymentOverlay .btn-primary:active {
+  transform: scale(0.97);
+}
+
+#shodaqohPaymentOverlay .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===== UPLOAD SECTION ===== */
+#shodaqohPaymentOverlay .shod-upload-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1.5px solid var(--line);
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .shod-upload-section.hidden {
+  display: none !important;
+}
+
+/* ===== DARK THEME ===== */
+[data-theme="dark"] #shodaqohPaymentOverlay .filter-dropdown-menu {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .field-input {
+  background: var(--surface);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-susulan-container {
+  background: var(--surface-alt);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .btn-ghost {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .btn-ghost:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--brand-dark) 30%, var(--line));
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .btn-primary:hover {
+  background: var(--brand-dark);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-allocation-status {
+  background: var(--surface-alt);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-susulan-item {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-susulan-item:hover {
+  border-color: var(--brand-dark);
+  background: var(--surface-alt);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  .shod-susulan-nominal {
+  color: var(--ink);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  .shod-susulan-nominal:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.2);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  input[type="checkbox"]:checked
+  ~ .shod-susulan-nominal {
+  border-color: var(--brand-dark);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-member-wrapper
+  .btn-load-last {
+  background: var(--surface-alt);
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-member-wrapper
+  .btn-load-last:hover:not(:disabled) {
+  background: var(--brand-soft);
+  border-color: var(--brand-dark);
+  color: var(--brand);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .filter-dropdown-trigger {
+  background: var(--surface);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .filter-dropdown-trigger:hover {
+  background: var(--surface-alt);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .filter-dropdown.open
+  .filter-dropdown-trigger {
+  background: var(--brand-soft);
+}
+
+/* ===== MAX-WIDTH UTILITY ===== */
+#shodaqohPaymentOverlay .sheet-scroll * {
+  max-width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll .field-group,
+#shodaqohPaymentOverlay .sheet-scroll .field-group-full,
+#shodaqohPaymentOverlay .sheet-scroll .shod-payment-row,
+#shodaqohPaymentOverlay .sheet-scroll .shod-payment-actions,
+#shodaqohPaymentOverlay .sheet-scroll .shod-payment-amount-wrapper,
+#shodaqohPaymentOverlay .sheet-scroll .allocation-items,
+#shodaqohPaymentOverlay .sheet-scroll .allocation-grid,
+#shodaqohPaymentOverlay .sheet-scroll .shod-susulan-container,
+#shodaqohPaymentOverlay .sheet-scroll .shod-susulan-checkboxes,
+#shodaqohPaymentOverlay .sheet-scroll .shod-allocation-status,
+#shodaqohPaymentOverlay .sheet-scroll .shod-member-wrapper {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll input,
+#shodaqohPaymentOverlay .sheet-scroll textarea,
+#shodaqohPaymentOverlay .sheet-scroll select,
+#shodaqohPaymentOverlay .sheet-scroll .filter-dropdown,
+#shodaqohPaymentOverlay .sheet-scroll .filter-dropdown-trigger,
+#shodaqohPaymentOverlay .sheet-scroll .filter-dropdown-menu {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* ===== SUSULAN IR: MODERN TOUCH ===== */
+#shodaqohPaymentOverlay .shod-susulan-container {
+  margin-top: 6px;
+  padding: 16px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-container:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-total {
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-total span {
+  font-weight: 800;
+  color: var(--brand);
+  font-size: 11px;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Item susulan - MODERN BUTTON STYLE */
+#shodaqohPaymentOverlay .shod-susulan-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 10px 6px 8px !important;
+  min-height: 72px !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item:hover:not(.checked) {
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--line));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item:active {
+  transform: scale(0.96);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.checked {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow:
+    0 0 0 3px var(--brand-soft),
+    0 4px 16px rgba(22, 163, 74, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Label - di atas, dengan icon checkbox tersembunyi */
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  font-size: 9.5px !important;
+  text-align: center !important;
+  font-weight: 700 !important;
+  color: var(--ink-soft) !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.checked .shod-susulan-label {
+  color: var(--brand) !important;
+}
+
+/* Sembunyikan checkbox asli - tetap ada untuk JS */
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-checkbox {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Status indicator - lingkaran dengan centang */
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-status {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--line) !important;
+  background: var(--surface) !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  flex-shrink: 0 !important;
+  position: relative;
+  pointer-events: none;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-status svg {
+  width: 12px !important;
+  height: 12px !important;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: #fff;
+  display: block;
+  stroke-width: 3;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.checked .shod-susulan-status {
+  border-color: var(--brand);
+  background: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+  transform: scale(1.05);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.checked .shod-susulan-status svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Nominal wrapper */
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal-wrap {
+  width: 100% !important;
+  display: none;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.checked .shod-susulan-nominal-wrap {
+  display: block !important;
+  pointer-events: auto;
+}
+
+/* Input nominal - di bawah */
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal {
+  width: 100% !important;
+  max-width: 64px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  margin: 0 auto !important;
+  padding: 2px 6px !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: 6px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+  outline: none !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  line-height: 1.2 !important;
+  pointer-events: auto;
+  cursor: text;
+  display: block !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+  transform: scale(1.06);
+  background: var(--surface) !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal::placeholder {
+  color: var(--ink-faint) !important;
+  font-weight: 400 !important;
+  font-size: 8px !important;
+  text-align: center !important;
+  opacity: 0.7;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal:disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+  background: var(--surface-alt) !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item.checked .shod-susulan-nominal {
+  border-color: var(--brand) !important;
+  background: var(--surface) !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal.valid {
+  border-color: var(--pos) !important;
+  background: var(--pos-soft) !important;
+}
+
+#shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal.invalid {
+  border-color: var(--neg) !important;
+  background: var(--neg-soft) !important;
+}
+
+/* Validation text */
+#shodaqohPaymentOverlay .shod-susulan-validation {
+  margin-top: 12px;
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+#shodaqohPaymentOverlay .shod-susulan-validation .validation-icon {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* ===== DARK THEME ===== */
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-susulan-item {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item:hover:not(.checked) {
+  border-color: color-mix(in srgb, var(--brand-dark) 35%, var(--line));
+  background: var(--surface-alt);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-susulan-item.checked {
+  border-color: var(--brand-dark);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.15);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  .shod-susulan-nominal {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  .shod-susulan-nominal:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.2);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item.checked
+  .shod-susulan-status {
+  border-color: var(--brand-dark);
+  background: var(--brand-dark);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item.checked
+  .shod-susulan-nominal {
+  border-color: var(--brand-dark);
+}
+
+[data-theme="dark"] #shodaqohPaymentOverlay .shod-susulan-validation {
+  background: var(--surface-alt);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  .shod-susulan-nominal.valid {
+  border-color: var(--pos-dark);
+  background: rgba(40, 199, 111, 0.15);
+}
+
+[data-theme="dark"]
+  #shodaqohPaymentOverlay
+  .shod-susulan-item
+  .shod-susulan-nominal.invalid {
+  border-color: var(--neg-dark);
+  background: rgba(255, 102, 102, 0.15);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  #shodaqohPaymentOverlay .shod-susulan-checkboxes {
+    gap: 6px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item {
+    min-height: 66px !important;
+    padding: 8px 4px 6px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-label {
+    font-size: 8.5px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-status {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-status svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal {
+    max-width: 56px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #shodaqohPaymentOverlay .shod-susulan-checkboxes {
+    gap: 4px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item {
+    min-height: 60px !important;
+    padding: 6px 3px 6px !important;
+    border-radius: 8px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-label {
+    font-size: 7.5px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-status {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-status svg {
+    width: 9px !important;
+    height: 9px !important;
+  }
+
+  #shodaqohPaymentOverlay .shod-susulan-item .shod-susulan-nominal {
+    max-width: 48px !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    font-size: 9px !important;
+    padding: 1px 4px !important;
+  }
+}
