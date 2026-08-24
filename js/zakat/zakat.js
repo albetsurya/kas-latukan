@@ -1,11 +1,44 @@
-// ============================================================
-// ZAKAT - ZAKAT.JS (LENGKAP)
-// ============================================================
+var renderZakatMuzakiView, renderZakatRincianView, renderZakatMustahikView;
+var applyMuzakiSheetCount, applyMustahikSheetCount;
+var renderMuzakiSheetRows, renderMustahikSheetRows;
+var updateMuzakiSheetTotal, updateMustahikSheetTotal;
+var openZakatMuzakiSheet, openZakatMustahikSheet, openZakatRincianSheet;
+var closeZakatMuzakiSheet, closeZakatMustahikSheet, closeZakatRincianSheet;
+var submitZakatMuzakiSheet, submitZakatMustahikSheet, submitZakatRincianSheet;
+var markMuzakiForDeletion, markMustahikForDeletion;
+var showMarkMuzakiConfirm, showMarkMustahikConfirm;
+var updateRincianSheet, setValueIfExists;
+var syncMuzakiSheetRowsToData, syncMustahikSheetRowsToData;
+var deleteMuzakiSheetRow, deleteMustahikSheetRow;
 
 let zakatDataLoading = false;
 let zakatDataLoaded = false;
 
+function ensureZakatState() {
+  if (!state.zakat) {
+    state.zakat = {
+      list: [],
+      currentId: null,
+      isViewOpen: false,
+      _loaded: false,
+      _loading: false,
+    };
+  }
+  return state.zakat;
+}
+
+// ✅ PANGGIL INI DULU
+ensureZakatState();
+
+// ✅ LOAD DARI LOCALSTORAGE
+var cachedZakat = getZakatData();
+if (cachedZakat && cachedZakat.length > 0) {
+  state.zakat.list = cachedZakat;
+}
+
 async function loadZakatData() {
+  ensureZakatState();
+
   if (zakatDataLoading) {
     return new Promise(function (resolve) {
       var checkInterval = setInterval(function () {
@@ -17,60 +50,218 @@ async function loadZakatData() {
     });
   }
 
-  if (zakatDataLoaded && state.zakat.list && state.zakat.list.length > 0) {
-    renderZakatList();
-    if (state.zakat && state.zakat.isViewOpen && state.zakat.currentId) {
-      var zakat = getZakatById(state.zakat.currentId);
-      if (zakat) {
-        renderZakatMuzakiView(zakat);
-        renderZakatRincianView(zakat);
-        renderZakatMustahikView(zakat);
-      }
-    }
-    return;
-  }
-
   zakatDataLoading = true;
 
   try {
-    showZakatLoader("Memuat data zakat...");
-    var response = await apiGetZakatList();
+    showZakatLoader("Memuat data...");
 
-    if (response && response.success === true) {
-      var data = response.data || [];
-      state.zakat.list = data;
-      saveZakatData(state.zakat.list);
-      zakatDataLoaded = true;
+    var zakatResult = await apiGetZakatList();
+
+    if (zakatResult && zakatResult.success === true) {
+      var data = zakatResult.data || [];
+      if (Array.isArray(data) && data.length > 0) {
+        state.zakat.list = data;
+        saveZakatData(state.zakat.list);
+        zakatDataLoaded = true;
+      } else {
+        var cached = getZakatData();
+        if (cached && cached.length > 0) {
+          state.zakat.list = cached;
+        } else {
+          state.zakat.list = [];
+        }
+        zakatDataLoaded = true;
+      }
     } else {
-      state.zakat.list = getZakatData();
-      if (response && response.message) {
-        showToast(response.message, "warning");
+      var cached = getZakatData();
+      if (cached && cached.length > 0) {
+        state.zakat.list = cached;
+      } else {
+        state.zakat.list = [];
       }
       zakatDataLoaded = true;
     }
 
     renderZakatList();
 
-    if (state.zakat && state.zakat.isViewOpen && state.zakat.currentId) {
+    if (state.zakat.isViewOpen && state.zakat.currentId) {
       var zakat = getZakatById(state.zakat.currentId);
       if (zakat) {
         setTimeout(function () {
           renderZakatMuzakiView(zakat);
           renderZakatRincianView(zakat);
           renderZakatMustahikView(zakat);
-        }, 100);
+        }, 50);
       }
     }
 
     hideZakatLoader();
   } catch (err) {
-    state.zakat.list = getZakatData();
+    var cached = getZakatData();
+    if (cached && cached.length > 0) {
+      state.zakat.list = cached;
+    } else {
+      state.zakat.list = [];
+    }
     renderZakatList();
     hideZakatLoader();
-    showToast("Gagal sync data zakat, menggunakan data lokal", "warning");
   } finally {
     zakatDataLoading = false;
   }
+}
+
+async function forceLoadZakat() {
+  ensureZakatState();
+  showZakatLoader("Memuat ulang data...");
+  try {
+    var result = await apiGetZakatList();
+    if (result && result.success && result.data && result.data.length > 0) {
+      state.zakat.list = result.data;
+      saveZakatData(state.zakat.list);
+      zakatDataLoaded = true;
+      renderZakatList();
+      hideZakatLoader();
+      showToast(
+        "Data berhasil dimuat (" + state.zakat.list.length + " zakat)",
+        "success",
+      );
+      return true;
+    } else {
+      hideZakatLoader();
+      showToast("Tidak ada data dari server", "warning");
+      return false;
+    }
+  } catch (e) {
+    hideZakatLoader();
+    showToast("Error: " + e.message, "error");
+    return false;
+  }
+}
+
+async function forceReloadZakatData() {
+  zakatDataLoaded = false;
+  showZakatLoader("Memuat ulang data...");
+  try {
+    var result = await apiGetZakatList();
+    if (result && result.success && result.data && result.data.length > 0) {
+      state.zakat.list = result.data;
+      saveZakatData(state.zakat.list);
+      zakatDataLoaded = true;
+      renderZakatList();
+      hideZakatLoader();
+      showToast("Data berhasil dimuat ulang!", "success");
+    } else {
+      hideZakatLoader();
+      showToast("Gagal memuat data dari server", "error");
+    }
+  } catch (e) {
+    hideZakatLoader();
+    showToast("Error: " + e.message, "error");
+  }
+}
+
+async function loadMastersData() {
+  try {
+    var result = await apiGetMasters();
+    if (result && result.success) {
+      var data = result.data || {};
+      state.masterMuzaki = data.muzaki || [];
+      state.masterMustahik = data.mustahik || [];
+      localStorage.setItem("master_muzaki", JSON.stringify(state.masterMuzaki));
+      localStorage.setItem(
+        "master_mustahik",
+        JSON.stringify(state.masterMustahik),
+      );
+      masterMuzakiCache = {};
+      masterMustahikCache = {};
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+function loadMuzakiSuggestions() {
+  // ✅ Cek state dulu
+  if (state && state.masterMuzaki && state.masterMuzaki.length > 0) {
+    const names = state.masterMuzaki
+      .filter(function (m) {
+        return m.status !== "DELETED";
+      })
+      .map(function (m) {
+        return m.nama || "";
+      })
+      .filter(function (n) {
+        return n.trim() !== "";
+      });
+    return names.sort();
+  }
+
+  // ✅ Cek localStorage
+  try {
+    const stored = localStorage.getItem("master_muzaki");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const names = parsed
+        .filter(function (m) {
+          return m.status !== "DELETED";
+        })
+        .map(function (m) {
+          return m.nama || "";
+        })
+        .filter(function (n) {
+          return n.trim() !== "";
+        });
+      return names.sort();
+    }
+  } catch (e) {
+    console.warn("Failed to load muzaki from localStorage:", e);
+  }
+
+  console.warn("⚠️ No muzaki suggestions found");
+  return [];
+}
+
+function loadMustahikSuggestions() {
+  // ✅ Cek state dulu
+  if (state && state.masterMustahik && state.masterMustahik.length > 0) {
+    const names = state.masterMustahik
+      .filter(function (m) {
+        return m.status !== "DELETED";
+      })
+      .map(function (m) {
+        return m.nama || "";
+      })
+      .filter(function (n) {
+        return n.trim() !== "";
+      });
+    return names.sort();
+  }
+
+  // ✅ Cek localStorage
+  try {
+    const stored = localStorage.getItem("master_mustahik");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const names = parsed
+        .filter(function (m) {
+          return m.status !== "DELETED";
+        })
+        .map(function (m) {
+          return m.nama || "";
+        })
+        .filter(function (n) {
+          return n.trim() !== "";
+        });
+      return names.sort();
+    }
+  } catch (e) {
+    console.warn("Failed to load mustahik from localStorage:", e);
+  }
+
+  console.warn("⚠️ No mustahik suggestions found");
+  return [];
 }
 
 async function refreshZakatData() {
@@ -78,7 +269,40 @@ async function refreshZakatData() {
   await loadZakatData();
 }
 
+async function refreshSingleZakat(id) {
+  try {
+    var result = await apiGetZakatDetail(id);
+
+    // Sesuaikan dengan format respons API kamu (array langsung / wrapper)
+    var fresh = null;
+    if (result && result.success && result.data) {
+      fresh = Array.isArray(result.data) ? result.data[0] : result.data;
+    } else if (result && result.id) {
+      fresh = result; // kemungkinan API kembalikan object langsung
+    }
+
+    if (!fresh) return false;
+
+    var idx = state.zakat.list.findIndex(function (z) {
+      return z.id === id;
+    });
+
+    if (idx !== -1) {
+      state.zakat.list[idx] = fresh;
+    } else {
+      state.zakat.list.push(fresh);
+    }
+
+    saveZakatData(state.zakat.list);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 async function syncZakatToBackend(data) {
+  ensureZakatState();
+
   try {
     var existing = state.zakat.list.find(function (z) {
       return z.id === data.id;
@@ -860,10 +1084,10 @@ document.addEventListener("click", function (e) {
 
   var desc = document.getElementById("completeZakatConfirmDesc");
   if (desc) {
-    desc.textContent =
-      'Zakat "' +
-      zakat.title +
-      '" akan ditandai sebagai selesai dan tidak dapat diedit lagi.';
+    desc.innerHTML =
+      "Zakat <strong>" +
+      escapeHtml(zakat.title) +
+      "</strong> akan ditandai sebagai selesai dan tidak dapat diedit lagi.";
   }
   var overlay = document.getElementById("completeZakatConfirmOverlay");
   if (overlay) {
@@ -922,10 +1146,10 @@ document.addEventListener("click", function (e) {
 
   var desc = document.getElementById("cancelCompleteZakatConfirmDesc");
   if (desc) {
-    desc.textContent =
-      'Zakat "' +
-      zakat.title +
-      '" akan dikembalikan ke status Aktif dan dapat diedit kembali.';
+    desc.innerHTML =
+      "Zakat <strong>" +
+      escapeHtml(zakat.title) +
+      "</strong> akan ditandai sebagai selesai dan tidak dapat diedit lagi.";
   }
   var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
   if (overlay) {
@@ -946,21 +1170,6 @@ document.addEventListener("click", function (e) {
   if (e.target === overlay) {
     overlay.classList.add("hidden");
   }
-});
-
-document.addEventListener("click", function (e) {
-  var target = e.target.closest("#btnCancelCompleteZakatConfirm");
-  if (!target) return;
-  var zakatId = state.zakat.currentId;
-  if (!zakatId) {
-    showToast("Zakat tidak ditemukan", "error");
-    var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
-    if (overlay) overlay.classList.add("hidden");
-    return;
-  }
-  cancelCompleteZakat(zakatId);
-  var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
-  if (overlay) overlay.classList.add("hidden");
 });
 
 async function completeZakat(zakatId) {
@@ -991,17 +1200,12 @@ async function completeZakat(zakatId) {
     state.zakat.list[idx] = zakat;
   }
 
-  if (typeof saveZakatData === "function") {
-    saveZakatData(state.zakat.list);
-  }
+  saveZakatData(state.zakat.list);
 
   renderZakatList(state.zakat.list);
   if (state.zakat.isViewOpen) {
     renderZakatDetailDirect(zakatId);
-  } else {
-    renderZakatList(state.zakat.list);
   }
-  updateZakatDetailActions(zakat);
 
   showToast("⏳ Menyimpan perubahan...", "info");
 
@@ -1009,50 +1213,41 @@ async function completeZakat(zakatId) {
     var result = await apiCompleteZakat({ id: zakatId });
 
     if (result && result.success) {
-      showToast('Zakat "' + zakat.title + '" ditandai selesai!', "success");
-      if (typeof loadZakatData === "function") {
-        await loadZakatData();
+      showToast(
+        "Zakat <strong>" +
+          escapeHtml(zakat.title) +
+          "</strong> ditandai selesai!",
+        "success",
+      );
+      await loadZakatData();
+      if (state.zakat.isViewOpen) {
+        renderZakatDetailDirect(zakatId);
       }
     } else {
       zakat.status = previousStatus;
       zakat.completedAt = previousCompletedAt;
-
       if (idx !== -1) {
         state.zakat.list[idx] = zakat;
       }
       saveZakatData(state.zakat.list);
-
       renderZakatList(state.zakat.list);
       if (state.zakat.isViewOpen) {
         renderZakatDetailDirect(zakatId);
-      } else {
-        renderZakatList(state.zakat.list);
       }
-      updateZakatDetailActions(zakat);
-
-      showToast(
-        result?.message || "Gagal sync ke server, perubahan dibatalkan",
-        "error",
-      );
+      showToast(result?.message || "Gagal sync ke server", "error");
     }
   } catch (err) {
     zakat.status = previousStatus;
     zakat.completedAt = previousCompletedAt;
-
     if (idx !== -1) {
       state.zakat.list[idx] = zakat;
     }
     saveZakatData(state.zakat.list);
-
     renderZakatList(state.zakat.list);
     if (state.zakat.isViewOpen) {
       renderZakatDetailDirect(zakatId);
-    } else {
-      renderZakatList(state.zakat.list);
     }
-    updateZakatDetailActions(zakat);
-
-    showToast("Gagal terhubung ke server, perubahan dibatalkan", "error");
+    showToast("Gagal terhubung ke server", "error");
   }
 }
 
@@ -1089,10 +1284,7 @@ async function cancelCompleteZakat(zakatId) {
   renderZakatList(state.zakat.list);
   if (state.zakat.isViewOpen) {
     renderZakatDetailDirect(zakatId);
-  } else {
-    renderZakatList(state.zakat.list);
   }
-  updateZakatDetailActions(zakat);
 
   showToast("⏳ Menyimpan perubahan...", "info");
 
@@ -1101,69 +1293,107 @@ async function cancelCompleteZakat(zakatId) {
 
     if (result && result.success) {
       showToast(
-        'Status selesai dibatalkan. Zakat "' + zakat.title + '" kembali Aktif.',
+        "Status selesai dibatalkan. Zakat <strong>" +
+          escapeHtml(zakat.title) +
+          "</strong> kembali Aktif.",
         "info",
       );
-      if (typeof loadZakatData === "function") {
-        await loadZakatData();
+      await loadZakatData();
+      if (state.zakat.isViewOpen) {
+        renderZakatDetailDirect(zakatId);
       }
     } else {
       zakat.status = previousStatus;
       zakat.completedAt = previousCompletedAt;
-
       if (idx !== -1) {
         state.zakat.list[idx] = zakat;
       }
       saveZakatData(state.zakat.list);
-
       renderZakatList(state.zakat.list);
       if (state.zakat.isViewOpen) {
         renderZakatDetailDirect(zakatId);
-      } else {
-        renderZakatList(state.zakat.list);
       }
-      updateZakatDetailActions(zakat);
-
-      showToast(
-        result?.message || "Gagal sync ke server, perubahan dibatalkan",
-        "error",
-      );
+      showToast(result?.message || "Gagal sync ke server", "error");
     }
   } catch (err) {
     zakat.status = previousStatus;
     zakat.completedAt = previousCompletedAt;
-
     if (idx !== -1) {
       state.zakat.list[idx] = zakat;
     }
     saveZakatData(state.zakat.list);
-
     renderZakatList(state.zakat.list);
     if (state.zakat.isViewOpen) {
       renderZakatDetailDirect(zakatId);
-    } else {
-      renderZakatList(state.zakat.list);
     }
-    updateZakatDetailActions(zakat);
-
-    showToast("Gagal terhubung ke server, perubahan dibatalkan", "error");
+    showToast("Gagal terhubung ke server", "error");
   }
 }
 
 function updateZakatDetailActions(zakat) {
-  var btnComplete = document.getElementById("btnCompleteZakat");
-  var btnCancelComplete = document.getElementById("btnCancelCompleteZakat");
+  console.log("🔄 updateZakatDetailActions called");
 
-  if (!btnComplete || !btnCancelComplete) return;
+  var btnToggle = document.getElementById("btnToggleCompleteZakat");
+  var iconComplete = document.getElementById("iconComplete");
+  var iconCancelComplete = document.getElementById("iconCancelComplete");
+  var toggleLabel = document.getElementById("btnToggleCompleteLabel");
+  var btnPrint = document.getElementById("btnPrintZakat");
+  var btnDelete = document.getElementById("btnDeleteZakat");
 
   var isCompleted = isZakatCompleted(zakat);
+  var isActive = zakat.status === "ACTIVE";
 
-  if (isCompleted) {
-    btnComplete.classList.add("hidden");
-    btnCancelComplete.classList.remove("hidden");
-  } else {
-    btnComplete.classList.remove("hidden");
-    btnCancelComplete.classList.add("hidden");
+  console.log("📊 isCompleted:", isCompleted);
+  console.log("📊 isActive:", isActive);
+
+  // ✅ UPDATE TOGGLE BUTTON - HARUS TETAP AKTIF
+  if (btnToggle) {
+    if (isCompleted) {
+      btnToggle.className = "dropdown-item";
+      if (iconComplete) iconComplete.style.display = "none";
+      if (iconCancelComplete) iconCancelComplete.style.display = "inline-block";
+      if (toggleLabel) toggleLabel.textContent = "Batalkan Selesai";
+      btnToggle.title = "Batalkan Status Selesai";
+      // ✅ TOMBOL TOGGLE TETAP AKTIF
+      btnToggle.style.opacity = "1";
+      btnToggle.style.pointerEvents = "auto";
+      console.log("✅ Toggle berubah menjadi: Batalkan Selesai (aktif)");
+    } else {
+      btnToggle.className = "dropdown-item";
+      if (iconComplete) iconComplete.style.display = "inline-block";
+      if (iconCancelComplete) iconCancelComplete.style.display = "none";
+      if (toggleLabel) toggleLabel.textContent = "Tandai Selesai";
+      btnToggle.title = "Tandai Zakat Selesai";
+      btnToggle.style.opacity = isActive ? "1" : "0.4";
+      btnToggle.style.pointerEvents = isActive ? "auto" : "none";
+      console.log("✅ Toggle berubah menjadi: Tandai Selesai");
+    }
+  }
+
+  // ✅ PRINT - SELALU AKTIF
+  if (btnPrint) {
+    btnPrint.style.opacity = "1";
+    btnPrint.style.pointerEvents = "auto";
+  }
+
+  // ✅ EDIT - HANYA AKTIF JIKA ACTIVE
+  var btnEdit = document.getElementById("btnEditZakatHeader");
+  if (btnEdit) {
+    btnEdit.style.opacity = isActive ? "1" : "0.4";
+    btnEdit.style.pointerEvents = isActive ? "auto" : "none";
+  }
+
+  // ✅ DELETE - DISABLE JIKA COMPLETED ATAU TIDAK ACTIVE
+  if (btnDelete) {
+    if (isCompleted) {
+      btnDelete.style.opacity = "0.4";
+      btnDelete.style.pointerEvents = "none";
+      btnDelete.title = "Tidak dapat menghapus zakat yang sudah selesai";
+    } else {
+      btnDelete.style.opacity = isActive ? "1" : "0.4";
+      btnDelete.style.pointerEvents = isActive ? "auto" : "none";
+      btnDelete.title = "Hapus Zakat";
+    }
   }
 }
 
@@ -1174,18 +1404,16 @@ function updateZakatDetailStatus(zakat) {
   }
   if (!statusContainer) return;
 
-  var statusInfo = getZakatStatusBadge(zakat.status);
   var status = zakat.status || "ACTIVE";
   var statusClass = ZAKAT_STATUS_CLASSES[status] || "active";
   var statusLabel = ZAKAT_STATUS_LABELS[status] || status;
 
-  statusContainer.innerHTML =
-    '<span class="zakat-detail-status-badge ' +
-    statusClass +
-    '">' +
-    "● " +
-    statusLabel +
-    "</span>";
+  // ✅ Gunakan struktur baru dengan status-dot dan status-label
+  statusContainer.className = "zakat-detail-status-badge " + statusClass;
+  statusContainer.innerHTML = `
+    <span class="status-dot"></span>
+    <span class="status-label">${statusLabel}</span>
+  `;
 }
 
 function openZakatDetail(id) {
@@ -1203,8 +1431,17 @@ async function initZakatDetailRoute(id) {
   state.zakat.currentId = id;
   state.zakat.isViewOpen = true;
 
-  // Ambil data jika belum ada
-  if (!state.zakat.list || state.zakat.list.length === 0) {
+  // Render cache dulu supaya tidak blank
+  var cachedZakat = getZakatById(id);
+  if (cachedZakat) {
+    renderZakatDetailDirect(id);
+  }
+
+  // ✅ Fetch HANYA data zakat ini dari server (lebih cepat dari loadZakatData penuh)
+  var refreshed = await refreshSingleZakat(id);
+
+  if (!refreshed) {
+    // fallback: fetch seluruh list kalau endpoint detail gagal/belum ada
     await loadZakatData();
   }
 
@@ -1216,8 +1453,6 @@ async function initZakatDetailRoute(id) {
   }
 
   renderZakatDetailDirect(id);
-
-  // Pastikan visibility filter benar
   updateZakatFilterVisibility();
 }
 
@@ -1255,6 +1490,16 @@ function renderZakatDetailDirect(id) {
   updateZakatDetailStatus(zakat);
   updateZakatDetailActions(zakat);
 
+  renderZakatMuzakiView(zakat);
+  renderZakatRincianView(zakat);
+  renderZakatMustahikView(zakat);
+
+  // ✅ RE-INISIALISASI DROPDOWN
+  setTimeout(function () {
+    initZakatActionsDropdown();
+  }, 100);
+
+  // Setup tab aktif
   var tabs = document.querySelectorAll(".zakat-tab");
   var panels = {
     muzaki: document.getElementById("zakatTabMuzaki"),
@@ -1287,10 +1532,6 @@ function renderZakatDetailDirect(id) {
     panels.muzaki.classList.add("active");
     panels.muzaki.style.display = "block";
   }
-
-  renderZakatMuzakiView(zakat);
-  renderZakatRincianView(zakat);
-  renderZakatMustahikView(zakat);
 }
 
 function closeZakatDetail() {
@@ -2460,208 +2701,150 @@ function applyZakatFilters() {
 
 function renderZakatList(data) {
   var container = document.getElementById("zakatList");
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   var list = data || state.zakat.list || [];
 
   if (list.length === 0) {
-    container.innerHTML = `
-      <div class="zakat-list-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-          <circle cx="12" cy="12" r="4"/>
-        </svg>
-        <p>Belum ada kegiatan Zakat.</p>
-        <p style="font-size:11px;margin-top:4px;">Klik tombol + untuk membuat baru.</p>
-      </div>
-    `;
+    container.innerHTML =
+      '<div class="zakat-list-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg><p>Belum ada kegiatan Zakat.</p><p style="font-size:11px;margin-top:4px;">Klik tombol + untuk membuat baru.</p></div>';
     return;
   }
 
-  container.innerHTML = list
-    .map(function (z) {
-      var hasMustahik = z.mustahik && z.mustahik.length > 0;
-      var hasRincian =
-        z.rincian &&
-        ((z.rincian.mustahik && z.rincian.mustahik.persen > 0) ||
-          (z.rincian.sabilillah && z.rincian.sabilillah.persen > 0) ||
-          (z.rincian.amil && z.rincian.amil.persen > 0));
+  var html = "";
 
-      var totalMustahikTerisi = 0;
-      if (z.mustahik && z.mustahik.length > 0) {
-        totalMustahikTerisi = z.mustahik.reduce(function (sum, m) {
-          return sum + (parseInt(m.nominal) || 0);
-        }, 0);
+  for (var i = 0; i < list.length; i++) {
+    var z = list[i];
+    var hasMustahik = z.mustahik && z.mustahik.length > 0;
+    var hasRincian =
+      z.rincian &&
+      ((z.rincian.mustahik && z.rincian.mustahik.persen > 0) ||
+        (z.rincian.sabilillah && z.rincian.sabilillah.persen > 0) ||
+        (z.rincian.amil && z.rincian.amil.persen > 0));
+
+    var statusInfo = getZakatStatusBadge(z.status);
+    var isCompleted = statusInfo.isCompleted;
+    var statusBadgeClass = isCompleted ? "status-completed" : "status-active";
+    var statusBadgeText = statusInfo.label;
+    var statusBadgeIcon = isCompleted
+      ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+      : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>';
+
+    var badges = [];
+    badges.push(
+      hasRincian
+        ? '<span class="zakat-badge zakat-badge-success"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Rincian</span>'
+        : '<span class="zakat-badge zakat-badge-warning"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg> Rincian belum</span>',
+    );
+
+    var totalMustahikTerisi = 0;
+    var danaMustahik = 0;
+    if (hasMustahik) {
+      for (var j = 0; j < z.mustahik.length; j++) {
+        totalMustahikTerisi += parseInt(z.mustahik[j].nominal) || 0;
       }
+    }
+    if (z.rincian && z.rincian.mustahik && z.rincian.mustahik.nominal) {
+      danaMustahik = parseInt(z.rincian.mustahik.nominal) || 0;
+    }
+    var isMustahikAllocated =
+      hasMustahik &&
+      danaMustahik > 0 &&
+      totalMustahikTerisi >= danaMustahik * 0.9;
 
-      var danaMustahik = 0;
-      if (z.rincian && z.rincian.mustahik && z.rincian.mustahik.nominal) {
-        danaMustahik = parseInt(z.rincian.mustahik.nominal) || 0;
-      }
+    badges.push(
+      hasMustahik
+        ? isMustahikAllocated
+          ? '<span class="zakat-badge zakat-badge-success"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Mustahik teralokasi</span>'
+          : '<span class="zakat-badge zakat-badge-warning"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg> Mustahik belum dialokasi</span>'
+        : '<span class="zakat-badge zakat-badge-danger"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Belum ada mustahik</span>',
+    );
 
-      var isMustahikAllocated =
-        hasMustahik &&
-        danaMustahik > 0 &&
-        totalMustahikTerisi >= danaMustahik * 0.9;
-
-      var allMuzakiPaid = true;
-      if (z.muzaki && z.muzaki.length > 0) {
-        allMuzakiPaid = z.muzaki.every(function (m) {
-          return parseInt(m.nominal) > 0;
-        });
-      } else {
-        allMuzakiPaid = false;
-      }
-
-      var paidCount = 0;
-      if (z.muzaki && z.muzaki.length > 0) {
-        paidCount = z.muzaki.filter(function (m) {
-          return parseInt(m.nominal) > 0;
-        }).length;
-      }
-
-      var statusInfo = getZakatStatusBadge(z.status);
-      var isCompleted = statusInfo.isCompleted;
-      var statusBadgeClass = isCompleted ? "status-completed" : "status-active";
-      var statusBadgeText = statusInfo.label;
-      var statusBadgeIcon = isCompleted
-        ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
-        : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>';
-
-      var badges = [];
-
-      if (hasRincian) {
-        badges.push(
-          '<span class="zakat-badge zakat-badge-success">' +
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' +
-            " Rincian" +
-            "</span>",
-        );
-      } else {
-        badges.push(
-          '<span class="zakat-badge zakat-badge-warning">' +
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>' +
-            " Rincian belum" +
-            "</span>",
-        );
-      }
-
-      if (hasMustahik) {
-        if (isMustahikAllocated) {
-          badges.push(
-            '<span class="zakat-badge zakat-badge-success">' +
-              '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' +
-              " Mustahik teralokasi" +
-              "</span>",
-          );
+    var muzakiLength = z.muzaki ? z.muzaki.length : 0;
+    var allMuzakiPaid = true;
+    var paidCount = 0;
+    if (muzakiLength > 0) {
+      for (var k = 0; k < z.muzaki.length; k++) {
+        if (parseInt(z.muzaki[k].nominal) > 0) {
+          paidCount++;
         } else {
-          badges.push(
-            '<span class="zakat-badge zakat-badge-warning">' +
-              '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>' +
-              " Mustahik belum dialokasi" +
-              "</span>",
-          );
+          allMuzakiPaid = false;
         }
-      } else {
-        badges.push(
-          '<span class="zakat-badge zakat-badge-danger">' +
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-            " Belum ada mustahik" +
-            "</span>",
-        );
       }
+    } else {
+      allMuzakiPaid = false;
+    }
 
-      if (z.muzaki && z.muzaki.length > 0) {
-        if (allMuzakiPaid) {
-          badges.push(
-            '<span class="zakat-badge zakat-badge-success">' +
-              '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' +
-              " Semua muzaki bayar" +
-              "</span>",
-          );
-        } else {
-          badges.push(
-            '<span class="zakat-badge zakat-badge-warning">' +
-              '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>' +
-              " " +
-              paidCount +
-              "/" +
-              z.muzaki.length +
-              " muzaki bayar" +
-              "</span>",
-          );
-        }
-      } else {
-        badges.push(
-          '<span class="zakat-badge zakat-badge-danger">' +
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-            " Belum ada muzaki" +
-            "</span>",
-        );
-      }
+    badges.push(
+      muzakiLength > 0
+        ? allMuzakiPaid
+          ? '<span class="zakat-badge zakat-badge-success"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Semua muzaki bayar</span>'
+          : '<span class="zakat-badge zakat-badge-warning"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg> ' +
+            paidCount +
+            "/" +
+            muzakiLength +
+            " muzaki bayar</span>"
+        : '<span class="zakat-badge zakat-badge-danger"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Belum ada muzaki</span>',
+    );
 
-      return `
-      <div class="zakat-item" data-zakat-id="${z.id}">
-        <div class="zakat-item-content" data-zakat-id="${z.id}">
-          <div class="zakat-item-status">
-            <span class="zakat-badge ${statusBadgeClass}">
-              ${statusBadgeIcon}
-              ${statusBadgeText}
-            </span>
-          </div>
-          <div class="zakat-item-header">
-            <div class="zakat-item-title">${escapeHtml(z.title)}</div>
-            <div class="zakat-item-total">${fmtRp(z.total || 0)}</div>
-          </div>
-          <div class="zakat-item-meta">
-            <span>${z.tanggal ? fmtDateShort(z.tanggal) : "-"}</span>
-            <span>•</span>
-            <span>${escapeHtml(z.tempat || "Tempat tidak ditentukan")}</span>
-            <span>•</span>
-            <span>${z.muzaki ? z.muzaki.length : 0} Muzaki</span>
-            ${z.mustahik ? "<span>•</span><span>" + z.mustahik.length + " Mustahik</span>" : ""}
-          </div>
-          <div class="zakat-item-badges">
-            ${badges.join("")}
-          </div>
-        </div>
-      </div>
-    `;
-    })
-    .join("");
+    html +=
+      '<div class="zakat-item" data-zakat-id="' +
+      z.id +
+      '"><div class="zakat-item-content" data-zakat-id="' +
+      z.id +
+      '"><div class="zakat-item-status"><span class="zakat-badge ' +
+      statusBadgeClass +
+      '">' +
+      statusBadgeIcon +
+      statusBadgeText +
+      '</span></div><div class="zakat-item-header"><div class="zakat-item-title">' +
+      escapeHtml(z.title) +
+      '</div><div class="zakat-item-total">' +
+      fmtRp(z.total || 0) +
+      '</div></div><div class="zakat-item-meta"><span>' +
+      (z.tanggal ? fmtDateShort(z.tanggal) : "-") +
+      "</span><span>•</span><span>" +
+      escapeHtml(z.tempat || "Tempat tidak ditentukan") +
+      "</span><span>•</span><span>" +
+      muzakiLength +
+      " Muzaki</span>" +
+      (z.mustahik
+        ? "<span>•</span><span>" + z.mustahik.length + " Mustahik</span>"
+        : "") +
+      '</div><div class="zakat-item-badges">' +
+      badges.join("") +
+      "</div></div></div>";
+  }
 
-  container.querySelectorAll(".zakat-item-content").forEach(function (item) {
-    item.addEventListener("click", function (e) {
-      var id = this.dataset.zakatId;
-      if (id) openZakatDetail(id);
-    });
-  });
+  container.innerHTML = html;
 
-  container.querySelectorAll(".zakat-item").forEach(function (item) {
-    item.addEventListener("contextmenu", function (e) {
-      e.preventDefault();
-      var id = this.dataset.zakatId;
-      if (id) openZakatActionSheet(id);
-    });
-
-    var pressTimer = null;
-    item.addEventListener("touchstart", function (e) {
-      pressTimer = setTimeout(
-        function () {
-          var id = this.dataset.zakatId;
-          if (id) openZakatActionSheet(id);
-        }.bind(this),
-        600,
-      );
-    });
-    item.addEventListener("touchend", function () {
-      clearTimeout(pressTimer);
-    });
-    item.addEventListener("touchmove", function () {
-      clearTimeout(pressTimer);
-    });
-  });
+  var items = container.querySelectorAll(".zakat-item-content");
+  for (var i = 0; i < items.length; i++) {
+    (function (item) {
+      item.addEventListener("click", function (e) {
+        var id = this.dataset.zakatId;
+        if (id) openZakatDetail(id);
+      });
+    })(items[i]);
+  }
 }
+
+// 1. Cek apakah state terisi
+console.log("state.zakat.list:", state.zakat.list);
+
+// 2. Panggil render langsung
+renderZakatList(state.zakat.list);
+
+// 3. Cek container
+document.getElementById("zakatList");
+
+// 4. Force load
+loadZakatData().then(function () {
+  console.log("After load:", state.zakat.list);
+  renderZakatList(state.zakat.list);
+});
 
 function loadZakatDataAndInitFilters() {
   if (typeof getZakatData === "function") {
@@ -2853,11 +3036,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (typeof getZakatData === "function") {
-    state.zakat.list = getZakatData() || [];
+    var cached = getZakatData();
+    if (cached && cached.length > 0) {
+      state.zakat.list = cached;
+    }
   }
 
   if (typeof router !== "undefined" && router) {
     router.on("routeChange", function (data) {
+      ensureZakatState();
+
       if (data.route === "zakat") {
         state.zakat.isViewOpen = false;
         state.zakat.currentId = null;
@@ -2877,12 +3065,11 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (data.route === "zakat-detail" && data.params && data.params.id) {
-        renderZakatDetailDirect(data.params.id);
+        initZakatDetailRoute(data.params.id);
         return;
       }
     });
   }
-
   renderZakatList(state.zakat.list);
 
   function initFiltersWithRetry(attempt) {
@@ -3062,14 +3249,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var desc = document.getElementById("completeZakatConfirmDesc");
     if (desc) {
-      desc.textContent =
-        'Zakat "' +
-        zakat.title +
-        '" akan ditandai sebagai selesai dan tidak dapat diedit lagi.';
+      desc.innerHTML =
+        "Zakat <strong>" +
+        escapeHtml(zakat.title) +
+        "</strong> akan ditandai sebagai selesai dan tidak dapat diedit lagi.";
     }
     var overlay = document.getElementById("completeZakatConfirmOverlay");
     if (overlay) {
       overlay.classList.remove("hidden");
+    }
+  });
+
+  document.addEventListener("click", function (e) {
+    var target = e.target.closest("#btnToggleCompleteZakat");
+    if (!target) return;
+
+    console.log("🔘 btnToggleCompleteZakat clicked");
+
+    var zakatId = state.zakat.currentId;
+    if (!zakatId) {
+      showToast("Zakat tidak ditemukan", "error");
+      return;
+    }
+
+    var zakat = state.zakat.list.find(function (z) {
+      return z.id === zakatId;
+    });
+    if (!zakat) {
+      showToast("Zakat tidak ditemukan", "error");
+      return;
+    }
+
+    console.log("📊 Zakat status:", zakat.status);
+    console.log("📊 isCompleted:", isZakatCompleted(zakat));
+
+    if (isZakatCompleted(zakat)) {
+      console.log("✅ Membuka modal CANCEL COMPLETE");
+      var overlay = document.getElementById(
+        "cancelCompleteZakatConfirmOverlay",
+      );
+      if (overlay) {
+        var desc = document.getElementById("cancelCompleteZakatConfirmDesc");
+        if (desc) {
+          desc.innerHTML =
+            'Zakat "<strong>' +
+            escapeHtml(zakat.title) +
+            '</strong>" akan dikembalikan ke status Aktif dan dapat diedit kembali.';
+        }
+        overlay.classList.remove("hidden");
+      } else {
+        console.warn("⚠️ cancelCompleteZakatConfirmOverlay not found");
+      }
+    } else {
+      console.log("✅ Membuka modal COMPLETE");
+      var overlay = document.getElementById("completeZakatConfirmOverlay");
+      if (overlay) {
+        var desc = document.getElementById("completeZakatConfirmDesc");
+        if (desc) {
+          desc.innerHTML =
+            'Zakat "<strong>' +
+            escapeHtml(zakat.title) +
+            '</strong>" akan ditandai sebagai selesai dan tidak dapat diedit lagi.';
+        }
+        overlay.classList.remove("hidden");
+      } else {
+        console.warn("⚠️ completeZakatConfirmOverlay not found");
+      }
     }
   });
 
@@ -3132,10 +3377,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var desc = document.getElementById("cancelCompleteZakatConfirmDesc");
     if (desc) {
-      desc.textContent =
-        'Zakat "' +
-        zakat.title +
-        '" akan dikembalikan ke status Aktif dan dapat diedit kembali.';
+      desc.innerHTML =
+        "Zakat <strong>" +
+        escapeHtml(zakat.title) +
+        "</strong> akan ditandai sebagai selesai dan tidak dapat diedit lagi.";
     }
     var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
     if (overlay) {
@@ -3173,7 +3418,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     cancelCompleteZakat(zakatId);
-
     var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
     if (overlay) overlay.classList.add("hidden");
   });
@@ -3352,1323 +3596,6 @@ document.addEventListener("DOMContentLoaded", function () {
     initZakatDatePicker();
   }, 300);
 });
-
-function renderZakatMuzakiView(zakat) {
-  var tbody = document.getElementById("zakatMuzakiTableBody");
-  var totalEl = document.getElementById("zakatMuzakiTableTotal");
-  var countEl = document.getElementById("zakatMuzakiCountDisplay");
-
-  if (!tbody) return;
-
-  if (!zakat) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="3" class="zakat-table-empty">Data tidak ditemukan</td>
-      </tr>
-    `;
-    return;
-  }
-
-  var muzaki = Array.isArray(zakat.muzaki) ? zakat.muzaki : [];
-
-  var total = 0;
-  if (muzaki.length > 0) {
-    total = muzaki.reduce(function (sum, m) {
-      return sum + (Number(m.nominal) || 0);
-    }, 0);
-  }
-
-  if (countEl) {
-    countEl.textContent = muzaki.length + " orang";
-  }
-
-  if (muzaki.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="3" class="zakat-table-empty">Belum ada data muzaki.</td>
-      </tr>
-    `;
-    if (totalEl) {
-      totalEl.textContent = fmtRp(0);
-    }
-    return;
-  }
-
-  var rows = muzaki.map(function (m, idx) {
-    var nama = m.nama || "-";
-    var nominal = Number(m.nominal) || 0;
-    return `
-      <tr>
-        <td style="text-align:center; padding:8px 10px;">${idx + 1}</td>
-        <td style="text-align:left; padding:8px 10px;">${escapeHtml(nama)}</td>
-        <td style="text-align:right; padding:8px 10px;">${fmtRp(nominal)}</td>
-      </tr>
-    `;
-  });
-
-  tbody.innerHTML = rows.join("");
-
-  if (totalEl) {
-    totalEl.textContent = fmtRp(total);
-    totalEl.style.color = "var(--brand)";
-  }
-}
-
-function renderZakatRincianView(zakat) {
-  var totalZakat = zakat.total || 0;
-  var r = zakat.rincian || {};
-
-  var mustahik = r.mustahik || {
-    persen: 45,
-    nominal: 0,
-    kelompok: { persen: 80, nominal: 0 },
-    daerah: { persen: 20, nominal: 0 },
-  };
-  var sabilillah = r.sabilillah || { persen: 40, nominal: 0 };
-  var amil = r.amil || {
-    persen: 15,
-    nominal: 0,
-    kelompok: { persen: 12, nominal: 0 },
-    desa: { persen: 2, nominal: 0 },
-    daerah: { persen: 1, nominal: 0 },
-  };
-
-  var mustahikNominal =
-    mustahik.nominal || Math.round((totalZakat * mustahik.persen) / 100);
-  var sabilillahNominal =
-    sabilillah.nominal || Math.round((totalZakat * sabilillah.persen) / 100);
-  var amilNominal =
-    amil.nominal || Math.round((totalZakat * amil.persen) / 100);
-
-  var mustahikKelompokNominal =
-    mustahik.kelompok?.nominal ||
-    Math.round((mustahikNominal * mustahik.kelompok.persen) / 100);
-  var mustahikDaerahNominal =
-    mustahik.daerah?.nominal ||
-    Math.round((mustahikNominal * mustahik.daerah.persen) / 100);
-
-  var amilKelompokNominal =
-    amil.kelompok?.nominal ||
-    Math.round((amilNominal * amil.kelompok.persen) / 100);
-  var amilDesaNominal =
-    amil.desa?.nominal || Math.round((amilNominal * amil.desa.persen) / 100);
-  var amilDaerahNominal =
-    amil.daerah?.nominal ||
-    Math.round((amilNominal * amil.daerah.persen) / 100);
-
-  var setDisplay = function (id, value) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = value;
-  };
-
-  setDisplay(
-    "zakatRincianMustahik",
-    mustahik.persen + "% · " + fmtRp(mustahikNominal),
-  );
-  setDisplay(
-    "zakatRincianMustahikKelompok",
-    mustahik.kelompok.persen + "% · " + fmtRp(mustahikKelompokNominal),
-  );
-  setDisplay(
-    "zakatRincianMustahikDaerah",
-    mustahik.daerah.persen + "% · " + fmtRp(mustahikDaerahNominal),
-  );
-  setDisplay(
-    "zakatRincianSabilillah",
-    sabilillah.persen + "% · " + fmtRp(sabilillahNominal),
-  );
-  setDisplay("zakatRincianAmil", amil.persen + "% · " + fmtRp(amilNominal));
-  setDisplay(
-    "zakatRincianAmilKelompok",
-    amil.kelompok.persen + "% · " + fmtRp(amilKelompokNominal),
-  );
-  setDisplay(
-    "zakatRincianAmilDesa",
-    amil.desa.persen + "% · " + fmtRp(amilDesaNominal),
-  );
-  setDisplay(
-    "zakatRincianAmilDaerah",
-    amil.daerah.persen + "% · " + fmtRp(amilDaerahNominal),
-  );
-
-  var statusEl = document.getElementById("zakatRincianStatus");
-  if (statusEl) {
-    var isSaved = r.mustahik && r.mustahik.nominal > 0;
-    statusEl.textContent = isSaved ? "✓ Tersimpan" : "● Belum disimpan";
-    statusEl.className = "zakat-tab-status " + (isSaved ? "saved" : "unsaved");
-  }
-}
-
-function renderZakatMustahikView(zakat) {
-  var tbody = document.getElementById("zakatMustahikTableBody");
-  var totalEl = document.getElementById("zakatMustahikTableTotal");
-  var countEl = document.getElementById("zakatMustahikCountDisplay");
-  var danaEl = document.getElementById("zakatMustahikDanaView");
-  var tersalurkanEl = document.getElementById("zakatMustahikTersalurkan");
-  var sisaEl = document.getElementById("zakatMustahikSisaView");
-  var statusEl = document.getElementById("zakatMustahikStatusView");
-  var progressEl = document.getElementById("zakatMustahikProgressView");
-  var progressLabelEl = document.getElementById("zakatMustahikProgressLabel");
-
-  if (!tbody) return;
-
-  var mustahik = zakat.mustahik || [];
-  var total = mustahik.reduce(function (sum, m) {
-    return sum + (Number(m.nominal) || 0);
-  }, 0);
-
-  var r = zakat.rincian || {};
-
-  var danaMustahik = 0;
-  if (r.mustahik && typeof r.mustahik === "object") {
-    danaMustahik = Number(r.mustahik.nominal) || 0;
-  }
-
-  if (
-    danaMustahik === 0 &&
-    zakat.total > 0 &&
-    r.mustahik &&
-    r.mustahik.persen
-  ) {
-    danaMustahik = Math.round((zakat.total * r.mustahik.persen) / 100);
-  }
-
-  var sisa = Math.max(0, danaMustahik - total);
-  var progress = danaMustahik > 0 ? (total / danaMustahik) * 100 : 0;
-
-  if (danaEl) danaEl.textContent = fmtRp(danaMustahik);
-  if (tersalurkanEl) {
-    tersalurkanEl.textContent = fmtRp(total);
-    tersalurkanEl.style.color = total > 0 ? "var(--pos)" : "var(--ink-soft)";
-  }
-  if (sisaEl) {
-    sisaEl.textContent = fmtRp(sisa);
-    sisaEl.style.color = sisa > 0 ? "var(--pos)" : "var(--ink-soft)";
-  }
-
-  if (progressEl) {
-    var clampedProgress = Math.min(100, Math.max(0, progress));
-    progressEl.style.width = clampedProgress + "%";
-    progressEl.style.background =
-      clampedProgress >= 100 ? "var(--pos)" : "var(--brand)";
-  }
-
-  if (progressLabelEl) {
-    var roundedProgress = Math.round(progress);
-    progressLabelEl.textContent = roundedProgress + "% dari dana mustahik";
-  }
-
-  if (statusEl) {
-    var badgeClass = "";
-    var badgeIcon = "";
-    var badgeText = "";
-
-    if (danaMustahik === 0) {
-      badgeClass = "idle";
-      badgeIcon = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />
-        </svg>
-      `;
-      badgeText = "Belum diatur";
-    } else if (total === 0) {
-      badgeClass = "warning";
-      badgeIcon = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />
-        </svg>
-      `;
-      badgeText = "Belum ada alokasi";
-    } else if (total === danaMustahik) {
-      badgeClass = "saved";
-      badgeIcon = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
-      `;
-      badgeText = "Seimbang";
-    } else if (total < danaMustahik) {
-      badgeClass = "warning";
-      badgeIcon = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />
-        </svg>
-      `;
-      badgeText = "Kurang " + fmtRp(danaMustahik - total);
-    } else {
-      badgeClass = "invalid";
-      badgeIcon = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="15" y1="9" x2="9" y2="15" />
-          <line x1="9" y1="9" x2="15" y2="15" />
-        </svg>
-      `;
-      badgeText = "Kelebihan " + fmtRp(total - danaMustahik);
-    }
-
-    statusEl.innerHTML =
-      '<span class="zakat-status-badge ' +
-      badgeClass +
-      '">' +
-      badgeIcon +
-      badgeText +
-      "</span>";
-  }
-
-  if (countEl) {
-    countEl.textContent = mustahik.length + " orang";
-  }
-
-  if (mustahik.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="3" class="zakat-table-empty">Belum ada data mustahik.</td>
-      </tr>
-    `;
-    if (totalEl) totalEl.textContent = fmtRp(0);
-    return;
-  }
-
-  tbody.innerHTML = mustahik
-    .map(function (m, idx) {
-      return `
-      <tr>
-        <td style="text-align:center; padding:8px 10px;">${idx + 1}</td>
-        <td style="text-align:left; padding:8px 10px;">${escapeHtml(m.nama || "-")}</td>
-        <td style="text-align:right; padding:8px 10px; font-family: 'JetBrains Mono', monospace;">${fmtRp(m.nominal || 0)}</td>
-      </tr>
-    `;
-    })
-    .join("");
-
-  if (totalEl) {
-    totalEl.textContent = fmtRp(total);
-    totalEl.style.color = "var(--brand)";
-  }
-}
-
-function openZakatMuzakiSheet() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  var overlay = document.getElementById("zakatMuzakiSheet");
-  if (!overlay) return;
-
-  var muzakiList = zakat.muzaki || [];
-  var count = Math.max(muzakiList.length || 1, 1);
-
-  document.getElementById("zakatMuzakiSheetCount").value = count;
-  renderMuzakiSheetRows(zakat);
-  updateMuzakiSheetTotal(zakat);
-
-  overlay.classList.remove("hidden");
-}
-
-function closeZakatMuzakiSheet() {
-  var overlay = document.getElementById("zakatMuzakiSheet");
-  if (overlay) overlay.classList.add("hidden");
-}
-
-function renderMuzakiSheetRows(zakat) {
-  var container = document.getElementById("zakatMuzakiSheetList");
-  var countInput = document.getElementById("zakatMuzakiSheetCount");
-  if (!container || !countInput) return;
-
-  var muzakiList = zakat.muzaki || [];
-  var currentCount = parseInt(countInput.value) || 1;
-  var allNames = getAllMuzakiNames();
-
-  var rows = [];
-  for (var i = 0; i < currentCount; i++) {
-    var existing = muzakiList[i] || { nama: "", nominal: 0 };
-    var rowNumber = i + 1;
-
-    rows.push(`
-  <div class="zakat-muzaki-row" data-sheet-index="${i}">
-    <div class="zakat-row-label">${rowNumber}.</div>
-    <div class="zakat-name-wrapper" style="position:relative;flex:1;">
-      <input type="text" class="field-input zakat-muzaki-sheet-name" 
-             placeholder="Nama Muzaki ${rowNumber}" 
-             value="${escapeHtml(existing.nama || "")}" 
-             data-index="${i}"
-             list="sheet-suggest-muzaki-${i}"
-             autocomplete="off"
-             style="width:100%;">
-      <datalist id="sheet-suggest-muzaki-${i}">
-        ${allNames
-          .filter(function (n) {
-            var lower = n.toLowerCase().trim();
-            return !muzakiList.some(function (m) {
-              return (
-                m.nama &&
-                m.nama.toLowerCase().trim() === lower &&
-                m !== existing
-              );
-            });
-          })
-          .map(function (n) {
-            return '<option value="' + escapeHtml(n) + '">';
-          })
-          .join("")}
-      </datalist>
-    </div>
-    <div class="zakat-nominal-wrapper">
-      <span class="zakat-nominal-label">Rp</span>
-      <input type="number" class="field-input zakat-muzaki-sheet-nominal" 
-             placeholder="0" 
-             value="${existing.nominal || ""}" 
-             data-index="${i}" 
-             min="0" step="1000"
-             style="max-width:140px;">
-    </div>
-    <button type="button" class="zakat-row-delete-btn" data-index="${i}" title="Hapus Muzaki ${rowNumber}">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
-      </svg>
-    </button>
-  </div>
-`);
-  }
-
-  container.innerHTML = rows.join("");
-
-  container
-    .querySelectorAll(".zakat-muzaki-sheet-nominal")
-    .forEach(function (input) {
-      input.addEventListener("input", function () {
-        updateMuzakiSheetTotal(zakat);
-      });
-    });
-}
-
-function updateMuzakiSheetTotal(zakat) {
-  var container = document.getElementById("zakatMuzakiSheetList");
-  var totalEl = document.getElementById("zakatMuzakiSheetTotal");
-  if (!container || !totalEl) return;
-
-  var total = 0;
-  container
-    .querySelectorAll(".zakat-muzaki-sheet-nominal")
-    .forEach(function (input) {
-      total += Number(input.value) || 0;
-    });
-  totalEl.textContent = fmtRp(total);
-}
-
-async function submitZakatMuzakiSheet() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  var container = document.getElementById("zakatMuzakiSheetList");
-  var btn = document.getElementById("zakatMuzakiSheetSubmit");
-
-  showZakatButtonLoading(btn, "Menyimpan...");
-
-  try {
-    var rows = container.querySelectorAll(".zakat-muzaki-row");
-    var newMuzaki = [];
-    var hasDuplicate = false;
-    var names = [];
-    var total = 0;
-
-    rows.forEach(function (row) {
-      var nameInput = row.querySelector(".zakat-muzaki-sheet-name");
-      var nominalInput = row.querySelector(".zakat-muzaki-sheet-nominal");
-
-      var name = nameInput ? nameInput.value.trim() : "";
-      var nominal = nominalInput ? Number(nominalInput.value) || 0 : 0;
-      total += nominal;
-
-      if (name) {
-        var key = name.toLowerCase().trim();
-        if (names.indexOf(key) !== -1) {
-          hasDuplicate = true;
-        } else {
-          names.push(key);
-          newMuzaki.push({
-            id:
-              "MZ" +
-              Date.now().toString(36).toUpperCase() +
-              Math.random().toString(36).substring(2, 5),
-            nama: name,
-            nominal: nominal,
-            createdAt: new Date().toISOString(),
-          });
-        }
-      } else if (nominal > 0) {
-        newMuzaki.push({
-          id:
-            "MZ" +
-            Date.now().toString(36).toUpperCase() +
-            Math.random().toString(36).substring(2, 5),
-          nama: "Muzaki " + (newMuzaki.length + 1),
-          nominal: nominal,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    });
-
-    if (hasDuplicate) {
-      showToast("Ada nama yang sama! Periksa kembali.", "error");
-      hideZakatButtonLoading(btn);
-      return;
-    }
-
-    if (newMuzaki.length === 0) {
-      showToast("Tambahkan minimal satu muzaki.", "error");
-      hideZakatButtonLoading(btn);
-      return;
-    }
-
-    zakat.muzaki = newMuzaki;
-    zakat.total = total;
-    zakat.updatedAt = new Date().toISOString();
-
-    var idx = state.zakat.list.findIndex(function (z) {
-      return z.id === zakat.id;
-    });
-    if (idx !== -1) {
-      state.zakat.list[idx] = zakat;
-      saveZakatData(state.zakat.list);
-    }
-
-    showZakatLoader("Menyimpan data muzaki...");
-    var result = await apiUpdateZakatMuzaki({
-      id: zakat.id,
-      muzaki: zakat.muzaki,
-      total: zakat.total,
-    });
-
-    if (result.success) {
-      showToast("Muzaki berhasil disimpan!", "success");
-    } else {
-      showToast("Muzaki disimpan (offline mode)", "warning");
-    }
-
-    renderZakatMuzakiView(zakat);
-    document.getElementById("zakatDetailTotal").textContent = fmtRp(
-      zakat.total,
-    );
-    closeZakatMuzakiSheet();
-    renderZakatList();
-  } catch (err) {
-    showToast("Gagal menyimpan muzaki", "error");
-  } finally {
-    hideZakatLoader();
-    hideZakatButtonLoading(btn);
-  }
-}
-
-function openZakatRincianSheet() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  var overlay = document.getElementById("zakatRincianSheet");
-  if (!overlay) return;
-
-  var r = zakat.rincian || {};
-  var mustahik = r.mustahik || {
-    persen: 45,
-    kelompok: { persen: 80 },
-    daerah: { persen: 20 },
-  };
-  var sabilillah = r.sabilillah || { persen: 40 };
-  var amil = r.amil || {
-    persen: 15,
-    kelompok: { persen: 12 },
-    desa: { persen: 2 },
-    daerah: { persen: 1 },
-  };
-
-  setValueIfExists("zakatPersenMustahikSheet", mustahik.persen || 45);
-  setValueIfExists(
-    "zakatPersenMustahikKelompokSheet",
-    mustahik.kelompok?.persen || 80,
-  );
-  setValueIfExists(
-    "zakatPersenMustahikDaerahSheet",
-    mustahik.daerah?.persen || 20,
-  );
-  setValueIfExists("zakatPersenSabilillahSheet", sabilillah.persen || 40);
-  setValueIfExists("zakatPersenAmilSheet", amil.persen || 15);
-  setValueIfExists("zakatPersenAmilKelompokSheet", amil.kelompok?.persen || 12);
-  setValueIfExists("zakatPersenAmilDesaSheet", amil.desa?.persen || 2);
-  setValueIfExists("zakatPersenAmilDaerahSheet", amil.daerah?.persen || 1);
-
-  updateRincianSheet(zakat);
-
-  overlay.classList.remove("hidden");
-}
-
-function updateRincianSheet(zakat) {
-  var totalZakat = zakat.total || 0;
-
-  var getVal = function (id) {
-    var el = document.getElementById(id);
-    return el ? Number(el.value) || 0 : 0;
-  };
-
-  var pMustahik = getVal("zakatPersenMustahikSheet");
-  var pSabilillah = getVal("zakatPersenSabilillahSheet");
-  var pAmil = getVal("zakatPersenAmilSheet");
-
-  var pKelompok = getVal("zakatPersenMustahikKelompokSheet");
-  var pDaerah = getVal("zakatPersenMustahikDaerahSheet");
-  var pAmilKelompok = getVal("zakatPersenAmilKelompokSheet");
-  var pAmilDesa = getVal("zakatPersenAmilDesaSheet");
-  var pAmilDaerah = getVal("zakatPersenAmilDaerahSheet");
-
-  var mustahikSub = pKelompok + pDaerah;
-  var mustahikSubEl = document.getElementById("zakatMustahikSubTotalSheet");
-  if (mustahikSubEl) {
-    mustahikSubEl.textContent =
-      "Subtotal: " + pKelompok + "% + " + pDaerah + "% = " + mustahikSub + "%";
-    mustahikSubEl.className =
-      "zakat-rincian-sub-total " + (mustahikSub === 100 ? "valid" : "invalid");
-  }
-
-  var amilSub = pAmilKelompok + pAmilDesa + pAmilDaerah;
-  var amilSubEl = document.getElementById("zakatAmilSubTotalSheet");
-  if (amilSubEl) {
-    amilSubEl.textContent =
-      "Subtotal: " +
-      pAmilKelompok +
-      "% + " +
-      pAmilDesa +
-      "% + " +
-      pAmilDaerah +
-      "% = " +
-      amilSub +
-      "%";
-    amilSubEl.className =
-      "zakat-rincian-sub-total " + (amilSub === pAmil ? "valid" : "invalid");
-  }
-
-  var totalPersen = pMustahik + pSabilillah + pAmil;
-  var totalEl = document.getElementById("zakatTotalPersenSheet");
-  if (totalEl) {
-    totalEl.textContent = totalPersen + "%";
-    totalEl.style.color = totalPersen === 100 ? "var(--pos)" : "var(--neg)";
-  }
-
-  var nominalEl = document.getElementById("zakatTotalNominalSheet");
-  if (nominalEl) {
-    if (totalPersen === 100) {
-      var totalNominal =
-        Math.round((totalZakat * pMustahik) / 100) +
-        Math.round((totalZakat * pSabilillah) / 100) +
-        Math.round((totalZakat * pAmil) / 100);
-      nominalEl.textContent = fmtRp(totalNominal);
-      nominalEl.style.color = "var(--brand)";
-    } else {
-      nominalEl.textContent = "⚠️ Harus 100%";
-      nominalEl.style.color = "var(--neg)";
-    }
-  }
-
-  var statusEl = document.getElementById("zakatRincianStatusSheet");
-  if (statusEl) {
-    if (totalZakat === 0) {
-      statusEl.textContent = "● Total Rp 0";
-      statusEl.style.color = "var(--ink-faint)";
-    } else if (totalPersen === 100) {
-      statusEl.textContent = "✓ Seimbang";
-      statusEl.style.color = "var(--pos)";
-    } else if (totalPersen < 100) {
-      statusEl.textContent = "⚠️ Kurang " + (100 - totalPersen) + "%";
-      statusEl.style.color = "var(--gold)";
-    } else {
-      statusEl.textContent = "⚠️ Kelebihan " + (totalPersen - 100) + "%";
-      statusEl.style.color = "var(--neg)";
-    }
-  }
-
-  var previewNominal = function (id, value) {
-    var el = document.getElementById(id);
-    if (el) {
-      el.textContent = fmtRp(value);
-      el.style.color = value > 0 ? "var(--pos)" : "var(--ink-faint)";
-    }
-  };
-
-  var mustahikNominalPreview = Math.round((totalZakat * pMustahik) / 100);
-  var sabilillahNominalPreview = Math.round((totalZakat * pSabilillah) / 100);
-  var amilNominalPreview = Math.round((totalZakat * pAmil) / 100);
-
-  previewNominal("zakatMustahikNominalPreview", mustahikNominalPreview);
-  previewNominal("zakatSabilillahNominalPreview", sabilillahNominalPreview);
-  previewNominal("zakatAmilNominalPreview", amilNominalPreview);
-}
-
-function setValueIfExists(id, value) {
-  var el = document.getElementById(id);
-  if (el) {
-    el.value = value;
-  }
-}
-
-function closeZakatRincianSheet() {
-  var overlay = document.getElementById("zakatRincianSheet");
-  if (overlay) overlay.classList.add("hidden");
-}
-
-async function submitZakatRincianSheet() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  var getVal = function (id) {
-    return Number(document.getElementById(id)?.value || 0);
-  };
-
-  var mustahikPersen = getVal("zakatPersenMustahikSheet");
-  var sabilillahPersen = getVal("zakatPersenSabilillahSheet");
-  var amilPersen = getVal("zakatPersenAmilSheet");
-
-  if (mustahikPersen + sabilillahPersen + amilPersen !== 100) {
-    showToast("Total persentase harus 100%!", "error");
-    return;
-  }
-
-  var mustahikKelompokPersen = getVal("zakatPersenMustahikKelompokSheet");
-  var mustahikDaerahPersen = getVal("zakatPersenMustahikDaerahSheet");
-  if (mustahikKelompokPersen + mustahikDaerahPersen !== 100) {
-    showToast("Mustahik Kelompok + Daerah harus 100%!", "error");
-    return;
-  }
-
-  var amilKelompokPersen = getVal("zakatPersenAmilKelompokSheet");
-  var amilDesaPersen = getVal("zakatPersenAmilDesaSheet");
-  var amilDaerahPersen = getVal("zakatPersenAmilDaerahSheet");
-  if (amilKelompokPersen + amilDesaPersen + amilDaerahPersen !== amilPersen) {
-    showToast(
-      "Amil Kelompok + Desa + Daerah harus sama dengan persentase Amil!",
-      "error",
-    );
-    return;
-  }
-
-  var btn = document.getElementById("zakatRincianSheetSubmit");
-  showZakatButtonLoading(btn, "Menyimpan...");
-
-  try {
-    var totalZakat = zakat.total || 0;
-
-    var mustahikNominal = Math.round((totalZakat * mustahikPersen) / 100);
-    var sabilillahNominal = Math.round((totalZakat * sabilillahPersen) / 100);
-    var amilNominal = Math.round((totalZakat * amilPersen) / 100);
-
-    var mustahikKelompokNominal = Math.round(
-      (mustahikNominal * mustahikKelompokPersen) / 100,
-    );
-    var mustahikDaerahNominal = Math.round(
-      (mustahikNominal * mustahikDaerahPersen) / 100,
-    );
-
-    var amilKelompokNominal = Math.round(
-      (amilNominal * amilKelompokPersen) / 100,
-    );
-    var amilDesaNominal = Math.round((amilNominal * amilDesaPersen) / 100);
-    var amilDaerahNominal = Math.round((amilNominal * amilDaerahPersen) / 100);
-
-    zakat.rincian = {
-      mustahik: {
-        persen: mustahikPersen,
-        nominal: mustahikNominal,
-        kelompok: {
-          persen: mustahikKelompokPersen,
-          nominal: mustahikKelompokNominal,
-        },
-        daerah: {
-          persen: mustahikDaerahPersen,
-          nominal: mustahikDaerahNominal,
-        },
-      },
-      sabilillah: {
-        persen: sabilillahPersen,
-        nominal: sabilillahNominal,
-      },
-      amil: {
-        persen: amilPersen,
-        nominal: amilNominal,
-        kelompok: {
-          persen: amilKelompokPersen,
-          nominal: amilKelompokNominal,
-        },
-        desa: {
-          persen: amilDesaPersen,
-          nominal: amilDesaNominal,
-        },
-        daerah: {
-          persen: amilDaerahPersen,
-          nominal: amilDaerahNominal,
-        },
-      },
-    };
-    zakat.updatedAt = new Date().toISOString();
-
-    var idx = state.zakat.list.findIndex(function (z) {
-      return z.id === zakat.id;
-    });
-    if (idx !== -1) {
-      state.zakat.list[idx] = zakat;
-      saveZakatData(state.zakat.list);
-    }
-
-    showZakatLoader("Menyimpan rincian zakat...");
-    var result = await apiUpdateZakatRincian({
-      id: zakat.id,
-      rincian: zakat.rincian,
-    });
-
-    if (result.success) {
-      showToast("Rincian berhasil disimpan!", "success");
-    } else {
-      showToast("Rincian disimpan (offline mode)", "warning");
-    }
-
-    renderZakatRincianView(zakat);
-    closeZakatRincianSheet();
-    renderZakatList();
-  } catch (err) {
-    showToast("Gagal menyimpan rincian", "error");
-  } finally {
-    hideZakatLoader();
-    hideZakatButtonLoading(btn);
-  }
-}
-
-function openZakatMustahikSheet() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  var overlay = document.getElementById("zakatMustahikSheet");
-  if (!overlay) return;
-
-  var mustahikList = zakat.mustahik || [];
-  var count = Math.max(mustahikList.length || 1, 1);
-
-  var countInput = document.getElementById("zakatMustahikSheetCount");
-  if (countInput) countInput.value = count;
-
-  renderMustahikSheetRows(zakat);
-  updateMustahikSheetTotal(zakat);
-
-  overlay.classList.remove("hidden");
-}
-
-function closeZakatMustahikSheet() {
-  var overlay = document.getElementById("zakatMustahikSheet");
-  if (overlay) overlay.classList.add("hidden");
-}
-
-function renderMustahikSheetRows(zakat) {
-  var container = document.getElementById("zakatMustahikSheetList");
-  var countInput = document.getElementById("zakatMustahikSheetCount");
-
-  if (!container || !countInput) return;
-
-  var mustahikList = zakat.mustahik || [];
-  var currentCount = parseInt(countInput.value) || 1;
-  var allNames = getAllMustahikNames();
-
-  var rows = [];
-  for (var i = 0; i < currentCount; i++) {
-    var existing = mustahikList[i] || { nama: "", nominal: 0 };
-    var rowNumber = i + 1;
-
-    rows.push(`
-  <div class="zakat-muzaki-row" data-sheet-index="${i}">
-    <div class="zakat-row-label">${rowNumber}.</div>
-    <div class="zakat-name-wrapper" style="position:relative;flex:1;">
-      <input type="text" class="field-input zakat-mustahik-sheet-name" 
-             placeholder="Nama Mustahik ${rowNumber}" 
-             value="${escapeHtml(existing.nama || "")}" 
-             data-index="${i}"
-             list="sheet-suggest-mustahik-${i}"
-             autocomplete="off"
-             style="width:100%;">
-      <datalist id="sheet-suggest-mustahik-${i}">
-        ${allNames
-          .filter(function (n) {
-            var lower = n.toLowerCase().trim();
-            return !mustahikList.some(function (m) {
-              return (
-                m.nama &&
-                m.nama.toLowerCase().trim() === lower &&
-                m !== existing
-              );
-            });
-          })
-          .map(function (n) {
-            return '<option value="' + escapeHtml(n) + '">';
-          })
-          .join("")}
-      </datalist>
-    </div>
-    <div class="zakat-nominal-wrapper">
-      <span class="zakat-nominal-label">Rp</span>
-      <input type="number" class="field-input zakat-mustahik-sheet-nominal" 
-             placeholder="0" 
-             value="${existing.nominal || ""}" 
-             data-index="${i}" 
-             min="0" step="1000"
-             style="max-width:140px;">
-    </div>
-    <button type="button" class="zakat-row-delete-btn" data-index="${i}" title="Hapus Mustahik ${rowNumber}">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
-      </svg>
-    </button>
-  </div>
-`);
-  }
-
-  container.innerHTML = rows.join("");
-
-  container
-    .querySelectorAll(".zakat-mustahik-sheet-nominal")
-    .forEach(function (input) {
-      input.addEventListener("input", function () {
-        updateMustahikSheetTotal(zakat);
-      });
-    });
-
-  updateMustahikSheetTotal(zakat);
-}
-
-function updateMustahikSheetTotal(zakat) {
-  var container = document.getElementById("zakatMustahikSheetList");
-  var totalEl = document.getElementById("zakatMustahikSheetTotal");
-  var danaEl = document.getElementById("zakatMustahikSheetDana");
-  var dialokasikanEl = document.getElementById(
-    "zakatMustahikSheetDialokasikan",
-  );
-  var sisaEl = document.getElementById("zakatMustahikSheetSisa");
-  var statusEl = document.getElementById("zakatMustahikSheetStatus");
-  var progressEl = document.getElementById("zakatMustahikSheetProgress");
-  var progressLabelEl = document.getElementById(
-    "zakatMustahikSheetProgressLabel",
-  );
-
-  if (!container) return;
-
-  var total = 0;
-  container
-    .querySelectorAll(".zakat-mustahik-sheet-nominal")
-    .forEach(function (input) {
-      var val = Number(input.value) || 0;
-      total += val;
-    });
-
-  var r = zakat.rincian || {};
-  var mustahikData = r.mustahik || {
-    persen: 45,
-    nominal: 0,
-    kelompok: { persen: 80, nominal: 0 },
-  };
-  var danaMustahik = mustahikData.nominal || 0;
-
-  if (danaMustahik === 0 && zakat.total > 0 && mustahikData.persen) {
-    danaMustahik = Math.round((zakat.total * mustahikData.persen) / 100);
-  }
-
-  var sisa = Math.max(0, danaMustahik - total);
-  var progress = danaMustahik > 0 ? (total / danaMustahik) * 100 : 0;
-
-  if (totalEl) {
-    totalEl.textContent = fmtRp(total);
-    totalEl.style.color = "var(--brand)";
-  }
-
-  if (danaEl) {
-    danaEl.textContent = fmtRp(danaMustahik);
-    danaEl.style.color = danaMustahik > 0 ? "var(--brand)" : "var(--ink-faint)";
-  }
-
-  if (dialokasikanEl) {
-    dialokasikanEl.textContent = fmtRp(total);
-    dialokasikanEl.style.color = total > 0 ? "var(--pos)" : "var(--ink-soft)";
-  }
-
-  if (sisaEl) {
-    sisaEl.textContent = fmtRp(sisa);
-    sisaEl.style.color = sisa > 0 ? "var(--pos)" : "var(--ink-soft)";
-  }
-
-  if (statusEl) {
-    if (danaMustahik === 0) {
-      statusEl.textContent = "● Belum diatur";
-      statusEl.style.color = "var(--ink-faint)";
-      statusEl.style.background = "var(--surface-alt)";
-      statusEl.style.padding = "2px 10px";
-      statusEl.style.borderRadius = "999px";
-    } else if (total === 0) {
-      statusEl.textContent = "⚠️ Belum ada alokasi";
-      statusEl.style.color = "var(--gold)";
-      statusEl.style.background = "var(--gold-soft)";
-      statusEl.style.padding = "2px 10px";
-      statusEl.style.borderRadius = "999px";
-    } else if (total === danaMustahik) {
-      statusEl.textContent = "✓ Seimbang";
-      statusEl.style.color = "var(--pos)";
-      statusEl.style.background = "var(--pos-soft)";
-      statusEl.style.padding = "2px 10px";
-      statusEl.style.borderRadius = "999px";
-    } else if (total < danaMustahik) {
-      statusEl.textContent = "⚠️ Kurang " + fmtRp(danaMustahik - total);
-      statusEl.style.color = "var(--gold)";
-      statusEl.style.background = "var(--gold-soft)";
-      statusEl.style.padding = "2px 10px";
-      statusEl.style.borderRadius = "999px";
-    } else {
-      statusEl.textContent = "⚠️ Kelebihan " + fmtRp(total - danaMustahik);
-      statusEl.style.color = "var(--neg)";
-      statusEl.style.background = "var(--neg-soft)";
-      statusEl.style.padding = "2px 10px";
-      statusEl.style.borderRadius = "999px";
-    }
-  }
-
-  if (progressEl) {
-    var clampedProgress = Math.min(100, Math.max(0, progress));
-    progressEl.style.width = clampedProgress + "%";
-    progressEl.style.background =
-      clampedProgress >= 100
-        ? "var(--pos)"
-        : clampedProgress > 0
-          ? "var(--brand)"
-          : "var(--brand)";
-  }
-
-  if (progressLabelEl) {
-    var roundedProgress = Math.round(progress);
-    progressLabelEl.textContent = roundedProgress + "%";
-    progressLabelEl.style.color =
-      roundedProgress >= 100
-        ? "var(--pos)"
-        : roundedProgress > 0
-          ? "var(--ink-soft)"
-          : "var(--ink-faint)";
-  }
-}
-
-// ============================================================
-// MUZAKI - APPLY COUNT & DELETE ROW
-// ============================================================
-
-function syncMuzakiSheetRowsToData(zakat) {
-  var container = document.getElementById("zakatMuzakiSheetList");
-  if (!container) return;
-
-  var rows = container.querySelectorAll(".zakat-muzaki-row");
-  var updated = [];
-
-  rows.forEach(function (row, i) {
-    var nameInput = row.querySelector(".zakat-muzaki-sheet-name");
-    var nominalInput = row.querySelector(".zakat-muzaki-sheet-nominal");
-    var existing = (zakat.muzaki && zakat.muzaki[i]) || {};
-
-    updated.push({
-      id:
-        existing.id ||
-        "MZ" +
-          Date.now().toString(36).toUpperCase() +
-          Math.random().toString(36).substring(2, 5),
-      nama: nameInput ? nameInput.value.trim() : existing.nama || "",
-      nominal: nominalInput
-        ? Number(nominalInput.value) || 0
-        : existing.nominal || 0,
-      createdAt: existing.createdAt || new Date().toISOString(),
-    });
-  });
-
-  zakat.muzaki = updated;
-}
-
-function applyMuzakiSheetCount() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  // Simpan dulu data yang sudah diketik sebelum jumlah berubah
-  syncMuzakiSheetRowsToData(zakat);
-
-  var countInput = document.getElementById("zakatMuzakiSheetCount");
-  var newCount = parseInt(countInput.value) || 1;
-  newCount = Math.max(1, Math.min(20, newCount));
-  countInput.value = newCount;
-
-  if (!zakat.muzaki) zakat.muzaki = [];
-
-  while (zakat.muzaki.length < newCount) {
-    zakat.muzaki.push({
-      id:
-        "MZ" +
-        Date.now().toString(36).toUpperCase() +
-        Math.random().toString(36).substring(2, 5),
-      nama: "",
-      nominal: 0,
-      createdAt: new Date().toISOString(),
-    });
-  }
-  if (zakat.muzaki.length > newCount) {
-    zakat.muzaki = zakat.muzaki.slice(0, newCount);
-  }
-
-  renderMuzakiSheetRows(zakat);
-  updateMuzakiSheetTotal(zakat);
-  showToast("Jumlah muzaki diterapkan: " + newCount, "info");
-}
-
-function deleteMuzakiSheetRow(idx) {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) return;
-
-  syncMuzakiSheetRowsToData(zakat);
-
-  if (!zakat.muzaki || zakat.muzaki.length <= 1) {
-    showToast("Minimal harus ada 1 Muzaki.", "warning");
-    return;
-  }
-
-  zakat.muzaki.splice(idx, 1);
-
-  var countInput = document.getElementById("zakatMuzakiSheetCount");
-  if (countInput) countInput.value = zakat.muzaki.length;
-
-  renderMuzakiSheetRows(zakat);
-  updateMuzakiSheetTotal(zakat);
-  showToast("Baris muzaki dihapus.", "info");
-}
-
-document
-  .getElementById("zakatMuzakiSheetApplyCount")
-  ?.addEventListener("click", applyMuzakiSheetCount);
-
-// ============================================================
-// MUSTAHIK - APPLY COUNT & DELETE ROW
-// ============================================================
-
-function syncMustahikSheetRowsToData(zakat) {
-  var container = document.getElementById("zakatMustahikSheetList");
-  if (!container) return;
-
-  var rows = container.querySelectorAll(".zakat-muzaki-row");
-  var updated = [];
-
-  rows.forEach(function (row, i) {
-    var nameInput = row.querySelector(".zakat-mustahik-sheet-name");
-    var nominalInput = row.querySelector(".zakat-mustahik-sheet-nominal");
-    var existing = (zakat.mustahik && zakat.mustahik[i]) || {};
-
-    updated.push({
-      id:
-        existing.id ||
-        "MS" +
-          Date.now().toString(36).toUpperCase() +
-          Math.random().toString(36).substring(2, 5),
-      nama: nameInput ? nameInput.value.trim() : existing.nama || "",
-      nominal: nominalInput
-        ? Number(nominalInput.value) || 0
-        : existing.nominal || 0,
-      createdAt: existing.createdAt || new Date().toISOString(),
-    });
-  });
-
-  zakat.mustahik = updated;
-}
-
-function applyMustahikSheetCount() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  syncMustahikSheetRowsToData(zakat);
-
-  var countInput = document.getElementById("zakatMustahikSheetCount");
-  var newCount = parseInt(countInput.value) || 1;
-  newCount = Math.max(1, Math.min(20, newCount));
-  countInput.value = newCount;
-
-  if (!zakat.mustahik) zakat.mustahik = [];
-
-  while (zakat.mustahik.length < newCount) {
-    zakat.mustahik.push({
-      id:
-        "MS" +
-        Date.now().toString(36).toUpperCase() +
-        Math.random().toString(36).substring(2, 5),
-      nama: "",
-      nominal: 0,
-      createdAt: new Date().toISOString(),
-    });
-  }
-  if (zakat.mustahik.length > newCount) {
-    zakat.mustahik = zakat.mustahik.slice(0, newCount);
-  }
-
-  renderMustahikSheetRows(zakat);
-  updateMustahikSheetTotal(zakat);
-  showToast("Jumlah mustahik diterapkan: " + newCount, "info");
-}
-
-function deleteMustahikSheetRow(idx) {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) return;
-
-  syncMustahikSheetRowsToData(zakat);
-
-  if (!zakat.mustahik || zakat.mustahik.length <= 1) {
-    showToast("Minimal harus ada 1 Mustahik.", "warning");
-    return;
-  }
-
-  zakat.mustahik.splice(idx, 1);
-
-  var countInput = document.getElementById("zakatMustahikSheetCount");
-  if (countInput) countInput.value = zakat.mustahik.length;
-
-  renderMustahikSheetRows(zakat);
-  updateMustahikSheetTotal(zakat);
-  showToast("Baris mustahik dihapus.", "info");
-}
-
-document
-  .getElementById("zakatMustahikSheetApplyCount")
-  ?.addEventListener("click", applyMustahikSheetCount);
-
-async function submitZakatMustahikSheet() {
-  var zakat = getZakatById(state.zakat.currentId);
-  if (!zakat) {
-    showToast("Zakat tidak ditemukan.", "error");
-    return;
-  }
-
-  var container = document.getElementById("zakatMustahikSheetList");
-  var btn = document.getElementById("zakatMustahikSheetSubmit");
-
-  if (!container || !btn) {
-    showToast("Elemen sheet tidak ditemukan.", "error");
-    return;
-  }
-
-  showZakatButtonLoading(btn, "Menyimpan...");
-
-  try {
-    var rows = container.querySelectorAll(".zakat-muzaki-row");
-    var newMustahik = [];
-    var hasDuplicate = false;
-    var names = [];
-    var total = 0;
-
-    rows.forEach(function (row) {
-      var nameInput = row.querySelector(".zakat-mustahik-sheet-name");
-      var nominalInput = row.querySelector(".zakat-mustahik-sheet-nominal");
-
-      var name = nameInput ? nameInput.value.trim() : "";
-      var nominal = nominalInput ? Number(nominalInput.value) || 0 : 0;
-      total += nominal;
-
-      if (name) {
-        var key = name.toLowerCase().trim();
-        if (names.indexOf(key) !== -1) {
-          hasDuplicate = true;
-        } else {
-          names.push(key);
-          newMustahik.push({
-            id:
-              "MS" +
-              Date.now().toString(36).toUpperCase() +
-              Math.random().toString(36).substring(2, 5),
-            nama: name,
-            nominal: nominal,
-            createdAt: new Date().toISOString(),
-          });
-        }
-      } else if (nominal > 0) {
-        newMustahik.push({
-          id:
-            "MS" +
-            Date.now().toString(36).toUpperCase() +
-            Math.random().toString(36).substring(2, 5),
-          nama: "Mustahik " + (newMustahik.length + 1),
-          nominal: nominal,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    });
-
-    if (hasDuplicate) {
-      showToast("Ada nama yang sama! Periksa kembali.", "error");
-      hideZakatButtonLoading(btn);
-      return;
-    }
-
-    if (newMustahik.length === 0) {
-      showToast("Tambahkan minimal satu mustahik.", "error");
-      hideZakatButtonLoading(btn);
-      return;
-    }
-
-    zakat.mustahik = newMustahik;
-    zakat.updatedAt = new Date().toISOString();
-
-    var idx = state.zakat.list.findIndex(function (z) {
-      return z.id === zakat.id;
-    });
-    if (idx !== -1) {
-      state.zakat.list[idx] = zakat;
-      saveZakatData(state.zakat.list);
-    }
-
-    showZakatLoader("Menyimpan data mustahik...");
-    var result = await apiUpdateZakatMustahik({
-      id: zakat.id,
-      mustahik: zakat.mustahik,
-    });
-
-    if (result.success) {
-      showToast("Mustahik berhasil disimpan!", "success");
-    } else {
-      showToast("Mustahik disimpan (offline mode)", "warning");
-    }
-
-    renderZakatMustahikView(zakat);
-    closeZakatMustahikSheet();
-    renderZakatList();
-  } catch (err) {
-    showToast("Gagal menyimpan mustahik", "error");
-  } finally {
-    hideZakatLoader();
-    hideZakatButtonLoading(btn);
-  }
-}
 
 document
   .getElementById("zakatMuzakiEdit")
@@ -4869,3 +3796,287 @@ document
       closeZakatMustahikSheet();
     }
   });
+
+function renderZakatMuzakiView(zakat) {
+  var tbody = document.getElementById("zakatMuzakiTableBody");
+  var countDisplay = document.getElementById("zakatMuzakiCountDisplay");
+  var totalEl = document.getElementById("zakatMuzakiTableTotal");
+
+  if (!tbody) return;
+
+  var muzakiList = zakat.muzaki || [];
+  var activeMuzaki = [];
+  var total = 0;
+
+  for (var i = 0; i < muzakiList.length; i++) {
+    var m = muzakiList[i];
+    if (m._deleted === true) continue;
+    if (!m.id || !m.id.startsWith("MZ")) continue;
+    if (!m.nama || m.nama.trim() === "") continue;
+    activeMuzaki.push(m);
+    total += m.nominal || 0;
+  }
+
+  if (countDisplay) {
+    countDisplay.textContent = activeMuzaki.length + " orang";
+  }
+
+  if (activeMuzaki.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="3" style="text-align:center;padding:24px 10px;color:var(--ink-faint);font-size:13px;">Belum ada data muzaki</td></tr>';
+    if (totalEl) totalEl.textContent = "Rp 0";
+    return;
+  }
+
+  var rows = "";
+  var masterCache = {};
+
+  for (var i = 0; i < activeMuzaki.length; i++) {
+    var m = activeMuzaki[i];
+    var rowNumber = i + 1;
+    var master = masterCache[m.id];
+    if (!master) {
+      master = getMasterMuzakiById(m.id);
+      masterCache[m.id] = master;
+    }
+
+    rows +=
+      '<tr><td style="text-align:center;font-weight:600;color:var(--ink-faint);font-size:13px;">' +
+      rowNumber +
+      '</td><td style="font-weight:500;">' +
+      escapeHtml(m.nama || "-") +
+      '</td><td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
+      fmtRp(m.nominal || 0) +
+      "</td></tr>";
+  }
+
+  tbody.innerHTML = rows;
+
+  if (totalEl) {
+    totalEl.textContent = fmtRp(total);
+  }
+}
+
+function renderZakatMustahikView(zakat) {
+  var tbody = document.getElementById("zakatMustahikTableBody");
+  var totalEl = document.getElementById("zakatMustahikTableTotal");
+  var countEl = document.getElementById("zakatMustahikCountDisplay");
+  var danaEl = document.getElementById("zakatMustahikDanaView");
+  var tersalurkanEl = document.getElementById("zakatMustahikTersalurkan");
+  var sisaEl = document.getElementById("zakatMustahikSisaView");
+  var statusEl = document.getElementById("zakatMustahikStatusView");
+  var progressEl = document.getElementById("zakatMustahikProgressView");
+  var progressLabelEl = document.getElementById("zakatMustahikProgressLabel");
+
+  if (!tbody) return;
+
+  var mustahik = zakat.mustahik || [];
+  var activeMustahik = [];
+  var total = 0;
+
+  for (var i = 0; i < mustahik.length; i++) {
+    var m = mustahik[i];
+    if (m._deleted === true) continue;
+    if (!m.id || !m.id.startsWith("MS")) continue;
+    if (!m.nama || m.nama === "Unknown" || m.nama.trim() === "") continue;
+    activeMustahik.push(m);
+    total += Number(m.nominal) || 0;
+  }
+
+  var r = zakat.rincian || {};
+  var danaMustahik = 0;
+  if (r.mustahik && typeof r.mustahik === "object") {
+    danaMustahik = Number(r.mustahik.nominal) || 0;
+  }
+  if (
+    danaMustahik === 0 &&
+    zakat.total > 0 &&
+    r.mustahik &&
+    r.mustahik.persen
+  ) {
+    danaMustahik = Math.round((zakat.total * r.mustahik.persen) / 100);
+  }
+
+  var sisa = Math.max(0, danaMustahik - total);
+  var progress = danaMustahik > 0 ? (total / danaMustahik) * 100 : 0;
+
+  if (danaEl) danaEl.textContent = fmtRp(danaMustahik);
+  if (tersalurkanEl) {
+    tersalurkanEl.textContent = fmtRp(total);
+    tersalurkanEl.style.color = total > 0 ? "var(--pos)" : "var(--ink-soft)";
+  }
+  if (sisaEl) {
+    sisaEl.textContent = fmtRp(sisa);
+    sisaEl.style.color = sisa > 0 ? "var(--pos)" : "var(--ink-soft)";
+  }
+  if (progressEl) {
+    var clampedProgress = Math.min(100, Math.max(0, progress));
+    progressEl.style.width = clampedProgress + "%";
+    progressEl.style.background =
+      clampedProgress >= 100 ? "var(--pos)" : "var(--brand)";
+  }
+  if (progressLabelEl) {
+    progressLabelEl.textContent = Math.round(progress) + "% dari dana mustahik";
+  }
+
+  if (statusEl) {
+    var badgeClass = "idle";
+    var badgeIcon =
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>';
+    var badgeText = "Belum diatur";
+    if (danaMustahik === 0) {
+      badgeClass = "idle";
+      badgeText = "Belum diatur";
+    } else if (total === 0) {
+      badgeClass = "warning";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>';
+      badgeText = "Belum ada alokasi";
+    } else if (total === danaMustahik) {
+      badgeClass = "saved";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5" /></svg>';
+      badgeText = "Seimbang";
+    } else if (total < danaMustahik) {
+      badgeClass = "warning";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>';
+      badgeText = "Kurang " + fmtRp(danaMustahik - total);
+    } else {
+      badgeClass = "invalid";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>';
+      badgeText = "Kelebihan " + fmtRp(total - danaMustahik);
+    }
+    statusEl.innerHTML =
+      '<span class="zakat-status-badge ' +
+      badgeClass +
+      '">' +
+      badgeIcon +
+      badgeText +
+      "</span>";
+  }
+
+  if (countEl) {
+    countEl.textContent = activeMustahik.length + " orang";
+  }
+
+  if (activeMustahik.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="3" class="zakat-table-empty">Belum ada data mustahik.</td></tr>';
+    if (totalEl) totalEl.textContent = fmtRp(0);
+    return;
+  }
+
+  var rows = "";
+  var masterCache = {};
+  for (var i = 0; i < activeMustahik.length; i++) {
+    var m = activeMustahik[i];
+    var master = masterCache[m.id];
+    if (!master) {
+      master = getMasterMustahikById(m.id);
+      masterCache[m.id] = master;
+    }
+
+    rows +=
+      '<tr><td style="text-align:center; padding:8px 10px;">' +
+      (i + 1) +
+      '</td><td style="text-align:left; padding:8px 10px;">' +
+      escapeHtml(m.nama || "-") +
+      '</td><td style="text-align:right; padding:8px 10px;">' +
+      fmtRp(m.nominal || 0) +
+      "</td></tr>";
+  }
+
+  tbody.innerHTML = rows;
+
+  if (totalEl) {
+    totalEl.textContent = fmtRp(total);
+    totalEl.style.color = "var(--brand)";
+  }
+}
+
+function renderZakatRincianView(zakat) {
+  var totalZakat = zakat.total || 0;
+  var r = zakat.rincian || {};
+
+  var mustahik = r.mustahik || {
+    persen: 45,
+    nominal: 0,
+    kelompok: { persen: 80, nominal: 0 },
+    daerah: { persen: 20, nominal: 0 },
+  };
+  var sabilillah = r.sabilillah || { persen: 40, nominal: 0 };
+  var amil = r.amil || {
+    persen: 15,
+    nominal: 0,
+    kelompok: { persen: 12, nominal: 0 },
+    desa: { persen: 2, nominal: 0 },
+    daerah: { persen: 1, nominal: 0 },
+  };
+
+  var mustahikNominal =
+    mustahik.nominal || Math.round((totalZakat * mustahik.persen) / 100);
+  var sabilillahNominal =
+    sabilillah.nominal || Math.round((totalZakat * sabilillah.persen) / 100);
+  var amilNominal =
+    amil.nominal || Math.round((totalZakat * amil.persen) / 100);
+
+  var mustahikKelompokNominal =
+    mustahik.kelompok?.nominal ||
+    Math.round((mustahikNominal * mustahik.kelompok.persen) / 100);
+  var mustahikDaerahNominal =
+    mustahik.daerah?.nominal ||
+    Math.round((mustahikNominal * mustahik.daerah.persen) / 100);
+
+  var amilKelompokNominal =
+    amil.kelompok?.nominal ||
+    Math.round((amilNominal * amil.kelompok.persen) / 100);
+  var amilDesaNominal =
+    amil.desa?.nominal || Math.round((amilNominal * amil.desa.persen) / 100);
+  var amilDaerahNominal =
+    amil.daerah?.nominal ||
+    Math.round((amilNominal * amil.daerah.persen) / 100);
+
+  var setDisplay = function (id, value) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  setDisplay(
+    "zakatRincianMustahik",
+    mustahik.persen + "% · " + fmtRp(mustahikNominal),
+  );
+  setDisplay(
+    "zakatRincianMustahikKelompok",
+    mustahik.kelompok.persen + "% · " + fmtRp(mustahikKelompokNominal),
+  );
+  setDisplay(
+    "zakatRincianMustahikDaerah",
+    mustahik.daerah.persen + "% · " + fmtRp(mustahikDaerahNominal),
+  );
+  setDisplay(
+    "zakatRincianSabilillah",
+    sabilillah.persen + "% · " + fmtRp(sabilillahNominal),
+  );
+  setDisplay("zakatRincianAmil", amil.persen + "% · " + fmtRp(amilNominal));
+  setDisplay(
+    "zakatRincianAmilKelompok",
+    amil.kelompok.persen + "% · " + fmtRp(amilKelompokNominal),
+  );
+  setDisplay(
+    "zakatRincianAmilDesa",
+    amil.desa.persen + "% · " + fmtRp(amilDesaNominal),
+  );
+  setDisplay(
+    "zakatRincianAmilDaerah",
+    amil.daerah.persen + "% · " + fmtRp(amilDaerahNominal),
+  );
+
+  var statusEl = document.getElementById("zakatRincianStatus");
+  if (statusEl) {
+    var isSaved = r.mustahik && r.mustahik.nominal > 0;
+    statusEl.textContent = isSaved ? "✓ Tersimpan" : "● Belum disimpan";
+    statusEl.className = "zakat-tab-status " + (isSaved ? "saved" : "unsaved");
+  }
+}

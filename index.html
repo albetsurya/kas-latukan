@@ -28,9 +28,9 @@
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/sheets.css" />
     <link rel="stylesheet" href="/css/shodaqoh.css" />
-    <link rel="stylesheet" href="/css/zakat.css" />
+    <link rel="stylesheet" href="/css/zakat-screen.css" />
     <link rel="stylesheet" href="/css/zakat-sheet.css" />
-    <link rel="stylesheet" href="/css/detail-zakat.css" />
+    <link rel="stylesheet" href="/css/zakat-detail.css" />
     <link rel="stylesheet" href="/css/chart-print.css" />
     <link rel="stylesheet" href="/css/zakat-print.css" />
     <link rel="stylesheet" href="/css/overrides.css" />
@@ -493,12 +493,13 @@
                     </svg>
                   </button>
 
-                  <!-- ✅ STATUS BADGE -->
+                  <!-- ✅ STATUS BADGE - Lebih jelas -->
                   <span
-                    class="zakat-detail-status-badge active"
+                    class="zakat-detail-status-badge"
                     id="zakatDetailStatus"
                   >
-                    ● Aktif
+                    <span class="status-dot"></span>
+                    <span class="status-label">Aktif</span>
                   </span>
                 </div>
                 <p class="zakat-detail-meta" id="zakatDetailMeta">
@@ -509,109 +510,115 @@
                 </p>
               </div>
 
-              <!-- Actions sejajar dengan title (pojok kanan atas) -->
               <div class="zakat-detail-actions">
-                <!-- ✅ TOMBOL COMPLETE / CANCEL COMPLETE (Dinamis) -->
-                <button
-                  id="btnCompleteZakat"
-                  type="button"
-                  class="zakat-action-btn complete"
-                  title="Tandai Zakat Selesai"
-                  aria-label="Tandai Zakat Selesai"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
+                <!-- DROPDOWN MORE ACTIONS -->
+                <div class="zakat-actions-dropdown">
+                  <button
+                    id="btnMoreActions"
+                    type="button"
+                    class="zakat-action-btn"
+                    title="Lainnya"
+                    aria-label="Lainnya"
                   >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </button>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="5" r="1.5" />
+                      <circle cx="12" cy="12" r="1.5" />
+                      <circle cx="12" cy="19" r="1.5" />
+                    </svg>
+                  </button>
 
-                <button
-                  id="btnCancelCompleteZakat"
-                  type="button"
-                  class="zakat-action-btn cancel-complete hidden"
-                  title="Batalkan Status Selesai"
-                  aria-label="Batalkan Status Selesai"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
+                  <div
+                    class="zakat-actions-dropdown-menu hidden"
+                    id="zakatActionsDropdownMenu"
                   >
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
+                    <!-- COMPLETE / CANCEL COMPLETE (TOGGLE) -->
+                    <button id="btnToggleCompleteZakat" class="dropdown-item">
+                      <svg
+                        id="iconComplete"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <svg
+                        id="iconCancelComplete"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        style="display: none"
+                      >
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span id="btnToggleCompleteLabel">Tandai Selesai</span>
+                    </button>
 
-                <button
-                  id="btnPrintZakat"
-                  type="button"
-                  class="zakat-action-btn"
-                  title="Cetak Laporan Zakat"
-                  aria-label="Cetak Laporan Zakat"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 9V2h12v7" />
-                    <path
-                      d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5h-2"
-                    />
-                    <path d="M6 14h12v8H6z" />
-                    <path d="M18 13h.01" />
-                  </svg>
-                </button>
+                    <!-- PRINT -->
+                    <button id="btnPrintZakat" class="dropdown-item">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M6 9V2h12v7" />
+                        <path
+                          d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5h-2"
+                        />
+                        <path d="M6 14h12v8H6z" />
+                        <path d="M18 13h.01" />
+                      </svg>
+                      Cetak Laporan
+                    </button>
 
-                <button
-                  id="btnDeleteZakat"
-                  type="button"
-                  class="zakat-action-btn danger"
-                  title="Hapus Zakat"
-                  aria-label="Hapus Zakat"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
-                    />
-                  </svg>
-                </button>
+                    <!-- DELETE -->
+                    <button id="btnDeleteZakat" class="dropdown-item danger">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
+                        />
+                      </svg>
+                      Hapus Zakat
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Total di bawah header atau di tempat terpisah -->
             <div class="zakat-detail-total-wrapper">
-              <div class="zakat-detail-total" id="zakatDetailTotal">Rp 0</div>
+              <div class="zakat-detail-total">
+                <span class="zakat-detail-total-label"
+                  >Total Zakat Terkumpul</span
+                >
+                <span class="zakat-detail-total-value" id="zakatDetailTotal"
+                  >Rp 0</span
+                >
+              </div>
             </div>
 
             <!-- Tabs -->
@@ -1197,9 +1204,20 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 12px">%</span>
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalMustahikSheet"
+                      style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 80px;
+                      "
+                      >Rp 0</span
+                    >
                   </div>
                   <div class="field-group sub">
                     <label class="field-label" style="font-size: 11px"
@@ -1212,10 +1230,21 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 11px"
                       >% dari Mustahik</span
+                    >
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalMustahikKelompokSheet"
+                      style="
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 70px;
+                      "
+                      >Rp 0</span
                     >
                   </div>
                   <div class="field-group sub">
@@ -1229,10 +1258,21 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 11px"
                       >% dari Mustahik</span
+                    >
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalMustahikDaerahSheet"
+                      style="
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 70px;
+                      "
+                      >Rp 0</span
                     >
                   </div>
                 </div>
@@ -1263,9 +1303,20 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 12px">%</span>
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalSabilillahSheet"
+                      style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 80px;
+                      "
+                      >Rp 0</span
+                    >
                   </div>
                 </div>
               </div>
@@ -1295,9 +1346,20 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 12px">%</span>
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalAmilSheet"
+                      style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 80px;
+                      "
+                      >Rp 0</span
+                    >
                   </div>
                   <div class="field-group sub">
                     <label class="field-label" style="font-size: 11px"
@@ -1310,10 +1372,21 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 11px"
                       >% dari total</span
+                    >
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalAmilKelompokSheet"
+                      style="
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 70px;
+                      "
+                      >Rp 0</span
                     >
                   </div>
                   <div class="field-group sub">
@@ -1327,10 +1400,21 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 11px"
                       >% dari total</span
+                    >
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalAmilDesaSheet"
+                      style="
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 70px;
+                      "
+                      >Rp 0</span
                     >
                   </div>
                   <div class="field-group sub">
@@ -1344,10 +1428,21 @@
                       min="0"
                       max="100"
                       value="0"
-                      style="font-size: 14px; min-height: 38px"
+                      style="font-size: 14px; min-height: 38px; width: 70px"
                     />
                     <span class="field-suffix" style="font-size: 11px"
                       >% dari total</span
+                    >
+                    <span
+                      class="field-nominal"
+                      id="zakatNominalAmilDaerahSheet"
+                      style="
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--brand);
+                        min-width: 70px;
+                      "
+                      >Rp 0</span
                     >
                   </div>
                 </div>
@@ -1410,6 +1505,7 @@
           </div>
         </div>
       </div>
+      s
 
       <!-- ============================================================ -->
       <!-- ZAKAT - MUSTAHIK EDIT SHEET                                   -->

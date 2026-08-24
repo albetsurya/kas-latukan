@@ -1,45 +1,119 @@
-// ============================================================
-// ZAKAT - API CALLS (BACKEND INTEGRATION)
-// ============================================================
+function toSafeNumber(value, fallback) {
+  fallback = fallback || 0;
+
+  // Kosong / null / undefined
+  if (value === null || value === undefined || value === "") {
+    return fallback;
+  }
+
+  // Sudah number dan valid
+  if (typeof value === "number" && !isNaN(value) && isFinite(value)) {
+    // Guard tambahan: tolak angka absurd besar (kemungkinan hasil parsing tanggal)
+    if (Math.abs(value) > 1e12) {
+      console.warn(
+        "⚠️ toSafeNumber: nilai mencurigakan (kemungkinan timestamp):",
+        value,
+      );
+      return fallback;
+    }
+    return value;
+  }
+
+  // Jika berupa objek Date (misal hasil JSON.parse dari GAS)
+  if (value instanceof Date) {
+    console.warn("⚠️ toSafeNumber: menerima objek Date, bukan angka:", value);
+    return fallback;
+  }
+
+  // String yang menyerupai format tanggal (dd/mm/yyyy atau yyyy-mm-dd, dll)
+  if (typeof value === "string") {
+    var looksLikeDate =
+      /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value.trim()) ||
+      /^\d{4}-\d{2}-\d{2}/.test(value.trim());
+    if (looksLikeDate) {
+      console.warn(
+        "⚠️ toSafeNumber: string tanggal terdeteksi di field nominal:",
+        value,
+      );
+      return fallback;
+    }
+
+    var parsed = Number(value.replace(/[^0-9.-]/g, ""));
+    return isNaN(parsed) ? fallback : parsed;
+  }
+
+  return fallback;
+}
+
+// Sanitasi seluruh struktur rincian zakat sekaligus
+function sanitizeZakatRincian(rincian) {
+  if (!rincian || typeof rincian !== "object") return rincian;
+
+  var safeGroup = function (group) {
+    if (!group || typeof group !== "object") return group;
+    group.nominal = toSafeNumber(group.nominal);
+    group.persen = toSafeNumber(group.persen);
+    if (group.kelompok) {
+      group.kelompok.nominal = toSafeNumber(group.kelompok.nominal);
+      group.kelompok.persen = toSafeNumber(group.kelompok.persen);
+    }
+    if (group.daerah) {
+      group.daerah.nominal = toSafeNumber(group.daerah.nominal);
+      group.daerah.persen = toSafeNumber(group.daerah.persen);
+    }
+    if (group.desa) {
+      group.desa.nominal = toSafeNumber(group.desa.nominal);
+      group.desa.persen = toSafeNumber(group.desa.persen);
+    }
+    return group;
+  };
+
+  rincian.mustahik = safeGroup(rincian.mustahik);
+  rincian.sabilillah = safeGroup(rincian.sabilillah);
+  rincian.amil = safeGroup(rincian.amil);
+
+  return rincian;
+}
 
 async function apiGetZakatList() {
   try {
-    const url = `${CONFIG.WEB_APP_URL}?action=getZakatList`;
-    console.log("📡 Fetching zakat list from:", url);
-
-    const res = await fetch(url);
-    console.log("📡 Response status:", res.status);
-
+    var url = CONFIG.WEB_APP_URL + "?action=getZakatList";
+    var res = await fetch(url);
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      return { success: false, data: [], message: "HTTP " + res.status };
+    }
+    var data = await res.json();
+
+    var rawList = null;
+    if (Array.isArray(data)) {
+      rawList = data;
+    } else if (data && data.success === true) {
+      rawList = Array.isArray(data.data) ? data.data : [];
     }
 
-    const data = await res.json();
-    console.log("📡 Zakat list response:", data);
-
-    if (data && typeof data === "object") {
-      if (data.success === true) {
-        return {
-          success: true,
-          data: Array.isArray(data.data) ? data.data : [],
-          message: data.message || "",
-        };
-      }
+    if (rawList) {
+      // ✅ Sanitasi setiap item sebelum dipakai
+      var cleanList = rawList.map(function (zakat) {
+        if (zakat.rincian) {
+          zakat.rincian = sanitizeZakatRincian(zakat.rincian);
+        }
+        zakat.total = toSafeNumber(zakat.total);
+        return zakat;
+      });
 
       return {
-        success: false,
-        data: [],
-        message: data.message || "Gagal mengambil data",
+        success: true,
+        data: cleanList,
+        message: (data && data.message) || "",
       };
     }
 
     return {
       success: false,
       data: [],
-      message: "Response tidak valid",
+      message: (data && data.message) || "Gagal mengambil data",
     };
   } catch (e) {
-    console.error("❌ apiGetZakatList error:", e);
     return {
       success: false,
       data: [],
@@ -90,10 +164,6 @@ async function apiDeleteZakat(id) {
   return apiPost(payload);
 }
 
-// ============================================================
-// ZAKAT - API CALLS PARSIAL
-// ============================================================
-
 async function apiUpdateZakatHeader(data) {
   const session = getSession();
   const payload = {
@@ -134,12 +204,6 @@ async function apiUpdateZakatMustahik(data) {
   return apiPost(payload);
 }
 
-// ============================================================
-// ZAKAT - HELPERS
-// ============================================================
-
-const ZAKAT_STATE_KEY = "zakat_data";
-
 function generateZakatId() {
   return (
     "ZK" +
@@ -150,23 +214,52 @@ function generateZakatId() {
 
 function getZakatData() {
   try {
-    const raw = localStorage.getItem(ZAKAT_STATE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
+    var raw = localStorage.getItem(ZAKAT_STATE_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (e) {}
+  return [];
 }
 
+// ✅ HANYA SATU FUNGSI saveZakatData
 function saveZakatData(list) {
-  localStorage.setItem(ZAKAT_STATE_KEY, JSON.stringify(list));
-  if (state.zakat) {
-    state.zakat.list = list;
-  }
+  try {
+    if (!Array.isArray(list)) {
+      return;
+    }
+    var cleanList = list.map(function (zakat) {
+      if (zakat.muzaki) {
+        zakat.muzaki = zakat.muzaki.filter(function (m) {
+          return m._deleted !== true;
+        });
+      }
+      if (zakat.mustahik) {
+        zakat.mustahik = zakat.mustahik.filter(function (m) {
+          return m._deleted !== true;
+        });
+      }
+      return zakat;
+    });
+    localStorage.setItem(ZAKAT_STATE_KEY, JSON.stringify(cleanList));
+    if (state.zakat) {
+      state.zakat.list = cleanList;
+    }
+  } catch (e) {}
 }
 
 function getZakatById(id) {
+  ensureZakatState();
   if (!state.zakat || !state.zakat.list) return null;
-  return state.zakat.list.find((z) => z.id === id) || null;
+  for (var i = 0; i < state.zakat.list.length; i++) {
+    if (state.zakat.list[i].id === id) {
+      return state.zakat.list[i];
+    }
+  }
+  return null;
 }
 
 function createZakatItem(data) {
@@ -202,21 +295,8 @@ function getUniqueNames(list) {
   return result;
 }
 
-// ============================================================
-// ZAKAT - GET NAMES (DARI SUGGESTIONS + EXISTING DATA)
-// ============================================================
-
 function getAllMuzakiNames() {
   const names = new Set();
-
-  // Tambahkan dari suggestions
-  if (typeof ZAKAT_SUGGESTIONS !== "undefined" && ZAKAT_SUGGESTIONS.muzaki) {
-    ZAKAT_SUGGESTIONS.muzaki.forEach(function (n) {
-      names.add(n.trim());
-    });
-  }
-
-  // Tambahkan dari data yang sudah ada
   if (state.zakat && state.zakat.list) {
     state.zakat.list.forEach(function (z) {
       if (z.muzaki && Array.isArray(z.muzaki)) {
@@ -228,21 +308,11 @@ function getAllMuzakiNames() {
       }
     });
   }
-
   return Array.from(names).sort();
 }
 
 function getAllMustahikNames() {
   const names = new Set();
-
-  // Tambahkan dari suggestions
-  if (typeof ZAKAT_SUGGESTIONS !== "undefined" && ZAKAT_SUGGESTIONS.mustahik) {
-    ZAKAT_SUGGESTIONS.mustahik.forEach(function (n) {
-      names.add(n.trim());
-    });
-  }
-
-  // Tambahkan dari data yang sudah ada
   if (state.zakat && state.zakat.list) {
     state.zakat.list.forEach(function (z) {
       if (z.mustahik && Array.isArray(z.mustahik)) {
@@ -254,17 +324,11 @@ function getAllMustahikNames() {
       }
     });
   }
-
   return Array.from(names).sort();
 }
 
-// ============================================================
-// ZAKAT - GET EXISTING NAMES (HANYA DARI DATA)
-// ============================================================
-
 function getExistingMuzakiNames() {
   const names = new Set();
-
   if (state.zakat && state.zakat.list) {
     state.zakat.list.forEach(function (z) {
       if (z.muzaki && Array.isArray(z.muzaki)) {
@@ -276,13 +340,11 @@ function getExistingMuzakiNames() {
       }
     });
   }
-
   return Array.from(names).sort();
 }
 
 function getExistingMustahikNames() {
   const names = new Set();
-
   if (state.zakat && state.zakat.list) {
     state.zakat.list.forEach(function (z) {
       if (z.mustahik && Array.isArray(z.mustahik)) {
@@ -294,7 +356,6 @@ function getExistingMustahikNames() {
       }
     });
   }
-
   return Array.from(names).sort();
 }
 
@@ -302,7 +363,6 @@ function getZakatStatusBadge(status) {
   var statusKey = status || "ACTIVE";
   var label = ZAKAT_STATUS_LABELS[statusKey] || statusKey;
   var className = ZAKAT_STATUS_CLASSES[statusKey] || "active";
-
   return {
     label: label,
     className: className,
@@ -312,6 +372,7 @@ function getZakatStatusBadge(status) {
 }
 
 function isZakatCompleted(zakat) {
+  if (!zakat) return false;
   var status = zakat.status || "ACTIVE";
   return status === "COMPLETED" || status === "SELESAI";
 }
@@ -320,6 +381,14 @@ function isZakatActive(zakat) {
   var status = zakat.status || "ACTIVE";
   return status === "ACTIVE";
 }
+
+function escapeHtml(text) {
+  if (!text) return "";
+  var div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 async function apiCompleteZakat(data) {
   try {
     const session = getSession();
@@ -328,10 +397,8 @@ async function apiCompleteZakat(data) {
       token: session?.token || "",
       id: data.id,
     };
-    console.log("📡 apiCompleteZakat payload:", payload);
     return await apiPost(payload);
   } catch (err) {
-    console.error("❌ apiCompleteZakat error:", err);
     return { success: false, message: err.message };
   }
 }
@@ -344,10 +411,257 @@ async function apiCancelCompleteZakat(data) {
       token: session?.token || "",
       id: data.id,
     };
-    console.log("📡 apiCancelCompleteZakat payload:", payload);
     return await apiPost(payload);
   } catch (err) {
-    console.error("❌ apiCancelCompleteZakat error:", err);
     return { success: false, message: err.message };
   }
+}
+
+async function apiDeleteZakatMuzaki(data) {
+  try {
+    const session = getSession();
+    const payload = {
+      action: "deleteZakatMuzaki",
+      token: session?.token || "",
+      zakatId: data.zakatId,
+      muzakiId: data.muzakiId,
+    };
+    return await apiPost(payload);
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+}
+
+async function apiDeleteZakatMustahik(data) {
+  try {
+    const session = getSession();
+    const payload = {
+      action: "deleteZakatMustahik",
+      token: session?.token || "",
+      zakatId: data.zakatId,
+      mustahikId: data.mustahikId,
+    };
+    return await apiPost(payload);
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+}
+
+async function apiGetMasters() {
+  try {
+    const url = CONFIG.WEB_APP_URL + "?action=getMasters";
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+
+    // Jika backend mengembalikan langsung { muzaki, mustahik } tanpa wrapper
+    if (data && data.success === undefined && (data.muzaki || data.mustahik)) {
+      return {
+        success: true,
+        data: {
+          muzaki: data.muzaki || [],
+          mustahik: data.mustahik || [],
+        },
+      };
+    }
+
+    // Format wrapper standar { success, data, message }
+    return data;
+  } catch (e) {
+    return { success: false, message: e.message };
+  }
+}
+
+async function apiAddMasterMuzaki(nama) {
+  const session = getSession();
+  const payload = {
+    action: "addMasterMuzaki",
+    token: session?.token || "",
+    nama: nama,
+  };
+  return apiPost(payload);
+}
+
+async function apiAddMasterMustahik(nama) {
+  const session = getSession();
+  const payload = {
+    action: "addMasterMustahik",
+    token: session?.token || "",
+    nama: nama,
+  };
+  return apiPost(payload);
+}
+
+async function apiDeleteMasterMuzaki(id) {
+  const session = getSession();
+  const payload = {
+    action: "deleteMasterMuzaki",
+    token: session?.token || "",
+    id: id,
+  };
+  return apiPost(payload);
+}
+
+async function apiDeleteMasterMustahik(id) {
+  const session = getSession();
+  const payload = {
+    action: "deleteMasterMustahik",
+    token: session?.token || "",
+    id: id,
+  };
+  return apiPost(payload);
+}
+
+var masterMuzakiCache = {};
+var masterMustahikCache = {};
+
+function getMasterMuzakiList() {
+  if (state && state.masterMuzaki) {
+    return state.masterMuzaki || [];
+  }
+  try {
+    const stored = localStorage.getItem("master_muzaki");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      state.masterMuzaki = parsed;
+      return parsed;
+    }
+  } catch (e) {}
+  return [];
+}
+
+function getMasterMustahikList() {
+  if (state && state.masterMustahik) {
+    return state.masterMustahik || [];
+  }
+  try {
+    const stored = localStorage.getItem("master_mustahik");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      state.masterMustahik = parsed;
+      return parsed;
+    }
+  } catch (e) {}
+  return [];
+}
+
+function getMasterMuzakiById(id) {
+  if (masterMuzakiCache[id]) return masterMuzakiCache[id];
+  var list = getMasterMuzakiList();
+  var found = null;
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].id === id) {
+      found = list[i];
+      break;
+    }
+  }
+  masterMuzakiCache[id] = found;
+  return found;
+}
+
+function getMasterMuzakiByName(name) {
+  if (!name) return null;
+  var list = getMasterMuzakiList();
+  var searchName = name.toLowerCase().trim();
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    if (item.nama && item.nama.toLowerCase().trim() === searchName) {
+      return item;
+    }
+  }
+  return null;
+}
+
+function getMasterMustahikById(id) {
+  if (masterMustahikCache[id]) return masterMustahikCache[id];
+  var list = getMasterMustahikList();
+  var found = null;
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].id === id) {
+      found = list[i];
+      break;
+    }
+  }
+  masterMustahikCache[id] = found;
+  return found;
+}
+
+function getMasterMustahikByName(name) {
+  if (!name) return null;
+  var list = getMasterMustahikList();
+  var searchName = name.toLowerCase().trim();
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    if (item.nama && item.nama.toLowerCase().trim() === searchName) {
+      return item;
+    }
+  }
+  return null;
+}
+
+function loadMuzakiSuggestions() {
+  var masters = getMasterMuzakiList();
+  var names = [];
+  for (var i = 0; i < masters.length; i++) {
+    var n = masters[i].nama || "";
+    if (n.trim() !== "") {
+      names.push(n);
+    }
+  }
+  return names.sort();
+}
+
+function loadMustahikSuggestions() {
+  var masters = getMasterMustahikList();
+  var names = [];
+  for (var i = 0; i < masters.length; i++) {
+    var n = masters[i].nama || "";
+    if (n.trim() !== "") {
+      names.push(n);
+    }
+  }
+  return names.sort();
+}
+
+// ✅ TAMBAHKAN FUNGSI INI
+function ensureZakatState() {
+  if (!state.zakat) {
+    state.zakat = {
+      list: [],
+      currentId: null,
+      isViewOpen: false,
+      _loaded: false,
+      _loading: false,
+    };
+  }
+  return state.zakat;
+}
+
+async function loadMastersData() {
+  try {
+    var result = await apiGetMasters();
+    if (result && result.success) {
+      var data = result.data || {};
+      state.masterMuzaki = data.muzaki || [];
+      state.masterMustahik = data.mustahik || [];
+      localStorage.setItem("master_muzaki", JSON.stringify(state.masterMuzaki));
+      localStorage.setItem(
+        "master_mustahik",
+        JSON.stringify(state.masterMustahik),
+      );
+      masterMuzakiCache = {};
+      masterMustahikCache = {};
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+ensureZakatState();
+
+var cachedZakat = getZakatData();
+if (cachedZakat && cachedZakat.length > 0) {
+  state.zakat.list = cachedZakat;
 }
