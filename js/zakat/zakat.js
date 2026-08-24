@@ -516,38 +516,6 @@ document.getElementById("fabZakat").addEventListener("click", function () {
   openZakatForm(null);
 });
 
-function closeZakatDetail() {
-  state.zakat.currentId = null;
-  state.zakat.isViewOpen = false;
-
-  updateZakatFilterVisibility();
-
-  closeZakatFilterSheet();
-
-  var listContainer = document.getElementById("zakatListContainer");
-  var detailContainer = document.getElementById("zakatDetailContainer");
-  var fabZakat = document.getElementById("fabZakat");
-  var screenTitle = document.getElementById("zakatScreenTitle");
-
-  if (listContainer) {
-    listContainer.style.display = "block";
-  }
-
-  if (detailContainer) {
-    detailContainer.classList.add("hidden");
-  }
-
-  if (fabZakat) {
-    fabZakat.classList.remove("hidden");
-  }
-
-  if (screenTitle) {
-    screenTitle.textContent = "Manajemen Zakat";
-  }
-
-  renderZakatList();
-}
-
 function openEditZakatHeader() {
   var zakat = getZakatById(state.zakat.currentId);
   if (!zakat) {
@@ -1236,6 +1204,15 @@ function updateZakatDetailStatus(zakat) {
 }
 
 function openZakatDetail(id) {
+  if (typeof router !== "undefined" && router) {
+    router.navigateTo("zakat-detail", true, { id: id });
+    return;
+  }
+
+  renderZakatDetailDirect(id);
+}
+
+function renderZakatDetailDirect(id) {
   var zakat = getZakatById(id);
   if (!zakat) {
     showToast("Zakat tidak ditemukan.", "error");
@@ -1246,7 +1223,6 @@ function openZakatDetail(id) {
   state.zakat.isViewOpen = true;
 
   closeZakatFilterSheet();
-
   updateZakatFilterVisibility();
 
   var listContainer = document.getElementById("zakatListContainer");
@@ -1301,6 +1277,86 @@ function openZakatDetail(id) {
   renderZakatMuzakiView(zakat);
   renderZakatRincianView(zakat);
   renderZakatMustahikView(zakat);
+}
+
+function closeZakatDetail() {
+  if (typeof router !== "undefined" && router) {
+    router.navigateTo("zakat", true);
+    return;
+  }
+
+  closeZakatDetailDirect();
+}
+
+function closeZakatDetailDirect() {
+  var listContainer = document.getElementById("zakatListContainer");
+  var detailContainer = document.getElementById("zakatDetailContainer");
+  var fabZakat = document.getElementById("fabZakat");
+  var screenTitle = document.getElementById("zakatScreenTitle");
+
+  // Pastikan list muncul
+  if (listContainer) {
+    listContainer.style.display = "block";
+  }
+
+  // Pastikan detail disembunyikan
+  if (detailContainer) {
+    detailContainer.classList.add("hidden");
+  }
+
+  // Tampilkan FAB
+  if (fabZakat) {
+    fabZakat.classList.remove("hidden");
+  }
+
+  // Update judul
+  if (screenTitle) {
+    screenTitle.textContent = "Manajemen Zakat";
+  }
+
+  // Reset state
+  state.zakat.isViewOpen = false;
+  state.zakat.currentId = null;
+
+  // Update filter visibility
+  updateZakatFilterVisibility();
+  closeZakatFilterSheet();
+
+  // Render ulang list
+  renderZakatList(state.zakat.list);
+
+  // Pastikan tabs direset
+  var tabs = document.querySelectorAll(".zakat-tab");
+  tabs.forEach(function (tab) {
+    tab.classList.remove("active");
+    tab.style.background = "var(--surface)";
+    tab.style.color = "var(--ink-soft)";
+  });
+
+  // Aktifkan tab pertama
+  var firstTab = document.querySelector('.zakat-tab[data-zakat-tab="muzaki"]');
+  if (firstTab) {
+    firstTab.classList.add("active");
+    firstTab.style.background = "var(--brand)";
+    firstTab.style.color = "#fff";
+  }
+
+  // Sembunyikan semua panel
+  var panels = ["zakatTabMuzaki", "zakatTabRincian", "zakatTabMustahik"];
+  panels.forEach(function (id) {
+    var panel = document.getElementById(id);
+    if (panel) {
+      panel.classList.remove("active");
+      panel.style.display = "none";
+    }
+  });
+
+  // Tampilkan panel muzaki
+  var muzakiPanel = document.getElementById("zakatTabMuzaki");
+  if (muzakiPanel) {
+    muzakiPanel.classList.add("active");
+    muzakiPanel.style.display = "block";
+  }
 }
 
 function updateZakatDetailHeader(zakat) {
@@ -2619,11 +2675,7 @@ function updateZakatFilterVisibility() {
 }
 
 window.openZakatScreen = function () {
-  if (
-    typeof router !== "undefined" &&
-    router &&
-    typeof router.navigateTo === "function"
-  ) {
+  if (typeof router !== "undefined" && router) {
     router.navigateTo("zakat");
     setTimeout(function () {
       initZakatFilters();
@@ -2649,11 +2701,12 @@ window.openZakatScreen = function () {
 };
 
 window.closeZakatScreen = function () {
-  if (
-    typeof router !== "undefined" &&
-    router &&
-    typeof router.navigateTo === "function"
-  ) {
+  if (state.zakat && state.zakat.isViewOpen) {
+    closeZakatDetail();
+    return;
+  }
+
+  if (typeof router !== "undefined" && router) {
     router.navigateTo("profile");
   } else {
     var screen = document.getElementById("screen-zakat");
@@ -2787,6 +2840,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (typeof getZakatData === "function") {
     state.zakat.list = getZakatData() || [];
+  }
+
+  if (typeof router !== "undefined" && router) {
+    router.on("routeChange", function (data) {
+      if (data.route === "zakat") {
+        // Reset state sebelum apapun
+        state.zakat.isViewOpen = false;
+        state.zakat.currentId = null;
+
+        // Tutup detail
+        closeZakatDetailDirect();
+
+        // Render list
+        renderZakatList(state.zakat.list);
+
+        setTimeout(function () {
+          initZakatFilters();
+          applyZakatFilters();
+        }, 100);
+      }
+
+      if (data.route === "zakat-detail" && data.params && data.params.id) {
+        renderZakatList(state.zakat.list);
+        setTimeout(function () {
+          renderZakatDetailDirect(data.params.id);
+        }, 100);
+      }
+    });
+
+    if (router.isZakatDetailRoute()) {
+      var id = router.getZakatIdFromRoute();
+      if (id) {
+        setTimeout(function () {
+          renderZakatDetailDirect(id);
+        }, 200);
+      }
+    }
   }
 
   renderZakatList(state.zakat.list);
@@ -3013,23 +3103,40 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.addEventListener("click", function (e) {
-    var target = e.target.closest("#btnCancelCompleteZakatConfirm");
+    var target = e.target.closest("#btnCancelCompleteZakat");
     if (!target) return;
 
     var zakatId = state.zakat.currentId;
     if (!zakatId) {
       showToast("Zakat tidak ditemukan", "error");
-      var overlay = document.getElementById(
-        "cancelCompleteZakatConfirmOverlay",
-      );
-      if (overlay) overlay.classList.add("hidden");
       return;
     }
 
-    cancelCompleteZakat(zakatId);
+    var zakat = state.zakat.list.find(function (z) {
+      return z.id === zakatId;
+    });
 
+    if (!zakat) {
+      showToast("Zakat tidak ditemukan", "error");
+      return;
+    }
+
+    if (!isZakatCompleted(zakat)) {
+      showToast("Zakat tidak dalam status selesai", "warning");
+      return;
+    }
+
+    var desc = document.getElementById("cancelCompleteZakatConfirmDesc");
+    if (desc) {
+      desc.textContent =
+        'Zakat "' +
+        zakat.title +
+        '" akan dikembalikan ke status Aktif dan dapat diedit kembali.';
+    }
     var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
-    if (overlay) overlay.classList.add("hidden");
+    if (overlay) {
+      overlay.classList.remove("hidden");
+    }
   });
 
   document.addEventListener("click", function (e) {
@@ -3050,6 +3157,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("click", function (e) {
     var target = e.target.closest("#btnCancelCompleteZakatConfirm");
     if (!target) return;
+
     var zakatId = state.zakat.currentId;
     if (!zakatId) {
       showToast("Zakat tidak ditemukan", "error");
@@ -3059,7 +3167,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (overlay) overlay.classList.add("hidden");
       return;
     }
+
     cancelCompleteZakat(zakatId);
+
     var overlay = document.getElementById("cancelCompleteZakatConfirmOverlay");
     if (overlay) overlay.classList.add("hidden");
   });

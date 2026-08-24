@@ -36,15 +36,20 @@ class Router {
         tab: "profile",
         showInNav: true,
       },
-      // ============================================================
-      // ZAKAT ROUTE - TIDAK MUNCUL DI BOTTOM NAV
-      // ============================================================
       zakat: {
         path: "/zakat",
         title: "Manajemen Zakat",
         screen: "screen-zakat",
         tab: "zakat",
-        showInNav: false, // 👈 Tidak muncul di bottom navigation
+        showInNav: false,
+      },
+      "zakat-detail": {
+        path: "/zakat/:id",
+        title: "Detail Zakat",
+        screen: "screen-zakat",
+        tab: "zakat",
+        showInNav: false,
+        isDetail: true,
       },
     };
 
@@ -52,6 +57,7 @@ class Router {
     this.listeners = {};
     this.initialized = false;
     this._isNavigating = false;
+    this.currentParams = {};
   }
 
   init() {
@@ -62,87 +68,104 @@ class Router {
     });
 
     this.initialized = true;
-
     this.handleRouteChange();
   }
 
   normalizePath(path) {
     if (!path) return "/";
-
     path = path.split("?")[0];
-
     if (path.length > 1 && path.endsWith("/")) {
       path = path.slice(0, -1);
     }
-
     return path || "/";
   }
 
-  getRouteFromPath(path) {
+  matchRoute(path) {
     path = this.normalizePath(path);
 
-    const routeKey = Object.keys(this.routes).find(
-      (key) => this.routes[key].path === path,
-    );
+    for (const [key, route] of Object.entries(this.routes)) {
+      const pattern = route.path;
+      if (pattern.includes(":id")) {
+        const basePath = pattern.split("/:id")[0];
+        if (path === basePath) {
+          return { routeKey: key, params: null };
+        }
+        if (path.startsWith(basePath + "/")) {
+          const id = path.substring(basePath.length + 1);
+          return { routeKey: key, params: { id } };
+        }
+      } else if (pattern === path) {
+        return { routeKey: key, params: null };
+      }
+    }
 
-    return routeKey || null;
+    return null;
+  }
+
+  getRouteFromPath(path) {
+    const match = this.matchRoute(path);
+    return match ? match.routeKey : null;
+  }
+
+  getRouteParams(path) {
+    const match = this.matchRoute(path);
+    return match ? match.params : null;
   }
 
   handleRouteChange() {
     let path = this.normalizePath(window.location.pathname);
 
-    // Migrasi URL lama #/profile → /profile
     if (window.location.hash) {
       const hashPath = window.location.hash.replace(/^#/, "").trim();
-
       if (hashPath) {
         const normalizedHash = this.normalizePath(hashPath);
-
         const hashRoute = this.getRouteFromPath(normalizedHash);
-
         if (hashRoute) {
           window.history.replaceState({ route: hashRoute }, "", normalizedHash);
-
           path = normalizedHash;
         }
       }
     }
 
     const routeKey = this.getRouteFromPath(path);
+    const params = this.getRouteParams(path);
 
     if (!routeKey) {
       window.history.replaceState({ route: "home" }, "", "/");
-
       this.navigateTo("home", false);
       return;
     }
 
+    this.currentParams = params || {};
     this.navigateTo(routeKey, false);
   }
 
-  navigateTo(routeKey, updateHistory = true) {
+  navigateTo(routeKey, updateHistory = true, params = null) {
     const route = this.routes[routeKey];
-
     if (!route) {
       console.warn(`[Router] Route tidak ditemukan: ${routeKey}`);
       return;
     }
 
+    let path = route.path;
+    if (params && params.id) {
+      path = route.path.replace(":id", params.id);
+    }
+
     const currentPath = this.normalizePath(window.location.pathname);
 
-    if (updateHistory && currentPath !== route.path) {
-      window.history.pushState({ route: routeKey }, "", route.path);
+    if (updateHistory && currentPath !== path) {
+      window.history.pushState({ route: routeKey, params }, "", path);
     }
 
     this.currentRoute = routeKey;
+    this.currentParams = params || {};
 
-    // Router → UI
     switchTab(route.tab);
 
     document.title = `Kas · ${route.title}`;
 
     const screenTitle = document.getElementById("screenTitle");
-
     if (screenTitle) {
       screenTitle.textContent = route.title;
     }
@@ -153,19 +176,17 @@ class Router {
       route: routeKey,
       screen: route.screen,
       tab: route.tab,
-      path: route.path,
+      path: path,
+      params: this.currentParams,
+      isDetail: route.isDetail || false,
     });
   }
 
   updateNavButtons(routeKey) {
-    // Hanya update tombol nav yang ada di bottom nav
-    // dan hanya untuk route yang showInNav = true
     document.querySelectorAll(".nav-btn").forEach((btn) => {
       const tab = btn.dataset.tab;
-      // Cek apakah route ini ada dan showInNav = true
       const route = this.routes[tab];
       if (route && route.showInNav === false) {
-        // Jika route tidak muncul di nav, jangan toggle
         return;
       }
       btn.classList.toggle("active", tab === routeKey);
@@ -176,13 +197,11 @@ class Router {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
-
     this.listeners[event].push(callback);
   }
 
   trigger(event, data) {
     if (!this.listeners[event]) return;
-
     this.listeners[event].forEach((callback) => {
       try {
         callback(data);
@@ -200,13 +219,16 @@ class Router {
     return this.routes[routeKey] || null;
   }
 
+  getCurrentParams() {
+    return this.currentParams;
+  }
+
   goBack() {
     window.history.back();
   }
 
   setPathWithoutNavigation(path) {
     const normalizedPath = this.normalizePath(path);
-
     if (this.normalizePath(window.location.pathname) !== normalizedPath) {
       window.history.pushState(null, "", normalizedPath);
     }
@@ -215,12 +237,21 @@ class Router {
   getQueryParams() {
     const params = new URLSearchParams(window.location.search);
     const result = {};
-
     for (const [key, value] of params) {
       result[key] = value;
     }
-
     return result;
+  }
+
+  getZakatIdFromRoute() {
+    if (this.currentRoute === "zakat-detail") {
+      return this.currentParams.id || null;
+    }
+    return null;
+  }
+
+  isZakatDetailRoute() {
+    return this.currentRoute === "zakat-detail";
   }
 }
 
