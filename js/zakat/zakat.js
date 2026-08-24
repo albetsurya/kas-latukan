@@ -2799,9 +2799,9 @@ function renderZakatList(data) {
       '">' +
       statusBadgeIcon +
       statusBadgeText +
-      '</span></div><div class="zakat-item-header"><div class="zakat-item-title">' +
+      '</span></div><div class="zakat-item-header"><div class="zakat-item-title" style="font-size:17px;font-weight:700;">' +
       escapeHtml(z.title) +
-      '</div><div class="zakat-item-total">' +
+      '</div><div class="zakat-item-total" style="font-size:18px;font-weight:800;">' +
       fmtRp(z.total || 0) +
       '</div></div><div class="zakat-item-meta"><span>' +
       (z.tanggal ? fmtDateShort(z.tanggal) : "-") +
