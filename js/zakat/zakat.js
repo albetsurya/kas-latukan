@@ -2767,18 +2767,25 @@ function renderZakatList(data) {
 
     var totalMustahikTerisi = 0;
     var danaMustahik = 0;
+
     if (hasMustahik) {
       for (var j = 0; j < z.mustahik.length; j++) {
         totalMustahikTerisi += parseInt(z.mustahik[j].nominal) || 0;
       }
     }
-    if (z.rincian && z.rincian.mustahik && z.rincian.mustahik.nominal) {
+
+    // Ambil dana mustahik dari kelompok.nominal
+    if (z.rincian && z.rincian.mustahik && z.rincian.mustahik.kelompok) {
+      danaMustahik = parseInt(z.rincian.mustahik.kelompok.nominal) || 0;
+    }
+
+    // Fallback ke mustahik.nominal jika kelompok tidak ada
+    if (danaMustahik === 0 && z.rincian && z.rincian.mustahik) {
       danaMustahik = parseInt(z.rincian.mustahik.nominal) || 0;
     }
+
     var isMustahikAllocated =
-      hasMustahik &&
-      danaMustahik > 0 &&
-      totalMustahikTerisi >= danaMustahik * 0.9;
+      hasMustahik && danaMustahik > 0 && totalMustahikTerisi >= danaMustahik;
 
     badges.push(
       hasMustahik
