@@ -146,10 +146,12 @@ function closeZakatMuzakiSheet() {
   isSubmittingMuzaki = false;
 }
 
-function renderMuzakiSheetRows(zakat) {
+async function renderMuzakiSheetRows(zakat) {
   var container = document.getElementById("zakatMuzakiSheetList");
   var countInput = document.getElementById("zakatMuzakiSheetCount");
   if (!container || !countInput) return;
+
+  await loadMastersData();
 
   var muzakiList = zakat.muzaki || [];
   var activeMuzaki = muzakiList.filter(function (m) {
@@ -770,8 +772,19 @@ function openZakatMustahikSheet() {
   var overlay = document.getElementById("zakatMustahikSheet");
   if (!overlay) return;
 
-  // Panggil render view untuk tab Mustahik
-  renderZakatMustahikView(zakat);
+  // REFRESH DATA MASTER TERBARU
+  loadMastersData()
+    .then(function () {
+      renderZakatMustahikView(zakat);
+      renderMustahikSheetRows(zakat);
+      updateMustahikSheetTotal(zakat);
+    })
+    .catch(function () {
+      // Jika gagal load, tetap render dengan data yang ada
+      renderZakatMustahikView(zakat);
+      renderMustahikSheetRows(zakat);
+      updateMustahikSheetTotal(zakat);
+    });
 
   var mustahikList = zakat.mustahik || [];
   var activeMustahik = mustahikList.filter(function (m) {
@@ -790,9 +803,6 @@ function openZakatMustahikSheet() {
   var countInput = document.getElementById("zakatMustahikSheetCount");
   if (countInput) countInput.value = count;
 
-  renderMustahikSheetRows(zakat);
-  updateMustahikSheetTotal(zakat);
-
   overlay.classList.remove("hidden");
 }
 
@@ -801,11 +811,13 @@ function closeZakatMustahikSheet() {
   if (overlay) overlay.classList.add("hidden");
 }
 
-function renderMustahikSheetRows(zakat) {
+async function renderMustahikSheetRows(zakat) {
   var container = document.getElementById("zakatMustahikSheetList");
   var countInput = document.getElementById("zakatMustahikSheetCount");
 
   if (!container || !countInput) return;
+
+  await loadMastersData();
 
   var mustahikList = zakat.mustahik || [];
   var activeMustahik = mustahikList.filter(function (m) {
@@ -1398,8 +1410,10 @@ async function submitZakatMustahikSheet() {
       showToast("Mustahik disimpan (offline mode)", "warning");
     }
 
+    // REFRESH DATA MASTER SETELAH SUBMIT
+    await forceReloadMasters();
+
     // Refresh view setelah submit
-    renderZakatMustahikView(zakat);
     renderZakatMustahikView(zakat);
     closeZakatMustahikSheet();
     renderZakatList();

@@ -9,29 +9,18 @@ window.navigateTo = function (route) {
   }
 };
 
-// ============================================================
-// UPDATE switchTab - Gunakan Router jika tersedia
-// ============================================================
-
 function setupEventListeners() {
-  console.log("🔄 Setting up event listeners...");
-
-  // Inisialisasi router
   if (typeof initRouter === "function") {
     initRouter();
   }
 
-  // Load data
   if (typeof loadData === "function") {
     loadData();
   }
 
-  // Init zakat module
   if (typeof initZakatModule === "function") {
     initZakatModule();
   }
-
-  console.log("✅ Event listeners setup complete");
 }
 
 // Buat global
@@ -1840,11 +1829,7 @@ async function extractDataFromImage() {
       throw new Error("Data foto tidak valid.");
     }
 
-    console.log("MENGIRIM FOTO KE GEMINI...");
-
     const aiResult = await callShodaqohAI(dataUrl);
-
-    console.log("RESPONSE AI SHODAQOH:", aiResult);
 
     if (!aiResult || aiResult.success !== true) {
       throw new Error(aiResult?.message || "AI gagal membaca foto.");
@@ -1853,39 +1838,25 @@ async function extractDataFromImage() {
     const parsed =
       aiResult.data && typeof aiResult.data === "object" ? aiResult.data : {};
 
-    console.log("DATA SHODAQOH AI:", parsed);
-
     const aiData = {
       total: Number(parsed.total) || 0,
-
       susulan_ir: Number(parsed.susulan_ir) || 0,
-
       susulan_bulan: Array.isArray(parsed.susulan_bulan)
         ? parsed.susulan_bulan
         : [],
-
       uang_sambung: Number(parsed.uang_sambung) || 0,
-
       jimpitan: Number(parsed.jimpitan) || 0,
-
       siar_siar: Number(parsed.siar_siar) || 0,
-
       seribuan: Number(parsed.seribuan) || 0,
-
       kafan: Number(parsed.kafan) || 0,
-
       ukhro_mt: Number(parsed.ukhro_mt) || 0,
-
       keterangan: parsed.keterangan || "",
-
       rawText: parsed.rawText || aiResult.rawText || "",
     };
 
     window.shodAiExtractedData = aiData;
 
     renderShodaqohAiSusulanBulan(aiData.susulan_bulan);
-
-    console.log("DATA AI DISIMPAN:", window.shodAiExtractedData);
 
     const total = aiData.total;
     const susulanIr = aiData.susulan_ir;
@@ -1904,316 +1875,316 @@ async function extractDataFromImage() {
 
     if (ocrData) {
       ocrData.innerHTML = `
-    <div
-      style="
-        display:flex;
-        flex-direction:column;
-        gap:0;
-      "
-    >
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:10px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span
+        <div
           style="
-            font-size:12px;
-            font-weight:600;
+            display:flex;
+            flex-direction:column;
+            gap:0;
           "
         >
-          Total
-        </span>
 
-        <b
-          class="mono"
-          style="font-size:13px;"
-        >
-          ${fmtRp(total)}
-        </b>
-      </div>
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span class="text-xs">
-          Infak IR / Persenan
-        </span>
-
-        <span class="mono">
-          ${fmtRp(susulanIr)}
-        </span>
-      </div>
-
-      ${
-        susulanIr > 0
-          ? `
-            <div
-              style="
-                margin:10px 0 4px;
-                padding:11px;
-                border:1px solid var(--border);
-                border-radius:9px;
-                background:var(--surface-2);
-              "
-            >
-              <div
-                style="
-                  display:flex;
-                  align-items:center;
-                  justify-content:space-between;
-                  gap:8px;
-                  margin-bottom:9px;
-                "
-              >
-                <span
-                  style="
-                    font-size:11px;
-                    font-weight:700;
-                    color:var(--ink);
-                  "
-                >
-                  Bulan Susulan IR
-                </span>
-
-                <span
-                  style="
-                    font-size:9px;
-                    color:var(--muted);
-                  "
-                >
-                  Pilih bulan
-                </span>
-              </div>
-
-              <div
-                id="shodAiSusulanBulan"
-                style="
-                  display:grid;
-                  grid-template-columns:repeat(3,minmax(0,1fr));
-                  gap:6px;
-                "
-              ></div>
-
-              <div
-                style="
-                  margin-top:7px;
-                  font-size:9px;
-                  line-height:1.4;
-                  color:var(--muted);
-                "
-              >
-                Pilih minimal satu bulan jika terdapat Infak IR / Persenan.
-              </div>
-            </div>
-          `
-          : ""
-      }
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span class="text-xs">
-          Uang Sambung
-        </span>
-
-        <span class="mono">
-          ${fmtRp(uangSambung)}
-        </span>
-      </div>
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span class="text-xs">
-          Jimpitan
-        </span>
-
-        <span class="mono">
-          ${fmtRp(jimpitan)}
-        </span>
-      </div>
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span class="text-xs">
-          Siar-Siar
-        </span>
-
-        <span class="mono">
-          ${fmtRp(siarSiar)}
-        </span>
-      </div>
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span class="text-xs">
-          Seribuan
-        </span>
-
-        <span class="mono">
-          ${fmtRp(seribuan)}
-        </span>
-      </div>
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-          border-bottom:1px solid var(--border);
-        "
-      >
-        <span class="text-xs">
-          Kafan
-        </span>
-
-        <span class="mono">
-          ${fmtRp(kafan)}
-        </span>
-      </div>
-
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          padding:9px 0;
-        "
-      >
-        <span class="text-xs">
-          Ukhro MT
-        </span>
-
-        <span class="mono">
-          ${fmtRp(ukhroMt)}
-        </span>
-      </div>
-
-    </div>
-
-    ${
-      text
-        ? `
-          <details
+          <div
             style="
-              margin-top:14px;
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:10px 0;
+              border-bottom:1px solid var(--border);
             "
           >
-            <summary
+            <span
               style="
-                font-size:11px;
-                cursor:pointer;
-                user-select:none;
+                font-size:12px;
+                font-weight:600;
               "
             >
-              Lihat hasil pembacaan AI
-            </summary>
+              Total
+            </span>
 
-            <pre
-              style="
-                font-size:10px;
-                line-height:1.5;
-                white-space:pre-wrap;
-                word-break:break-word;
-                margin-top:8px;
-                padding:8px;
-                border-radius:8px;
-                background:var(--surface-2);
-                overflow:auto;
-                max-height:240px;
-              "
-            >${escapeHtml(text)}</pre>
-          </details>
-        `
-        : ""
-    }
+            <b
+              class="mono"
+              style="font-size:13px;"
+            >
+              ${fmtRp(total)}
+            </b>
+          </div>
 
-    <div
-      style="
-        margin-top:16px;
-        padding-top:12px;
-        border-top:1px solid var(--border);
-      "
-    >
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+              border-bottom:1px solid var(--border);
+            "
+          >
+            <span class="text-xs">
+              Infak IR / Persenan
+            </span>
 
-      <button
-        type="button"
-        id="btnSubmitShodaqohAI"
-        class="btn btn-primary w-full"
-        style="
-          min-height:40px;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          gap:8px;
-          font-size:12px;
-          font-weight:600;
-        "
-      >
-        Kirim Data Shodaqoh
-      </button>
+            <span class="mono">
+              ${fmtRp(susulanIr)}
+            </span>
+          </div>
 
-      <div
-        style="
-          margin-top:7px;
-          font-size:10px;
-          color:var(--muted);
-          text-align:center;
-          line-height:1.4;
-        "
-      >
-        Pastikan nama anggota, tanggal pembayaran, dan bulan Susulan IR sudah benar.
-      </div>
+          ${
+            susulanIr > 0
+              ? `
+                <div
+                  style="
+                    margin:10px 0 4px;
+                    padding:11px;
+                    border:1px solid var(--border);
+                    border-radius:9px;
+                    background:var(--surface-2);
+                  "
+                >
+                  <div
+                    style="
+                      display:flex;
+                      align-items:center;
+                      justify-content:space-between;
+                      gap:8px;
+                      margin-bottom:9px;
+                    "
+                  >
+                    <span
+                      style="
+                        font-size:11px;
+                        font-weight:700;
+                        color:var(--ink);
+                      "
+                    >
+                      Bulan Susulan IR
+                    </span>
 
-    </div>
-  `;
+                    <span
+                      style="
+                        font-size:9px;
+                        color:var(--muted);
+                      "
+                    >
+                      Pilih bulan
+                    </span>
+                  </div>
+
+                  <div
+                    id="shodAiSusulanBulan"
+                    style="
+                      display:grid;
+                      grid-template-columns:repeat(3,minmax(0,1fr));
+                      gap:6px;
+                    "
+                  ></div>
+
+                  <div
+                    style="
+                      margin-top:7px;
+                      font-size:9px;
+                      line-height:1.4;
+                      color:var(--muted);
+                    "
+                  >
+                    Pilih minimal satu bulan jika terdapat Infak IR / Persenan.
+                  </div>
+                </div>
+              `
+              : ""
+          }
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+              border-bottom:1px solid var(--border);
+            "
+          >
+            <span class="text-xs">
+              Uang Sambung
+            </span>
+
+            <span class="mono">
+              ${fmtRp(uangSambung)}
+            </span>
+          </div>
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+              border-bottom:1px solid var(--border);
+            "
+          >
+            <span class="text-xs">
+              Jimpitan
+            </span>
+
+            <span class="mono">
+              ${fmtRp(jimpitan)}
+            </span>
+          </div>
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+              border-bottom:1px solid var(--border);
+            "
+          >
+            <span class="text-xs">
+              Siar-Siar
+            </span>
+
+            <span class="mono">
+              ${fmtRp(siarSiar)}
+            </span>
+          </div>
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+              border-bottom:1px solid var(--border);
+            "
+          >
+            <span class="text-xs">
+              Seribuan
+            </span>
+
+            <span class="mono">
+              ${fmtRp(seribuan)}
+            </span>
+          </div>
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+              border-bottom:1px solid var(--border);
+            "
+          >
+            <span class="text-xs">
+              Kafan
+            </span>
+
+            <span class="mono">
+              ${fmtRp(kafan)}
+            </span>
+          </div>
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap:12px;
+              padding:9px 0;
+            "
+          >
+            <span class="text-xs">
+              Ukhro MT
+            </span>
+
+            <span class="mono">
+              ${fmtRp(ukhroMt)}
+            </span>
+          </div>
+
+        </div>
+
+        ${
+          text
+            ? `
+              <details
+                style="
+                  margin-top:14px;
+                "
+              >
+                <summary
+                  style="
+                    font-size:11px;
+                    cursor:pointer;
+                    user-select:none;
+                  "
+                >
+                  Lihat hasil pembacaan AI
+                </summary>
+
+                <pre
+                  style="
+                    font-size:10px;
+                    line-height:1.5;
+                    white-space:pre-wrap;
+                    word-break:break-word;
+                    margin-top:8px;
+                    padding:8px;
+                    border-radius:8px;
+                    background:var(--surface-2);
+                    overflow:auto;
+                    max-height:240px;
+                  "
+                >${escapeHtml(text)}</pre>
+              </details>
+            `
+            : ""
+        }
+
+        <div
+          style="
+            margin-top:16px;
+            padding-top:12px;
+            border-top:1px solid var(--border);
+          "
+        >
+
+          <button
+            type="button"
+            id="btnSubmitShodaqohAI"
+            class="btn btn-primary w-full"
+            style="
+              min-height:40px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              gap:8px;
+              font-size:12px;
+              font-weight:600;
+            "
+          >
+            Kirim Data Shodaqoh
+          </button>
+
+          <div
+            style="
+              margin-top:7px;
+              font-size:10px;
+              color:var(--muted);
+              text-align:center;
+              line-height:1.4;
+            "
+          >
+            Pastikan nama anggota, tanggal pembayaran, dan bulan Susulan IR sudah benar.
+          </div>
+
+        </div>
+      `;
 
       ocrData.style.display = "";
 
@@ -2229,8 +2200,6 @@ async function extractDataFromImage() {
         submitAiBtn.addEventListener("click", submitShodaqohAI);
       }
     }
-
-    console.log("EKSTRAKSI SHODAQOH SELESAI:", aiData);
 
     showToast(
       "Data berhasil diekstrak. Periksa hasil sebelum mengirim.",
@@ -2363,22 +2332,22 @@ async function extractDataFromImage() {
           regenerateBtn.style.cursor = "wait";
 
           regenerateBtn.innerHTML = `
-              <span
-                style="
-                  display:inline-block;
-                  width:13px;
-                  height:13px;
-                  border:2px solid rgba(255,255,255,.45);
-                  border-top-color:#fff;
-                  border-radius:50%;
-                  animation:spin .6s linear infinite;
-                "
-              ></span>
+            <span
+              style="
+                display:inline-block;
+                width:13px;
+                height:13px;
+                border:2px solid rgba(255,255,255,.45);
+                border-top-color:#fff;
+                border-radius:50%;
+                animation:spin .6s linear infinite;
+              "
+            ></span>
 
-              <span>
-                Mencoba lagi...
-              </span>
-            `;
+            <span>
+              Mencoba lagi...
+            </span>
+          `;
 
           await extractDataFromImage();
         });
@@ -2420,8 +2389,6 @@ async function submitShodaqohAI() {
       '#shodAiSusulanBulan input[type="checkbox"]:checked',
     ),
   ].map((el) => el.value);
-
-  console.log(susulanBulan, "susulanBulan");
 
   if (Number(data.susulan_ir || 0) > 0 && susulanBulan.length === 0) {
     showToast("Pilih minimal satu bulan untuk Susulan IR.", "error");
@@ -2465,16 +2432,6 @@ async function submitShodaqohAI() {
       "",
   };
 
-  console.log("SUBMIT SHODAQOH AI:", {
-    memberId,
-    tanggal,
-    data,
-  });
-
-  console.log("SUSULAN BULAN DARI FORM:", susulanBulan);
-
-  console.log("PAYLOAD SHODAQOH AI YANG DIKIRIM:", payload);
-
   const btn = document.getElementById("btnSubmitShodaqohAI");
 
   if (btn) {
@@ -2502,8 +2459,6 @@ async function submitShodaqohAI() {
     showToast("Mengirim data...", "info");
 
     const r = await apiPost(payload);
-
-    console.log("RESPONSE SUBMIT SHODAQOH AI:", r);
 
     if (!r || r.success !== true) {
       throw new Error(r?.message || "Gagal menyimpan data shodaqoh.");
@@ -2820,7 +2775,6 @@ function openShodMemberActionSheet(memberId) {
     return;
   }
 
-  console.log("Opening action sheet for:", member.nama, memberId);
   shodMemberActionId = memberId;
 
   if ($("shodMemberActionTitle")) {

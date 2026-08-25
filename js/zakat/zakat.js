@@ -160,24 +160,52 @@ async function forceReloadZakatData() {
   }
 }
 
-async function loadMastersData() {
+async function loadMastersData(forceRefresh) {
   try {
-    var result = await apiGetMasters();
-    if (result && result.success) {
-      var data = result.data || {};
-      state.masterMuzaki = data.muzaki || [];
-      state.masterMustahik = data.mustahik || [];
-      localStorage.setItem("master_muzaki", JSON.stringify(state.masterMuzaki));
-      localStorage.setItem(
-        "master_mustahik",
-        JSON.stringify(state.masterMustahik),
-      );
+    // Cek apakah cache expired (5 menit)
+    var cacheExpiry = 5 * 60 * 1000; // 5 menit
+    var lastFetch = localStorage.getItem("master_last_fetch");
+    var now = Date.now();
+
+    // Jika force refresh atau cache expired atau tidak ada cache
+    if (forceRefresh || !lastFetch || now - parseInt(lastFetch) > cacheExpiry) {
       masterMuzakiCache = {};
       masterMustahikCache = {};
-      return true;
+
+      var result = await apiGetMasters();
+      if (result && result.success) {
+        var data = result.data || {};
+        state.masterMuzaki = data.muzaki || [];
+        state.masterMustahik = data.mustahik || [];
+        localStorage.setItem(
+          "master_muzaki",
+          JSON.stringify(state.masterMuzaki),
+        );
+        localStorage.setItem(
+          "master_mustahik",
+          JSON.stringify(state.masterMustahik),
+        );
+        localStorage.setItem("master_last_fetch", String(now));
+        return true;
+      }
+      return false;
     }
+
+    // Gunakan cache jika masih valid
+    var storedMuzaki = localStorage.getItem("master_muzaki");
+    var storedMustahik = localStorage.getItem("master_mustahik");
+
+    if (storedMuzaki && storedMustahik) {
+      try {
+        state.masterMuzaki = JSON.parse(storedMuzaki);
+        state.masterMustahik = JSON.parse(storedMustahik);
+        return true;
+      } catch (e) {}
+    }
+
     return false;
   } catch (e) {
+    console.error("Failed to load masters data:", e);
     return false;
   }
 }
@@ -224,49 +252,59 @@ function loadMuzakiSuggestions() {
 }
 
 function loadMustahikSuggestions() {
-  // ✅ Cek state dulu
-  if (state && state.masterMustahik && state.masterMustahik.length > 0) {
-    const names = state.masterMustahik
-      .filter(function (m) {
-        return m.status !== "DELETED";
+  if (!state.masterMustahik || state.masterMustahik.length === 0) {
+    loadMastersData();
+  }
+
+  if (!state.masterMustahik || state.masterMustahik.length === 0) {
+    return [];
+  }
+
+  return state.masterMustahik.map(function (m) {
+    return m.nama;
+  });
+}
+
+function refreshMasterMustahikData() {
+  return new Promise(function (resolve, reject) {
+    loadMastersData()
+      .then(function () {
+        showToast("Data master mustahik berhasil di-refresh.", "success");
+        resolve(true);
       })
-      .map(function (m) {
-        return m.nama || "";
-      })
-      .filter(function (n) {
-        return n.trim() !== "";
+      .catch(function (err) {
+        showToast("Gagal refresh data master.", "error");
+        reject(err);
       });
-    return names.sort();
-  }
-
-  // ✅ Cek localStorage
-  try {
-    const stored = localStorage.getItem("master_mustahik");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      const names = parsed
-        .filter(function (m) {
-          return m.status !== "DELETED";
-        })
-        .map(function (m) {
-          return m.nama || "";
-        })
-        .filter(function (n) {
-          return n.trim() !== "";
-        });
-      return names.sort();
-    }
-  } catch (e) {
-    console.warn("Failed to load mustahik from localStorage:", e);
-  }
-
-  console.warn("⚠️ No mustahik suggestions found");
-  return [];
+  });
 }
 
 async function refreshZakatData() {
   zakatDataLoaded = false;
   await loadZakatData();
+}
+
+function forceReloadMasters() {
+  return new Promise(function (resolve, reject) {
+    state.masterMuzaki = null;
+    state.masterMustahik = null;
+    masterMuzakiCache = {};
+    masterMustahikCache = {};
+    localStorage.removeItem("master_muzaki");
+    localStorage.removeItem("master_mustahik");
+
+    loadMastersData(true)
+      .then(function (result) {
+        if (result) {
+          resolve(true);
+        } else {
+          reject(new Error("Failed to load masters data"));
+        }
+      })
+      .catch(function (err) {
+        reject(err);
+      });
+  });
 }
 
 async function refreshSingleZakat(id) {
@@ -1331,8 +1369,6 @@ async function cancelCompleteZakat(zakatId) {
 }
 
 function updateZakatDetailActions(zakat) {
-  console.log("🔄 updateZakatDetailActions called");
-
   var btnToggle = document.getElementById("btnToggleCompleteZakat");
   var iconComplete = document.getElementById("iconComplete");
   var iconCancelComplete = document.getElementById("iconCancelComplete");
@@ -1343,10 +1379,6 @@ function updateZakatDetailActions(zakat) {
   var isCompleted = isZakatCompleted(zakat);
   var isActive = zakat.status === "ACTIVE";
 
-  console.log("📊 isCompleted:", isCompleted);
-  console.log("📊 isActive:", isActive);
-
-  // ✅ UPDATE TOGGLE BUTTON - HARUS TETAP AKTIF
   if (btnToggle) {
     if (isCompleted) {
       btnToggle.className = "dropdown-item";
@@ -1354,10 +1386,8 @@ function updateZakatDetailActions(zakat) {
       if (iconCancelComplete) iconCancelComplete.style.display = "inline-block";
       if (toggleLabel) toggleLabel.textContent = "Batalkan Selesai";
       btnToggle.title = "Batalkan Status Selesai";
-      // ✅ TOMBOL TOGGLE TETAP AKTIF
       btnToggle.style.opacity = "1";
       btnToggle.style.pointerEvents = "auto";
-      console.log("✅ Toggle berubah menjadi: Batalkan Selesai (aktif)");
     } else {
       btnToggle.className = "dropdown-item";
       if (iconComplete) iconComplete.style.display = "inline-block";
@@ -1366,24 +1396,20 @@ function updateZakatDetailActions(zakat) {
       btnToggle.title = "Tandai Zakat Selesai";
       btnToggle.style.opacity = isActive ? "1" : "0.4";
       btnToggle.style.pointerEvents = isActive ? "auto" : "none";
-      console.log("✅ Toggle berubah menjadi: Tandai Selesai");
     }
   }
 
-  // ✅ PRINT - SELALU AKTIF
   if (btnPrint) {
     btnPrint.style.opacity = "1";
     btnPrint.style.pointerEvents = "auto";
   }
 
-  // ✅ EDIT - HANYA AKTIF JIKA ACTIVE
   var btnEdit = document.getElementById("btnEditZakatHeader");
   if (btnEdit) {
     btnEdit.style.opacity = isActive ? "1" : "0.4";
     btnEdit.style.pointerEvents = isActive ? "auto" : "none";
   }
 
-  // ✅ DELETE - DISABLE JIKA COMPLETED ATAU TIDAK ACTIVE
   if (btnDelete) {
     if (isCompleted) {
       btnDelete.style.opacity = "0.4";
@@ -2832,7 +2858,6 @@ function renderZakatList(data) {
 }
 
 // 1. Cek apakah state terisi
-console.log("state.zakat.list:", state.zakat.list);
 
 // 2. Panggil render langsung
 renderZakatList(state.zakat.list);
@@ -2842,7 +2867,6 @@ document.getElementById("zakatList");
 
 // 4. Force load
 loadZakatData().then(function () {
-  console.log("After load:", state.zakat.list);
   renderZakatList(state.zakat.list);
 });
 
@@ -3264,8 +3288,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var target = e.target.closest("#btnToggleCompleteZakat");
     if (!target) return;
 
-    console.log("🔘 btnToggleCompleteZakat clicked");
-
     var zakatId = state.zakat.currentId;
     if (!zakatId) {
       showToast("Zakat tidak ditemukan", "error");
@@ -3280,11 +3302,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    console.log("📊 Zakat status:", zakat.status);
-    console.log("📊 isCompleted:", isZakatCompleted(zakat));
-
     if (isZakatCompleted(zakat)) {
-      console.log("✅ Membuka modal CANCEL COMPLETE");
       var overlay = document.getElementById(
         "cancelCompleteZakatConfirmOverlay",
       );
@@ -3297,11 +3315,8 @@ document.addEventListener("DOMContentLoaded", function () {
             '</strong>" akan dikembalikan ke status Aktif dan dapat diedit kembali.';
         }
         overlay.classList.remove("hidden");
-      } else {
-        console.warn("⚠️ cancelCompleteZakatConfirmOverlay not found");
       }
     } else {
-      console.log("✅ Membuka modal COMPLETE");
       var overlay = document.getElementById("completeZakatConfirmOverlay");
       if (overlay) {
         var desc = document.getElementById("completeZakatConfirmDesc");
@@ -3312,8 +3327,6 @@ document.addEventListener("DOMContentLoaded", function () {
             '</strong>" akan ditandai sebagai selesai dan tidak dapat diedit lagi.';
         }
         overlay.classList.remove("hidden");
-      } else {
-        console.warn("⚠️ completeZakatConfirmOverlay not found");
       }
     }
   });

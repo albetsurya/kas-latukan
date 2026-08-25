@@ -1983,14 +1983,7 @@ async function runShodOcrMultiPass(dataUrl) {
         );
 
         const result = await Tesseract.recognize(processed, "eng", {
-          logger: function (message) {
-            console.log(
-              `OCR ${rotation}°`,
-              threshold,
-              message.status,
-              message.progress,
-            );
-          },
+          logger: function (message) {},
         });
 
         const text = result?.data?.text || "";
@@ -1998,13 +1991,6 @@ async function runShodOcrMultiPass(dataUrl) {
         const words = result?.data?.words || [];
 
         const score = scoreShodOcrResult(text);
-
-        console.log("OCR candidate:", {
-          rotation,
-          threshold,
-          score,
-          text,
-        });
 
         candidates.push({
           rotation,

@@ -561,7 +561,17 @@ function getMasterMuzakiById(id) {
 
 function getMasterMuzakiByName(name) {
   if (!name) return null;
-  var list = getMasterMuzakiList();
+
+  if (!state.masterMuzaki || state.masterMuzaki.length === 0) {
+    var stored = localStorage.getItem("master_muzaki");
+    if (stored) {
+      try {
+        state.masterMuzaki = JSON.parse(stored);
+      } catch (e) {}
+    }
+  }
+
+  var list = state.masterMuzaki || [];
   var searchName = name.toLowerCase().trim();
   for (var i = 0; i < list.length; i++) {
     var item = list[i];
@@ -588,7 +598,17 @@ function getMasterMustahikById(id) {
 
 function getMasterMustahikByName(name) {
   if (!name) return null;
-  var list = getMasterMustahikList();
+
+  if (!state.masterMustahik || state.masterMustahik.length === 0) {
+    var stored = localStorage.getItem("master_mustahik");
+    if (stored) {
+      try {
+        state.masterMustahik = JSON.parse(stored);
+      } catch (e) {}
+    }
+  }
+
+  var list = state.masterMustahik || [];
   var searchName = name.toLowerCase().trim();
   for (var i = 0; i < list.length; i++) {
     var item = list[i];
@@ -597,30 +617,6 @@ function getMasterMustahikByName(name) {
     }
   }
   return null;
-}
-
-function loadMuzakiSuggestions() {
-  var masters = getMasterMuzakiList();
-  var names = [];
-  for (var i = 0; i < masters.length; i++) {
-    var n = masters[i].nama || "";
-    if (n.trim() !== "") {
-      names.push(n);
-    }
-  }
-  return names.sort();
-}
-
-function loadMustahikSuggestions() {
-  var masters = getMasterMustahikList();
-  var names = [];
-  for (var i = 0; i < masters.length; i++) {
-    var n = masters[i].nama || "";
-    if (n.trim() !== "") {
-      names.push(n);
-    }
-  }
-  return names.sort();
 }
 
 // ✅ TAMBAHKAN FUNGSI INI
@@ -635,28 +631,6 @@ function ensureZakatState() {
     };
   }
   return state.zakat;
-}
-
-async function loadMastersData() {
-  try {
-    var result = await apiGetMasters();
-    if (result && result.success) {
-      var data = result.data || {};
-      state.masterMuzaki = data.muzaki || [];
-      state.masterMustahik = data.mustahik || [];
-      localStorage.setItem("master_muzaki", JSON.stringify(state.masterMuzaki));
-      localStorage.setItem(
-        "master_mustahik",
-        JSON.stringify(state.masterMustahik),
-      );
-      masterMuzakiCache = {};
-      masterMustahikCache = {};
-      return true;
-    }
-    return false;
-  } catch (e) {
-    return false;
-  }
 }
 
 ensureZakatState();
