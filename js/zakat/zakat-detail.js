@@ -1062,10 +1062,12 @@ function updateMustahikSheetTotal(zakat) {
     nominal: 0,
     kelompok: { persen: 80, nominal: 0 },
   };
-  var danaMustahik = mustahikData.nominal || 0;
 
-  if (danaMustahik === 0 && zakat.total > 0 && mustahikData.persen) {
-    danaMustahik = Math.round((zakat.total * mustahikData.persen) / 100);
+  var danaMustahik =
+    (mustahikData.kelompok && mustahikData.kelompok.nominal) || 0;
+
+  if (danaMustahik === 0) {
+    danaMustahik = mustahikData.nominal || 0;
   }
 
   var sisa = Math.max(0, danaMustahik - total);
