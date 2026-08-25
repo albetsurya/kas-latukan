@@ -3858,84 +3858,148 @@ function renderZakatMuzakiView(zakat) {
 }
 
 function renderZakatMustahikView(zakat) {
-  var container = document.getElementById("zakatMustahikView");
-  if (!container) return;
+  var tbody = document.getElementById("zakatMustahikTableBody");
+  var totalEl = document.getElementById("zakatMustahikTableTotal");
+  var countEl = document.getElementById("zakatMustahikCountDisplay");
+  var danaEl = document.getElementById("zakatMustahikDanaView");
+  var tersalurkanEl = document.getElementById("zakatMustahikTersalurkan");
+  var sisaEl = document.getElementById("zakatMustahikSisaView");
+  var statusEl = document.getElementById("zakatMustahikStatusView");
+  var progressEl = document.getElementById("zakatMustahikProgressView");
+  var progressLabelEl = document.getElementById("zakatMustahikProgressLabel");
 
-  var mustahikList = zakat.mustahik || [];
-  var activeMustahik = mustahikList.filter(function (m) {
-    return m._deleted !== true;
-  });
+  if (!tbody) return;
+
+  var mustahik = zakat.mustahik || [];
+  var activeMustahik = [];
+  var total = 0;
+
+  for (var i = 0; i < mustahik.length; i++) {
+    var m = mustahik[i];
+    if (m._deleted === true) continue;
+    if (!m.id || !m.id.startsWith("MS")) continue;
+    if (!m.nama || m.nama === "Unknown" || m.nama.trim() === "") continue;
+    activeMustahik.push(m);
+    total += Number(m.nominal) || 0;
+  }
 
   var r = zakat.rincian || {};
-  var mustahikData = r.mustahik || {
-    persen: 45,
-    nominal: 0,
-    kelompok: { persen: 80, nominal: 0 },
-  };
+  var danaMustahik = 0;
 
-  var danaMustahik =
-    (mustahikData.kelompok && mustahikData.kelompok.nominal) || 0;
+  if (r.mustahik && typeof r.mustahik === "object") {
+    danaMustahik = (r.mustahik.kelompok && r.mustahik.kelompok.nominal) || 0;
 
-  if (danaMustahik === 0) {
-    danaMustahik = mustahikData.nominal || 0;
+    if (danaMustahik === 0) {
+      danaMustahik = Number(r.mustahik.nominal) || 0;
+    }
   }
 
-  var totalAlokasi = activeMustahik.reduce(function (sum, m) {
-    return sum + (m.nominal || 0);
-  }, 0);
+  if (
+    danaMustahik === 0 &&
+    zakat.total > 0 &&
+    r.mustahik &&
+    r.mustahik.persen
+  ) {
+    danaMustahik = Math.round((zakat.total * r.mustahik.persen) / 100);
+  }
 
-  var sisa = Math.max(0, danaMustahik - totalAlokasi);
-  var progress = danaMustahik > 0 ? (totalAlokasi / danaMustahik) * 100 : 0;
+  var sisa = Math.max(0, danaMustahik - total);
+  var progress = danaMustahik > 0 ? (total / danaMustahik) * 100 : 0;
 
-  var html = '<div class="zakat-mustahik-summary">';
-  html += '<div class="zakat-mustahik-stats">';
-  html +=
-    '<div class="zakat-mustahik-stat"><span class="label">Dana Mustahik</span><span class="value">' +
-    fmtRp(danaMustahik) +
-    "</span></div>";
-  html +=
-    '<div class="zakat-mustahik-stat"><span class="label">Dialokasikan</span><span class="value">' +
-    fmtRp(totalAlokasi) +
-    "</span></div>";
-  html +=
-    '<div class="zakat-mustahik-stat"><span class="label">Sisa</span><span class="value">' +
-    fmtRp(sisa) +
-    "</span></div>";
-  html +=
-    '<div class="zakat-mustahik-stat"><span class="label">Progress</span><span class="value">' +
-    Math.round(progress) +
-    "%</span></div>";
-  html += "</div>";
+  if (danaEl) danaEl.textContent = fmtRp(danaMustahik);
+  if (tersalurkanEl) {
+    tersalurkanEl.textContent = fmtRp(total);
+    tersalurkanEl.style.color = total > 0 ? "var(--pos)" : "var(--ink-soft)";
+  }
+  if (sisaEl) {
+    sisaEl.textContent = fmtRp(sisa);
+    sisaEl.style.color = sisa > 0 ? "var(--pos)" : "var(--ink-soft)";
+  }
+  if (progressEl) {
+    var clampedProgress = Math.min(100, Math.max(0, progress));
+    progressEl.style.width = clampedProgress + "%";
+    progressEl.style.background =
+      clampedProgress >= 100 ? "var(--pos)" : "var(--brand)";
+  }
+  if (progressLabelEl) {
+    progressLabelEl.textContent = Math.round(progress) + "% dari dana mustahik";
+  }
 
-  html += '<div class="zakat-mustahik-progress-container">';
-  html +=
-    '<div class="zakat-mustahik-progress-bar" style="width:' +
-    Math.min(100, progress) +
-    '%"></div>';
-  html += "</div>";
+  if (statusEl) {
+    var badgeClass = "idle";
+    var badgeIcon =
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>';
+    var badgeText = "Belum diatur";
+    if (danaMustahik === 0) {
+      badgeClass = "idle";
+      badgeText = "Belum diatur";
+    } else if (total === 0) {
+      badgeClass = "warning";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>';
+      badgeText = "Belum ada alokasi";
+    } else if (total === danaMustahik) {
+      badgeClass = "saved";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5" /></svg>';
+      badgeText = "Seimbang";
+    } else if (total < danaMustahik) {
+      badgeClass = "warning";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>';
+      badgeText = "Kurang " + fmtRp(danaMustahik - total);
+    } else {
+      badgeClass = "invalid";
+      badgeIcon =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>';
+      badgeText = "Kelebihan " + fmtRp(total - danaMustahik);
+    }
+    statusEl.innerHTML =
+      '<span class="zakat-status-badge ' +
+      badgeClass +
+      '">' +
+      badgeIcon +
+      badgeText +
+      "</span>";
+  }
 
-  html += '<div class="zakat-mustahik-list">';
+  if (countEl) {
+    countEl.textContent = activeMustahik.length + " orang";
+  }
+
   if (activeMustahik.length === 0) {
-    html += '<div class="zakat-empty-state">Belum ada data mustahik</div>';
-  } else {
-    activeMustahik.forEach(function (m, idx) {
-      html += '<div class="zakat-mustahik-item">';
-      html += '<span class="zakat-mustahik-number">' + (idx + 1) + ".</span>";
-      html +=
-        '<span class="zakat-mustahik-name">' +
-        escapeHtml(m.nama || "-") +
-        "</span>";
-      html +=
-        '<span class="zakat-mustahik-nominal">' +
-        fmtRp(m.nominal || 0) +
-        "</span>";
-      html += "</div>";
-    });
+    tbody.innerHTML =
+      '<tr><td colspan="3" class="zakat-table-empty">Belum ada data mustahik.</td></tr>';
+    if (totalEl) totalEl.textContent = fmtRp(0);
+    return;
   }
-  html += "</div>";
-  html += "</div>";
 
-  container.innerHTML = html;
+  var rows = "";
+  var masterCache = {};
+  for (var i = 0; i < activeMustahik.length; i++) {
+    var m = activeMustahik[i];
+    var master = masterCache[m.id];
+    if (!master) {
+      master = getMasterMustahikById(m.id);
+      masterCache[m.id] = master;
+    }
+
+    rows +=
+      '<tr><td style="text-align:center; padding:8px 10px;">' +
+      (i + 1) +
+      '</td><td style="text-align:left; padding:8px 10px;">' +
+      escapeHtml(m.nama || "-") +
+      '</td><td style="text-align:right; padding:8px 10px;">' +
+      fmtRp(m.nominal || 0) +
+      "</td></tr>";
+  }
+
+  tbody.innerHTML = rows;
+
+  if (totalEl) {
+    totalEl.textContent = fmtRp(total);
+    totalEl.style.color = "var(--brand)";
+  }
 }
 
 function renderZakatRincianView(zakat) {

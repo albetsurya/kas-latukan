@@ -770,6 +770,9 @@ function openZakatMustahikSheet() {
   var overlay = document.getElementById("zakatMustahikSheet");
   if (!overlay) return;
 
+  // Panggil render view untuk tab Mustahik
+  renderZakatMustahikView(zakat);
+
   var mustahikList = zakat.mustahik || [];
   var activeMustahik = mustahikList.filter(function (m) {
     return m._deleted !== true;
@@ -1395,6 +1398,8 @@ async function submitZakatMustahikSheet() {
       showToast("Mustahik disimpan (offline mode)", "warning");
     }
 
+    // Refresh view setelah submit
+    renderZakatMustahikView(zakat);
     renderZakatMustahikView(zakat);
     closeZakatMustahikSheet();
     renderZakatList();
