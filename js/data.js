@@ -252,7 +252,19 @@ function refreshScopedUI() {
   renderHome();
   applyFilters();
 
-  const chartWrapper = document.getElementById("chartWrapper");
+  let chartWrapper = document.getElementById("chartWrapper");
+  if (!chartWrapper) {
+    // Cari berdasarkan canvas
+    const canvas = document.getElementById("saldoChart");
+    if (canvas) {
+      const parent = canvas.closest(".card");
+      if (parent) {
+        parent.id = "chartWrapper";
+        chartWrapper = parent;
+      }
+    }
+  }
+
   if (chartWrapper) {
     const skeleton = chartWrapper.querySelector(".chart-skeleton");
     if (skeleton) skeleton.remove();
@@ -563,31 +575,22 @@ function renderHome() {
   if (surplusEl && badgeEl && labelEl) {
     if (selisih > 0) {
       labelEl.textContent = "Surplus Periode Ini";
-
       surplusEl.textContent = "+" + fmtRp(selisih);
-
       surplusEl.style.color = "var(--pos)";
-
       badgeEl.textContent = "Surplus";
       badgeEl.style.background = "var(--pos-soft)";
       badgeEl.style.color = "var(--pos)";
     } else if (selisih < 0) {
       labelEl.textContent = "Defisit Periode Ini";
-
       surplusEl.textContent = "-" + fmtRp(Math.abs(selisih));
-
       surplusEl.style.color = "var(--neg)";
-
       badgeEl.textContent = "Defisit";
       badgeEl.style.background = "var(--neg-soft)";
       badgeEl.style.color = "var(--neg)";
     } else {
       labelEl.textContent = "Selisih Periode Ini";
-
       surplusEl.textContent = fmtRp(0);
-
       surplusEl.style.color = "var(--ink-soft)";
-
       badgeEl.textContent = "Impas";
       badgeEl.style.background = "var(--surface-alt)";
       badgeEl.style.color = "var(--ink-soft)";
@@ -595,194 +598,12 @@ function renderHome() {
   }
 
   const recent = scope.list.slice(-5).reverse();
-
   renderTxList(recent, "homeRecentList", null, { compact: true });
 
-  renderChart();
-}
-
-function renderChart() {
-  const ctx = document.getElementById("saldoChart");
-
-  if (!ctx) return;
-
-  const { labels, data } = computeMonthlySeries();
-
-  if (!labels.length) {
-    const now = new Date();
-    const currentMonthKey =
-      now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
-    labels.push(getMonthShortLabel(currentMonthKey));
-    data.push(state.saldoAwal);
-  }
-
-  // Update label periode
-  if ($("chartScopeLabel")) {
-    $("chartScopeLabel").textContent = labels.length + " bulan";
-  }
-
-  // Update nilai terakhir dan perubahan
-  const lastValue = data[data.length - 1] || 0;
-  const firstValue = data[0] || 0;
-  const change =
-    firstValue !== 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
-
-  if ($("chartLastValue")) {
-    $("chartLastValue").textContent = fmtRp(lastValue);
-  }
-
-  if ($("chartChange")) {
-    const changeEl = $("chartChange");
-    if (change > 0) {
-      changeEl.textContent = `▲ +${change.toFixed(1)}%`;
-      changeEl.style.color = "var(--pos)";
-    } else if (change < 0) {
-      changeEl.textContent = `▼ ${change.toFixed(1)}%`;
-      changeEl.style.color = "var(--neg)";
-    } else {
-      changeEl.textContent = `▬ 0%`;
-      changeEl.style.color = "var(--ink-soft)";
-    }
-  }
-
-  const dark = currentTheme() === "dark";
-
-  // Warna modern - gradasi hijau/teal
-  const lineColor = "#10b981";
-  const gradientColor1 = dark
-    ? "rgba(16,185,129,0.25)"
-    : "rgba(16,185,129,0.15)";
-  const gradientColor2 = dark
-    ? "rgba(16,185,129,0.02)"
-    : "rgba(16,185,129,0.01)";
-
-  const tickColor = dark ? "#475569" : "#94a3b8";
-  const gridColor = dark ? "rgba(71,85,105,0.15)" : "rgba(148,163,184,0.12)";
-  const textColor = dark ? "#94a3b8" : "#64748b";
-
-  if (state.chart) state.chart.destroy();
-
-  // Buat gradient fill
-  const gradient = ctx.getContext("2d").createLinearGradient(0, 0, 0, 160);
-  gradient.addColorStop(0, gradientColor1);
-  gradient.addColorStop(1, gradientColor2);
-
-  state.chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "Saldo Akhir Bulan",
-          data: data,
-          borderColor: lineColor,
-          backgroundColor: gradient,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 3,
-          pointHoverRadius: 6,
-          pointBackgroundColor: lineColor,
-          pointBorderColor: dark ? "#1e293b" : "#ffffff",
-          pointBorderWidth: 2,
-          borderWidth: 2.5,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        intersect: false,
-        mode: "index",
-      },
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          backgroundColor: dark
-            ? "rgba(30,41,59,0.92)"
-            : "rgba(255,255,255,0.92)",
-          titleColor: dark ? "#f1f5f9" : "#0f172a",
-          bodyColor: dark ? "#e2e8f0" : "#334155",
-          borderColor: dark ? "rgba(71,85,105,0.2)" : "rgba(148,163,184,0.2)",
-          borderWidth: 1,
-          cornerRadius: 8,
-          padding: 10,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          callbacks: {
-            label: function (context) {
-              return fmtRp(context.parsed.y);
-            },
-            title: function (items) {
-              return items[0].label;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          type: "category",
-          ticks: {
-            autoSkip: true,
-            maxTicksLimit: 8,
-            maxRotation: 0,
-            font: {
-              size: 8,
-              weight: "500",
-            },
-            color: tickColor,
-            padding: 4,
-          },
-          grid: {
-            display: false,
-            drawBorder: false,
-          },
-          border: {
-            display: false,
-          },
-        },
-        y: {
-          display: true,
-          position: "right",
-          ticks: {
-            font: {
-              size: 8,
-              weight: "500",
-            },
-            color: tickColor,
-            padding: 6,
-            maxTicksLimit: 6,
-            callback: function (value) {
-              if (value >= 1000000) return (value / 1000000).toFixed(0) + "jt";
-              if (value >= 1000) return (value / 1000).toFixed(0) + "rb";
-              return value.toFixed(0);
-            },
-          },
-          grid: {
-            color: gridColor,
-            drawBorder: false,
-            lineWidth: 0.8,
-          },
-          border: {
-            display: false,
-          },
-        },
-      },
-      elements: {
-        line: {
-          tension: 0.4,
-        },
-        point: {
-          hoverRadius: 6,
-        },
-      },
-      animation: {
-        duration: 800,
-        easing: "easeOutQuart",
-      },
-    },
-  });
+  // ✅ RENDER CHART DENGAN DELAY KECIL UNTUK MEMASTIKAN DOM SIAP
+  setTimeout(function () {
+    renderChart();
+  }, 50);
 }
 
 function renderSummaryHistory(scope, monthKey) {
@@ -972,4 +793,3 @@ function renderTxList(rows, containerId, emptyId, opts) {
     })
     .join("");
 }
-

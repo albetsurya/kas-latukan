@@ -1,10 +1,27 @@
-// ============================================================
-// RENDER CHART
-// ============================================================
-
 function renderChart() {
   const ctx = document.getElementById("saldoChart");
-  if (!ctx) return;
+  if (!ctx) {
+    console.warn("⚠️ saldoChart canvas not found");
+    return;
+  }
+
+  // ✅ PASTIKAN CANVAS TERLIHAT
+  ctx.style.display = "block";
+
+  // ✅ HAPUS SKELETON SEBELUM RENDER CHART
+  let chartWrapper = document.getElementById("chartWrapper");
+  if (!chartWrapper) {
+    const parent = ctx.closest(".card");
+    if (parent) {
+      parent.id = "chartWrapper";
+      chartWrapper = parent;
+    }
+  }
+
+  if (chartWrapper) {
+    const skeleton = chartWrapper.querySelector(".chart-skeleton");
+    if (skeleton) skeleton.remove();
+  }
 
   // Ambil data berdasarkan tipe chart
   const chartData = getChartData(chartState.type);
@@ -78,8 +95,13 @@ function renderChart() {
   gradient.addColorStop(0, gradientColor1);
   gradient.addColorStop(1, gradientColor2);
 
-  if (state.chart) state.chart.destroy();
+  // ✅ DESTROY CHART LAMA JIKA ADA
+  if (state.chart) {
+    state.chart.destroy();
+    state.chart = null;
+  }
 
+  // ✅ BUAT CHART BARU
   state.chart = new Chart(ctx, {
     type: "line",
     data: {
@@ -195,6 +217,11 @@ function renderChart() {
       },
     },
   });
+
+  // ✅ PASTIKAN CANVAS TETAP TERLIHAT
+  ctx.style.display = "block";
+
+  console.log("✅ Chart rendered with type:", chartState.type);
 }
 
 // ============================================================
@@ -275,7 +302,6 @@ function initChartFilterDropdown() {
     e.stopPropagation();
     const isOpen = dropdown.classList.contains("open");
 
-    // Tutup dropdown lain
     document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
       if (el.id !== dropdown.id) {
         el.classList.remove("open");
@@ -311,13 +337,28 @@ function initChartFilterDropdown() {
       dropdown.classList.remove("open");
       trigger.setAttribute("aria-expanded", "false");
 
-      // Update chart type dan render ulang
+      // ✅ UPDATE CHART TYPE DAN RENDER ULANG
       chartState.type = type;
+
+      // ✅ PASTIKAN CANVAS TERLIHAT SEBELUM RENDER
+      const canvas = document.getElementById("saldoChart");
+      if (canvas) {
+        canvas.style.display = "block";
+        // Pastikan parent memiliki ukuran yang benar
+        const parent = canvas.parentElement;
+        if (parent) {
+          parent.style.height = "160px";
+          parent.style.position = "relative";
+        }
+      }
+
+      // ✅ RENDER CHART
       renderChart();
+
+      console.log("🔄 Chart type changed to:", type);
     });
   });
 
-  // Tutup dropdown saat klik di luar
   document.addEventListener("click", function (e) {
     if (!dropdown.contains(e.target)) {
       dropdown.classList.remove("open");
@@ -325,4 +366,3 @@ function initChartFilterDropdown() {
     }
   });
 }
-

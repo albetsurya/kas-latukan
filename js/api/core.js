@@ -246,38 +246,56 @@ function applyTheme(mode) {
     localStorage.setItem("kas_theme", mode);
   } catch (e) {}
 
-  if ($("btnTheme"))
-    $("btnTheme").innerHTML = mode === "dark" ? ICON_SUN : ICON_MOON;
+  const btnTheme = document.getElementById("btnTheme");
+  if (btnTheme) {
+    btnTheme.innerHTML = mode === "dark" ? ICON_SUN : ICON_MOON;
+  }
 
-  if ($("themeLightBtn"))
-    $("themeLightBtn").classList.toggle("active", mode === "light");
+  const themeLightBtn = document.getElementById("themeLightBtn");
+  const themeDarkBtn = document.getElementById("themeDarkBtn");
 
-  if ($("themeDarkBtn"))
-    $("themeDarkBtn").classList.toggle("active", mode === "dark");
+  if (themeLightBtn) {
+    if (mode === "light") {
+      themeLightBtn.classList.add("active");
+    } else {
+      themeLightBtn.classList.remove("active");
+    }
+  }
 
-  if (state.chart) renderChart();
-}
+  if (themeDarkBtn) {
+    if (mode === "dark") {
+      themeDarkBtn.classList.add("active");
+    } else {
+      themeDarkBtn.classList.remove("active");
+    }
+  }
 
-function currentTheme() {
-  return document.documentElement.getAttribute("data-theme") || "dark";
+  if (state.chart) {
+    renderChart();
+  }
 }
 
 function initTheme() {
   let saved = null;
-
   try {
     saved = localStorage.getItem("kas_theme");
   } catch (e) {}
 
   if (!saved) {
-    saved =
+    const prefersDark =
       window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: light)").matches
-        ? "light"
-        : "dark";
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    saved = prefersDark ? "dark" : "light";
   }
 
   applyTheme(saved);
+}
+
+window.applyTheme = applyTheme;
+window.initTheme = initTheme;
+
+function currentTheme() {
+  return document.documentElement.getAttribute("data-theme") || "dark";
 }
 
 let toastTimer;
@@ -288,7 +306,6 @@ function showToast(msg, type = "success") {
 
   el.innerHTML = msg;
 
-  // Pastikan layout rapi
   el.style.display = "flex";
   el.style.alignItems = "center";
   el.style.justifyContent = "center";

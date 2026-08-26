@@ -1552,41 +1552,85 @@ function renderHomeSkeleton() {
     surplusBadge.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:50px;height:16px;border-radius:999px;"></span>`;
   }
 
-  const chartWrapper = document.getElementById("chartWrapper");
+  // ✅ PERBAIKI: Cari chartWrapper dengan ID yang benar
+  // Gunakan querySelector untuk mencari card yang berisi #saldoChart
+  let chartWrapper = document.getElementById("chartWrapper");
+
+  // Jika tidak ditemukan, cari parent dari canvas
+  if (!chartWrapper) {
+    const canvas = document.getElementById("saldoChart");
+    if (canvas) {
+      // Cari card container terdekat
+      let parent = canvas.closest(".card");
+      if (parent) {
+        // Beri ID agar bisa ditemukan下次
+        parent.id = "chartWrapper";
+        chartWrapper = parent;
+      }
+    }
+  }
+
   if (chartWrapper) {
+    // Hapus skeleton lama jika ada
     const oldSkeleton = chartWrapper.querySelector(".chart-skeleton");
     if (oldSkeleton) oldSkeleton.remove();
 
+    // Sembunyikan canvas
     const canvas = chartWrapper.querySelector("#saldoChart");
     if (canvas) canvas.style.display = "none";
 
+    // Buat skeleton baru dengan style inline
     const skeleton = document.createElement("div");
     skeleton.className = "chart-skeleton";
+    skeleton.style.cssText = `
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface-alt);
+      padding: 8px 4px 16px 4px;
+      z-index: 5;
+      top: 0;
+      left: 0;
+    `;
     skeleton.innerHTML = `
-      <div class="chart-skeleton-content">
-        <div class="chart-skeleton-grid">
-          <div class="chart-skeleton-grid-line"></div>
-          <div class="chart-skeleton-grid-line"></div>
-          <div class="chart-skeleton-grid-line"></div>
-          <div class="chart-skeleton-grid-line"></div>
-          <div class="chart-skeleton-grid-line"></div>
+      <div style="width:100%;height:100%;position:relative;">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;">
+          <div style="width:100%;height:1px;background:var(--line);opacity:0.3;"></div>
+          <div style="width:100%;height:1px;background:var(--line);opacity:0.3;"></div>
+          <div style="width:100%;height:1px;background:var(--line);opacity:0.3;"></div>
+          <div style="width:100%;height:1px;background:var(--line);opacity:0.3;"></div>
+          <div style="width:100%;height:1px;background:var(--line);opacity:0.3;"></div>
         </div>
-        <div class="chart-skeleton-wave">
-          <div class="chart-skeleton-wave-line"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;padding:8px 0;">
+          <div style="width:100%;height:3px;background:var(--brand);border-radius:4px;opacity:0.4;animation:skeletonWave 2s ease-in-out infinite;position:relative;">
+            <div style="position:absolute;top:50%;width:40px;height:3px;background:var(--brand);border-radius:4px;opacity:0.2;animation:skeletonWave 2.5s ease-in-out infinite;left:-20px;transform:translateY(-8px) rotate(-5deg);animation-delay:0.3s;"></div>
+            <div style="position:absolute;top:50%;width:40px;height:3px;background:var(--brand);border-radius:4px;opacity:0.2;animation:skeletonWave 2.5s ease-in-out infinite;right:-20px;transform:translateY(8px) rotate(5deg);animation-delay:0.6s;"></div>
+          </div>
         </div>
-        <div class="chart-skeleton-labels">
-          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
-          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
-          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
-          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
-          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
-          <span class="skeleton-line" style="width:28px;height:8px;border-radius:2px;"></span>
+        <div style="position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:4px 8px 0;">
+          <span style="width:28px;height:8px;border-radius:2px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+          <span style="width:28px;height:8px;border-radius:2px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+          <span style="width:28px;height:8px;border-radius:2px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+          <span style="width:28px;height:8px;border-radius:2px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+          <span style="width:28px;height:8px;border-radius:2px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+          <span style="width:28px;height:8px;border-radius:2px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;display:inline-block;"></span>
         </div>
       </div>
     `;
+
+    // Pastikan chartWrapper memiliki position relative
+    chartWrapper.style.position = "relative";
+    chartWrapper.style.minHeight = "160px";
+
     chartWrapper.appendChild(skeleton);
+  } else {
+    console.warn("⚠️ chartWrapper not found for skeleton");
   }
 
+  // Recent list
   const recentList = $("homeRecentList");
   if (recentList) {
     recentList.innerHTML = `
@@ -1594,15 +1638,15 @@ function renderHomeSkeleton() {
         .map(
           () => `
         <div class="tx-card skeleton-loading">
-          <div class="tx-icon skeleton-line" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;"></div>
+          <div class="tx-icon skeleton-line" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></div>
           <div class="flex-1">
-            <div class="skeleton-line" style="width:60%;height:16px;border-radius:4px;"></div>
-            <div class="skeleton-line mt-2" style="width:40%;height:12px;border-radius:4px;"></div>
-            <div class="skeleton-line mt-1" style="width:30%;height:10px;border-radius:4px;"></div>
+            <div class="skeleton-line" style="width:60%;height:16px;border-radius:4px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></div>
+            <div class="skeleton-line mt-2" style="width:40%;height:12px;border-radius:4px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></div>
+            <div class="skeleton-line mt-1" style="width:30%;height:10px;border-radius:4px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></div>
           </div>
           <div class="text-right">
-            <div class="skeleton-line" style="width:60px;height:16px;border-radius:4px;margin-left:auto;"></div>
-            <div class="skeleton-line mt-2" style="width:40px;height:12px;border-radius:4px;margin-left:auto;"></div>
+            <div class="skeleton-line" style="width:60px;height:16px;border-radius:4px;margin-left:auto;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></div>
+            <div class="skeleton-line mt-2" style="width:40px;height:12px;border-radius:4px;margin-left:auto;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></div>
           </div>
         </div>
       `,
@@ -1613,7 +1657,7 @@ function renderHomeSkeleton() {
 
   const chartScope = $("chartScopeLabel");
   if (chartScope) {
-    chartScope.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>`;
+    chartScope.innerHTML = `<span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;background:var(--line);animation:skeletonPulse 1.5s ease-in-out infinite;"></span>`;
   }
 }
 

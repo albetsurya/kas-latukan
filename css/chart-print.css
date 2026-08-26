@@ -2,6 +2,7 @@
 #saldoChart {
   width: 100% !important;
   height: 100% !important;
+  display: block !important;
 }
 
 /* Tooltip custom */
@@ -33,6 +34,198 @@
 /* Hover effect untuk chart */
 #saldoChart:hover {
   cursor: crosshair;
+}
+
+#chartWrapper {
+  position: relative;
+  width: 100%;
+  min-height: 250px;
+}
+
+.card #chartWrapper,
+#chartWrapper.card {
+  padding: 16px !important;
+}
+
+/* Pastikan canvas tidak disembunyikan */
+#saldoChart[style*="display: none"] {
+  display: block !important;
+}
+
+/* ============================================================
+   SKELETON ANIMATIONS
+   ============================================================ */
+
+@keyframes skeletonPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes skeletonWave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+  75% {
+    transform: translateY(4px);
+  }
+}
+
+.skeleton-loading {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-line {
+  background: var(--line);
+  border-radius: 4px;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+/* Chart skeleton */
+.chart-skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-alt);
+  padding: 8px 4px 16px 4px;
+  z-index: 5;
+}
+
+.chart-skeleton-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.chart-skeleton-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.chart-skeleton-grid-line {
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+  opacity: 0.3;
+}
+
+.chart-skeleton-wave {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.chart-skeleton-wave-line {
+  width: 100%;
+  height: 3px;
+  background: var(--brand);
+  border-radius: 4px;
+  opacity: 0.4;
+  animation: skeletonWave 2s ease-in-out infinite;
+  position: relative;
+}
+
+.chart-skeleton-wave-line-before {
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 3px;
+  background: var(--brand);
+  border-radius: 4px;
+  opacity: 0.2;
+  animation: skeletonWave 2.5s ease-in-out infinite;
+  left: -20px;
+  transform: translateY(-8px) rotate(-5deg);
+  animation-delay: 0.3s;
+}
+
+.chart-skeleton-wave-line-after {
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 3px;
+  background: var(--brand);
+  border-radius: 4px;
+  opacity: 0.2;
+  animation: skeletonWave 2.5s ease-in-out infinite;
+  right: -20px;
+  transform: translateY(8px) rotate(5deg);
+  animation-delay: 0.6s;
+}
+
+.chart-skeleton-labels {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 4px 8px 0;
+}
+
+.chart-skeleton-labels .skeleton-line {
+  background: var(--line);
+  border-radius: 2px;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonWave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+  75% {
+    transform: translateY(4px);
+  }
+}
+
+html[data-theme="dark"] .chart-skeleton {
+  background: var(--surface-alt);
+}
+
+html[data-theme="dark"] .chart-skeleton-wave-line {
+  background: var(--brand-dark);
+  opacity: 0.5;
+}
+
+html[data-theme="dark"] .chart-skeleton-wave-line::before,
+html[data-theme="dark"] .chart-skeleton-wave-line::after {
+  background: var(--brand-dark);
+  opacity: 0.3;
+}
+
+html[data-theme="dark"] .chart-skeleton-grid-line {
+  background: var(--line);
+  opacity: 0.2;
+}
+
+@media (max-width: 480px) {
+  .chart-skeleton {
+    padding: 6px 2px 14px 2px;
+  }
+  .chart-skeleton-labels .skeleton-line {
+    width: 20px !important;
+  }
 }
 
 /* Skeleton untuk chart */

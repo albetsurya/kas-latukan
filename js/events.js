@@ -37,24 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  if (typeof initTheme === "function") {
-    initTheme();
-  } else if (typeof window.initTheme === "function") {
-    window.initTheme();
-  } else {
-    // Fallback: apply theme manually
-    console.warn("⚠️ initTheme not found, using fallback");
-    const saved = localStorage.getItem("kas_theme") || "dark";
-    document.documentElement.setAttribute("data-theme", saved);
-
-    // Coba panggil applyTheme jika ada
-    if (typeof applyTheme === "function") {
-      applyTheme(saved);
-    } else if (typeof window.applyTheme === "function") {
-      window.applyTheme(saved);
-    }
-  }
-
   if ($("btnTheme")) {
     $("btnTheme").addEventListener("click", () =>
       applyTheme(currentTheme() === "dark" ? "light" : "dark"),

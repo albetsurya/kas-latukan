@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id" data-theme="light">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -37,6 +37,18 @@
     <link rel="stylesheet" href="/css/zakat-print.css" />
     <link rel="stylesheet" href="/css/overrides.css" />
     <link rel="stylesheet" href="/css/button.css" />
+    <script>
+      (function () {
+        var theme = localStorage.getItem("kas_theme");
+        if (!theme) {
+          var prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          theme = prefersDark ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
   </head>
 
   <body>
@@ -2227,11 +2239,13 @@
           </div>
 
           <div
+            id="chartWrapper"
             class="card p-4"
             style="
               background: var(--surface);
               border-radius: 12px;
               overflow: hidden;
+              position: relative;
             "
           >
             <!-- Header Chart -->
