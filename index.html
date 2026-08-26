@@ -2458,7 +2458,7 @@
                 Riwayat Transaksi
               </h2>
 
-              <p class="text-[10px] text-[color:var(--ink-faint)] mt-0.5">
+              <p class="text-sm text-[color:var(--ink-faint)] mt-0.5">
                 Rekap transaksi dan saldo berdasarkan periode
               </p>
             </div>
@@ -2584,7 +2584,7 @@
           <div class="grid grid-cols-2 gap-3">
             <div class="stat-chip p-4">
               <p class="eyebrow">Saldo Awal</p>
-              <p class="mono text-sm font-extrabold mt-1" id="rySaldoAwal">
+              <p class="mono text-md font-extrabold mt-1" id="rySaldoAwal">
                 Rp 0
               </p>
             </div>
@@ -2595,7 +2595,7 @@
             >
               <p class="eyebrow" style="color: var(--brand)">Saldo Akhir</p>
               <p
-                class="mono text-sm font-extrabold mt-1"
+                class="mono text-md font-extrabold mt-1"
                 style="color: var(--brand)"
                 id="rySaldoAkhir"
               >
@@ -2721,7 +2721,7 @@
               <div>
                 <p class="eyebrow">Manajemen</p>
                 <p class="text-[13px] font-bold mt-0.5">Zakat & Infak</p>
-                <p class="text-[10px] text-[color:var(--ink-faint)] mt-0.5">
+                <p class="text-[11px] text-[color:var(--ink-faint)] mt-0.5">
                   Kelola data zakat dan infak
                 </p>
               </div>
@@ -2772,7 +2772,7 @@
                 Monitoring & Pembayaran
               </h2>
               <p
-                class="text-xs text-[color:var(--ink-soft)]"
+                class="text-sm text-[color:var(--ink-soft)]"
                 id="shodMonthLabel"
               >
                 Bulan berjalan
@@ -2840,7 +2840,7 @@
               <p class="eyebrow" style="color: var(--ink-soft)">Target</p>
               <p
                 id="shodTarget"
-                class="mono text-sm font-extrabold mt-1"
+                class="mono text-md font-extrabold mt-1"
                 style="color: var(--ink)"
               >
                 Rp 0
@@ -2851,7 +2851,7 @@
               <p class="eyebrow" style="color: var(--ink-soft)">Pembayaran</p>
               <p
                 id="shodReceived"
-                class="mono text-sm font-extrabold mt-1"
+                class="mono text-md font-extrabold mt-1"
                 style="color: var(--ink)"
               >
                 Rp 0
@@ -2865,7 +2865,7 @@
               <p class="eyebrow" style="color: var(--pos)">Lunas</p>
               <p
                 id="shodPaidCount"
-                class="mono text-sm font-extrabold mt-1"
+                class="mono text-md font-extrabold mt-1"
                 style="color: var(--pos)"
               >
                 0
@@ -2879,7 +2879,7 @@
               <p class="eyebrow" style="color: var(--neg)">Belum</p>
               <p
                 id="shodUnpaidCount"
-                class="mono text-sm font-extrabold mt-1"
+                class="mono text-md font-extrabold mt-1"
                 style="color: var(--neg)"
               >
                 0
@@ -2907,119 +2907,144 @@
           </div>
 
           <div class="card p-4">
-            <p class="eyebrow mb-2">Rincian Alokasi Pembayaran</p>
+            <p class="eyebrow mb-3" style="font-size: 11px">
+              Rincian Alokasi Pembayaran
+            </p>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <!-- Infak IR -->
               <div class="stat-chip p-3">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Infak IR
                 </p>
-                <p id="shodTotalSusulanIr" class="mono text-sm font-extrabold">
+                <p
+                  id="shodTotalSusulanIr"
+                  class="mono text-[15px] font-extrabold"
+                >
                   Rp 0
                 </p>
               </div>
 
+              <!-- Uang Sambung -->
               <div class="stat-chip p-3 relative">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Uang Sambung
                 </p>
                 <p
                   id="shodTotalUangSambung"
-                  class="mono text-sm font-extrabold"
+                  class="mono text-[15px] font-extrabold"
                 >
                   Rp 0
                 </p>
                 <p
                   id="shodUangSambungAfterKesehatan"
-                  class="text-[8px] text-[color:var(--ink-faint)] mt-0.5"
+                  class="text-[9px] text-[color:var(--ink-faint)] mt-0.5"
                 >
                   sisa: Rp 0
                 </p>
               </div>
 
+              <!-- Jimpitan -->
               <div class="stat-chip p-3">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Jimpitan
                 </p>
-                <p id="shodTotalJimpitan" class="mono text-sm font-extrabold">
+                <p
+                  id="shodTotalJimpitan"
+                  class="mono text-[15px] font-extrabold"
+                >
                   Rp 0
                 </p>
               </div>
 
+              <!-- Siar-siar -->
               <div class="stat-chip p-3">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Siar-siar
                 </p>
-                <p id="shodTotalSiarSiar" class="mono text-sm font-extrabold">
+                <p
+                  id="shodTotalSiarSiar"
+                  class="mono text-[15px] font-extrabold"
+                >
                   Rp 0
                 </p>
               </div>
 
+              <!-- Seribuan -->
               <div class="stat-chip p-3">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Seribuan
                 </p>
-                <p id="shodTotalSeribuan" class="mono text-sm font-extrabold">
+                <p
+                  id="shodTotalSeribuan"
+                  class="mono text-[15px] font-extrabold"
+                >
                   Rp 0
                 </p>
               </div>
 
+              <!-- Kafan -->
               <div class="stat-chip p-3">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Kafan
                 </p>
-                <p id="shodTotalKafan" class="mono text-sm font-extrabold">
+                <p id="shodTotalKafan" class="mono text-[15px] font-extrabold">
                   Rp 0
                 </p>
               </div>
 
+              <!-- Ukhro MT -->
               <div class="stat-chip p-3">
                 <p
-                  class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                  class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                 >
                   Ukhro MT
                 </p>
-                <p id="shodTotalUkhroMt" class="mono text-sm font-extrabold">
+                <p
+                  id="shodTotalUkhroMt"
+                  class="mono text-[15px] font-extrabold"
+                >
                   Rp 0
                 </p>
               </div>
-              <!-- Dana Kesehatan - New -->
+
+              <!-- Dana Kesehatan -->
               <div
                 class="stat-chip p-3"
                 style="background: var(--pos-soft); border-color: var(--pos)"
               >
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5">
                   <p
-                    class="text-[9px] font-bold uppercase text-[color:var(--ink-faint)]"
+                    class="text-[10px] font-bold uppercase text-[color:var(--ink-faint)]"
                   >
                     Dana Kesehatan
                   </p>
                   <span
-                    class="text-[7px] font-bold text-[color:var(--pos)] bg-[color:var(--pos)]/10 px-1.5 py-0.5 rounded"
+                    class="text-[8.5px] font-bold text-[color:var(--pos)] bg-[color:var(--pos)]/10 px-2 py-0.5 rounded"
                   >
                     20%
                   </span>
                 </div>
                 <p
                   id="shodTotalDanaKesehatan"
-                  class="mono text-sm font-extrabold"
+                  class="mono text-[15px] font-extrabold"
                   style="color: var(--pos)"
                 >
                   Rp 0
                 </p>
-                <p class="text-[7px] text-[color:var(--ink-faint)] mt-0.5">
+                <p class="text-[9px] text-[color:var(--ink-faint)] mt-0.5">
                   20% dari Uang Sambung
                 </p>
               </div>

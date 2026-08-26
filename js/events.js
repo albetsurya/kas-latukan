@@ -37,6 +37,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  if (typeof initTheme === "function") {
+    initTheme();
+  } else if (typeof window.initTheme === "function") {
+    window.initTheme();
+  } else {
+    // Fallback
+    const saved = localStorage.getItem("kas_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+    if (typeof applyTheme === "function") {
+      applyTheme(saved);
+    }
+  }
+
   if ($("btnTheme")) {
     $("btnTheme").addEventListener("click", () =>
       applyTheme(currentTheme() === "dark" ? "light" : "dark"),

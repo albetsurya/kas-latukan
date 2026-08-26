@@ -246,6 +246,7 @@ function applyTheme(mode) {
     localStorage.setItem("kas_theme", mode);
   } catch (e) {}
 
+  // ✅ Cek apakah elemen sudah ada di DOM
   const btnTheme = document.getElementById("btnTheme");
   if (btnTheme) {
     btnTheme.innerHTML = mode === "dark" ? ICON_SUN : ICON_MOON;
@@ -254,6 +255,7 @@ function applyTheme(mode) {
   const themeLightBtn = document.getElementById("themeLightBtn");
   const themeDarkBtn = document.getElementById("themeDarkBtn");
 
+  // ✅ Tambahkan class active dengan aman
   if (themeLightBtn) {
     if (mode === "light") {
       themeLightBtn.classList.add("active");
@@ -291,8 +293,12 @@ function initTheme() {
   applyTheme(saved);
 }
 
+// ✅ Buat global
 window.applyTheme = applyTheme;
 window.initTheme = initTheme;
+
+// ✅ Jangan panggil initTheme() di sini (tunggu DOM siap)
+// initTheme(); // <-- HAPUS INI
 
 function currentTheme() {
   return document.documentElement.getAttribute("data-theme") || "dark";
