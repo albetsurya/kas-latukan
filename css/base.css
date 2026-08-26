@@ -2010,3 +2010,261 @@ html[data-theme="dark"] #toast {
   background: var(--neg-soft);
   color: var(--neg);
 }
+.kas-type-dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.kas-type-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  min-height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.kas-type-dropdown-trigger:hover {
+  background: var(--surface-alt);
+  border-color: var(--brand);
+}
+
+.kas-type-dropdown-trigger:active {
+  transform: scale(0.97);
+}
+
+.kas-type-dropdown-trigger[aria-expanded="true"] {
+  border-color: var(--brand);
+  background: var(--surface-alt);
+}
+
+.kas-type-dropdown-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kas-type-dropdown-value svg {
+  flex-shrink: 0;
+}
+
+.kas-type-dropdown-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--ink-faint);
+}
+
+.kas-type-dropdown-trigger[aria-expanded="true"] .kas-type-dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.kas-type-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 160px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px) scale(0.96);
+  transition: all 0.15s ease;
+  z-index: 100;
+  transform-origin: top right;
+}
+
+.kas-type-dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.kas-type-dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.kas-type-dropdown-option:hover {
+  background: var(--surface-alt);
+}
+
+.kas-type-dropdown-option:active {
+  transform: scale(0.97);
+}
+
+.kas-type-dropdown-option.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.kas-type-dropdown-option.active .kas-type-dropdown-option-check {
+  opacity: 1;
+}
+
+.kas-type-dropdown-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+}
+
+.kas-type-dropdown-option.active .kas-type-dropdown-option-icon {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.kas-type-dropdown-option-label {
+  flex: 1;
+}
+
+.kas-type-dropdown-option-check {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  color: var(--brand);
+}
+
+.kas-type-dropdown-option.active .kas-type-dropdown-option-check {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .kas-type-dropdown-trigger {
+    padding: 3px 8px 3px 6px;
+    min-height: 24px;
+    font-size: 10px;
+    gap: 4px;
+    border-radius: 6px;
+  }
+
+  .kas-type-dropdown-value svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .kas-type-dropdown-chevron {
+    width: 12px;
+    height: 12px;
+  }
+
+  .kas-type-dropdown-menu {
+    min-width: 140px;
+    padding: 3px;
+  }
+
+  .kas-type-dropdown-option {
+    padding: 6px 8px;
+    font-size: 11px;
+    gap: 8px;
+  }
+
+  .kas-type-dropdown-option-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .kas-type-dropdown-option-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .kas-type-dropdown-trigger {
+    padding: 2px 6px 2px 5px;
+    min-height: 22px;
+    font-size: 9px;
+    gap: 3px;
+    border-radius: 5px;
+  }
+
+  .kas-type-dropdown-value svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .kas-type-dropdown-chevron {
+    width: 10px;
+    height: 10px;
+  }
+
+  .kas-type-dropdown-menu {
+    min-width: 120px;
+    padding: 3px;
+  }
+
+  .kas-type-dropdown-option {
+    padding: 5px 6px;
+    font-size: 10px;
+    gap: 6px;
+  }
+
+  .kas-type-dropdown-option-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .kas-type-dropdown-option-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+html[data-theme="dark"] .kas-type-dropdown-trigger {
+  background: var(--surface-alt);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .kas-type-dropdown-trigger:hover {
+  background: var(--surface);
+  border-color: var(--brand);
+}
+
+html[data-theme="dark"] .kas-type-dropdown-menu {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .kas-type-dropdown-option:hover {
+  background: var(--surface-alt);
+}
+
+html[data-theme="dark"] .kas-type-dropdown-option.active {
+  background: var(--brand-soft);
+}
+
+html[data-theme="dark"] .kas-type-dropdown-option-icon {
+  background: var(--surface);
+}

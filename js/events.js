@@ -16,6 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el) el.classList.add("sheet-action");
   });
 
+  document.querySelectorAll(".kas-type-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const kasType = this.dataset.kasType;
+      switchKasType(kasType);
+    });
+  });
+
   // Universal sheet backdrop close:
   // clicking the overlay/backdrop closes the sheet, while clicks inside
   // the actual sheet content are ignored.
