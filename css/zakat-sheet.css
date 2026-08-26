@@ -1446,16 +1446,22 @@
   color-scheme: light dark !important;
 }
 
-#zakatFormOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator,
-#zakatEditHeaderOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator {
+#zakatFormOverlay
+  input[type="date"].field-input::-webkit-calendar-picker-indicator,
+#zakatEditHeaderOverlay
+  input[type="date"].field-input::-webkit-calendar-picker-indicator {
   filter: var(--date-picker-icon-filter, none) !important;
   opacity: 0.6 !important;
   padding: 4px !important;
   cursor: pointer !important;
 }
 
-[data-theme="dark"] #zakatFormOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator,
-[data-theme="dark"] #zakatEditHeaderOverlay input[type="date"].field-input::-webkit-calendar-picker-indicator {
+[data-theme="dark"]
+  #zakatFormOverlay
+  input[type="date"].field-input::-webkit-calendar-picker-indicator,
+[data-theme="dark"]
+  #zakatEditHeaderOverlay
+  input[type="date"].field-input::-webkit-calendar-picker-indicator {
   filter: invert(1) !important;
 }
 
@@ -1568,3 +1574,220 @@
   margin: 0 !important;
 }
 
+.zakat-count-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zakat-count-row .field-input {
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  width: 80px !important;
+  max-width: 80px !important;
+}
+
+.zakat-count-row .field-input::-webkit-inner-spin-button,
+.zakat-count-row .field-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.btn-count-adjust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-count-adjust:hover:not(:disabled) {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.btn-count-adjust:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.btn-count-adjust:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-count-adjust svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+  display: block;
+}
+
+/* Skeleton Loader Styles */
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-row .skeleton-number {
+  width: 24px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--surface-alt);
+  flex-shrink: 0;
+}
+
+.skeleton-row .skeleton-name {
+  flex: 1;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+}
+
+.skeleton-row .skeleton-nominal {
+  width: 120px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  flex-shrink: 0;
+}
+
+.skeleton-row .skeleton-actions {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  flex-shrink: 0;
+}
+
+.skeleton-rincian-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0;
+  background: var(--surface);
+  z-index: 5;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.skeleton-rincian-overlay > div {
+  opacity: 0.6;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-rincian .zakat-rincian-section {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-rincian .zakat-rincian-total {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-rincian .zakat-rincian-header h4 {
+  height: 20px;
+  width: 100px;
+  background: var(--surface-alt);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.skeleton-rincian .zakat-rincian-header .zakat-default-btn {
+  height: 28px;
+  width: 100px;
+  background: var(--surface-alt);
+  border-radius: 6px;
+  border: none;
+  cursor: default;
+}
+
+/* Skeleton animasi */
+@keyframes skeletonPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes skeletonProgress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+/* Style untuk state loading pada teks */
+.zakat-total-value.skeleton-loading,
+.zakat-sheet-validation-value.skeleton-loading {
+  color: var(--ink-faint) !important;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+/* Skeleton untuk Rincian Sheet */
+.skeleton-rincian {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skeleton-rincian .zakat-rincian-section {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-rincian .zakat-rincian-total {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-rincian .zakat-rincian-header h4 {
+  height: 20px;
+  width: 100px;
+  background: var(--surface-alt);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.skeleton-rincian .zakat-rincian-header .zakat-default-btn {
+  height: 28px;
+  width: 100px;
+  background: var(--surface-alt);
+  border-radius: 6px;
+  border: none;
+  cursor: default;
+}

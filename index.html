@@ -1072,9 +1072,7 @@
         </button>
       </section>
 
-      <!-- ============================================================ -->
-      <!-- ZAKAT - MUZAKI EDIT SHEET                                     -->
-      <!-- ============================================================ -->
+      <!-- ZAKAT - MUZAKI EDIT SHEET -->
       <div id="zakatMuzakiSheet" class="sheet-overlay hidden">
         <div class="sheet">
           <div class="sheet-header sheet-header-payment">
@@ -1105,6 +1103,24 @@
             <div class="field-group">
               <label class="field-label">Jumlah Muzaki</label>
               <div class="zakat-count-row">
+                <button
+                  type="button"
+                  class="btn-count-adjust btn-count-minus"
+                  data-target="zakatMuzakiSheetCount"
+                  data-min="1"
+                  data-max="20"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path d="M5 12h14" />
+                  </svg>
+                </button>
                 <input
                   type="number"
                   id="zakatMuzakiSheetCount"
@@ -1112,14 +1128,25 @@
                   max="20"
                   value="1"
                   class="field-input"
-                  style="max-width: 120px"
+                  style="max-width: 120px; text-align: center"
                 />
                 <button
                   type="button"
-                  id="zakatMuzakiSheetApplyCount"
-                  class="btn-apply-count"
+                  class="btn-count-adjust btn-count-plus"
+                  data-target="zakatMuzakiSheetCount"
+                  data-min="1"
+                  data-max="20"
                 >
-                  Terapkan
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -1510,9 +1537,7 @@
         </div>
       </div>
 
-      <!-- ============================================================ -->
-      <!-- ZAKAT - MUSTAHIK EDIT SHEET                                   -->
-      <!-- ============================================================ -->
+      <!-- ZAKAT - MUSTAHIK EDIT SHEET -->
       <div id="zakatMustahikSheet" class="sheet-overlay hidden">
         <div class="sheet">
           <div class="sheet-header sheet-header-payment">
@@ -1541,6 +1566,24 @@
             <div class="field-group">
               <label class="field-label">Jumlah Mustahik</label>
               <div class="zakat-count-row">
+                <button
+                  type="button"
+                  class="btn-count-adjust btn-count-minus"
+                  data-target="zakatMustahikSheetCount"
+                  data-min="1"
+                  data-max="20"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path d="M5 12h14" />
+                  </svg>
+                </button>
                 <input
                   type="number"
                   id="zakatMustahikSheetCount"
@@ -1548,14 +1591,25 @@
                   max="20"
                   value="1"
                   class="field-input"
-                  style="max-width: 120px"
+                  style="max-width: 120px; text-align: center"
                 />
                 <button
                   type="button"
-                  id="zakatMustahikSheetApplyCount"
-                  class="btn-apply-count"
+                  class="btn-count-adjust btn-count-plus"
+                  data-target="zakatMustahikSheetCount"
+                  data-min="1"
+                  data-max="20"
                 >
-                  Terapkan
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -4731,6 +4785,8 @@
     <script src="/js/zakat/zakat-helpers.js"></script>
     <script src="/js/zakat/zakat.js"></script>
     <script src="/js/zakat/zakat-detail.js"></script>
+    <script src="/js/zakat/zakat-sheet.js"></script>
+    <script src="/js/zakat/zakat-skeleton.js"></script>
     <script src="/js/zakat/zakat-components.js"></script>
 
     <script src="/js/events.js"></script>

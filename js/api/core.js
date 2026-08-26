@@ -286,13 +286,15 @@ function showToast(msg, type = "success") {
   const el = $("toast");
   if (!el) return;
 
-  const isHtml = msg.includes("<svg") || msg.includes("<span");
+  el.innerHTML = msg;
 
-  if (isHtml) {
-    el.innerHTML = msg;
-  } else {
-    el.textContent = msg;
-  }
+  // Pastikan layout rapi
+  el.style.display = "flex";
+  el.style.alignItems = "center";
+  el.style.justifyContent = "center";
+  el.style.flexWrap = "wrap";
+  el.style.textAlign = "center";
+  el.style.gap = "4px";
 
   el.style.background =
     type === "error"
@@ -302,10 +304,9 @@ function showToast(msg, type = "success") {
         : "var(--brand-dark)";
 
   el.classList.remove("hidden");
-
   clearTimeout(toastTimer);
 
-  toastTimer = setTimeout(() => {
+  toastTimer = setTimeout(function () {
     el.classList.add("hidden");
   }, 3200);
 }
