@@ -469,32 +469,31 @@ function renderShodaqohTabs() {
   <div class="shod-tabs-container">
     <div class="shod-tabs">
       <button class="shod-tab active" data-tab="shod-monitoring">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <line x1="9" y1="9" x2="15" y2="9" />
           <line x1="9" y1="15" x2="15" y2="15" />
           <line x1="9" y1="12" x2="15" y2="12" />
         </svg>
-        Monitoring
+        <span style="font-size: 12px;">Monitoring</span>
       </button>
       <button class="shod-tab" data-tab="shod-members">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </svg>
-        Anggota
+        <span style="font-size: 12px;">Anggota</span>
       </button>
       <button class="shod-tab" data-tab="shod-payments">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="6" width="20" height="14" rx="2" />
           <line x1="2" y1="10" x2="22" y2="10" />
         </svg>
-        Riwayat
+        <span style="font-size: 12px;">Riwayat</span>
       </button>
     </div>
   </div>
 `;
-
   // Cari card filter atau allocation untuk menempatkan tabs
   const filterCard = container.querySelector(".card:has(.filter-group)");
   if (filterCard) {
