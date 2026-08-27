@@ -27,7 +27,7 @@ class Router {
         title: "Shodaqoh",
         screen: "screen-shodaqoh",
         tab: "shodaqoh",
-        showInNav: true,
+        showInNav: false,
       },
       profile: {
         path: "/profile",

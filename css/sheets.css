@@ -6,7 +6,7 @@
 body > .sheet-overlay {
   position: fixed !important;
   inset: 0 !important;
-  z-index: 500 !important;
+  z-index: 10050 !important;
   display: flex !important;
   align-items: flex-end !important;
   justify-content: center !important;

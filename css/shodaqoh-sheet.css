@@ -1,9 +1,24 @@
 /* ============================================================
+   SHODAQOH SHEET STACKING FIX
+   ------------------------------------------------------------
+   The fullscreen #screen-shodaqoh uses z-index: 9999. All Shodaqoh
+   bottom sheets are therefore kept above it.
+   ============================================================ */
+
+body > #shodaqohPaymentOverlay.sheet-overlay,
+body > #shodMemberActionOverlay.sheet-overlay,
+body > #shodMemberFormOverlay.sheet-overlay,
+body > #shodPaymentDetailOverlay.sheet-overlay,
+body > #shodMemberDetailOverlay.sheet-overlay {
+  z-index: 10050 !important;
+}
+
+/* ============================================================
    SHODAQOH PAYMENT OVERLAY - MODERN STYLE
    ============================================================ */
 
 #shodaqohPaymentOverlay {
-  z-index: 500 !important;
+  z-index: 10050 !important;
 }
 
 #shodaqohPaymentOverlay > .sheet {
@@ -1415,5 +1430,35 @@
     min-height: 22px !important;
     font-size: 9px !important;
     padding: 1px 4px !important;
+  }
+}
+
+#shodaqohPaymentForm.loading .shod-form-field {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#shodaqohPaymentForm.loading .shod-form-field::after {
+  content: "";
+  display: block;
+  height: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--line) 25%,
+    var(--surface-alt) 50%,
+    var(--line) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

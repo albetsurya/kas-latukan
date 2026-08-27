@@ -38,7 +38,7 @@
   flex-wrap: wrap;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 10px 12px 10px 8px !important;
+  padding: 10px 16px 10px 16px !important; /* padding kanan-kiri 16px */
   background: var(--surface) !important;
   border-bottom: 1px solid var(--line) !important;
   flex-shrink: 0 !important;
@@ -198,7 +198,7 @@
   flex: 1 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding: 0 12px 80px 12px !important;
+  padding: 0 16px 80px 16px !important; /* padding kanan-kiri 16px */
   padding-bottom: 80px !important;
   -webkit-overflow-scrolling: touch !important;
   height: 100% !important;
@@ -577,7 +577,7 @@
 
 @media (max-width: 480px) {
   .zakat-header {
-    padding: 8px 10px 8px 6px !important;
+    padding: 8px 12px 8px 12px !important; /* padding kanan-kiri 12px untuk mobile */
     min-height: 44px !important;
   }
 
@@ -586,7 +586,7 @@
   }
 
   .zakat-content {
-    padding: 0 8px 70px 8px !important;
+    padding: 0 12px 70px 12px !important; /* padding kanan-kiri 12px untuk mobile */
     padding-bottom: 70px !important;
   }
 }
@@ -595,4 +595,31 @@
   .zakat-title {
     font-size: 12px !important;
   }
+}
+
+/* Shodaqoh filter uses the exact same visual filter sheet as Zakat. */
+#shodaqohFilterSheet.sheet-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  display: none !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+
+#shodaqohFilterSheet.sheet-overlay:not(.hidden) {
+  display: flex !important;
+}
+
+#shodaqohFilterSheet .sheet {
+  background: var(--surface) !important;
+  border-radius: 20px 20px 0 0 !important;
+  max-height: 85vh !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  padding: 10px 14px 16px !important;
+  overflow-y: auto !important;
+  animation: slideUp 0.3s ease !important;
 }

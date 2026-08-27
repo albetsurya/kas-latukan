@@ -134,22 +134,22 @@ document.addEventListener("DOMContentLoaded", () => {
           loadShodaqohData();
         }
 
-        // Handle Zakat
-        if (tab === "zakat") {
-          // Sembunyikan bottom nav karena zakat full screen
+        // Handle Fullscreen Screens (Zakat & Shodaqoh)
+        if (tab === "zakat" || tab === "shodaqoh") {
+          // Sembunyikan bottom nav karena screen full screen
           const bottomNav = document.getElementById("bottomnav");
           if (bottomNav) {
             bottomNav.style.display = "none";
           }
 
-          // Tampilkan screen zakat
-          const screen = document.getElementById("screen-zakat");
+          // Tampilkan screen terkait
+          const screen = document.getElementById("screen-" + tab);
           if (screen) {
             screen.classList.add("active");
           }
 
-          // Load data zakat jika belum
-          if (!state.zakat._loaded) {
+          // Load data zakat jika belum (khusus zakat)
+          if (tab === "zakat" && !state.zakat._loaded) {
             showZakatLoader("Memuat data zakat...");
             loadZakatData()
               .then(() => {
@@ -161,16 +161,22 @@ document.addEventListener("DOMContentLoaded", () => {
               });
           }
         } else {
-          // Kembalikan bottom nav untuk route lain (kecuali zakat)
+          // Kembalikan bottom nav untuk route lain (kecuali zakat & shodaqoh)
           const bottomNav = document.getElementById("bottomnav");
           if (bottomNav) {
             bottomNav.style.display = "";
           }
 
           // Sembunyikan screen zakat jika aktif
-          const screen = document.getElementById("screen-zakat");
-          if (screen && screen.classList.contains("active")) {
-            screen.classList.remove("active");
+          const zakatScreen = document.getElementById("screen-zakat");
+          if (zakatScreen && zakatScreen.classList.contains("active")) {
+            zakatScreen.classList.remove("active");
+          }
+
+          // Sembunyikan screen shodaqoh jika aktif
+          const shodaqohScreen = document.getElementById("screen-shodaqoh");
+          if (shodaqohScreen && shodaqohScreen.classList.contains("active")) {
+            shodaqohScreen.classList.remove("active");
           }
         }
 
@@ -613,34 +619,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if ($("shodFilterYear"))
-    $("shodFilterYear").addEventListener("change", function () {
-      state.shodaqoh.filters.year = this.value;
-      renderPaymentHistory();
-    });
-
-  if ($("shodFilterMonth"))
-    $("shodFilterMonth").addEventListener("change", function () {
-      state.shodaqoh.filters.month = this.value;
-      var p = state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month;
-      if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
-        loadShodaqohData(p);
-      }
-    });
-
-  if ($("shodFilterMember"))
-    $("shodFilterMember").addEventListener("change", function () {
-      state.shodaqoh.filters.memberId = this.value;
-      renderShodaqohMonitoring();
-      renderPaymentHistory();
-    });
-
-  if ($("shodFilterStatus"))
-    $("shodFilterStatus").addEventListener("change", function () {
-      state.shodaqoh.filters.status = this.value;
-      renderShodaqohMonitoring();
-    });
-
   if ($("shodMethodManual")) {
     $("shodMethodManual").addEventListener("click", function () {
       if (typeof toggleShodMethod === "function") {
@@ -853,10 +831,30 @@ document.addEventListener("DOMContentLoaded", () => {
   if ($("btnShodEditPayment")) {
     $("btnShodEditPayment").addEventListener("click", async () => {
       const id = $("btnShodEditPayment").dataset.paymentId;
-      const d = await apiGetShodaqohPaymentDetail(id);
+
+      // Tutup detail
       $("shodPaymentDetailOverlay")?.classList.add("hidden");
+
+      // Buka form dengan skeleton/loading state
       if (typeof openShodaqohPaymentForm === "function") {
-        openShodaqohPaymentForm(d.payment);
+        openShodaqohPaymentForm(null, true); // true = show immediately
+      }
+
+      // Tambahkan class loading pada form
+      const form = document.getElementById("shodaqohPaymentForm");
+      if (form) form.classList.add("loading");
+
+      try {
+        const d = await apiGetShodaqohPaymentDetail(id);
+        if (d.success && d.payment) {
+          if (typeof fillShodaqohPaymentForm === "function") {
+            fillShodaqohPaymentForm(d.payment);
+          }
+        }
+      } catch (err) {
+        showToast("Gagal memuat data: " + err.message, "error");
+      } finally {
+        if (form) form.classList.remove("loading");
       }
     });
   }
@@ -1454,16 +1452,83 @@ async function openShodaqohPaymentDetail(paymentId) {
       }
     }
 
-    const isLunas = p.status === "LUNAS" || p.status === "ACTIVE";
-    const statusClass = isLunas ? "status-active" : "status-inactive";
-    const statusLabel = isLunas ? "Lunas" : "Belum";
+    let isLunas = false;
+    let statusLabel = "Belum";
 
+    // Cek dari berbagai kemungkinan
+    if (p.status) {
+      // Jika status berupa string teks
+      if (typeof p.status === "string") {
+        isLunas = p.status === "LUNAS" || p.status === "ACTIVE";
+        statusLabel = isLunas ? "Lunas" : "Belum";
+      }
+      // Jika status berupa tanggal (bug), gunakan logika lain
+      else if (
+        p.status instanceof Date ||
+        !isNaN(new Date(p.status).getTime())
+      ) {
+        // Fallback: cek dari total_paid vs target
+        const totalPaid = Number(p.total_paid || p.total || 0);
+        const target = Number(p.target || 0);
+
+        if (target > 0 && totalPaid >= target) {
+          isLunas = true;
+          statusLabel = "Lunas";
+        } else if (totalPaid > 0) {
+          isLunas = false;
+          statusLabel = "Sebagian";
+        } else {
+          isLunas = false;
+          statusLabel = "Belum";
+        }
+
+        console.log("🔧 Fallback status:", { totalPaid, target, isLunas });
+      }
+    } else {
+      // Fallback: cek dari total vs target
+      const totalPaid = Number(p.total_paid || p.total || 0);
+      const target = Number(p.target || 0);
+
+      if (target > 0 && totalPaid >= target) {
+        isLunas = true;
+        statusLabel = "Lunas";
+      } else if (totalPaid > 0) {
+        isLunas = false;
+        statusLabel = "Sebagian";
+      } else {
+        isLunas = false;
+        statusLabel = "Belum";
+      }
+    }
+
+    const statusClass = isLunas ? "status-active" : "status-inactive";
+
+    console.log("Status di detail:", p.status);
+    console.log("isLunas:", isLunas);
+
+    // ============================================================
+    // PERBAIKAN: Nama dan badge menjadi 2 baris - tetap di CENTER
+    // ============================================================
     if ($("shodPaymentDetailMeta")) {
       $("shodPaymentDetailMeta").innerHTML = `
-        ${escapeHtml(p.nama)} · ${formattedDate} · ${fmtRp(p.total)}
-        <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;margin-left:4px;vertical-align:middle;">
-          ${escapeHtml(statusLabel)}
-        </span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;text-align:center;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:13px;font-weight:600;color:var(--ink);">
+              ${escapeHtml(p.nama)}
+            </span>
+            <span style="font-size:11px;color:var(--ink-soft);">
+              · ${formattedDate}
+            </span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:6px;width:80%;">
+            <span style="font-size:14px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;">
+              ${fmtRp(p.total)}
+            </span>
+            <span class="status-pill ${statusClass}" style="font-size:8px;padding:4px 12px;font-weight:700;">
+              ${escapeHtml(statusLabel)}
+            </span>
+          </div>
+        </div>
       `;
     }
 

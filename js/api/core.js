@@ -30,7 +30,7 @@ let state = {
     members: [],
     monitoring: [],
     payments: [],
-    filters: { year: "", month: "", memberId: "", status: "ALL" },
+    filters: { year: "", month: "", status: "ALL" },
     selectedMemberId: null,
     selectedPaymentId: null,
     actionNo: null,

@@ -22,159 +22,184 @@ function getShortMonthLabel(monthKey) {
   return monthNames[parseInt(m) - 1] + "-" + y.slice(2, 4);
 }
 
+const SHODAQOH_FILTER_STATUS_LABELS = {
+  ALL: "Semua",
+  LUNAS: "Lunas",
+  BELUM: "Belum",
+};
+
+function getShodaqohFilterYears() {
+  return [
+    ...new Set(
+      (state.shodaqoh.payments || [])
+        .map((p) => String(p.tanggal || "").slice(0, 4))
+        .filter(Boolean)
+        .concat([String(state.shodaqoh.selectedMonth || "").slice(0, 4)])
+    ),
+  ].filter(Boolean).sort().reverse();
+}
+
 function renderShodaqohFilters() {
+  renderShodaqohFilterOptions();
+  updateShodaqohFilterSheetState();
+  updateShodaqohFilterBadge();
+  updateShodaqohActiveFiltersDisplay();
+
+  if (!document.getElementById("btnOpenShodaqohFilter")?.dataset.filterBound) {
+    initShodaqohFilters();
+  }
+}
+
+function renderShodaqohFilterOptions() {
+  const yearContainer = $("shodaqohFilterYears");
+  const monthContainer = $("shodaqohFilterMonths");
+  const statusContainer = $("shodaqohFilterStatuses");
+  if (!yearContainer || !monthContainer || !statusContainer) return;
+
+  const years = getShodaqohFilterYears();
   const months = [
-    { value: "", label: "Semua" },
-    { value: "01", label: "Januari" },
-    { value: "02", label: "Februari" },
-    { value: "03", label: "Maret" },
-    { value: "04", label: "April" },
-    { value: "05", label: "Mei" },
-    { value: "06", label: "Juni" },
-    { value: "07", label: "Juli" },
-    { value: "08", label: "Agustus" },
-    { value: "09", label: "September" },
-    { value: "10", label: "Oktober" },
-    { value: "11", label: "November" },
+    { value: "", label: "Semua" }, { value: "01", label: "Januari" },
+    { value: "02", label: "Februari" }, { value: "03", label: "Maret" },
+    { value: "04", label: "April" }, { value: "05", label: "Mei" },
+    { value: "06", label: "Juni" }, { value: "07", label: "Juli" },
+    { value: "08", label: "Agustus" }, { value: "09", label: "September" },
+    { value: "10", label: "Oktober" }, { value: "11", label: "November" },
     { value: "12", label: "Desember" },
   ];
-
   const statuses = [
     { value: "ALL", label: "Semua" },
     { value: "LUNAS", label: "Lunas" },
     { value: "BELUM", label: "Belum" },
   ];
+  const toButton = (item) => `<button type="button" class="filter-chip-option" data-filter="${item.filter}" data-value="${item.value}">${item.label}</button>`;
 
-  const years = [
-    ...new Set(
-      state.shodaqoh.payments
-        .map((p) => String(p.tanggal).slice(0, 4))
-        .filter(Boolean)
-        .concat([String(state.shodaqoh.selectedMonth).slice(0, 4)]),
-    ),
-  ]
-    .sort()
-    .reverse();
-
-  const members = [
-    { value: "", label: "Semua" },
-    ...(state.shodaqoh.members || []).map(function (m) {
-      return { value: m.member_id, label: m.nama };
-    }),
-  ];
-
-  renderFilterDropdown("shodYear", years, state.shodaqoh.filters.year || "");
-  renderFilterDropdown("shodMonth", months, state.shodaqoh.filters.month || "");
-  renderFilterDropdown(
-    "shodMember",
-    members,
-    state.shodaqoh.filters.memberId || "",
-  );
-  renderFilterDropdown(
-    "shodStatus",
-    statuses,
-    state.shodaqoh.filters.status || "ALL",
-  );
+  yearContainer.innerHTML = [{ value: "", label: "Semua", filter: "tahun" }]
+    .concat(years.map((year) => ({ value: year, label: year, filter: "tahun" })))
+    .map(toButton).join("");
+  monthContainer.innerHTML = months.map((item) => ({ ...item, filter: "bulan" })).map(toButton).join("");
+  statusContainer.innerHTML = statuses.map((item) => ({ ...item, filter: "status" })).map(toButton).join("");
 }
 
-function renderFilterDropdown(prefix, items, selectedValue) {
-  const menu = $(prefix + "DropdownMenu");
-  const value = $(prefix + "DropdownValue");
-  const trigger = $(prefix + "DropdownTrigger");
+function initShodaqohFilters() {
+  const trigger = document.getElementById("btnOpenShodaqohFilter");
+  const sheet = document.getElementById("shodaqohFilterSheet");
+  if (!trigger || !sheet) return;
+  trigger.dataset.filterBound = "true";
 
-  if (!menu || !value) return;
+  trigger.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); openShodaqohFilterSheet(); });
+  sheet.addEventListener("click", function (e) { if (e.target === this) closeShodaqohFilterSheet(); });
 
-  if (Array.isArray(items) && items.length > 0) {
-    const selectedItem = items.find(function (item) {
-      const itemVal = item.value !== undefined ? item.value : item;
-      return String(itemVal) === String(selectedValue);
-    });
-    if (selectedItem) {
-      value.textContent =
-        selectedItem.label || selectedItem.nama || selectedItem;
-    } else {
-      value.textContent = "Semua";
-    }
-  }
+  const handle = sheet.querySelector(".sheet-handle");
+  if (handle) handle.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); closeShodaqohFilterSheet(); });
 
-  menu.innerHTML = items
-    .map(function (item) {
-      const val = item.value !== undefined ? item.value : item;
-      const label = item.label || item.nama || item;
-      const isSelected = String(val) === String(selectedValue);
-      return `<button type="button"
-        class="filter-dropdown-option ${isSelected ? "active" : ""}"
-        data-value="${val}"
-        role="option"
-        aria-selected="${isSelected}">
-        <span>${label}</span>
-      </button>`;
-    })
-    .join("");
-
-  trigger.onclick = function (event) {
-    event.stopPropagation();
-    const dropdown = $(prefix + "Dropdown");
-    const isOpen = dropdown.classList.contains("open");
-    document.querySelectorAll(".filter-dropdown.open").forEach(function (el) {
-      if (el.id !== dropdown.id) {
-        el.classList.remove("open");
-        el.querySelector(".filter-dropdown-trigger")?.setAttribute(
-          "aria-expanded",
-          "false",
-        );
-      }
-    });
-    dropdown.classList.toggle("open");
-    dropdown
-      .querySelector(".filter-dropdown-trigger")
-      ?.setAttribute("aria-expanded", String(!isOpen));
-  };
-
-  menu.querySelectorAll(".filter-dropdown-option").forEach(function (option) {
-    option.onclick = function (event) {
-      event.stopPropagation();
-      const val = this.dataset.value;
-      const label = this.textContent.trim();
-      const dropdown = $(prefix + "Dropdown");
-      dropdown.classList.remove("open");
-      dropdown
-        .querySelector(".filter-dropdown-trigger")
-        ?.setAttribute("aria-expanded", "false");
-
-      const filterKey = prefix.replace("shod", "").toLowerCase();
-
-      if (filterKey === "year") {
-        state.shodaqoh.filters.year = val || "";
-        value.textContent = label || "Semua";
-        renderPaymentHistory();
-      } else if (filterKey === "month") {
-        state.shodaqoh.filters.month = val || "";
-        value.textContent = label || "Semua";
-        const p =
-          state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month;
-        if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
-          loadShodaqohData(p);
-        } else {
-          loadShodaqohData("");
-        }
-      } else if (filterKey === "member") {
-        state.shodaqoh.filters.memberId = val || "";
-        value.textContent = label || "Semua";
-        renderShodaqohMonitoring();
-        renderPaymentHistory();
-      } else if (filterKey === "status") {
-        state.shodaqoh.filters.status = val || "ALL";
-        value.textContent = label || "Semua";
-        renderShodaqohMonitoring();
-      }
-
-      menu.querySelectorAll(".filter-dropdown-option").forEach(function (el) {
-        el.classList.toggle("active", el.dataset.value === val);
-        el.setAttribute("aria-selected", el.dataset.value === val);
-      });
-    };
+  sheet.addEventListener("click", function (e) {
+    const option = e.target.closest(".filter-chip-option");
+    if (!option || !sheet.contains(option)) return;
+    const group = option.dataset.filter;
+    sheet.querySelectorAll('.filter-chip-option[data-filter="' + group + '"]').forEach((btn) => btn.classList.remove("active"));
+    option.classList.add("active");
   });
+
+  const applyBtn = document.getElementById("btnApplyShodaqohFilter");
+  if (applyBtn) applyBtn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); applyShodaqohFilterFromSheet(); });
+  const resetBtn = document.getElementById("btnResetShodaqohFilter");
+  if (resetBtn) resetBtn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); resetShodaqohFilters(); });
+}
+
+function openShodaqohFilterSheet() {
+  const sheet = document.getElementById("shodaqohFilterSheet");
+  if (!sheet) return;
+  updateShodaqohFilterSheetState();
+  sheet.classList.remove("hidden");
+  sheet.style.display = "flex";
+  document.body.classList.add("shodaqoh-filter-open");
+}
+
+function closeShodaqohFilterSheet() {
+  const sheet = document.getElementById("shodaqohFilterSheet");
+  if (!sheet) return;
+  sheet.classList.add("hidden");
+  sheet.style.display = "none";
+  document.body.classList.remove("shodaqoh-filter-open");
+}
+
+function updateShodaqohFilterSheetState() {
+  const sheet = document.getElementById("shodaqohFilterSheet");
+  if (!sheet) return;
+  const filters = state.shodaqoh.filters;
+  sheet.querySelectorAll(".filter-chip-option").forEach((btn) => {
+    const group = btn.dataset.filter;
+    const currentValue = group === "tahun" ? filters.year || "" : group === "bulan" ? filters.month || "" : filters.status || "ALL";
+    btn.classList.toggle("active", btn.dataset.value === currentValue);
+  });
+}
+
+function applyShodaqohFilterFromSheet() {
+  const sheet = document.getElementById("shodaqohFilterSheet");
+  if (!sheet) return;
+  const activeYear = sheet.querySelector('.filter-chip-option[data-filter="tahun"].active');
+  const activeMonth = sheet.querySelector('.filter-chip-option[data-filter="bulan"].active');
+  const activeStatus = sheet.querySelector('.filter-chip-option[data-filter="status"].active');
+
+  state.shodaqoh.filters.year = activeYear ? activeYear.dataset.value : "";
+  state.shodaqoh.filters.month = activeMonth ? activeMonth.dataset.value : "";
+  state.shodaqoh.filters.status = activeStatus ? activeStatus.dataset.value : "ALL";
+
+  closeShodaqohFilterSheet();
+  updateShodaqohFilterBadge();
+  updateShodaqohActiveFiltersDisplay();
+
+  if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
+    loadShodaqohData(state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month);
+  } else {
+    renderShodaqohMonitoring();
+    renderPaymentHistory();
+  }
+}
+
+function resetShodaqohFilters() {
+  state.shodaqoh.filters = { year: "", month: "", status: "ALL" };
+  closeShodaqohFilterSheet();
+  updateShodaqohFilterSheetState();
+  updateShodaqohFilterBadge();
+  updateShodaqohActiveFiltersDisplay();
+  loadShodaqohData("");
+}
+
+function updateShodaqohFilterBadge() {
+  const badge = document.getElementById("shodaqohFilterBadge");
+  if (!badge) return;
+  let activeCount = 0;
+  if (state.shodaqoh.filters.year) activeCount++;
+  if (state.shodaqoh.filters.month) activeCount++;
+  if (state.shodaqoh.filters.status !== "ALL") activeCount++;
+  if (activeCount > 0) { badge.textContent = activeCount; badge.classList.remove("hidden"); }
+  else badge.classList.add("hidden");
+}
+
+function updateShodaqohActiveFiltersDisplay() {
+  const container = document.getElementById("shodaqohActiveFilters");
+  if (!container) return;
+  const filters = state.shodaqoh.filters;
+  const activeFilters = [];
+  if (filters.year) activeFilters.push({ label: filters.year, filter: "tahun" });
+  if (filters.month) {
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    activeFilters.push({ label: monthNames[Number(filters.month) - 1] || filters.month, filter: "bulan" });
+  }
+  if (filters.status !== "ALL" && SHODAQOH_FILTER_STATUS_LABELS[filters.status]) activeFilters.push({ label: SHODAQOH_FILTER_STATUS_LABELS[filters.status], filter: "status" });
+  if (!activeFilters.length) { container.innerHTML = ""; return; }
+
+  container.innerHTML = activeFilters.map((f) => '<span class="zakat-active-filter-chip">' + f.label + '<button class="remove-filter" data-filter="' + f.filter + '" aria-label="Hapus filter ' + f.label + '">×</button></span>').join("");
+  container.querySelectorAll(".remove-filter").forEach((btn) => btn.addEventListener("click", function (e) {
+    e.preventDefault(); e.stopPropagation();
+    if (this.dataset.filter === "tahun") state.shodaqoh.filters.year = "";
+    if (this.dataset.filter === "bulan") state.shodaqoh.filters.month = "";
+    if (this.dataset.filter === "status") state.shodaqoh.filters.status = "ALL";
+    updateShodaqohFilterSheetState(); updateShodaqohFilterBadge(); updateShodaqohActiveFiltersDisplay();
+    if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) loadShodaqohData(state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month);
+    else { renderShodaqohMonitoring(); renderPaymentHistory(); }
+  }));
 }
 
 document.addEventListener("click", function (event) {
@@ -1293,147 +1318,85 @@ function formatDateInput(date) {
 }
 
 function renderShodaqohSkeleton() {
-  const container = document.querySelector("#screen-shodaqoh");
+  const screen = document.querySelector("#screen-shodaqoh");
+  const container = screen?.querySelector(".shodaqoh-content");
   if (!container) return;
 
-  // Hapus skeleton lama jika ada
-  container
-    .querySelectorAll(".shod-skeleton-wrapper")
-    .forEach((el) => el.remove());
+  // Skeleton hanya menggantikan isi area scrollable.
+  // Header/filter Shodaqoh tetap terlihat agar layout saat loading identik
+  // dengan state normal dan tidak terjadi loncatan posisi konten.
+  container.querySelectorAll(".shod-skeleton-wrapper").forEach((el) => el.remove());
+  container.querySelectorAll(":scope > *").forEach((child) => {
+    if (!child.classList.contains("shod-skeleton-wrapper")) child.style.display = "none";
+  });
 
-  // SEMBUNYIKAN SEMUA KONTEN ASLI
-  const children = container.children;
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i];
-    if (child.classList && child.classList.contains("shod-skeleton-wrapper"))
-      continue;
-    child.style.display = "none";
-  }
-
-  // Buat wrapper skeleton
   const wrapper = document.createElement("div");
   wrapper.className = "shod-skeleton-wrapper";
-  wrapper.style.cssText = "display:block;width:100%;";
+  wrapper.style.cssText = "display:block;width:100%;box-sizing:border-box;padding:0 2px 60px;";
+
+  const line = (width, height, extra = "") =>
+    `<span class="skeleton-line" style="display:block;width:${width};height:${height};border-radius:5px;${extra}"></span>`;
 
   wrapper.innerHTML = `
-    <!-- Skeleton: Header (judul + tombol) -->
-    <div class="flex items-center justify-between gap-3 skeleton-loading" style="margin-bottom:12px;">
-      <div>
-        <div class="skeleton-line" style="width:80px;height:10px;border-radius:4px;margin-bottom:4px;"></div>
-        <div class="skeleton-line" style="width:200px;height:24px;border-radius:4px;margin-bottom:4px;"></div>
-        <div class="skeleton-line" style="width:120px;height:14px;border-radius:4px;"></div>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="skeleton-line" style="width:34px;height:34px;border-radius:8px;"></div>
-        <div class="skeleton-line" style="width:34px;height:34px;border-radius:8px;"></div>
-      </div>
-    </div>
-
-    <!-- Skeleton: Dashboard 4 card (grid 2x2) -->
+    <!-- Dashboard summary -->
     <div class="grid grid-cols-2 gap-3" style="margin-bottom:12px;">
-      ${[1, 2, 3, 4]
-        .map(
-          () => `
-        <div class="card p-4 skeleton-loading">
-          <div class="skeleton-line" style="width:40%;height:10px;border-radius:4px;margin-bottom:6px;"></div>
-          <div class="skeleton-line" style="width:60%;height:20px;border-radius:4px;"></div>
+      ${[1, 2, 3, 4].map(() => `
+        <div class="card p-4 skeleton-loading" style="min-height:76px;box-sizing:border-box;">
+          ${line("42%", "9px", "margin-bottom:8px;")}
+          ${line("68%", "19px")}
         </div>
-      `,
-        )
-        .join("")}
+      `).join("")}
     </div>
 
-    <!-- Skeleton: Rincian Alokasi Pembayaran -->
+    <!-- Allocation -->
     <div class="card p-4" style="margin-bottom:12px;">
-      <div class="skeleton-line" style="width:50%;height:14px;border-radius:4px;margin-bottom:12px;"></div>
+      ${line("48%", "14px", "margin-bottom:12px;")}
       <div class="grid grid-cols-2 gap-2">
-        ${[1, 2, 3, 4, 5, 6, 7, 8]
-          .map(
-            () => `
-          <div class="card p-3 skeleton-loading">
-            <div class="skeleton-line" style="width:60%;height:8px;border-radius:4px;margin-bottom:4px;"></div>
-            <div class="skeleton-line" style="width:50%;height:16px;border-radius:4px;"></div>
+        ${Array.from({ length: 8 }, () => `
+          <div class="card p-3 skeleton-loading" style="box-sizing:border-box;">
+            ${line("62%", "8px", "margin-bottom:6px;")}
+            ${line("52%", "16px")}
           </div>
-        `,
-          )
-          .join("")}
+        `).join("")}
       </div>
     </div>
 
-    <!-- Skeleton: Filter (4 dropdown) -->
-    <div class="card p-4" style="margin-bottom:12px;">
-      <div class="grid grid-cols-2 gap-3 skeleton-loading">
-        ${[1, 2, 3, 4]
-          .map(
-            () => `
-          <div>
-            <div class="skeleton-line" style="width:30%;height:8px;border-radius:4px;margin-bottom:4px;"></div>
-            <div class="skeleton-line" style="width:100%;height:34px;border-radius:8px;"></div>
-          </div>
-        `,
-          )
-          .join("")}
-      </div>
-    </div>
-
-    <!-- Skeleton: Tabs (3 tab) -->
+    <!-- Tabs -->
     <div style="margin-bottom:8px;">
-      <div class="shod-tabs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-        ${[1, 2, 3]
-          .map(
-            () => `
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;">
+        ${[1, 2, 3].map(() => `
           <div style="height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;">
-            <span class="skeleton-line" style="display:block;width:48px;height:10px;border-radius:4px;"></span>
+            ${line("48px", "10px")}
           </div>
-        `,
-          )
-          .join("")}
+        `).join("")}
       </div>
     </div>
 
-    <!-- Skeleton: Monitoring Table -->
+    <!-- Monitoring -->
     <div class="card p-4">
-      <!-- Header table -->
       <div class="flex items-center justify-between mb-3 skeleton-loading">
         <div class="flex items-center gap-3">
-          <span class="skeleton-line" style="display:inline-block;width:80px;height:12px;border-radius:4px;"></span>
-          <span class="skeleton-line" style="display:inline-block;width:60px;height:10px;border-radius:4px;"></span>
+          ${line("80px", "12px")}
+          ${line("60px", "10px")}
         </div>
         <div class="flex items-center gap-3">
-          <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
-          <span class="skeleton-line" style="display:inline-block;width:50px;height:10px;border-radius:4px;"></span>
+          ${line("50px", "10px")}
+          ${line("50px", "10px")}
         </div>
       </div>
-      
-      <!-- Table header -->
-      <div style="display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 1fr;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line);">
-        ${["Anggota", "Target", "Dibayar", "Status", "Tgl Bayar"]
-          .map(
-            () =>
-              `<span class="skeleton-line" style="height:10px;border-radius:4px;"></span>`,
-          )
-          .join("")}
+
+      <div style="display:grid;grid-template-columns:1.5fr .8fr .8fr .8fr 1fr;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+        ${[1, 2, 3, 4, 5].map(() => line("100%", "10px")).join("")}
       </div>
-      
-      <!-- Table rows -->
-      ${[1, 2, 3, 4, 5, 6, 7]
-        .map(
-          () => `
-        <div style="display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);">
-          ${[1, 2, 3, 4, 5]
-            .map(
-              () =>
-                `<span class="skeleton-line" style="height:12px;border-radius:4px;"></span>`,
-            )
-            .join("")}
+
+      ${Array.from({ length: 7 }, () => `
+        <div style="display:grid;grid-template-columns:1.5fr .8fr .8fr .8fr 1fr;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);">
+          ${[1, 2, 3, 4, 5].map(() => line("100%", "12px")).join("")}
         </div>
-      `,
-        )
-        .join("")}
+      `).join("")}
     </div>
   `;
 
-  // Masukkan skeleton di awal container (sebelum konten asli)
   container.insertBefore(wrapper, container.firstChild);
 }
 

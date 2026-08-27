@@ -1,0 +1,148 @@
+/* ============================================================
+   SHODAQOH SCREEN - FULL SCREEN OVERLAY
+   (Mirrors #screen-zakat fullscreen behaviour — see zakat-screen.css)
+   ============================================================ */
+
+#screen-shodaqoh {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  background: var(--bg) !important;
+  display: none !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+#screen-shodaqoh.active {
+  display: flex !important;
+}
+
+/* ============================================================
+   SHODAQOH HEADER
+   ============================================================ */
+
+.shodaqoh-header {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+  display: flex;
+  align-items: center !important;
+  gap: 6px;
+  padding: 10px 16px 10px 16px !important; /* padding kanan-kiri 16px */
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+  flex-shrink: 0 !important;
+  min-height: 52px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.shodaqoh-back-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.shodaqoh-back-btn:hover {
+  background: var(--surface-alt);
+}
+
+.shodaqoh-back-btn:active {
+  transform: scale(0.92);
+}
+
+.shodaqoh-header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.shodaqoh-title {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+/* ============================================================
+   SHODAQOH CONTENT (SCROLLABLE)
+   ============================================================ */
+
+.shodaqoh-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 16px 80px 16px !important; /* padding kanan-kiri 16px */
+  -webkit-overflow-scrolling: touch !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.shodaqoh-content > * + * {
+  margin-top: 1.25rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .shodaqoh-header {
+    padding: 8px 12px 8px 12px !important; /* padding kanan-kiri 12px untuk mobile */
+    min-height: 44px !important;
+  }
+
+  .shodaqoh-title {
+    font-size: 14px !important;
+  }
+
+  .shodaqoh-content {
+    padding: 0 12px 70px 12px !important; /* padding kanan-kiri 12px untuk mobile */
+  }
+}
+
+@media (max-width: 380px) {
+  .shodaqoh-title {
+    font-size: 12px !important;
+  }
+}
+
+/* ============================================================
+   FIX: FAB Tambah Pembayaran & Post ke Kas
+   ------------------------------------------------------------
+   #fabAdd dan #fabPostToKas berada di luar #screen-shodaqoh
+   (z-index: 50 bawaan). Saat Shodaqoh fullscreen aktif
+   (z-index: 9999), kedua FAB itu jadi tertutup dan tidak bisa
+   diklik. Aturan ini HANYA menaikkan stacking order-nya —
+   tidak mengubah posisi, ukuran, maupun handler klik apa pun.
+   ============================================================ */
+
+#fabAdd,
+#fabPostToKas {
+  z-index: 10000 !important;
+}

@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="/css/shodaqoh-sheet.css" />
     <link rel="stylesheet" href="/css/shodaqoh.css" />
     <link rel="stylesheet" href="/css/zakat-screen.css" />
+    <link rel="stylesheet" href="/css/shodaqoh-screen.css" />
     <link rel="stylesheet" href="/css/zakat-sheet.css" />
     <link rel="stylesheet" href="/css/zakat-detail.css" />
     <link rel="stylesheet" href="/css/chart-print.css" />
@@ -2875,6 +2876,42 @@
           </div>
 
           <div class="card p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="eyebrow">Manajemen</p>
+                <p class="text-[13px] font-bold mt-0.5">Shodaqoh</p>
+                <p class="text-[11px] text-[color:var(--ink-faint)] mt-0.5">
+                  Kelola infak bulanan &amp; pembayaran
+                </p>
+              </div>
+              <button
+                id="btnOpenShodaqoh"
+                class="btn-ghost"
+                onclick="openShodaqohScreen()"
+                style="
+                  padding: 8px 16px;
+                  font-size: 11px;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                "
+              >
+                <span>Kelola Shodaqoh</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card p-5">
             <p class="eyebrow mb-1.5">Sinkronisasi</p>
             <p class="text-[12.5px] text-[color:var(--ink-soft)]">
               Klik tombol <strong>Sinkron</strong> di pojok kanan atas untuk
@@ -2886,7 +2923,51 @@
           </div>
         </section>
 
-        <section id="screen-shodaqoh" class="screen space-y-5">
+        <section id="screen-shodaqoh" class="screen screen-shodaqoh-full">
+          <!-- Loader awal Shodaqoh — identik dengan loader Zakat -->
+          <div id="shodaqohLoader" class="zakat-loader hidden">
+            <div class="zakat-loader-content">
+              <div class="zakat-loader-spinner"></div>
+              <p class="zakat-loader-text" id="shodaqohLoaderText">Memuat data shodaqoh...</p>
+            </div>
+          </div>
+          <!-- Header dengan Back Button (STICKY) -->
+          <div class="zakat-header">
+            <button
+              type="button"
+              id="btnShodaqohBack"
+              class="zakat-back-btn"
+              aria-label="Kembali ke Profil"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <div class="zakat-header-center">
+              <h2 class="zakat-title" id="shodaqohScreenTitle">
+                Shodaqoh Bulanan
+              </h2>
+              <button id="btnOpenShodaqohFilter" class="zakat-filter-trigger" aria-label="Buka filter Shodaqoh">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M6 12h12M10 18h4" />
+                </svg>
+                <span id="shodaqohFilterBadge" class="filter-badge hidden">0</span>
+              </button>
+            </div>
+            <div id="shodaqohActiveFilters" class="zakat-active-filters"></div>
+          </div>
+
+          <!-- Main Content (SCROLLABLE) -->
+          <div class="shodaqoh-content">
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="eyebrow">Infak Bulanan</p>
@@ -3173,145 +3254,39 @@
             </div>
           </div>
 
-          <div class="card p-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div class="filter-group">
-                <label class="filter-label">Tahun</label>
-                <div class="filter-dropdown" id="shodYearDropdown">
-                  <button
-                    type="button"
-                    id="shodYearDropdownTrigger"
-                    class="filter-dropdown-trigger"
-                    aria-haspopup="listbox"
-                    aria-expanded="false"
-                  >
-                    <span
-                      id="shodYearDropdownValue"
-                      class="filter-dropdown-value"
-                      >Semua</span
-                    >
-                    <svg
-                      class="filter-dropdown-chevron"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div
-                    id="shodYearDropdownMenu"
-                    class="filter-dropdown-menu"
-                    role="listbox"
-                  ></div>
+          <!-- Shodaqoh Filter Sheet — visual pattern identical to Zakat -->
+          <div id="shodaqohFilterSheet" class="sheet-overlay hidden">
+            <div class="sheet" style="padding: 12px 16px 20px">
+              <div class="sheet-header sheet-header-payment">
+                <div class="sheet-handle"></div>
+                <div class="sheet-header-icon" style="background: var(--brand-soft); color: var(--brand)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M6 12h12M10 18h4" />
+                  </svg>
                 </div>
+                <h3 class="sheet-title">Filter Shodaqoh</h3>
+                <p class="sheet-subtitle">Pilih filter untuk menyaring data shodaqoh</p>
               </div>
 
-              <div class="filter-group">
-                <label class="filter-label">Bulan</label>
-                <div class="filter-dropdown" id="shodMonthDropdown">
-                  <button
-                    type="button"
-                    id="shodMonthDropdownTrigger"
-                    class="filter-dropdown-trigger"
-                    aria-haspopup="listbox"
-                    aria-expanded="false"
-                  >
-                    <span
-                      id="shodMonthDropdownValue"
-                      class="filter-dropdown-value"
-                      >Semua</span
-                    >
-                    <svg
-                      class="filter-dropdown-chevron"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div
-                    id="shodMonthDropdownMenu"
-                    class="filter-dropdown-menu"
-                    role="listbox"
-                  ></div>
+              <div class="sheet-scroll">
+                <div style="margin-bottom: 16px">
+                  <label style="font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.05em">Tahun</label>
+                  <div id="shodaqohFilterYears" style="display: flex; gap: 6px; flex-wrap: wrap"></div>
                 </div>
-              </div>
 
-              <div class="filter-group">
-                <label class="filter-label">Anggota</label>
-                <div class="filter-dropdown" id="shodMemberDropdown">
-                  <button
-                    type="button"
-                    id="shodMemberDropdownTrigger"
-                    class="filter-dropdown-trigger"
-                    aria-haspopup="listbox"
-                    aria-expanded="false"
-                  >
-                    <span
-                      id="shodMemberDropdownValue"
-                      class="filter-dropdown-value"
-                      >Semua</span
-                    >
-                    <svg
-                      class="filter-dropdown-chevron"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div
-                    id="shodMemberDropdownMenu"
-                    class="filter-dropdown-menu"
-                    role="listbox"
-                  ></div>
+                <div style="margin-bottom: 16px">
+                  <label style="font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.05em">Bulan</label>
+                  <div id="shodaqohFilterMonths" style="display: flex; gap: 6px; flex-wrap: wrap"></div>
                 </div>
-              </div>
 
-              <div class="filter-group">
-                <label class="filter-label">Status</label>
-                <div class="filter-dropdown" id="shodStatusDropdown">
-                  <button
-                    type="button"
-                    id="shodStatusDropdownTrigger"
-                    class="filter-dropdown-trigger"
-                    aria-haspopup="listbox"
-                    aria-expanded="false"
-                  >
-                    <span
-                      id="shodStatusDropdownValue"
-                      class="filter-dropdown-value"
-                      >Semua</span
-                    >
-                    <svg
-                      class="filter-dropdown-chevron"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div
-                    id="shodStatusDropdownMenu"
-                    class="filter-dropdown-menu"
-                    role="listbox"
-                  ></div>
+                <div style="margin-bottom: 16px">
+                  <label style="font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.05em">Status</label>
+                  <div id="shodaqohFilterStatuses" style="display: flex; gap: 6px; flex-wrap: wrap"></div>
+                </div>
+
+                <div style="display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line)">
+                  <button id="btnResetShodaqohFilter" class="btn-ghost flex-1" style="min-height: 42px; font-size: 13px">Reset</button>
+                  <button id="btnApplyShodaqohFilter" class="btn-primary flex-1" style="min-height: 42px; font-size: 13px">Terapkan</button>
                 </div>
               </div>
             </div>
@@ -4239,6 +4214,7 @@
               </button>
             </div>
           </div>
+          </div>
         </section>
       </main>
 
@@ -4331,26 +4307,6 @@
             </svg>
           </span>
           <span>Rekap</span>
-        </button>
-
-        <button class="nav-btn" data-tab="shodaqoh">
-          <span class="nav-pill">
-            <svg
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.1"
-            >
-              <path
-                d="M20 7h-4.5A2.5 2.5 0 0 0 13 9.5v5a2.5 2.5 0 0 0 2.5 2.5H20"
-              />
-              <path d="M4 7h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" />
-              <circle cx="17" cy="12" r="1" />
-            </svg>
-          </span>
-          <span>Shodaqoh</span>
         </button>
 
         <button class="nav-btn" data-tab="profile">

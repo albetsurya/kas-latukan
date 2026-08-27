@@ -43,7 +43,7 @@ const SHOD_STATUS_LABELS = {
 
 async function loadShodaqohData(monthKey) {
   try {
-    renderShodaqohSkeleton();
+    showShodaqohLoader("Memuat data shodaqoh...");
 
     const month = monthKey || state.shodaqoh.selectedMonth || "";
     const data = await apiGetShodaqoh(month);
@@ -100,6 +100,7 @@ async function loadShodaqohData(monthKey) {
     renderShodaqohAllocation();
     renderShodaqohFilters();
     renderShodaqohTabs();
+    hideShodaqohLoader();
 
     const postStatus = $("shodPostStatus");
     if (postStatus) {
@@ -113,6 +114,7 @@ async function loadShodaqohData(monthKey) {
     }
   } catch (err) {
     console.error(err);
+    hideShodaqohLoader();
     showToast("Gagal memuat Shodaqoh IR: " + err.message, "error");
     renderShodaqohError(err.message);
   }
@@ -211,9 +213,9 @@ function renderShodaqohAllocation() {
 
 function getFilteredMonitoringRows() {
   const f = state.shodaqoh.filters;
-  return (state.shodaqoh.monitoring || [])
-    .filter((r) => !f.memberId || String(r.member_id) === String(f.memberId))
-    .filter((r) => f.status === "ALL" || r.status === f.status);
+  return (state.shodaqoh.monitoring || []).filter(
+    (r) => f.status === "ALL" || r.status === f.status,
+  );
 }
 
 function renderShodaqohMonitoring() {
@@ -223,7 +225,6 @@ function renderShodaqohMonitoring() {
   const f = state.shodaqoh.filters;
 
   const rows = (state.shodaqoh.monitoring || []).filter(function (r) {
-    if (f.memberId && String(r.member_id) !== String(f.memberId)) return false;
     if (f.status !== "ALL" && r.status !== f.status) return false;
     return true;
   });
@@ -734,7 +735,6 @@ function renderPaymentHistory() {
   if (!body) return;
   const f = state.shodaqoh.filters;
   const rows = (state.shodaqoh.payments || [])
-    .filter((p) => !f.memberId || String(p.member_id) === String(f.memberId))
     .filter((p) => !f.year || String(p.tanggal).slice(0, 4) === String(f.year))
     .filter(
       (p) => !f.month || String(p.tanggal).slice(5, 7) === String(f.month),
@@ -1120,8 +1120,13 @@ function getCurrentMonthKey() {
   return `${year}-${month}`;
 }
 
-function openShodaqohPaymentForm(payment) {
+function openShodaqohPaymentForm(payment, showImmediately = true) {
   state.shodaqoh.selectedPaymentId = payment?.payment_id || null;
+
+  // Jika showImmediately true, tampilkan sheet dulu
+  if (showImmediately) {
+    $("shodaqohPaymentOverlay")?.classList.remove("hidden");
+  }
 
   const f = $("shodaqohPaymentForm");
   if (f) {
@@ -1130,24 +1135,24 @@ function openShodaqohPaymentForm(payment) {
     f.addEventListener("submit", handleShodaqohSubmit);
   }
 
-  if (typeof toggleShodMethod === "function") {
-    toggleShodMethod("manual");
+  // ... setup lainnya ...
+
+  // Jika ada payment, isi form
+  if (payment) {
+    fillShodaqohPaymentForm(payment);
   }
 
-  if (typeof clearShodUpload === "function") {
-    clearShodUpload();
+  // Jika showImmediately false, tampilkan setelah setup selesai
+  if (!showImmediately) {
+    $("shodaqohPaymentOverlay")?.classList.remove("hidden");
   }
+}
 
-  if (typeof updateLoadLastNominalsButton === "function") {
-    setTimeout(updateLoadLastNominalsButton, 100);
-  }
-
-  // ============================================================
-  // SET TANGGAL
-  // ============================================================
+// Fungsi terpisah untuk mengisi form
+function fillShodaqohPaymentForm(payment) {
+  // Set tanggal
   const dateValueDisplay = $("shodDateDropdownValue");
   const dateHidden = $("shodPaymentDate");
-
   if (payment?.tanggal) {
     const d = new Date(payment.tanggal);
     if (!isNaN(d.getTime())) {
@@ -1157,55 +1162,24 @@ function openShodaqohPaymentForm(payment) {
       datePickerState.currentMonth = d.getMonth();
       datePickerState.currentYear = d.getFullYear();
     }
-  } else {
-    const today = new Date();
-    if (dateValueDisplay)
-      dateValueDisplay.textContent = formatDateDisplay(today);
-    if (dateHidden) dateHidden.value = formatDateInput(today);
-    datePickerState.selectedDate = today;
-    datePickerState.currentMonth = today.getMonth();
-    datePickerState.currentYear = today.getFullYear();
   }
 
-  // ============================================================
-  // SET MEMBER
-  // ============================================================
+  // Set member
   const member = $("shodPaymentMember");
-  if (member) {
-    member.innerHTML =
-      '<option value="">Pilih anggota</option>' +
-      (state.shodaqoh.members || [])
-        .map(
-          (m) =>
-            `<option value="${escapeHtml(m.member_id)}">${escapeHtml(
-              m.nama,
-            )}</option>`,
-        )
-        .join("");
-    member.value = payment?.member_id || "";
-
-    // Update dropdown display
+  if (member && payment?.member_id) {
+    member.value = payment.member_id;
     const memberValueDisplay = $("shodPaymentMemberValue");
-    if (memberValueDisplay && payment?.member_id) {
-      const foundMember = (state.shodaqoh.members || []).find(
-        (m) => String(m.member_id) === String(payment.member_id),
-      );
-      if (foundMember) {
-        memberValueDisplay.textContent = foundMember.nama;
-      }
+    const foundMember = (state.shodaqoh.members || []).find(
+      (m) => String(m.member_id) === String(payment.member_id),
+    );
+    if (foundMember) {
+      memberValueDisplay.textContent = foundMember.nama;
     }
   }
 
-  // ============================================================
-  // SET FIELD LAINNYA
-  // ============================================================
-  if ($("shodPaymentDate"))
-    $("shodPaymentDate").value =
-      payment?.tanggal || new Date().toISOString().slice(0, 10);
-
+  // Set field lainnya
   if ($("shodPaymentAmount"))
     $("shodPaymentAmount").value = payment?.total || "";
-
   if ($("shodPaymentNote"))
     $("shodPaymentNote").value = payment?.keterangan || "";
 
@@ -1222,17 +1196,12 @@ function openShodaqohPaymentForm(payment) {
     if (el) el.value = payment?.[pos] || "";
   });
 
-  // ============================================================
-  // RENDER SUSULAN BULAN DENGAN INPUT NOMINAL
-  // ============================================================
+  // Render susulan bulan
   let selectedMonths = {};
-
-  // Cek apakah ada susulan_rincian (format baru)
   if (payment?.susulan_rincian) {
     try {
       selectedMonths = JSON.parse(payment.susulan_rincian);
     } catch (e) {
-      // Fallback: jika ada susulan_bulan tapi tidak ada rincian
       if (payment.susulan_bulan) {
         const bulanArray = String(payment.susulan_bulan)
           .split(",")
@@ -1248,9 +1217,7 @@ function openShodaqohPaymentForm(payment) {
         });
       }
     }
-  }
-  // Jika hanya ada susulan_bulan (format lama)
-  else if (payment?.susulan_bulan) {
+  } else if (payment?.susulan_bulan) {
     const bulanArray = String(payment.susulan_bulan).split(",").filter(Boolean);
     const totalIR = Number(payment.susulan_ir) || 0;
     const perBulan =
@@ -1263,20 +1230,12 @@ function openShodaqohPaymentForm(payment) {
     });
   }
 
-  // Panggil fungsi render (HANYA SATU KALI)
   renderShodSusulanBulan(selectedMonths);
-
-  // ============================================================
-  // SETUP WATCHER & TAMPILKAN OVERLAY
-  // ============================================================
   setupShodaqohAllocationWatcher();
 
-  // Update status alokasi setelah render
   setTimeout(function () {
     updateShodAllocationStatus();
   }, 200);
-
-  $("shodaqohPaymentOverlay")?.classList.remove("hidden");
 }
 
 // Fungsi untuk render checkbox bulan susulan dengan input nominal
@@ -3217,3 +3176,97 @@ async function openShodaqohMemberDetail(memberId) {
     showToast(err.message, "error");
   }
 }
+
+// ============================================================
+// SHODAQOH LOADER (mengikuti loader awal Zakat)
+// ============================================================
+function showShodaqohLoader(message) {
+  message = message || "Memuat data shodaqoh...";
+  var loader = document.getElementById("shodaqohLoader");
+  var text = document.getElementById("shodaqohLoaderText");
+  if (loader) {
+    loader.classList.remove("hidden");
+    if (text) text.textContent = message;
+  }
+}
+
+function hideShodaqohLoader() {
+  var loader = document.getElementById("shodaqohLoader");
+  if (loader) loader.classList.add("hidden");
+}
+
+// ============================================================
+// SHODAQOH - FULLSCREEN NAVIGATION (identik dengan pola Zakat)
+// ============================================================
+// Catatan: fungsi di bawah ini HANYA menangani pembungkus tampilan
+// (fullscreen show/hide + navigasi), tidak mengubah handler,
+// state management, ataupun logic bisnis Shodaqoh yang sudah ada.
+
+window.openShodaqohScreen = function () {
+  if (typeof router !== "undefined" && router) {
+    router.navigateTo("shodaqoh");
+  } else {
+    var screen = document.getElementById("screen-shodaqoh");
+    if (!screen) {
+      showToast("Screen Shodaqoh tidak ditemukan", "error");
+      return;
+    }
+
+    var bottomNav = document.getElementById("bottomnav");
+    if (bottomNav) {
+      bottomNav.style.display = "none";
+    }
+
+    screen.classList.add("active");
+    showShodaqohLoader("Memuat data shodaqoh...");
+
+    if (!state.shodaqoh.loaded && typeof loadShodaqohData === "function") {
+      loadShodaqohData();
+    }
+  }
+};
+
+window.closeShodaqohScreen = function () {
+  if (typeof router !== "undefined" && router) {
+    router.navigateTo("profile");
+  } else {
+    var screen = document.getElementById("screen-shodaqoh");
+    if (screen) {
+      screen.classList.remove("active");
+    }
+
+    var bottomNav = document.getElementById("bottomnav");
+    if (bottomNav) {
+      bottomNav.style.display = "";
+    }
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("#btnOpenShodaqoh");
+    if (btn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (typeof openShodaqohScreen === "function") {
+        openShodaqohScreen();
+      } else if (typeof window.openShodaqohScreen === "function") {
+        window.openShodaqohScreen();
+      } else {
+        showToast("Fungsi Shodaqoh belum siap", "error");
+      }
+    }
+  });
+
+  var btnShodaqohBack = document.getElementById("btnShodaqohBack");
+  if (btnShodaqohBack) {
+    btnShodaqohBack.addEventListener("click", function () {
+      if (typeof closeShodaqohScreen === "function") {
+        closeShodaqohScreen();
+      } else if (window.closeShodaqohScreen) {
+        window.closeShodaqohScreen();
+      }
+    });
+  }
+});
