@@ -41,84 +41,163 @@ const SHOD_STATUS_LABELS = {
   BELUM: "Belum",
 };
 
+
 async function loadShodaqohData(monthKey) {
-  try {
-    showShodaqohLoader("Memuat data shodaqoh...");
+  // ============================================================
+  // REQUEST LOCK / DEDUPLICATION
+  // Jika sedang ada request berjalan, jangan fetch lagi.
+  // Kembalikan Promise yang sama agar caller kedua ikut menunggu.
+  // ============================================================
 
-    const month = monthKey || state.shodaqoh.selectedMonth || "";
-    const data = await apiGetShodaqoh(month);
+  if (state.shodaqoh.loadingPromise) {
+    return state.shodaqoh.loadingPromise;
+  }
 
-    if (!data.success) {
-      throw new Error(data.message || "Gagal memuat data");
-    }
+  // Tentukan bulan sebelum membuat request
+  const month = monthKey || state.shodaqoh.selectedMonth || "";
 
-    if (state.shodaqoh.loadingPromise) {
-      return state.shodaqoh.loadingPromise;
-    }
+  // Simpan Promise SEBELUM fetch dimulai
+  state.shodaqoh.loadingPromise = (async function () {
+    try {
+      showShodaqohLoader("Memuat data shodaqoh...");
 
-    const container = document.querySelector("#screen-shodaqoh");
-    if (container) {
-      container
-        .querySelectorAll(".shod-skeleton-wrapper")
-        .forEach((el) => el.remove());
+      const data = await apiGetShodaqoh(month);
 
-      const children = container.children;
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        if (
-          !child.classList ||
-          !child.classList.contains("shod-skeleton-wrapper")
-        ) {
-          child.style.display = "";
+      if (!data.success) {
+        throw new Error(data.message || "Gagal memuat data");
+      }
+
+      // ============================================================
+      // HAPUS SKELETON
+      // ============================================================
+
+      const container = document.querySelector("#screen-shodaqoh");
+
+      if (container) {
+        container
+          .querySelectorAll(".shod-skeleton-wrapper")
+          .forEach((el) => el.remove());
+
+        const children = container.children;
+
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+
+          if (
+            !child.classList ||
+            !child.classList.contains("shod-skeleton-wrapper")
+          ) {
+            child.style.display = "";
+          }
         }
       }
-    }
 
-    state.shodaqoh.loaded = true;
-    state.shodaqoh.currentMonth = data.currentMonth || "";
-    state.shodaqoh.selectedMonth =
-      data.selectedMonth || data.currentMonth || "";
-    state.shodaqoh.dashboard = data.dashboard || {};
-    state.shodaqoh.members = data.members || [];
-    state.shodaqoh.monitoring = data.monitoring || [];
-    state.shodaqoh.payments = data.payments || [];
+      // ============================================================
+      // UPDATE STATE
+      // ============================================================
 
-    if (!state.shodaqoh.filters.year) {
-      state.shodaqoh.filters.year = String(state.shodaqoh.selectedMonth).slice(
-        0,
-        4,
+      state.shodaqoh.loaded = true;
+
+      state.shodaqoh.currentMonth =
+        data.currentMonth || "";
+
+      state.shodaqoh.selectedMonth =
+        data.selectedMonth ||
+        data.currentMonth ||
+        "";
+
+      state.shodaqoh.dashboard =
+        data.dashboard || {};
+
+      state.shodaqoh.members =
+        data.members || [];
+
+      state.shodaqoh.monitoring =
+        data.monitoring || [];
+
+      state.shodaqoh.payments =
+        data.payments || [];
+
+      // ============================================================
+      // SET DEFAULT FILTER
+      // ============================================================
+
+      if (!state.shodaqoh.filters.year) {
+        state.shodaqoh.filters.year =
+          String(state.shodaqoh.selectedMonth).slice(0, 4);
+      }
+
+      if (!state.shodaqoh.filters.month) {
+        state.shodaqoh.filters.month =
+          String(state.shodaqoh.selectedMonth).slice(5, 7);
+      }
+
+      // ============================================================
+      // RENDER
+      // ============================================================
+
+      renderShodaqohDashboard();
+      renderShodaqohAllocation();
+      renderShodaqohFilters();
+      renderShodaqohTabs();
+
+      hideShodaqohLoader();
+
+      // ============================================================
+      // POST STATUS
+      // ============================================================
+
+      const postStatus = $("shodPostStatus");
+
+      if (postStatus) {
+        const payments =
+          state.shodaqoh.payments || [];
+
+        const allPosted =
+          payments.length > 0 &&
+          payments.every(function (p) {
+            return String(
+              p.kas_transaction_no || ""
+            ).includes("POSTED");
+          });
+
+        postStatus.classList.toggle(
+          "hidden",
+          !allPosted
+        );
+      }
+
+      return data;
+    } catch (err) {
+      console.error(err);
+
+      hideShodaqohLoader();
+
+      showToast(
+        "Gagal memuat Shodaqoh IR: " + err.message,
+        "error"
       );
-    }
-    if (!state.shodaqoh.filters.month) {
-      state.shodaqoh.filters.month = String(state.shodaqoh.selectedMonth).slice(
-        5,
-        7,
-      );
-    }
 
-    renderShodaqohDashboard();
-    renderShodaqohAllocation();
-    renderShodaqohFilters();
-    renderShodaqohTabs();
-    hideShodaqohLoader();
+      renderShodaqohError(err.message);
 
-    const postStatus = $("shodPostStatus");
-    if (postStatus) {
-      const payments = state.shodaqoh.payments || [];
-      const allPosted =
-        payments.length > 0 &&
-        payments.every(function (p) {
-          return String(p.kas_transaction_no || "").includes("POSTED");
-        });
-      postStatus.classList.toggle("hidden", !allPosted);
+      // Biarkan caller mengetahui bahwa request gagal
+      throw err;
+    } finally {
+      // ============================================================
+      // RELEASE REQUEST LOCK
+      //
+      // Setelah request selesai/gagal, Promise dihapus sehingga
+      // request berikutnya (misalnya ganti bulan / refresh)
+      // tetap bisa melakukan fetch baru.
+      // ============================================================
+
+      state.shodaqoh.loadingPromise = null;
     }
-  } catch (err) {
-    console.error(err);
-    hideShodaqohLoader();
-    showToast("Gagal memuat Shodaqoh IR: " + err.message, "error");
-    renderShodaqohError(err.message);
-  }
+  })();
+
+  return state.shodaqoh.loadingPromise;
 }
+
 
 function renderShodaqohScreen() {
   renderShodaqohDashboard();

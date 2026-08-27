@@ -446,30 +446,6 @@ async function logout() {
   return result;
 }
 
-async function loadData() {
-  try {
-    const result = await apiGet();
-    if (result.success) {
-      state.saldoAwal = result.saldoAwal || 0;
-      state.totalDebet = result.totalDebet || 0;
-      state.totalKredit = result.totalKredit || 0;
-      state.saldoAkhir = result.saldoAkhir || 0;
-      state.transactions = result.transactions || [];
-
-      renderDashboard();
-      renderTable();
-      renderChart();
-      renderMonthFilter();
-
-      hideLoginForm();
-    } else {
-      showToastWithIcon(result.message || "Gagal memuat data", "error");
-    }
-  } catch (e) {
-    showToastWithIcon("Error: " + e.message, "error");
-  }
-}
-
 async function addTransaction(data) {
   const result = await apiPost({
     action: "addTransaction",

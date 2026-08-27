@@ -111,31 +111,42 @@ async function manualSync() {
   }
 }
 
-// ============================================================
-// LOAD DATA (PERTAMA KALI)
-// ============================================================
+let loadDataPromise = null;
 
 async function loadData() {
-  // Cek apakah benar-benar authenticated
-  if (!document.documentElement.classList.contains("authenticated")) {
-    console.warn("loadData dipanggil tanpa authenticated");
-    return;
+  if (loadDataPromise) {
+    return loadDataPromise;
   }
 
-  if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
-    if ($("configWarning")) $("configWarning").classList.remove("hidden");
-    renderTxList([], "txList", "txEmpty");
-    return;
-  }
+  loadDataPromise = (async () => {
+    try {
+      if (!document.documentElement.classList.contains("authenticated")) {
+        console.warn("loadData dipanggil tanpa authenticated");
+        return;
+      }
 
-  renderHomeSkeleton();
-  renderHistorySkeleton();
-  renderRecapSkeleton();
+      if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
+        if ($("configWarning")) {
+          $("configWarning").classList.remove("hidden");
+        }
 
-  await refreshAllData();
-  updateLastSyncTime();
+        renderTxList([], "txList", "txEmpty");
+        return;
+      }
 
-  // Shodaqoh akan di-load oleh switchTab jika diperlukan
+      renderHomeSkeleton();
+      renderHistorySkeleton();
+      renderRecapSkeleton();
+
+      await refreshAllData();
+
+      updateLastSyncTime();
+    } finally {
+      loadDataPromise = null;
+    }
+  })();
+
+  return loadDataPromise;
 }
 
 function getMonthsDesc() {
