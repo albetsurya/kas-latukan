@@ -41,7 +41,6 @@ const SHOD_STATUS_LABELS = {
   BELUM: "Belum",
 };
 
-
 async function loadShodaqohData(monthKey) {
   // ============================================================
   // REQUEST LOCK / DEDUPLICATION
@@ -98,38 +97,33 @@ async function loadShodaqohData(monthKey) {
 
       state.shodaqoh.loaded = true;
 
-      state.shodaqoh.currentMonth =
-        data.currentMonth || "";
+      state.shodaqoh.currentMonth = data.currentMonth || "";
 
       state.shodaqoh.selectedMonth =
-        data.selectedMonth ||
-        data.currentMonth ||
-        "";
+        data.selectedMonth || data.currentMonth || "";
 
-      state.shodaqoh.dashboard =
-        data.dashboard || {};
+      state.shodaqoh.dashboard = data.dashboard || {};
 
-      state.shodaqoh.members =
-        data.members || [];
+      state.shodaqoh.members = data.members || [];
 
-      state.shodaqoh.monitoring =
-        data.monitoring || [];
+      state.shodaqoh.monitoring = data.monitoring || [];
 
-      state.shodaqoh.payments =
-        data.payments || [];
+      state.shodaqoh.payments = data.payments || [];
 
       // ============================================================
       // SET DEFAULT FILTER
       // ============================================================
 
       if (!state.shodaqoh.filters.year) {
-        state.shodaqoh.filters.year =
-          String(state.shodaqoh.selectedMonth).slice(0, 4);
+        state.shodaqoh.filters.year = String(
+          state.shodaqoh.selectedMonth,
+        ).slice(0, 4);
       }
 
       if (!state.shodaqoh.filters.month) {
-        state.shodaqoh.filters.month =
-          String(state.shodaqoh.selectedMonth).slice(5, 7);
+        state.shodaqoh.filters.month = String(
+          state.shodaqoh.selectedMonth,
+        ).slice(5, 7);
       }
 
       // ============================================================
@@ -150,21 +144,15 @@ async function loadShodaqohData(monthKey) {
       const postStatus = $("shodPostStatus");
 
       if (postStatus) {
-        const payments =
-          state.shodaqoh.payments || [];
+        const payments = state.shodaqoh.payments || [];
 
         const allPosted =
           payments.length > 0 &&
           payments.every(function (p) {
-            return String(
-              p.kas_transaction_no || ""
-            ).includes("POSTED");
+            return String(p.kas_transaction_no || "").includes("POSTED");
           });
 
-        postStatus.classList.toggle(
-          "hidden",
-          !allPosted
-        );
+        postStatus.classList.toggle("hidden", !allPosted);
       }
 
       return data;
@@ -173,10 +161,7 @@ async function loadShodaqohData(monthKey) {
 
       hideShodaqohLoader();
 
-      showToast(
-        "Gagal memuat Shodaqoh IR: " + err.message,
-        "error"
-      );
+      showToast("Gagal memuat Shodaqoh IR: " + err.message, "error");
 
       renderShodaqohError(err.message);
 
@@ -197,7 +182,6 @@ async function loadShodaqohData(monthKey) {
 
   return state.shodaqoh.loadingPromise;
 }
-
 
 function renderShodaqohScreen() {
   renderShodaqohDashboard();
@@ -949,56 +933,76 @@ function setupShodaqohAllocationWatcher() {
 
   const updateTotal = () => {
     const total = Number($("shodPaymentAmount")?.value || 0);
-    const alokasi = [
-      "shod_susulan_ir",
-      "shod_uang_sambung",
-      "shod_jimpitan",
-      "shod_siar_siar",
-      "shod_seribuan",
-      "shod_kafan",
-      "shod_ukhro_mt",
-    ].reduce((s, id) => s + Number($(id)?.value || 0), 0);
+    const susulanIR = Number($("shod_susulan_ir")?.value || 0);
+    const uangSambung = Number($("shod_uang_sambung")?.value || 0);
+    const jimpitan = Number($("shod_jimpitan")?.value || 0);
+    const siarSiar = Number($("shod_siar_siar")?.value || 0);
+    const seribuan = Number($("shod_seribuan")?.value || 0);
+    const kafan = Number($("shod_kafan")?.value || 0);
+    const ukhroMt = Number($("shod_ukhro_mt")?.value || 0);
 
-    const selisih = total - alokasi;
-    const isBalanced = total > 0 && selisih === 0;
+    const { isBalanced: susulanBalanced } = validateShodSusulanRincian();
 
-    const statusIcon = $("shodAllocationIcon");
+    const alokasiTotal =
+      susulanIR +
+      uangSambung +
+      jimpitan +
+      siarSiar +
+      seribuan +
+      kafan +
+      ukhroMt;
+    const selisih = alokasiTotal - total;
+
     const statusText = $("shodAllocationText");
-    const statusEl = $("shodAllocationStatus");
+    const submitBtn = $("btnSubmitShodaqohPayment");
 
-    if (statusEl && statusText && statusIcon) {
-      if (total === 0) {
-        statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />`;
-        statusIcon.style.color = "var(--ink-soft)";
-        statusText.textContent = "Masukkan total pembayaran";
+    const hasSusulanIR = susulanIR > 0;
+    const susulanValid = !hasSusulanIR || (hasSusulanIR && susulanBalanced);
+
+    if (total <= 0) {
+      if (statusText) {
+        statusText.innerHTML =
+          '<i class="fas fa-info-circle" style="margin-right: 6px;"></i> Masukkan total pembayaran';
         statusText.style.color = "var(--ink-soft)";
-      } else if (isBalanced) {
-        statusIcon.innerHTML = `<path d="M20 6L9 17l-5-5" />`;
-        statusIcon.style.color = "var(--pos)";
-        statusText.textContent = "SEIMBANG (Rp0)";
-        statusText.style.color = "var(--pos)";
-      } else if (selisih > 0) {
-        statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />`;
-        statusIcon.style.color = "var(--neg)";
-        statusText.textContent = "Kurang Rp" + selisih.toLocaleString("id-ID");
-        statusText.style.color = "var(--neg)";
-      } else {
-        statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />`;
-        statusIcon.style.color = "var(--neg)";
-        statusText.textContent =
-          "Kelebihan Rp" + Math.abs(selisih).toLocaleString("id-ID");
-        statusText.style.color = "var(--neg)";
       }
+      if (submitBtn) submitBtn.disabled = true;
+      return;
     }
 
-    const btn = $("btnSubmitShodaqohPayment");
-    if (btn) btn.disabled = !(total > 0 && isBalanced);
+    if (!susulanValid) {
+      if (statusText) {
+        statusText.innerHTML =
+          '<i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> Periksa rincian Susulan IR';
+        statusText.style.color = "var(--neg)";
+      }
+      if (submitBtn) submitBtn.disabled = true;
+      return;
+    }
+
+    if (selisih === 0) {
+      if (statusText) {
+        statusText.innerHTML =
+          '<i class="fas fa-check-circle" style="margin-right: 6px;"></i> SEIMBANG (Rp 0)';
+        statusText.style.color = "var(--pos)";
+      }
+      if (submitBtn) submitBtn.disabled = false;
+    } else if (selisih > 0) {
+      if (statusText) {
+        statusText.innerHTML =
+          '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Kurang ' +
+          fmtRp(Math.abs(selisih));
+        statusText.style.color = "var(--neg)";
+      }
+      if (submitBtn) submitBtn.disabled = true;
+    } else {
+      if (statusText) {
+        statusText.innerHTML =
+          '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Kelebihan ' +
+          fmtRp(Math.abs(selisih));
+        statusText.style.color = "var(--neg)";
+      }
+      if (submitBtn) submitBtn.disabled = true;
+    }
   };
 
   fields.forEach((id) => {
@@ -1214,16 +1218,86 @@ function openShodaqohPaymentForm(payment, showImmediately = true) {
     f.addEventListener("submit", handleShodaqohSubmit);
   }
 
-  // ... setup lainnya ...
+  // Reset status alokasi
+  const statusText = document.getElementById("shodAllocationText");
+  const statusIcon = document.getElementById("shodAllocationIcon");
+  if (statusText) {
+    statusText.innerHTML =
+      '<i class="fas fa-info-circle" style="margin-right: 6px;"></i> Masukkan total pembayaran';
+    statusText.style.color = "var(--ink-soft)";
+  }
+  if (statusIcon) {
+    statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />`;
+    statusIcon.style.color = "var(--ink-soft)";
+  }
 
-  // Jika ada payment, isi form
+  // Reset submit button
+  const submitBtn = document.getElementById("btnSubmitShodaqohPayment");
+  if (submitBtn) submitBtn.disabled = true;
+
+  // Reset member dropdown
+  const memberValue = document.getElementById("shodPaymentMemberValue");
+  const memberHidden = document.getElementById("shodPaymentMember");
+  if (memberValue) memberValue.textContent = "Pilih anggota";
+  if (memberHidden) memberHidden.value = "";
+
+  // Reset tanggal ke hari ini
+  const today = new Date();
+  const dateValueDisplay = document.getElementById("shodDateDropdownValue");
+  const dateHidden = document.getElementById("shodPaymentDate");
+  if (dateValueDisplay) dateValueDisplay.textContent = formatDateDisplay(today);
+  if (dateHidden) dateHidden.value = formatDateInput(today);
+  datePickerState.selectedDate = today;
+  datePickerState.currentMonth = today.getMonth();
+  datePickerState.currentYear = today.getFullYear();
+
+  // Reset field nominal
+  const fields = [
+    "shodPaymentAmount",
+    "shod_susulan_ir",
+    "shod_uang_sambung",
+    "shod_jimpitan",
+    "shod_siar_siar",
+    "shod_seribuan",
+    "shod_kafan",
+    "shod_ukhro_mt",
+  ];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  // Reset keterangan
+  const note = document.getElementById("shodPaymentNote");
+  if (note) note.value = "";
+
+  // Jika ada payment (edit), isi form
   if (payment) {
     fillShodaqohPaymentForm(payment);
+  } else {
+    // ✅ TAMBAHKAN INI: Render bulan susulan default (kosong) untuk pembayaran baru
+    renderShodSusulanBulan({});
+    setupShodaqohAllocationWatcher();
   }
+
+  // Update tombol Load Last Nominals
+  setTimeout(updateLoadLastNominalsButton, 100);
 
   // Jika showImmediately false, tampilkan setelah setup selesai
   if (!showImmediately) {
     $("shodaqohPaymentOverlay")?.classList.remove("hidden");
+  }
+
+  // Reset upload mode jika aktif
+  if (typeof clearShodUpload === "function") {
+    clearShodUpload();
+  }
+
+  // Pastikan mode manual aktif
+  if (typeof toggleShodMethod === "function") {
+    toggleShodMethod("manual");
   }
 }
 
@@ -1515,22 +1589,29 @@ function validateShodSusulanRincian() {
   const statusEl = document.getElementById("shodSusulanStatus");
   if (statusEl) {
     if (totalIR === 0) {
-      statusEl.textContent = "✓ Tidak ada Susulan IR";
+      statusEl.innerHTML =
+        '<i class="fas fa-check-circle" style="margin-right: 6px;"></i> Tidak ada Susulan IR';
       statusEl.style.color = "var(--ink-faint)";
     } else if (totalRincian === totalIR && validCount > 0) {
-      statusEl.textContent = "✓ Seimbang: " + fmtRp(totalRincian);
+      statusEl.innerHTML =
+        '<i class="fas fa-check-circle" style="margin-right: 6px;"></i> Seimbang: ' +
+        fmtRp(totalRincian);
       statusEl.style.color = "var(--pos)";
     } else if (validCount === 0) {
-      statusEl.textContent = "⚠️ Centang bulan dan isi nominal masing-masing";
+      statusEl.innerHTML =
+        '<i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> Centang bulan dan isi nominal masing-masing';
       statusEl.style.color = "var(--neg)";
     } else {
       const selisih = totalRincian - totalIR;
       if (selisih > 0) {
-        statusEl.textContent =
-          "⚠️ Kelebihan " + fmtRp(selisih) + " dari target " + fmtRp(totalIR);
+        statusEl.innerHTML =
+          '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Kelebihan ' +
+          fmtRp(selisih) +
+          " dari target " +
+          fmtRp(totalIR);
       } else {
-        statusEl.textContent =
-          "⚠️ Kurang " +
+        statusEl.innerHTML =
+          '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Kurang ' +
           fmtRp(Math.abs(selisih)) +
           " dari target " +
           fmtRp(totalIR);
@@ -1565,81 +1646,59 @@ function updateShodAllocationStatus() {
   const kafan = Number(document.getElementById("shod_kafan")?.value || 0);
   const ukhroMt = Number(document.getElementById("shod_ukhro_mt")?.value || 0);
 
-  // Validasi rincian susulan
   const { totalRincian, isBalanced } = validateShodSusulanRincian();
 
-  // Total alokasi
   const alokasiTotal =
     susulanIR + uangSambung + jimpitan + siarSiar + seribuan + kafan + ukhroMt;
   const selisih = alokasiTotal - total;
 
   const statusText = document.getElementById("shodAllocationText");
-  const statusIcon = document.getElementById("shodAllocationIcon");
   const submitBtn = document.getElementById("btnSubmitShodaqohPayment");
 
-  // Cek apakah ada susulan IR yang perlu divalidasi
   const hasSusulanIR = susulanIR > 0;
   const susulanValid = !hasSusulanIR || (hasSusulanIR && isBalanced);
 
   if (total <= 0) {
-    // Total belum diisi
     if (statusText) {
-      statusText.textContent = "Masukkan total pembayaran";
+      statusText.innerHTML =
+        '<i class="fas fa-info-circle" style="margin-right: 6px;"></i> Masukkan total pembayaran';
       statusText.style.color = "var(--ink-soft)";
-    }
-    if (statusIcon) {
-      statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />`;
-      statusIcon.style.color = "var(--ink-soft)";
     }
     if (submitBtn) submitBtn.disabled = true;
     return;
   }
 
   if (!susulanValid) {
-    // Susulan IR belum valid
     if (statusText) {
-      statusText.textContent = "⚠️ Periksa rincian Susulan IR";
+      statusText.innerHTML =
+        '<i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> Periksa rincian Susulan IR';
       statusText.style.color = "var(--neg)";
-    }
-    if (statusIcon) {
-      statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />`;
-      statusIcon.style.color = "var(--neg)";
     }
     if (submitBtn) submitBtn.disabled = true;
     return;
   }
 
   if (selisih === 0) {
-    // SEIMBANG
     if (statusText) {
-      statusText.textContent = "✓ SEIMBANG (Rp 0)";
+      statusText.innerHTML =
+        '<i class="fas fa-check-circle" style="margin-right: 6px;"></i> SEIMBANG (Rp 0)';
       statusText.style.color = "var(--pos)";
-    }
-    if (statusIcon) {
-      statusIcon.innerHTML = `<path d="M20 6L9 17l-5-5" />`;
-      statusIcon.style.color = "var(--pos)";
     }
     if (submitBtn) submitBtn.disabled = false;
   } else if (selisih > 0) {
-    // KURANG
     if (statusText) {
-      statusText.textContent = "⚠️ Kurang " + fmtRp(Math.abs(selisih));
+      statusText.innerHTML =
+        '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Kurang ' +
+        fmtRp(Math.abs(selisih));
       statusText.style.color = "var(--neg)";
-    }
-    if (statusIcon) {
-      statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />`;
-      statusIcon.style.color = "var(--neg)";
     }
     if (submitBtn) submitBtn.disabled = true;
   } else {
-    // KELEBIHAN
     if (statusText) {
-      statusText.textContent = "⚠️ Kelebihan " + fmtRp(Math.abs(selisih));
+      statusText.innerHTML =
+        '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Kelebihan ' +
+        fmtRp(Math.abs(selisih));
       statusText.style.color = "var(--neg)";
-    }
-    if (statusIcon) {
-      statusIcon.innerHTML = `<circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />`;
-      statusIcon.style.color = "var(--neg)";
     }
     if (submitBtn) submitBtn.disabled = true;
   }
