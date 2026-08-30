@@ -34,9 +34,12 @@ function getShodaqohFilterYears() {
       (state.shodaqoh.payments || [])
         .map((p) => String(p.tanggal || "").slice(0, 4))
         .filter(Boolean)
-        .concat([String(state.shodaqoh.selectedMonth || "").slice(0, 4)])
+        .concat([String(state.shodaqoh.selectedMonth || "").slice(0, 4)]),
     ),
-  ].filter(Boolean).sort().reverse();
+  ]
+    .filter(Boolean)
+    .sort()
+    .reverse();
 }
 
 function renderShodaqohFilters() {
@@ -58,12 +61,18 @@ function renderShodaqohFilterOptions() {
 
   const years = getShodaqohFilterYears();
   const months = [
-    { value: "", label: "Semua" }, { value: "01", label: "Januari" },
-    { value: "02", label: "Februari" }, { value: "03", label: "Maret" },
-    { value: "04", label: "April" }, { value: "05", label: "Mei" },
-    { value: "06", label: "Juni" }, { value: "07", label: "Juli" },
-    { value: "08", label: "Agustus" }, { value: "09", label: "September" },
-    { value: "10", label: "Oktober" }, { value: "11", label: "November" },
+    { value: "", label: "Semua" },
+    { value: "01", label: "Januari" },
+    { value: "02", label: "Februari" },
+    { value: "03", label: "Maret" },
+    { value: "04", label: "April" },
+    { value: "05", label: "Mei" },
+    { value: "06", label: "Juni" },
+    { value: "07", label: "Juli" },
+    { value: "08", label: "Agustus" },
+    { value: "09", label: "September" },
+    { value: "10", label: "Oktober" },
+    { value: "11", label: "November" },
     { value: "12", label: "Desember" },
   ];
   const statuses = [
@@ -71,13 +80,23 @@ function renderShodaqohFilterOptions() {
     { value: "LUNAS", label: "Lunas" },
     { value: "BELUM", label: "Belum" },
   ];
-  const toButton = (item) => `<button type="button" class="filter-chip-option" data-filter="${item.filter}" data-value="${item.value}">${item.label}</button>`;
+  const toButton = (item) =>
+    `<button type="button" class="filter-chip-option" data-filter="${item.filter}" data-value="${item.value}">${item.label}</button>`;
 
   yearContainer.innerHTML = [{ value: "", label: "Semua", filter: "tahun" }]
-    .concat(years.map((year) => ({ value: year, label: year, filter: "tahun" })))
-    .map(toButton).join("");
-  monthContainer.innerHTML = months.map((item) => ({ ...item, filter: "bulan" })).map(toButton).join("");
-  statusContainer.innerHTML = statuses.map((item) => ({ ...item, filter: "status" })).map(toButton).join("");
+    .concat(
+      years.map((year) => ({ value: year, label: year, filter: "tahun" })),
+    )
+    .map(toButton)
+    .join("");
+  monthContainer.innerHTML = months
+    .map((item) => ({ ...item, filter: "bulan" }))
+    .map(toButton)
+    .join("");
+  statusContainer.innerHTML = statuses
+    .map((item) => ({ ...item, filter: "status" }))
+    .map(toButton)
+    .join("");
 }
 
 function initShodaqohFilters() {
@@ -86,24 +105,47 @@ function initShodaqohFilters() {
   if (!trigger || !sheet) return;
   trigger.dataset.filterBound = "true";
 
-  trigger.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); openShodaqohFilterSheet(); });
-  sheet.addEventListener("click", function (e) { if (e.target === this) closeShodaqohFilterSheet(); });
+  trigger.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    openShodaqohFilterSheet();
+  });
+  sheet.addEventListener("click", function (e) {
+    if (e.target === this) closeShodaqohFilterSheet();
+  });
 
   const handle = sheet.querySelector(".sheet-handle");
-  if (handle) handle.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); closeShodaqohFilterSheet(); });
+  if (handle)
+    handle.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeShodaqohFilterSheet();
+    });
 
   sheet.addEventListener("click", function (e) {
     const option = e.target.closest(".filter-chip-option");
     if (!option || !sheet.contains(option)) return;
     const group = option.dataset.filter;
-    sheet.querySelectorAll('.filter-chip-option[data-filter="' + group + '"]').forEach((btn) => btn.classList.remove("active"));
+    sheet
+      .querySelectorAll('.filter-chip-option[data-filter="' + group + '"]')
+      .forEach((btn) => btn.classList.remove("active"));
     option.classList.add("active");
   });
 
   const applyBtn = document.getElementById("btnApplyShodaqohFilter");
-  if (applyBtn) applyBtn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); applyShodaqohFilterFromSheet(); });
+  if (applyBtn)
+    applyBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      applyShodaqohFilterFromSheet();
+    });
   const resetBtn = document.getElementById("btnResetShodaqohFilter");
-  if (resetBtn) resetBtn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); resetShodaqohFilters(); });
+  if (resetBtn)
+    resetBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      resetShodaqohFilters();
+    });
 }
 
 function openShodaqohFilterSheet() {
@@ -129,7 +171,12 @@ function updateShodaqohFilterSheetState() {
   const filters = state.shodaqoh.filters;
   sheet.querySelectorAll(".filter-chip-option").forEach((btn) => {
     const group = btn.dataset.filter;
-    const currentValue = group === "tahun" ? filters.year || "" : group === "bulan" ? filters.month || "" : filters.status || "ALL";
+    const currentValue =
+      group === "tahun"
+        ? filters.year || ""
+        : group === "bulan"
+          ? filters.month || ""
+          : filters.status || "ALL";
     btn.classList.toggle("active", btn.dataset.value === currentValue);
   });
 }
@@ -137,20 +184,30 @@ function updateShodaqohFilterSheetState() {
 function applyShodaqohFilterFromSheet() {
   const sheet = document.getElementById("shodaqohFilterSheet");
   if (!sheet) return;
-  const activeYear = sheet.querySelector('.filter-chip-option[data-filter="tahun"].active');
-  const activeMonth = sheet.querySelector('.filter-chip-option[data-filter="bulan"].active');
-  const activeStatus = sheet.querySelector('.filter-chip-option[data-filter="status"].active');
+  const activeYear = sheet.querySelector(
+    '.filter-chip-option[data-filter="tahun"].active',
+  );
+  const activeMonth = sheet.querySelector(
+    '.filter-chip-option[data-filter="bulan"].active',
+  );
+  const activeStatus = sheet.querySelector(
+    '.filter-chip-option[data-filter="status"].active',
+  );
 
   state.shodaqoh.filters.year = activeYear ? activeYear.dataset.value : "";
   state.shodaqoh.filters.month = activeMonth ? activeMonth.dataset.value : "";
-  state.shodaqoh.filters.status = activeStatus ? activeStatus.dataset.value : "ALL";
+  state.shodaqoh.filters.status = activeStatus
+    ? activeStatus.dataset.value
+    : "ALL";
 
   closeShodaqohFilterSheet();
   updateShodaqohFilterBadge();
   updateShodaqohActiveFiltersDisplay();
 
   if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
-    loadShodaqohData(state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month);
+    loadShodaqohData(
+      state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month,
+    );
   } else {
     renderShodaqohMonitoring();
     renderPaymentHistory();
@@ -173,8 +230,10 @@ function updateShodaqohFilterBadge() {
   if (state.shodaqoh.filters.year) activeCount++;
   if (state.shodaqoh.filters.month) activeCount++;
   if (state.shodaqoh.filters.status !== "ALL") activeCount++;
-  if (activeCount > 0) { badge.textContent = activeCount; badge.classList.remove("hidden"); }
-  else badge.classList.add("hidden");
+  if (activeCount > 0) {
+    badge.textContent = activeCount;
+    badge.classList.remove("hidden");
+  } else badge.classList.add("hidden");
 }
 
 function updateShodaqohActiveFiltersDisplay() {
@@ -182,24 +241,71 @@ function updateShodaqohActiveFiltersDisplay() {
   if (!container) return;
   const filters = state.shodaqoh.filters;
   const activeFilters = [];
-  if (filters.year) activeFilters.push({ label: filters.year, filter: "tahun" });
+  if (filters.year)
+    activeFilters.push({ label: filters.year, filter: "tahun" });
   if (filters.month) {
-    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    activeFilters.push({ label: monthNames[Number(filters.month) - 1] || filters.month, filter: "bulan" });
+    const monthNames = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+    activeFilters.push({
+      label: monthNames[Number(filters.month) - 1] || filters.month,
+      filter: "bulan",
+    });
   }
-  if (filters.status !== "ALL" && SHODAQOH_FILTER_STATUS_LABELS[filters.status]) activeFilters.push({ label: SHODAQOH_FILTER_STATUS_LABELS[filters.status], filter: "status" });
-  if (!activeFilters.length) { container.innerHTML = ""; return; }
+  if (filters.status !== "ALL" && SHODAQOH_FILTER_STATUS_LABELS[filters.status])
+    activeFilters.push({
+      label: SHODAQOH_FILTER_STATUS_LABELS[filters.status],
+      filter: "status",
+    });
+  if (!activeFilters.length) {
+    container.innerHTML = "";
+    return;
+  }
 
-  container.innerHTML = activeFilters.map((f) => '<span class="zakat-active-filter-chip">' + f.label + '<button class="remove-filter" data-filter="' + f.filter + '" aria-label="Hapus filter ' + f.label + '">×</button></span>').join("");
-  container.querySelectorAll(".remove-filter").forEach((btn) => btn.addEventListener("click", function (e) {
-    e.preventDefault(); e.stopPropagation();
-    if (this.dataset.filter === "tahun") state.shodaqoh.filters.year = "";
-    if (this.dataset.filter === "bulan") state.shodaqoh.filters.month = "";
-    if (this.dataset.filter === "status") state.shodaqoh.filters.status = "ALL";
-    updateShodaqohFilterSheetState(); updateShodaqohFilterBadge(); updateShodaqohActiveFiltersDisplay();
-    if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) loadShodaqohData(state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month);
-    else { renderShodaqohMonitoring(); renderPaymentHistory(); }
-  }));
+  container.innerHTML = activeFilters
+    .map(
+      (f) =>
+        '<span class="zakat-active-filter-chip">' +
+        f.label +
+        '<button class="remove-filter" data-filter="' +
+        f.filter +
+        '" aria-label="Hapus filter ' +
+        f.label +
+        '">×</button></span>',
+    )
+    .join("");
+  container.querySelectorAll(".remove-filter").forEach((btn) =>
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.dataset.filter === "tahun") state.shodaqoh.filters.year = "";
+      if (this.dataset.filter === "bulan") state.shodaqoh.filters.month = "";
+      if (this.dataset.filter === "status")
+        state.shodaqoh.filters.status = "ALL";
+      updateShodaqohFilterSheetState();
+      updateShodaqohFilterBadge();
+      updateShodaqohActiveFiltersDisplay();
+      if (state.shodaqoh.filters.year && state.shodaqoh.filters.month)
+        loadShodaqohData(
+          state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month,
+        );
+      else {
+        renderShodaqohMonitoring();
+        renderPaymentHistory();
+      }
+    }),
+  );
 }
 
 document.addEventListener("click", function (event) {
@@ -230,22 +336,29 @@ function setButtonLoading(btn, isLoading) {
 
   if (isLoading) {
     btn._originalContent ||= btn.innerHTML;
+    // Gunakan loading indicator tanpa mengubah opacity
     btn.innerHTML =
       btn.id === "fabPostToKas"
-        ? `<span style="display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite"></span>`
+        ? `<span style="display:inline-block;width:20px;height:20px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite"></span><span class="fab-label">Memproses...</span>`
         : `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:-2px;margin-right:7px"></span> Memproses...`;
 
     btn.disabled = true;
-    btn.style.opacity = "0.7";
+    // HAPUS atau ubah menjadi 1 (tidak transparan)
+    btn.style.opacity = "1";
+    // Tambahkan class loading untuk styling tambahan
+    btn.classList.add("loading");
   } else {
     btn.innerHTML =
       btn._originalContent ||
       (btn.id === "fabPostToKas"
-        ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7"/><polyline points="15 3 21 3 21 9"/><line x1="9" y1="15" x2="21" y2="3"/></svg>`
+        ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7"/><polyline points="15 3 21 3 21 9"/><line x1="9" y1="15" x2="21" y2="3"/></svg><span class="fab-label">Post ke Kas</span>`
         : "Post ke Kas");
 
     btn.disabled = false;
     btn.style.opacity = "1";
+    btn.classList.remove("loading");
+    // Hapus _originalContent setelah restore agar tidak menumpuk
+    delete btn._originalContent;
   }
 }
 
@@ -1155,7 +1268,7 @@ const ACCOUNT_CATEGORIES = [
   "KAFAN",
   "INFAK SERIBUAN",
   "PEMASUKAN UKHRO MT",
-  "SETOR INFAK SAMBUNG",
+  "SETOR UANG SAMBUNG",
   "SETOR 2/3 INFAK JUMAT",
   "INFAQ SAMBUNG DESA",
   "INFAQ SAMBUNG DAERAH",
@@ -1325,14 +1438,18 @@ function renderShodaqohSkeleton() {
   // Skeleton hanya menggantikan isi area scrollable.
   // Header/filter Shodaqoh tetap terlihat agar layout saat loading identik
   // dengan state normal dan tidak terjadi loncatan posisi konten.
-  container.querySelectorAll(".shod-skeleton-wrapper").forEach((el) => el.remove());
+  container
+    .querySelectorAll(".shod-skeleton-wrapper")
+    .forEach((el) => el.remove());
   container.querySelectorAll(":scope > *").forEach((child) => {
-    if (!child.classList.contains("shod-skeleton-wrapper")) child.style.display = "none";
+    if (!child.classList.contains("shod-skeleton-wrapper"))
+      child.style.display = "none";
   });
 
   const wrapper = document.createElement("div");
   wrapper.className = "shod-skeleton-wrapper";
-  wrapper.style.cssText = "display:block;width:100%;box-sizing:border-box;padding:0 2px 60px;";
+  wrapper.style.cssText =
+    "display:block;width:100%;box-sizing:border-box;padding:0 2px 60px;";
 
   const line = (width, height, extra = "") =>
     `<span class="skeleton-line" style="display:block;width:${width};height:${height};border-radius:5px;${extra}"></span>`;
@@ -1340,35 +1457,46 @@ function renderShodaqohSkeleton() {
   wrapper.innerHTML = `
     <!-- Dashboard summary -->
     <div class="grid grid-cols-2 gap-3" style="margin-bottom:12px;">
-      ${[1, 2, 3, 4].map(() => `
+      ${[1, 2, 3, 4]
+        .map(
+          () => `
         <div class="card p-4 skeleton-loading" style="min-height:76px;box-sizing:border-box;">
           ${line("42%", "9px", "margin-bottom:8px;")}
           ${line("68%", "19px")}
         </div>
-      `).join("")}
+      `,
+        )
+        .join("")}
     </div>
 
     <!-- Allocation -->
     <div class="card p-4" style="margin-bottom:12px;">
       ${line("48%", "14px", "margin-bottom:12px;")}
       <div class="grid grid-cols-2 gap-2">
-        ${Array.from({ length: 8 }, () => `
+        ${Array.from(
+          { length: 8 },
+          () => `
           <div class="card p-3 skeleton-loading" style="box-sizing:border-box;">
             ${line("62%", "8px", "margin-bottom:6px;")}
             ${line("52%", "16px")}
           </div>
-        `).join("")}
+        `,
+        ).join("")}
       </div>
     </div>
 
     <!-- Tabs -->
     <div style="margin-bottom:8px;">
       <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;">
-        ${[1, 2, 3].map(() => `
+        ${[1, 2, 3]
+          .map(
+            () => `
           <div style="height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;">
             ${line("48px", "10px")}
           </div>
-        `).join("")}
+        `,
+          )
+          .join("")}
       </div>
     </div>
 
@@ -1389,11 +1517,14 @@ function renderShodaqohSkeleton() {
         ${[1, 2, 3, 4, 5].map(() => line("100%", "10px")).join("")}
       </div>
 
-      ${Array.from({ length: 7 }, () => `
+      ${Array.from(
+        { length: 7 },
+        () => `
         <div style="display:grid;grid-template-columns:1.5fr .8fr .8fr .8fr 1fr;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);">
           ${[1, 2, 3, 4, 5].map(() => line("100%", "12px")).join("")}
         </div>
-      `).join("")}
+      `,
+      ).join("")}
     </div>
   `;
 

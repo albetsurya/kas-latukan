@@ -315,3 +315,39 @@ function printShodaqohReport() {
   setTimeout(restore, 2000);
 }
 
+// ============================================================
+// SHODAQOH DROPDOWN TOGGLE
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+  // Shodaqoh print dropdown
+  const shodDropdownBtn = document.getElementById("shodBtnPrintDropdown");
+  const shodDropdownMenu = document.getElementById("shodPrintDropdownMenu");
+
+  if (shodDropdownBtn && shodDropdownMenu) {
+    shodDropdownBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const isOpen = shodDropdownMenu.classList.contains("hidden");
+      shodDropdownMenu.classList.toggle("hidden");
+      shodDropdownBtn.setAttribute("aria-expanded", isOpen);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (
+        !shodDropdownBtn.contains(e.target) &&
+        !shodDropdownMenu.contains(e.target)
+      ) {
+        shodDropdownMenu.classList.add("hidden");
+        shodDropdownBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    shodDropdownMenu
+      .querySelectorAll(".print-dropdown-item")
+      .forEach((item) => {
+        item.addEventListener("click", function () {
+          shodDropdownMenu.classList.add("hidden");
+          shodDropdownBtn.setAttribute("aria-expanded", "false");
+        });
+      });
+  }
+});

@@ -653,98 +653,136 @@
 
               <div class="zakat-detail-actions">
                 <!-- DROPDOWN MORE ACTIONS -->
-                <div class="zakat-actions-dropdown">
+                <div class="zakat-actions-dropdown relative">
                   <button
                     id="btnMoreActions"
                     type="button"
-                    class="zakat-action-btn"
+                    class="zakat-action-btn icon-btn"
                     title="Lainnya"
                     aria-label="Lainnya"
+                    style="
+                      width: 34px;
+                      height: 34px;
+                      border-radius: 9px;
+                      background: var(--surface-alt);
+                      border: 1px solid var(--line);
+                      color: var(--ink-soft);
+                      display: inline-flex;
+                      align-items: center;
+                      justify-content: center;
+                      transition: all 0.15s ease;
+                      cursor: pointer;
+                    "
+                    aria-haspopup="true"
+                    aria-expanded="false"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <circle cx="12" cy="5" r="1.5" />
-                      <circle cx="12" cy="12" r="1.5" />
-                      <circle cx="12" cy="19" r="1.5" />
-                    </svg>
+                    <i class="fas fa-ellipsis-vertical text-[16px]"></i>
                   </button>
 
                   <div
                     class="zakat-actions-dropdown-menu hidden"
                     id="zakatActionsDropdownMenu"
+                    style="
+                      position: absolute;
+                      right: 0;
+                      top: calc(100% + 6px);
+                      min-width: 200px;
+                      background: var(--surface);
+                      border: 1px solid var(--line);
+                      border-radius: 10px;
+                      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                      padding: 6px;
+                      z-index: 50;
+                    "
                   >
                     <!-- COMPLETE / CANCEL COMPLETE (TOGGLE) -->
-                    <button id="btnToggleCompleteZakat" class="dropdown-item">
-                      <svg
+                    <button
+                      id="btnToggleCompleteZakat"
+                      class="dropdown-item"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        width: 100%;
+                        padding: 10px 14px;
+                        border: none;
+                        background: transparent;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: var(--ink-soft);
+                        transition: all 0.15s ease;
+                        text-align: left;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <i
+                        class="fas fa-check-circle text-[15px] w-[20px] text-left"
                         id="iconComplete"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <svg
+                      ></i>
+                      <i
+                        class="fas fa-undo-alt text-[15px] w-[20px] text-left"
                         id="iconCancelComplete"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
                         style="display: none"
-                      >
-                        <path d="M18 6L6 18M6 6l12 12" />
-                      </svg>
+                      ></i>
                       <span id="btnToggleCompleteLabel">Tandai Selesai</span>
                     </button>
 
                     <!-- PRINT -->
-                    <button id="btnPrintZakat" class="dropdown-item">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M6 9V2h12v7" />
-                        <path
-                          d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5h-2"
-                        />
-                        <path d="M6 14h12v8H6z" />
-                        <path d="M18 13h.01" />
-                      </svg>
-                      Cetak Laporan
+                    <button
+                      id="btnPrintZakat"
+                      class="dropdown-item"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        width: 100%;
+                        padding: 10px 14px;
+                        border: none;
+                        background: transparent;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: var(--ink-soft);
+                        transition: all 0.15s ease;
+                        text-align: left;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <i
+                        class="fas fa-print text-[15px] w-[20px] text-left"
+                      ></i>
+                      <span>Cetak Laporan</span>
                     </button>
 
                     <!-- DELETE -->
-                    <button id="btnDeleteZakat" class="dropdown-item danger">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"
-                        />
-                      </svg>
-                      Hapus Zakat
+                    <button
+                      id="btnDeleteZakat"
+                      class="dropdown-item danger"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        width: 100%;
+                        padding: 10px 14px;
+                        border: none;
+                        background: transparent;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: var(--neg);
+                        transition: all 0.15s ease;
+                        text-align: left;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <i
+                        class="fas fa-trash-alt text-[15px] w-[20px] text-left"
+                      ></i>
+                      <span>Hapus Zakat</span>
                     </button>
                   </div>
                 </div>
@@ -2590,45 +2628,109 @@
               </p>
             </div>
 
-            <button
-              id="btnPrintReport"
-              type="button"
-              class="icon-btn"
-              title="Cetak Rekap Transaksi"
-              aria-label="Cetak Rekap Transaksi"
-              style="
-                width: 36px;
-                height: 36px;
-                min-width: 36px;
-                border-radius: 9px;
-                background: var(--surface-alt);
-                border: 1px solid var(--line);
-                color: var(--ink-soft);
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.15s ease;
-              "
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
+            <!-- DROPDOWN PRINT ACTIONS -->
+            <div class="relative" id="printDropdownWrapper">
+              <button
+                id="btnPrintDropdown"
+                type="button"
+                class="icon-btn"
+                title="Opsi Cetak"
+                aria-label="Opsi Cetak"
+                style="
+                  width: 36px;
+                  height: 36px;
+                  min-width: 36px;
+                  border-radius: 9px;
+                  background: var(--surface-alt);
+                  border: 1px solid var(--line);
+                  color: var(--ink-soft);
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  transition: all 0.15s ease;
+                "
+                aria-haspopup="true"
+                aria-expanded="false"
               >
-                <path d="M6 9V2h12v7" />
-                <path
-                  d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5h-2"
-                />
-                <path d="M6 14h12v8H6z" />
-                <path d="M18 13h.01" />
-              </svg>
-            </button>
+                <i class="fas fa-ellipsis-vertical text-[18px]"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                id="printDropdownMenu"
+                class="print-dropdown-menu hidden"
+                role="menu"
+                aria-label="Opsi cetak"
+                style="
+                  position: absolute;
+                  right: 0;
+                  top: calc(100% + 6px);
+                  min-width: 210px;
+                  background: var(--surface);
+                  border: 1px solid var(--line);
+                  border-radius: 10px;
+                  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                  padding: 6px;
+                  z-index: 50;
+                "
+              >
+                <button
+                  type="button"
+                  id="btnPrintReport"
+                  class="print-dropdown-item"
+                  role="menuitem"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
+                    padding: 10px 14px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--ink-soft);
+                    transition: all 0.15s ease;
+                    text-align: left;
+                    justify-content: flex-start;
+                  "
+                >
+                  <i class="fas fa-print text-[15px] w-[20px] text-left"></i>
+                  <span>Cetak Riwayat</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="btnPrintLaporan"
+                  class="print-dropdown-item"
+                  role="menuitem"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
+                    padding: 10px 14px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--ink-soft);
+                    transition: all 0.15s ease;
+                    text-align: left;
+                    justify-content: flex-start;
+                  "
+                >
+                  <i
+                    class="fas fa-file-invoice text-[15px] w-[20px] text-left"
+                  ></i>
+                  <span>Cetak Laporan Kas</span>
+                </button>
+              </div>
+            </div>
           </div>
           <div class="relative">
             <svg
@@ -2999,60 +3101,107 @@
                   Bulan berjalan
                 </p>
               </div>
-              <div class="flex items-center gap-2">
+
+              <!-- DROPDOWN PRINT ACTIONS -->
+              <div class="relative" id="shodPrintDropdownWrapper">
                 <button
-                  id="btnPrintShodaqoh"
+                  id="shodBtnPrintDropdown"
+                  type="button"
                   class="icon-btn"
+                  title="Opsi Cetak"
+                  aria-label="Opsi Cetak"
                   style="
                     width: 34px;
                     height: 34px;
+                    min-width: 34px;
                     border-radius: 8px;
                     background: var(--surface-alt);
-                    border-color: var(--line);
+                    border: 1px solid var(--line);
                     color: var(--ink-soft);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.15s ease;
                   "
-                  title="Cetak Rekap Shodaqoh"
+                  aria-haspopup="true"
+                  aria-expanded="false"
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"
-                    />
-                  </svg>
+                  <i class="fas fa-ellipsis-vertical text-[16px]"></i>
                 </button>
-                <button
-                  id="btnCopyShodaqohRekap"
-                  class="icon-btn"
+
+                <!-- Dropdown Menu -->
+                <div
+                  id="shodPrintDropdownMenu"
+                  class="print-dropdown-menu hidden"
+                  role="menu"
+                  aria-label="Opsi cetak"
                   style="
-                    width: 34px;
-                    height: 34px;
-                    border-radius: 8px;
-                    background: var(--surface-alt);
-                    border-color: var(--line);
-                    color: var(--ink-soft);
+                    position: absolute;
+                    right: 0;
+                    top: calc(100% + 6px);
+                    min-width: 210px;
+                    background: var(--surface);
+                    border: 1px solid var(--line);
+                    border-radius: 10px;
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                    padding: 6px;
+                    z-index: 50;
                   "
-                  title="Salin rekap ke clipboard"
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
+                  <button
+                    type="button"
+                    id="btnPrintShodaqoh"
+                    class="print-dropdown-item"
+                    role="menuitem"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 12px;
+                      width: 100%;
+                      padding: 10px 14px;
+                      border: none;
+                      background: transparent;
+                      border-radius: 8px;
+                      cursor: pointer;
+                      font-size: 12.5px;
+                      font-weight: 600;
+                      color: var(--ink-soft);
+                      transition: all 0.15s ease;
+                      text-align: left;
+                      justify-content: flex-start;
+                    "
                   >
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path
-                      d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                    />
-                  </svg>
-                </button>
+                    <i class="fas fa-print text-[15px] w-[20px] text-left"></i>
+                    <span>Cetak Rekap Shodaqoh</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="btnCopyShodaqohRekap"
+                    class="print-dropdown-item"
+                    role="menuitem"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 12px;
+                      width: 100%;
+                      padding: 10px 14px;
+                      border: none;
+                      background: transparent;
+                      border-radius: 8px;
+                      cursor: pointer;
+                      font-size: 12.5px;
+                      font-weight: 600;
+                      color: var(--ink-soft);
+                      transition: all 0.15s ease;
+                      text-align: left;
+                      justify-content: flex-start;
+                    "
+                  >
+                    <i class="fas fa-copy text-[15px] w-[20px] text-left"></i>
+                    <span>Salin Rekap ke Clipboard</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -4936,6 +5085,35 @@
                 <td class="num font-bold" id="printTotalSaldo">Rp 0</td>
               </tr>
             </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="printLaporanArea" style="display: none !important">
+      <div class="print-laporan-wrapper">
+        <div class="print-laporan-header">
+          <h1>KELOMPOK : LATUKAN</h1>
+          <h2>LAPORAN KAS</h2>
+          <p id="printLaporanPeriod">
+            BULAN: ................... TAHUN: .....................
+          </p>
+        </div>
+
+        <div class="print-laporan-table-wrapper">
+          <table id="printLaporanTable">
+            <thead>
+              <tr>
+                <th style="width: 10%">Tgl</th>
+                <th style="width: 40%">Keterangan</th>
+                <th style="width: 20%; text-align: right">Debet</th>
+                <th style="width: 20%; text-align: right">Kredit</th>
+                <th style="width: 10%; text-align: right">Saldo</th>
+              </tr>
+            </thead>
+            <tbody id="printLaporanBody">
+              <!-- Akan diisi oleh JavaScript -->
+            </tbody>
           </table>
         </div>
       </div>

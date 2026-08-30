@@ -231,16 +231,41 @@ async function executePostToKas(monthKey) {
 }
 
 function showPostResultModal(res) {
-  let detailRows = res.details
-    .map(function (d) {
-      return `
-        <div class="flex items-center justify-between py-2 border-b border-[color:var(--line)] last:border-0">
-          <span class="text-xs font-medium">${d.account}</span>
-          <span class="mono text-xs font-bold">${fmtRp(d.amount)}</span>
-        </div>
-      `;
-    })
-    .join("");
+  // Gunakan totalDebet dari response
+  const totalAmount = res.totalDebet || res.total || 0;
+
+  // Buat detail rows dari results
+  let detailRows = "";
+
+  if (res.details && res.details.length > 0) {
+    detailRows = res.details
+      .map(function (d) {
+        // Ambil nilai debet atau kredit (mana yang > 0)
+        const amount = d.debet || d.kredit || d.amount || 0;
+        const account = d.account || d.keterangan || "Unknown";
+        // Tampilkan tipe transaksi
+        const type = d.debet > 0 ? "Debet" : d.kredit > 0 ? "Kredit" : "";
+
+        return `
+          <div class="flex items-center justify-between py-2 border-b border-[color:var(--line)] last:border-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium">${account}</span>
+              ${type ? `<span class="text-[9px] text-[color:var(--ink-faint)]">${type}</span>` : ""}
+            </div>
+            <span class="mono text-xs font-bold">${fmtRp(amount)}</span>
+          </div>
+        `;
+      })
+      .join("");
+  } else {
+    // Jika tidak ada details, tampilkan total saja
+    detailRows = `
+      <div class="flex items-center justify-between py-2">
+        <span class="text-xs font-medium">Total Posting</span>
+        <span class="mono text-xs font-bold">${fmtRp(totalAmount)}</span>
+      </div>
+    `;
+  }
 
   const resultOverlay = document.createElement("div");
   resultOverlay.className = "modal-overlay";
@@ -256,14 +281,28 @@ function showPostResultModal(res) {
         Posting Berhasil!
       </h3>
       <p class="text-[12.5px] text-[color:var(--ink-soft)] text-center mt-1.5">
-        Rincian transaksi yang dibuat di Kas Utama:
+        ${res.details && res.details.length > 0 ? res.details.length : 0} transaksi berhasil dibuat di Kas Utama:
       </p>
-      <div class="mt-3 p-3 bg-[color:var(--surface-alt)] rounded-lg max-h-48 overflow-y-auto">
+      <div class="mt-3 p-3 bg-[color:var(--surface-alt)] rounded-lg max-h-52 overflow-y-auto">
         ${detailRows}
       </div>
       <div class="flex items-center justify-between mt-3 pt-2 border-t border-[color:var(--line)]">
-        <span class="text-xs font-bold">TOTAL</span>
-        <span class="mono text-sm font-extrabold">${fmtRp(res.total)}</span>
+        <span class="text-xs font-bold">TOTAL DEBET</span>
+        <span class="mono text-sm font-extrabold" style="color:var(--pos);">${fmtRp(totalAmount)}</span>
+      </div>
+      ${
+        res.totalKredit
+          ? `
+      <div class="flex items-center justify-between mt-1 pt-1 border-b border-[color:var(--line)]">
+        <span class="text-xs font-bold">TOTAL KREDIT</span>
+        <span class="mono text-sm font-extrabold" style="color:var(--neg);">${fmtRp(res.totalKredit)}</span>
+      </div>
+      `
+          : ""
+      }
+      <div class="flex items-center justify-between mt-1 pt-1">
+        <span class="text-[9px] text-[color:var(--ink-faint)]">No. Transaksi</span>
+        <span class="text-[9px] mono font-mono text-[color:var(--ink-faint)]">${res.transactionNo || "-"}</span>
       </div>
       <button type="button" id="btnResultClose" class="btn-primary w-full mt-4" style="padding:12px 0;">Tutup</button>
     </div>
