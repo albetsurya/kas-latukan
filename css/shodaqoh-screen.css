@@ -146,3 +146,83 @@
 #fabPostToKas {
   z-index: 10000 !important;
 }
+
+/* ============================================================
+   SHODAQOH - MORE ACTIONS DROPDOWN
+   Mirrors the Zakat Detail action dropdown pattern.
+   ============================================================ */
+.shodaqoh-actions-dropdown {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.shodaqoh-actions-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 200;
+  overflow: hidden;
+}
+
+.shodaqoh-actions-dropdown-menu.hidden {
+  display: none !important;
+}
+
+.shodaqoh-actions-dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  text-align: left;
+}
+
+.shodaqoh-actions-dropdown-menu .dropdown-item:hover {
+  background: var(--surface-alt);
+}
+
+.shodaqoh-actions-dropdown-menu .dropdown-item svg {
+  flex-shrink: 0;
+}
+
+/* Action buttons become dropdown items; keep their existing ID states intact. */
+.shodaqoh-actions-dropdown-menu #btnPrintShodaqoh,
+.shodaqoh-actions-dropdown-menu #btnCopyShodaqohRekap {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  justify-content: flex-start !important;
+}
+
+.shodaqoh-actions-dropdown-menu #btnPrintShodaqoh:hover,
+.shodaqoh-actions-dropdown-menu #btnCopyShodaqohRekap:hover {
+  background: var(--surface-alt) !important;
+  border-color: transparent !important;
+  color: var(--ink) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
