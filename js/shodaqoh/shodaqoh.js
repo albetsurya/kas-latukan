@@ -42,20 +42,12 @@ const SHOD_STATUS_LABELS = {
 };
 
 async function loadShodaqohData(monthKey) {
-  // ============================================================
-  // REQUEST LOCK / DEDUPLICATION
-  // Jika sedang ada request berjalan, jangan fetch lagi.
-  // Kembalikan Promise yang sama agar caller kedua ikut menunggu.
-  // ============================================================
-
   if (state.shodaqoh.loadingPromise) {
     return state.shodaqoh.loadingPromise;
   }
 
-  // Tentukan bulan sebelum membuat request
   const month = monthKey || state.shodaqoh.selectedMonth || "";
 
-  // Simpan Promise SEBELUM fetch dimulai
   state.shodaqoh.loadingPromise = (async function () {
     try {
       showShodaqohLoader("Memuat data shodaqoh...");
@@ -66,49 +58,47 @@ async function loadShodaqohData(monthKey) {
         throw new Error(data.message || "Gagal memuat data");
       }
 
-      // ============================================================
-      // HAPUS SKELETON
-      // ============================================================
-
-      const container = document.querySelector("#screen-shodaqoh");
-
-      if (container) {
-        container
-          .querySelectorAll(".shod-skeleton-wrapper")
-          .forEach((el) => el.remove());
-
-        const children = container.children;
-
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i];
-
-          if (
-            !child.classList ||
-            !child.classList.contains("shod-skeleton-wrapper")
-          ) {
-            child.style.display = "";
-          }
-        }
-      }
-
-      // ============================================================
-      // UPDATE STATE
-      // ============================================================
+      const monitoringData = Array.isArray(data.monitoring)
+        ? data.monitoring
+        : [];
+      const membersData = Array.isArray(data.members) ? data.members : [];
+      const paymentsData = Array.isArray(data.payments) ? data.payments : [];
+      const dashboardData = data.dashboard || {};
 
       state.shodaqoh.loaded = true;
-
       state.shodaqoh.currentMonth = data.currentMonth || "";
-
       state.shodaqoh.selectedMonth =
         data.selectedMonth || data.currentMonth || "";
 
-      state.shodaqoh.dashboard = data.dashboard || {};
+      // ✅ SALIN DENGAN BENAR
+      state.shodaqoh.dashboard = {
+        target: dashboardData.target || 0,
+        received: dashboardData.received || 0,
+        paidCount: dashboardData.paidCount || 0,
+        unpaidCount: dashboardData.unpaidCount || 0,
+        memberCount: dashboardData.memberCount || 0,
+      };
 
-      state.shodaqoh.members = data.members || [];
+      state.shodaqoh.members = membersData;
 
-      state.shodaqoh.monitoring = data.monitoring || [];
+      // ✅ INI YANG PALING PENTING - PASTIKAN MONITORING TERSALIN
+      state.shodaqoh.monitoring = monitoringData;
 
-      state.shodaqoh.payments = data.payments || [];
+      state.shodaqoh.payments = paymentsData;
+
+      // ✅ VALIDASI: Jika monitoring kosong tapi members ada, beri peringatan
+      if (
+        state.shodaqoh.monitoring.length === 0 &&
+        state.shodaqoh.members.length > 0
+      ) {
+        console.warn(
+          "⚠️ MONITORING KOSONG! Members:",
+          state.shodaqoh.members.length,
+        );
+        console.warn("⚠️ Data monitoring dari API:", data.monitoring);
+        console.warn("⚠️ Type of monitoring:", typeof data.monitoring);
+        console.warn("⚠️ Is array?", Array.isArray(data.monitoring));
+      }
 
       // ============================================================
       // SET DEFAULT FILTER
@@ -119,11 +109,33 @@ async function loadShodaqohData(monthKey) {
           state.shodaqoh.selectedMonth,
         ).slice(0, 4);
       }
-
       if (!state.shodaqoh.filters.month) {
         state.shodaqoh.filters.month = String(
           state.shodaqoh.selectedMonth,
         ).slice(5, 7);
+      }
+
+      // ============================================================
+      // HAPUS SKELETON
+      // ============================================================
+
+      const container = document.querySelector("#screen-shodaqoh");
+      if (container) {
+        container
+          .querySelectorAll(".shod-skeleton-wrapper")
+          .forEach(function (el) {
+            el.remove();
+          });
+        const children = container.children;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if (
+            !child.classList ||
+            !child.classList.contains("shod-skeleton-wrapper")
+          ) {
+            child.style.display = "";
+          }
+        }
       }
 
       // ============================================================
@@ -142,46 +154,58 @@ async function loadShodaqohData(monthKey) {
       // ============================================================
 
       const postStatus = $("shodPostStatus");
-
       if (postStatus) {
         const payments = state.shodaqoh.payments || [];
-
         const allPosted =
           payments.length > 0 &&
           payments.every(function (p) {
             return String(p.kas_transaction_no || "").includes("POSTED");
           });
-
         postStatus.classList.toggle("hidden", !allPosted);
       }
 
       return data;
     } catch (err) {
-      console.error(err);
-
+      console.error("❌ Error loading Shodaqoh data:", err);
       hideShodaqohLoader();
-
       showToast("Gagal memuat Shodaqoh IR: " + err.message, "error");
-
       renderShodaqohError(err.message);
-
-      // Biarkan caller mengetahui bahwa request gagal
       throw err;
     } finally {
-      // ============================================================
-      // RELEASE REQUEST LOCK
-      //
-      // Setelah request selesai/gagal, Promise dihapus sehingga
-      // request berikutnya (misalnya ganti bulan / refresh)
-      // tetap bisa melakukan fetch baru.
-      // ============================================================
-
       state.shodaqoh.loadingPromise = null;
     }
   })();
 
   return state.shodaqoh.loadingPromise;
 }
+
+// Fungsi untuk refresh data shodaqoh dari backend
+async function refreshShodaqohData() {
+  state.shodaqoh.loaded = false;
+  state.shodaqoh.monitoring = [];
+  state.shodaqoh.members = [];
+  state.shodaqoh.payments = [];
+  state.shodaqoh.dashboard = {
+    target: 0,
+    received: 0,
+    paidCount: 0,
+    unpaidCount: 0,
+    memberCount: 0,
+  };
+
+  // Load ulang
+  await loadShodaqohData(state.shodaqoh.selectedMonth);
+
+  // Render ulang
+  renderShodaqohDashboard();
+  renderShodaqohAllocation();
+  renderShodaqohMonitoring();
+  renderShodaqohMembers();
+  renderPaymentHistory();
+}
+
+// Expose ke global
+window.refreshShodaqohData = refreshShodaqohData;
 
 function renderShodaqohScreen() {
   renderShodaqohDashboard();
@@ -283,11 +307,16 @@ function getFilteredMonitoringRows() {
 
 function renderShodaqohMonitoring() {
   const body = $("shodMonitoringBody");
-  if (!body) return;
+  if (!body) {
+    console.warn("⚠️ Element #shodMonitoringBody tidak ditemukan");
+    return;
+  }
 
   const f = state.shodaqoh.filters;
 
-  const rows = (state.shodaqoh.monitoring || []).filter(function (r) {
+  const monitoringData = state.shodaqoh.monitoring || [];
+
+  const rows = monitoringData.filter(function (r) {
     if (f.status !== "ALL" && r.status !== f.status) return false;
     return true;
   });
@@ -303,6 +332,8 @@ function renderShodaqohMonitoring() {
   const memberCountEl = $("shodMemberCount");
   if (memberCountEl) {
     memberCountEl.textContent = `${filteredCount} dari ${totalMembers} anggota`;
+  } else {
+    console.warn("⚠️ Element #shodMemberCount tidak ditemukan");
   }
 
   const lunasCountEl = $("shodLunasCount");
@@ -351,7 +382,7 @@ function renderShodaqohMonitoring() {
   }
 
   body.innerHTML = rows
-    .map(function (r) {
+    .map(function (r, index) {
       let formattedDate = "—";
       if (r.allocated_at) {
         const d = new Date(r.allocated_at);
@@ -365,9 +396,6 @@ function renderShodaqohMonitoring() {
       const totalPaid = r.total_paid || 0;
       const paymentId = r.payment_id || "";
 
-      // ============================================================
-      // TRUNCATE NAMA MENJADI 3 KATA PERTAMA
-      // ============================================================
       const displayName = truncateNameToThreeWords(r.nama);
 
       const clickAction = paymentId
@@ -412,7 +440,12 @@ function renderShodaqohMembers() {
   const members = state.shodaqoh.members || [];
   const isAdmin = isAdminUser();
 
-  // Tampilkan anggota tanpa data pembayaran
+  function isActiveStatus(status) {
+    if (!status) return false;
+    const upper = String(status).toUpperCase().trim();
+    return upper === "ACTIVE" || upper === "AKTIF" || upper === "AKTIVE";
+  }
+
   body.innerHTML = `
     <div class="shod-members-container">
       <div class="shod-members-header">
@@ -459,9 +492,9 @@ function renderShodaqohMembers() {
           <div class="shod-members-items">
             ${members
               .map(function (m) {
-                const statusClass =
-                  m.status === "AKTIF" ? "status-active" : "status-inactive";
-                const statusLabel = m.status || "AKTIF";
+                const aktif = isActiveStatus(m.status);
+                const statusClass = aktif ? "status-active" : "status-inactive";
+                const statusLabel = aktif ? "AKTIF" : "TIDAK AKTIF";
 
                 return `
                 <button type="button" class="tx-card w-full text-left ${isAdmin ? "tx-card-clickable" : ""}" 
@@ -490,7 +523,6 @@ function renderShodaqohMembers() {
     </div>
   `;
 
-  // Event listeners untuk tombol tambah
   const addBtn = $("shodAddMemberBtn");
   if (addBtn && isAdmin) {
     addBtn.addEventListener("click", function (e) {
@@ -2877,9 +2909,9 @@ function openShodMemberActionSheet(memberId) {
     $("shodMemberActionTitle").textContent = member.nama;
   }
 
-  const statusClass =
-    member.status === "AKTIF" ? "status-active" : "status-inactive";
-  const statusLabel = member.status || "AKTIF";
+  const isActive = member.status === "ACTIVE" || member.status === "AKTIF";
+  const statusClass = isActive ? "status-active" : "status-inactive";
+  const statusLabel = isActive ? "Aktif" : "Tidak Aktif";
 
   if ($("shodMemberActionSubtitle")) {
     $("shodMemberActionSubtitle").innerHTML =
@@ -3100,11 +3132,11 @@ async function openShodaqohMemberDetail(memberId) {
 
     if ($("shodMemberDetailMeta")) {
       $("shodMemberDetailMeta").innerHTML = `
-        Nominal bulanan ${fmtRp(m.nominal_bulanan)}
-        <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;margin-left:4px;vertical-align:middle;">
-          ${escapeHtml(statusLabel)}
-        </span>
-      `;
+    Nominal bulanan ${fmtRp(m.nominal_bulanan)}
+    <span class="status-pill ${statusClass}" style="font-size:8px;padding:2px 10px;margin-left:4px;vertical-align:middle;">
+      ${escapeHtml(statusLabel)}
+    </span>
+  `;
     }
 
     if (body) {

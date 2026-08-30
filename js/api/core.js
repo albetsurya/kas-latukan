@@ -287,7 +287,10 @@ async function apiGetShodaqoh(monthKey) {
 
   const res = await fetch(url);
   if (!res.ok) throw new Error("Gagal mengambil data (" + res.status + ")");
-  return res.json();
+
+  const data = await res.json();
+
+  return data;
 }
 
 function switchKasType(kasType) {
