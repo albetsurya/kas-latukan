@@ -3171,8 +3171,35 @@
                       justify-content: flex-start;
                     "
                   >
-                    <i class="fas fa-print text-[15px] w-[20px] text-left"></i>
+                    <i class="fas fa-file-invoice text-[15px] w-[22px] text-center"></i>
                     <span>Cetak Rekap Shodaqoh</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="btnPrintInfakIR"
+                    class="print-dropdown-item"
+                    role="menuitem"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 12px;
+                      width: 100%;
+                      padding: 10px 14px;
+                      border: none;
+                      background: transparent;
+                      border-radius: 8px;
+                      cursor: pointer;
+                      font-size: 12.5px;
+                      font-weight: 600;
+                      color: var(--ink-soft);
+                      transition: all 0.15s ease;
+                      text-align: left;
+                      justify-content: flex-start;
+                    "
+                  >
+                    <i class="fas fa-print text-[15px] w-[20px] text-left"></i>
+                    <span>Cetak Rekap Infak IR</span>
                   </button>
 
                   <button
@@ -5122,7 +5149,7 @@
     <div id="printShodaqohArea">
       <div class="print-wrapper">
         <div class="print-header">
-          <h1>REKAP SHODAQOH BULANAN</h1>
+          <h1 id="printShodaqohTitle">REKAP SHODAQOH BULANAN</h1>
           <h2>KELOMPOK LATUKAN</h2>
           <p id="printShodaqohPeriod">Periode: -</p>
         </div>
@@ -5157,7 +5184,7 @@
     <script src="/js/data.js"></script>
     <script src="/js/api/core.js"></script>
     <script src="/js/finance/finance-print.js"></script>
-    <script src="/js/shodaqoh/print.js"></script>
+    <script src="/js/shodaqoh/shodaqoh-print.js"></script>
     <script src="/js/zakat/zakat-print.js"></script>
     <script src="/js/navigation.js"></script>
     <script src="/js/shodaqoh/shodaqoh.js"></script>

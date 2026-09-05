@@ -648,6 +648,11 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     visibility: hidden !important;
   }
 
+  body.printing-shodaqoh #printShodaqohArea {
+    page: shodaqoh !important;
+    size: landscape !important;
+  }
+
   body.printing-shodaqoh #printShodaqohArea,
   body.printing-shodaqoh #printShodaqohArea * {
     visibility: visible !important;
