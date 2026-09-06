@@ -832,24 +832,31 @@ document.addEventListener("DOMContentLoaded", () => {
     $("btnShodEditPayment").addEventListener("click", async () => {
       const id = $("btnShodEditPayment").dataset.paymentId;
 
-      // Tutup detail
-      $("shodPaymentDetailOverlay")?.classList.add("hidden");
-
-      // Buka form dengan skeleton/loading state
-      if (typeof openShodaqohPaymentForm === "function") {
-        openShodaqohPaymentForm(null, true); // true = show immediately
+      if (!id) {
+        showToast("ID pembayaran tidak ditemukan.", "error");
+        return;
       }
 
-      // Tambahkan class loading pada form
+      state.shodaqoh.selectedPaymentId = id;
+
+      $("shodPaymentDetailOverlay")?.classList.add("hidden");
+
+      if (typeof openShodaqohPaymentForm === "function") {
+        openShodaqohPaymentForm(null, true);
+      }
+
       const form = document.getElementById("shodaqohPaymentForm");
       if (form) form.classList.add("loading");
 
       try {
         const d = await apiGetShodaqohPaymentDetail(id);
+
         if (d.success && d.payment) {
           if (typeof fillShodaqohPaymentForm === "function") {
             fillShodaqohPaymentForm(d.payment);
           }
+
+          state.shodaqoh.selectedPaymentId = d.payment.payment_id || id;
         }
       } catch (err) {
         showToast("Gagal memuat data: " + err.message, "error");

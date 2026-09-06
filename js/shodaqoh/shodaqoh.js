@@ -1236,7 +1236,10 @@ function getCurrentMonthKey() {
 }
 
 function openShodaqohPaymentForm(payment, showImmediately = true) {
-  state.shodaqoh.selectedPaymentId = payment?.payment_id || null;
+  if (payment) {
+    state.shodaqoh.selectedPaymentId =
+      payment.payment_id || payment.paymentId || null;
+  }
 
   // Jika showImmediately true, tampilkan sheet dulu
   if (showImmediately) {
