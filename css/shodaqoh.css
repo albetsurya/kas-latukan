@@ -2813,7 +2813,6 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
   }
 }
 
-
 /* ============================================================
    POSTING KAS — ACTION UX
    Clear primary/secondary hierarchy + destructive action treatment.
@@ -2862,7 +2861,9 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
   font-size: 9.5px;
   line-height: 1.4;
   font-weight: 800;
-  letter-spacing: .07em;
+  text-align: center;
+  text-align: center;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -2931,7 +2932,7 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
 }
 
 .post-action-modal .modal-actions .btn-danger-action:hover {
-  filter: brightness(.94);
+  filter: brightness(0.94);
 }
 
 .post-action-modal .modal-actions button:focus-visible {
@@ -2940,7 +2941,7 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
 }
 
 .post-action-modal .modal-actions button:disabled {
-  opacity: .55;
+  opacity: 0.55;
   cursor: wait;
   transform: none !important;
 }
