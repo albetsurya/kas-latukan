@@ -312,6 +312,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if ($("btnShodCancelPostToKas")) {
+    $("btnShodCancelPostToKas").addEventListener("click", function () {
+      if (typeof cancelPostShodaqohToKas === "function") {
+        cancelPostShodaqohToKas();
+      } else {
+        showToast("Fungsi batal posting tidak tersedia.", "error");
+      }
+    });
+  }
+
   if ($("btnCancelTx")) {
     $("btnCancelTx").addEventListener("click", () => {
       state.editingNo = null;

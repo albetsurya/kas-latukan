@@ -2700,8 +2700,8 @@ async function handleShodaqohSubmit(e) {
     tanggalPembayaran: tanggal,
     total: total,
     susulan_ir: susulan_ir,
-    susulan_bulan: Object.keys(susulanRincian), // Array bulan
-    susulan_rincian: susulanRincian, // Object { "2026-01": 100000, ... }
+    susulan_bulan: Object.keys(susulanRincian),
+    susulan_rincian: susulanRincian,
     uang_sambung: Number($("shod_uang_sambung")?.value || 0),
     jimpitan: Number($("shod_jimpitan")?.value || 0),
     siar_siar: Number($("shod_siar_siar")?.value || 0),

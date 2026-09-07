@@ -79,6 +79,7 @@ function switchTab(tab) {
 function updateFabVisibility() {
   const fabAdd = $("fabAdd");
   const fabPost = $("fabPostToKas");
+  const postStatus = $("shodPostStatus");
 
   if (!fabAdd) return;
 
@@ -92,15 +93,26 @@ function updateFabVisibility() {
   const shouldShowAdd = isAdmin && isAllowedTab;
   fabAdd.classList.toggle("hidden", !shouldShowAdd);
 
-  if (fabPost) {
-    const shouldShowPost = isAdmin && state.activeTab === "shodaqoh";
-    fabPost.classList.toggle("hidden", !shouldShowPost);
+  const payments = state.shodaqoh.payments || [];
+  const allPosted =
+    payments.length > 0 &&
+    payments.every(function (p) {
+      return String(p.kas_transaction_no || "").includes("POSTED");
+    });
 
-    if (shouldShowPost) {
-      fabPost.style.display = "flex";
-    } else {
-      fabPost.style.display = "";
-    }
+  if (fabPost) {
+    // FAB Post hanya tampil kalau di tab Shodaqoh, admin, DAN belum posting
+    const shouldShowPost =
+      isAdmin && state.activeTab === "shodaqoh" && !allPosted;
+
+    fabPost.classList.toggle("hidden", !shouldShowPost);
+    fabPost.style.display = shouldShowPost ? "flex" : "";
+  }
+
+  if (postStatus) {
+    // Card status + tombol Cancel hanya tampil kalau di tab Shodaqoh DAN sudah posting
+    const shouldShowStatus = state.activeTab === "shodaqoh" && allPosted;
+    postStatus.classList.toggle("hidden", !shouldShowStatus);
   }
 }
 
