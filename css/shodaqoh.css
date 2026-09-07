@@ -2812,3 +2812,149 @@ html[data-theme="dark"] #carryForwardOverlay .modal-actions .btn-primary:hover {
     padding: 10px 0 !important;
   }
 }
+
+
+/* ============================================================
+   POSTING KAS — ACTION UX
+   Clear primary/secondary hierarchy + destructive action treatment.
+   ============================================================ */
+
+.post-action-modal {
+  max-width: 420px !important;
+  padding: 22px !important;
+}
+
+.post-action-modal .modal-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+
+.post-action-modal .modal-title {
+  margin: 14px 0 0;
+  text-align: center;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.post-action-modal .modal-description {
+  margin: 7px 0 0;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.post-action-modal .modal-summary {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-alt);
+}
+
+.post-action-modal .modal-summary-label {
+  color: var(--ink-faint);
+  font-size: 9.5px;
+  line-height: 1.4;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.post-action-modal .modal-summary-value {
+  margin-top: 3px;
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 800;
+  text-align: center;
+}
+
+.post-action-modal .modal-note {
+  margin: 8px 0 0;
+  color: var(--ink-faint);
+  font-size: 10.5px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.post-action-modal .modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.post-action-modal .modal-actions .btn {
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.post-action-modal .modal-actions .btn-secondary {
+  border: 1px solid var(--line);
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+}
+
+.post-action-modal .modal-actions .btn-secondary:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink-soft) 22%, var(--line));
+}
+
+.post-action-modal .modal-actions .btn-primary-action {
+  border: 1px solid var(--brand);
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+.post-action-modal .modal-actions .btn-primary-action:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+
+.post-action-modal .modal-actions .btn-danger-action {
+  border: 1px solid var(--neg);
+  background: var(--neg);
+  color: #fff;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--neg) 18%, transparent);
+}
+
+.post-action-modal .modal-actions .btn-danger-action:hover {
+  filter: brightness(.94);
+}
+
+.post-action-modal .modal-actions button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.post-action-modal .modal-actions button:disabled {
+  opacity: .55;
+  cursor: wait;
+  transform: none !important;
+}
+
+@media (max-width: 420px) {
+  .post-action-modal {
+    padding: 18px !important;
+  }
+
+  .post-action-modal .modal-actions {
+    grid-template-columns: 1fr 1.1fr;
+  }
+
+  .post-action-modal .modal-actions .btn {
+    min-height: 44px;
+  }
+}

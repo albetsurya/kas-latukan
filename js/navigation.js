@@ -94,9 +94,12 @@ function updateFabVisibility() {
   fabAdd.classList.toggle("hidden", !shouldShowAdd);
 
   const payments = state.shodaqoh.payments || [];
+  // Jika sudah ada transaksi hasil posting, anggap bulan ini sudah diposting.
+  // Menggunakan `some()` lebih aman karena backend bisa saja hanya menandai
+  // baris pembayaran yang benar-benar menghasilkan transaksi Kas.
   const allPosted =
     payments.length > 0 &&
-    payments.every(function (p) {
+    payments.some(function (p) {
       return String(p.kas_transaction_no || "").includes("POSTED");
     });
 

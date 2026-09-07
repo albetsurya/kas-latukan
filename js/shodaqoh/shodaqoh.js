@@ -158,7 +158,7 @@ async function loadShodaqohData(monthKey) {
         const payments = state.shodaqoh.payments || [];
         const allPosted =
           payments.length > 0 &&
-          payments.every(function (p) {
+          payments.some(function (p) {
             return String(p.kas_transaction_no || "").includes("POSTED");
           });
         postStatus.classList.toggle("hidden", !allPosted);
@@ -240,7 +240,7 @@ function renderShodaqohDashboard() {
     const payments = state.shodaqoh.payments || [];
     const allPosted =
       payments.length > 0 &&
-      payments.every(function (p) {
+      payments.some(function (p) {
         return String(p.kas_transaction_no || "").includes("POSTED");
       });
     postStatus.classList.toggle("hidden", !allPosted);
