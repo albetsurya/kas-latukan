@@ -9,6 +9,7 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
+  gap: 0 !important;
   width: 100vw !important;
   height: 100dvh !important;
   z-index: 9999 !important;
@@ -674,7 +675,7 @@ body:has(#shodaqohLoader:not(.hidden)) #fabPrint {
   }
 
   .zakat-content {
-    padding: 0 12px 70px 12px !important; /* padding kanan-kiri 12px untuk mobile */
+    padding: 12px 12px 70px 12px !important; /* padding kanan-kiri 12px untuk mobile */
     padding-bottom: 70px !important;
   }
 }
