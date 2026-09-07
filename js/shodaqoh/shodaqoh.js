@@ -164,6 +164,13 @@ async function loadShodaqohData(monthKey) {
         postStatus.classList.toggle("hidden", !allPosted);
       }
 
+      // Setiap kali periode berubah dan data selesai dimuat, sinkronkan FAB
+      // dengan periode tersebut. Sebelumnya updateFabVisibility hanya dipanggil
+      // saat pindah tab/posting, sehingga FAB bisa tertinggal dari filter.
+      if (typeof updateFabVisibility === "function") {
+        updateFabVisibility();
+      }
+
       return data;
     } catch (err) {
       console.error("❌ Error loading Shodaqoh data:", err);

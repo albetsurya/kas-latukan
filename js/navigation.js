@@ -93,20 +93,36 @@ function updateFabVisibility() {
   const shouldShowAdd = isAdmin && isAllowedTab;
   fabAdd.classList.toggle("hidden", !shouldShowAdd);
 
-  const payments = state.shodaqoh.payments || [];
-  // Jika sudah ada transaksi hasil posting, anggap bulan ini sudah diposting.
-  // Menggunakan `some()` lebih aman karena backend bisa saja hanya menandai
-  // baris pembayaran yang benar-benar menghasilkan transaksi Kas.
+  const shodaqoh = state.shodaqoh || {};
+  const payments = shodaqoh.payments || [];
+
+  // Posting hanya boleh ditentukan untuk periode yang spesifik (tahun + bulan).
+  // Jika filter belum menentukan keduanya, jangan tampilkan FAB agar tidak
+  // berisiko melakukan posting ke periode yang salah.
+  const filterYear = String(shodaqoh.filters?.year || "");
+  const filterMonth = String(shodaqoh.filters?.month || "");
+  const filteredMonthKey =
+    filterYear && filterMonth ? `${filterYear}-${filterMonth}` : "";
+  const selectedMonthKey = String(shodaqoh.selectedMonth || "");
+  const hasSpecificPeriod = Boolean(filteredMonthKey);
+
+  // Data `payments` berasal dari selectedMonth yang dimuat dari backend.
+  // Jadi status POSTED di sini adalah status untuk periode yang sedang dipilih.
   const allPosted =
-    payments.length > 0 &&
+    hasSpecificPeriod &&
+    selectedMonthKey === filteredMonthKey &&
     payments.some(function (p) {
       return String(p.kas_transaction_no || "").includes("POSTED");
     });
 
   if (fabPost) {
-    // FAB Post hanya tampil kalau di tab Shodaqoh, admin, DAN belum posting
+    // FAB Post hanya tampil pada periode spesifik yang BELUM diposting.
     const shouldShowPost =
-      isAdmin && state.activeTab === "shodaqoh" && !allPosted;
+      isAdmin &&
+      state.activeTab === "shodaqoh" &&
+      hasSpecificPeriod &&
+      selectedMonthKey === filteredMonthKey &&
+      !allPosted;
 
     fabPost.classList.toggle("hidden", !shouldShowPost);
     fabPost.style.display = shouldShowPost ? "flex" : "";

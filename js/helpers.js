@@ -134,17 +134,17 @@ function initShodaqohFilters() {
 
   const applyBtn = document.getElementById("btnApplyShodaqohFilter");
   if (applyBtn)
-    applyBtn.addEventListener("click", function (e) {
+    applyBtn.addEventListener("click", async function (e) {
       e.preventDefault();
       e.stopPropagation();
-      applyShodaqohFilterFromSheet();
+      await applyShodaqohFilterFromSheet();
     });
   const resetBtn = document.getElementById("btnResetShodaqohFilter");
   if (resetBtn)
-    resetBtn.addEventListener("click", function (e) {
+    resetBtn.addEventListener("click", async function (e) {
       e.preventDefault();
       e.stopPropagation();
-      resetShodaqohFilters();
+      await resetShodaqohFilters();
     });
 }
 
@@ -181,7 +181,7 @@ function updateShodaqohFilterSheetState() {
   });
 }
 
-function applyShodaqohFilterFromSheet() {
+async function applyShodaqohFilterFromSheet() {
   const sheet = document.getElementById("shodaqohFilterSheet");
   if (!sheet) return;
   const activeYear = sheet.querySelector(
@@ -205,22 +205,27 @@ function applyShodaqohFilterFromSheet() {
   updateShodaqohActiveFiltersDisplay();
 
   if (state.shodaqoh.filters.year && state.shodaqoh.filters.month) {
-    loadShodaqohData(
+    await loadShodaqohData(
       state.shodaqoh.filters.year + "-" + state.shodaqoh.filters.month,
     );
   } else {
     renderShodaqohMonitoring();
     renderPaymentHistory();
   }
+
+  // Filter adalah sumber kebenaran untuk FAB Post. Pastikan UI langsung
+  // mengikuti periode yang baru dipilih.
+  if (typeof updateFabVisibility === "function") updateFabVisibility();
 }
 
-function resetShodaqohFilters() {
+async function resetShodaqohFilters() {
   state.shodaqoh.filters = { year: "", month: "", status: "ALL" };
   closeShodaqohFilterSheet();
   updateShodaqohFilterSheetState();
   updateShodaqohFilterBadge();
   updateShodaqohActiveFiltersDisplay();
-  loadShodaqohData("");
+  await loadShodaqohData("");
+  if (typeof updateFabVisibility === "function") updateFabVisibility();
 }
 
 function updateShodaqohFilterBadge() {
@@ -286,7 +291,7 @@ function updateShodaqohActiveFiltersDisplay() {
     )
     .join("");
   container.querySelectorAll(".remove-filter").forEach((btn) =>
-    btn.addEventListener("click", function (e) {
+    btn.addEventListener("click", async function (e) {
       e.preventDefault();
       e.stopPropagation();
       if (this.dataset.filter === "tahun") state.shodaqoh.filters.year = "";
