@@ -69,6 +69,16 @@ function switchTab(tab) {
 
   if ($("screenTitle")) $("screenTitle").textContent = TAB_TITLES[tab];
 
+  document.body.classList.remove(
+    "screen-shodaqoh-active",
+    "screen-zakat-active",
+  );
+  if (tab === "shodaqoh") {
+    document.body.classList.add("screen-shodaqoh-active");
+  } else if (tab === "zakat") {
+    document.body.classList.add("screen-zakat-active");
+  }
+
   updateFabVisibility();
 
   document.querySelector("main")?.scrollTo({

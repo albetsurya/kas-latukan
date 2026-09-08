@@ -2,9 +2,8 @@
   position: fixed !important;
   width: 56px !important;
   height: 56px !important;
-  left: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
-  /* SAMAKAN DENGAN FAB ADD */
-  bottom: calc(90px + env(safe-area-inset-bottom)) !important;
+  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
   background: var(--ink) !important;
   color: #fff !important;
   box-shadow: 0 8px 28px rgba(23, 25, 28, 0.35) !important;
@@ -25,9 +24,8 @@
   #fabAiChat {
     width: 50px !important;
     height: 50px !important;
-    left: 16px !important;
-    /* SAMAKAN DENGAN FAB ADD DI MOBILE */
-    bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+    bottom: calc(156px + env(safe-area-inset-bottom)) !important;
   }
   #fabAiChat svg {
     width: 22px !important;
@@ -42,9 +40,8 @@
   #fabAiChat {
     width: 46px !important;
     height: 46px !important;
-    left: 14px !important;
-    /* SAMAKAN DENGAN FAB ADD DI MOBILE KECIL */
-    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+    bottom: calc(156px + env(safe-area-inset-bottom)) !important;
   }
   #fabAiChat svg {
     width: 20px !important;

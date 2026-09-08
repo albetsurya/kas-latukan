@@ -34,6 +34,95 @@ function aiChatScrollToBottom() {
   if (box) box.scrollTop = box.scrollHeight;
 }
 
+function aiChatEscapeHtml(text) {
+  return String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function aiChatInlineMarkdown(text) {
+  let value = aiChatEscapeHtml(text);
+
+  value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
+  value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  value = value.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+  value = value.replace(/(^|[^\*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+  value = value.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, "$1<em>$2</em>");
+
+  return value;
+}
+
+function aiChatRenderMarkdown(text) {
+  const source = String(text || "").replace(/\r\n?/g, "\n");
+  const lines = source.split("\n");
+  const html = [];
+  let listType = null;
+
+  function closeList() {
+    if (listType) {
+      html.push("</" + listType + ">");
+      listType = null;
+    }
+  }
+
+  function renderInline(value) {
+    return aiChatInlineMarkdown(value);
+  }
+
+  lines.forEach(function (line) {
+    const raw = line.trim();
+
+    if (!raw) {
+      closeList();
+      html.push('<div class="ai-chat-md-spacer"></div>');
+      return;
+    }
+
+    const heading = raw.match(/^(#{1,6})\s+(.+)$/);
+    if (heading) {
+      closeList();
+      const level = Math.min(heading[1].length, 3);
+      html.push(
+        '<h' + level + ' class="ai-chat-md-h' + level + '">' +
+        renderInline(heading[2]) +
+        "</h" + level + ">"
+      );
+      return;
+    }
+
+    const bullet = raw.match(/^\*\s+(.+)$/) || raw.match(/^[-•]\s+(.+)$/);
+    if (bullet) {
+      if (listType !== "ul") {
+        closeList();
+        html.push("<ul>");
+        listType = "ul";
+      }
+      html.push("<li>" + renderInline(bullet[1]) + "</li>");
+      return;
+    }
+
+    const ordered = raw.match(/^\d+\.\s+(.+)$/);
+    if (ordered) {
+      if (listType !== "ol") {
+        closeList();
+        html.push("<ol>");
+        listType = "ol";
+      }
+      html.push("<li>" + renderInline(ordered[1]) + "</li>");
+      return;
+    }
+
+    closeList();
+    html.push("<p>" + renderInline(raw) + "</p>");
+  });
+
+  closeList();
+  return html.join("");
+}
+
 function aiChatAppendBubble(role, text, opts) {
   opts = opts || {};
 
@@ -43,9 +132,13 @@ function aiChatAppendBubble(role, text, opts) {
   const bubble = document.createElement("div");
   bubble.className = "ai-chat-bubble " + role + (opts.pending ? " pending" : "");
 
-  const p = document.createElement("p");
-  p.textContent = text;
-  bubble.appendChild(p);
+  if (role === "assistant" && !opts.pending) {
+    bubble.innerHTML = aiChatRenderMarkdown(text);
+  } else {
+    const p = document.createElement("p");
+    p.textContent = text;
+    bubble.appendChild(p);
+  }
 
   box.appendChild(bubble);
   aiChatScrollToBottom();

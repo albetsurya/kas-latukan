@@ -1099,6 +1099,134 @@ html[data-theme="dark"] #fabPrint {
   }
 }
 
+#fabAiChat {
+  position: fixed !important;
+  width: 56px !important;
+  height: 56px !important;
+  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
+  background: var(--ink) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 28px rgba(23, 25, 28, 0.35) !important;
+  z-index: 55 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+  user-select: none !important;
+}
+
+#fabAiChat svg {
+  width: 24px !important;
+  height: 24px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.3s ease !important;
+}
+
+#fabAiChat:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 36px rgba(23, 25, 28, 0.45) !important;
+}
+
+#fabAiChat:hover svg {
+  transform: scale(1.05) !important;
+}
+
+#fabAiChat:active {
+  transform: scale(0.92) !important;
+}
+
+#fabAiChat:active svg {
+  transform: scale(0.85) !important;
+}
+
+html[data-theme="dark"] #fabAiChat {
+  background: var(--brand) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 28px rgba(40, 199, 111, 0.3) !important;
+}
+
+html[data-theme="dark"] #fabAiChat:hover {
+  box-shadow: 0 12px 36px rgba(40, 199, 111, 0.4) !important;
+}
+
+#fabAiChat .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+#fabAiChat:hover .fab-label,
+#fabAiChat:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+body.ai-chat-open #fabAiChat {
+  display: none !important;
+}
+
+body.screen-shodaqoh-active #fabAiChat,
+body.screen-zakat-active #fabAiChat {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  #fabAiChat {
+    width: 50px !important;
+    height: 50px !important;
+    right: 16px !important;
+    bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabAiChat svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  #fabAiChat .fab-label {
+    display: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #fabAiChat {
+    width: 46px !important;
+    height: 46px !important;
+    right: 14px !important;
+    bottom: calc(132px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabAiChat svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+@media (min-width: 481px) {
+  #fabAiChat {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+}
+
 @media (max-width: 380px) {
   #fabAdd {
     width: 46px !important;
@@ -2267,4 +2395,21 @@ html[data-theme="dark"] .kas-type-dropdown-option.active {
 
 html[data-theme="dark"] .kas-type-dropdown-option-icon {
   background: var(--surface);
+}
+
+/* ============================================================
+   SHEET LAYERING — FAB BEHIND TRANSACTION SHEET
+   ============================================================ */
+#fabAdd,
+#fabPostToKas,
+#fabAiChat {
+  z-index: 40 !important;
+}
+
+body:has(#txOverlay:not(.hidden)) #fabAdd,
+body:has(#txOverlay:not(.hidden)) #fabPostToKas {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(0.92) !important;
 }
