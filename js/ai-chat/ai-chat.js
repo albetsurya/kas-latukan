@@ -86,9 +86,15 @@ function aiChatRenderMarkdown(text) {
       closeList();
       const level = Math.min(heading[1].length, 3);
       html.push(
-        '<h' + level + ' class="ai-chat-md-h' + level + '">' +
-        renderInline(heading[2]) +
-        "</h" + level + ">"
+        "<h" +
+          level +
+          ' class="ai-chat-md-h' +
+          level +
+          '">' +
+          renderInline(heading[2]) +
+          "</h" +
+          level +
+          ">",
       );
       return;
     }
@@ -130,7 +136,8 @@ function aiChatAppendBubble(role, text, opts) {
   if (!box) return null;
 
   const bubble = document.createElement("div");
-  bubble.className = "ai-chat-bubble " + role + (opts.pending ? " pending" : "");
+  bubble.className =
+    "ai-chat-bubble " + role + (opts.pending ? " pending" : "");
 
   if (role === "assistant" && !opts.pending) {
     bubble.innerHTML = aiChatRenderMarkdown(text);
@@ -192,11 +199,13 @@ async function aiChatSend(question) {
 
     if (res && res.success) {
       const reply =
-        (res.data && res.data.reply) || "Maaf, saya belum menemukan jawabannya.";
+        (res.data && res.data.reply) ||
+        "Maaf, saya belum menemukan jawabannya.";
       aiChatAppendBubble("assistant", reply);
       aiChatState.history.push({ role: "assistant", text: reply });
     } else {
-      const msg = (res && res.message) || "Terjadi kesalahan saat memproses pertanyaan.";
+      const msg =
+        (res && res.message) || "Terjadi kesalahan saat memproses pertanyaan.";
       aiChatAppendBubble("assistant", "⚠️ " + msg);
     }
   } catch (err) {
@@ -241,6 +250,18 @@ document.addEventListener("DOMContentLoaded", function () {
       if (overlayEl && !overlayEl.classList.contains("hidden")) closeAiChat();
     }
   });
+
+  document
+    .getElementById("fabAiChat")
+    .addEventListener("mouseenter", function () {
+      this.querySelector("svg").style.transform = "rotate(180deg) scale(1.1)";
+    });
+
+  document
+    .getElementById("fabAiChat")
+    .addEventListener("mouseleave", function () {
+      this.querySelector("svg").style.transform = "rotate(0deg) scale(1)";
+    });
 });
 
 window.openAiChat = openAiChat;
