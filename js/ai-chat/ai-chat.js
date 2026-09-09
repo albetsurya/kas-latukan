@@ -1,16 +1,19 @@
-// ============================================================
-// AI CHAT - Tanya jawab seputar data (Kas, Shodaqoh, Zakat)
-// Backend action: "aiChatQuery" (lihat ai-chat.gs)
-// ============================================================
-
 const aiChatState = {
-  history: [], // { role: "user" | "assistant", text: string }
+  history: [],
   loading: false,
+  provider: "omniroute",
 };
+
+function $(id) {
+  return document.getElementById(id);
+}
 
 function openAiChat() {
   const overlay = $("aiChatOverlay");
-  if (!overlay) return;
+  if (!overlay) {
+    console.warn("aiChatOverlay tidak ditemukan");
+    return;
+  }
 
   overlay.classList.remove("hidden");
   document.body.classList.add("ai-chat-open");
@@ -161,6 +164,64 @@ function aiChatSetLoading(isLoading) {
 
   if (btn) btn.disabled = isLoading;
   if (input) input.disabled = isLoading;
+
+  if (isLoading) {
+    document.body.classList.add("ai-chat-loading");
+  } else {
+    document.body.classList.remove("ai-chat-loading");
+  }
+}
+
+function updateProviderStatus(provider) {
+  const statusEl = document.getElementById("aiChatProviderStatus");
+  if (!statusEl) return;
+
+  const labels = {
+    omniroute: "🚀 OmniRoute",
+    gemini: "🧠 Gemini",
+    auto: "🔄 Auto",
+  };
+
+  statusEl.textContent = labels[provider] || provider;
+  statusEl.className = "active-" + provider;
+}
+
+async function aiChatSwitchProvider(provider) {
+  try {
+    const response = await apiPost({
+      action: "setAIProvider",
+      provider: provider,
+    });
+
+    if (response && response.success) {
+      aiChatState.provider = provider;
+      updateProviderStatus(provider);
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("Switch provider error:", err);
+    return false;
+  }
+}
+
+async function aiChatGetProvider() {
+  try {
+    const response = await apiPost({
+      action: "getCurrentProvider",
+    });
+
+    if (response && response.success) {
+      const provider = response.data?.active || "omniroute";
+      aiChatState.provider = provider;
+      updateProviderStatus(provider);
+
+      const select = document.getElementById("aiProviderSelect");
+      if (select) select.value = provider;
+    }
+  } catch (err) {
+    console.error("Get provider error:", err);
+  }
 }
 
 async function aiChatSend(question) {
@@ -185,30 +246,43 @@ async function aiChatSend(question) {
   );
 
   try {
-    // Selalu kirim kasType "main" agar tidak ikut ke-routing ke handler Kas
-    // Amil ketika tab Kas Amil sedang aktif (lihat catatan patch doPost).
-    const res = await apiPost({
-      action: "aiChatQuery",
-      kasType: "main",
-      message: q,
-      // riwayat percakapan sebelumnya (tanpa pertanyaan yg baru saja dikirim)
-      history: aiChatState.history.slice(0, -1).slice(-12),
-    });
+    let response;
+
+    if (typeof apiPost === "function") {
+      response = await apiPost({
+        action: "aiChatQuery",
+        kasType: "main",
+        message: q,
+        history: aiChatState.history.slice(0, -1).slice(-12),
+        provider: aiChatState.provider,
+      });
+    } else {
+      response = await aiChatFetchFallback(q);
+    }
 
     if (pendingBubble) pendingBubble.remove();
 
-    if (res && res.success) {
+    if (response && response.success) {
       const reply =
-        (res.data && res.data.reply) ||
+        (response.data && response.data.reply) ||
         "Maaf, saya belum menemukan jawabannya.";
       aiChatAppendBubble("assistant", reply);
       aiChatState.history.push({ role: "assistant", text: reply });
+
+      if (response.data && response.data.provider) {
+        aiChatState.provider = response.data.provider;
+        updateProviderStatus(response.data.provider);
+        const select = document.getElementById("aiProviderSelect");
+        if (select) select.value = response.data.provider;
+      }
     } else {
       const msg =
-        (res && res.message) || "Terjadi kesalahan saat memproses pertanyaan.";
+        (response && response.message) ||
+        "Terjadi kesalahan saat memproses pertanyaan.";
       aiChatAppendBubble("assistant", "⚠️ " + msg);
     }
   } catch (err) {
+    console.error("AI Chat Error:", err);
     if (pendingBubble) pendingBubble.remove();
     aiChatAppendBubble("assistant", "⚠️ Gagal terhubung ke server. Coba lagi.");
   } finally {
@@ -216,9 +290,51 @@ async function aiChatSend(question) {
   }
 }
 
+async function aiChatFetchFallback(message) {
+  try {
+    const response = await fetch("/api/ai/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "aiChatQuery",
+        message: message,
+        kasType: "main",
+        provider: aiChatState.provider,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error("Fetch error:", err);
+    return {
+      success: false,
+      message: "Gagal terhubung ke server",
+    };
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const fab = $("fabAiChat");
-  if (fab) fab.addEventListener("click", openAiChat);
+  if (fab) {
+    fab.addEventListener("click", openAiChat);
+
+    fab.addEventListener("mouseenter", function () {
+      const svg = this.querySelector("svg");
+      if (svg) {
+        svg.style.transform = "rotate(180deg) scale(1.1)";
+      }
+    });
+
+    fab.addEventListener("mouseleave", function () {
+      const svg = this.querySelector("svg");
+      if (svg) {
+        svg.style.transform = "rotate(0deg) scale(1)";
+      }
+    });
+  }
 
   const closeBtn = $("aiChatCloseBtn");
   if (closeBtn) closeBtn.addEventListener("click", closeAiChat);
@@ -234,36 +350,65 @@ document.addEventListener("DOMContentLoaded", function () {
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      aiChatSend($("aiChatInput") ? $("aiChatInput").value : "");
+      const input = $("aiChatInput");
+      if (input) {
+        aiChatSend(input.value);
+      }
+    });
+  }
+
+  const input = $("aiChatInput");
+  if (input) {
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        const form = $("aiChatForm");
+        if (form) form.dispatchEvent(new Event("submit"));
+      }
     });
   }
 
   document.querySelectorAll(".ai-chat-chip").forEach(function (chip) {
     chip.addEventListener("click", function () {
-      aiChatSend(this.dataset.q || this.textContent);
+      const q = this.dataset.q || this.textContent;
+      aiChatSend(q);
     });
   });
+
+  const providerSelect = document.getElementById("aiProviderSelect");
+  if (providerSelect) {
+    providerSelect.addEventListener("change", async function () {
+      const provider = this.value;
+      const success = await aiChatSwitchProvider(provider);
+      if (success) {
+        aiChatAppendBubble(
+          "assistant",
+          `🔄 Berpindah ke **${provider.toUpperCase()}** provider`,
+        );
+      } else {
+        this.value = aiChatState.provider;
+        aiChatAppendBubble(
+          "assistant",
+          "⚠️ Gagal berpindah provider. Coba lagi.",
+        );
+      }
+    });
+  }
+
+  aiChatGetProvider();
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       const overlayEl = $("aiChatOverlay");
-      if (overlayEl && !overlayEl.classList.contains("hidden")) closeAiChat();
+      if (overlayEl && !overlayEl.classList.contains("hidden")) {
+        closeAiChat();
+      }
     }
   });
-
-  document
-    .getElementById("fabAiChat")
-    .addEventListener("mouseenter", function () {
-      this.querySelector("svg").style.transform = "rotate(180deg) scale(1.1)";
-    });
-
-  document
-    .getElementById("fabAiChat")
-    .addEventListener("mouseleave", function () {
-      this.querySelector("svg").style.transform = "rotate(0deg) scale(1)";
-    });
 });
 
 window.openAiChat = openAiChat;
 window.closeAiChat = closeAiChat;
 window.aiChatSend = aiChatSend;
+window.aiChatState = aiChatState;
+window.aiChatSwitchProvider = aiChatSwitchProvider;
