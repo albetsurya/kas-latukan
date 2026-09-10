@@ -5,10 +5,8 @@ function renderChart() {
     return;
   }
 
-  // ✅ PASTIKAN CANVAS TERLIHAT
   ctx.style.display = "block";
 
-  // ✅ HAPUS SKELETON SEBELUM RENDER CHART
   let chartWrapper = document.getElementById("chartWrapper");
   if (!chartWrapper) {
     const parent = ctx.closest(".card");
@@ -23,7 +21,6 @@ function renderChart() {
     if (skeleton) skeleton.remove();
   }
 
-  // Ambil data berdasarkan tipe chart
   const chartData = getChartData(chartState.type);
   const labels = chartData.labels;
   const data = chartData.data;
@@ -31,19 +28,16 @@ function renderChart() {
   const label = chartState.labelsMap[chartState.type] || "Saldo";
   const title = chartState.titlesMap[chartState.type] || "Tren Saldo Bulanan";
 
-  // Update judul chart
   const titleEl = document.getElementById("chartTitle");
   if (titleEl) {
     titleEl.textContent = title;
   }
 
-  // Update legend
   const legendDot = document.getElementById("chartLegendDot");
   const legendLabel = document.getElementById("chartLegendLabel");
   if (legendDot) legendDot.style.background = color;
   if (legendLabel) legendLabel.textContent = label;
 
-  // Update scope label
   const scopeLabel = document.getElementById("chartScopeLabel");
   if (scopeLabel) {
     const monthCount = labels.length;
@@ -59,7 +53,6 @@ function renderChart() {
     data.push(0);
   }
 
-  // Update nilai terakhir dan perubahan
   const lastValue = data[data.length - 1] || 0;
   const firstValue = data[0] || 0;
   const change =
@@ -88,20 +81,21 @@ function renderChart() {
   const tickColor = dark ? "#475569" : "#94a3b8";
   const gridColor = dark ? "rgba(71,85,105,0.15)" : "rgba(148,163,184,0.12)";
 
-  // Buat gradient fill
   const gradient = ctx.getContext("2d").createLinearGradient(0, 0, 0, 160);
   const gradientColor1 = dark ? `${color}40` : `${color}25`;
   const gradientColor2 = dark ? `${color}05` : `${color}02`;
   gradient.addColorStop(0, gradientColor1);
   gradient.addColorStop(1, gradientColor2);
 
-  // ✅ DESTROY CHART LAMA JIKA ADA
   if (state.chart) {
-    state.chart.destroy();
+    try {
+      state.chart.destroy();
+    } catch (e) {
+      console.warn("Chart destroy error:", e);
+    }
     state.chart = null;
   }
 
-  // ✅ BUAT CHART BARU
   state.chart = new Chart(ctx, {
     type: "line",
     data: {
@@ -218,15 +212,47 @@ function renderChart() {
     },
   });
 
-  // ✅ PASTIKAN CANVAS TETAP TERLIHAT
   ctx.style.display = "block";
 
   console.log("✅ Chart rendered with type:", chartState.type);
 }
 
-// ============================================================
-// GET CHART DATA BERDASARKAN TIPE
-// ============================================================
+function resizeChart() {
+  if (state.chart) {
+    try {
+      state.chart.resize();
+    } catch (e) {
+      console.warn("Chart resize error:", e);
+    }
+  }
+}
+
+function renderChartWhenVisible() {
+  const screen = document.getElementById("screen-home");
+  const canvas = document.getElementById("saldoChart");
+  if (!screen || !canvas) return;
+
+  const isVisible =
+    screen.classList.contains("active") &&
+    screen.offsetParent !== null &&
+    canvas.offsetParent !== null;
+
+  if (!isVisible) {
+    requestAnimationFrame(renderChartWhenVisible);
+    return;
+  }
+
+  const parent = canvas.parentElement;
+  if (parent && (parent.clientWidth < 50 || parent.clientHeight < 50)) {
+    requestAnimationFrame(renderChartWhenVisible);
+    return;
+  }
+
+  renderChart();
+  requestAnimationFrame(function () {
+    resizeChart();
+  });
+}
 
 function getChartData(type) {
   const months = [
@@ -263,11 +289,9 @@ function getChartData(type) {
     let value = 0;
 
     if (type === "saldo") {
-      // Saldo akhir bulan
       const lastTx = monthTx[monthTx.length - 1];
       value = lastTx ? lastTx.saldo || 0 : 0;
     } else {
-      // Filter berdasarkan account
       const accountList = accountMap[type] || [];
       value = monthTx
         .filter((t) => {
@@ -285,10 +309,6 @@ function getChartData(type) {
 
   return { labels, data };
 }
-
-// ============================================================
-// INIT CHART FILTER DROPDOWN
-// ============================================================
 
 function initChartFilterDropdown() {
   const dropdown = document.getElementById("chartFilterDropdown");
@@ -322,7 +342,6 @@ function initChartFilterDropdown() {
       const type = this.dataset.chartType;
       const label = this.textContent.trim();
 
-      // Update active state
       menu.querySelectorAll(".filter-dropdown-option").forEach(function (el) {
         el.classList.remove("active");
         el.setAttribute("aria-selected", "false");
@@ -330,21 +349,16 @@ function initChartFilterDropdown() {
       this.classList.add("active");
       this.setAttribute("aria-selected", "true");
 
-      // Update value display
       valueDisplay.textContent = label;
 
-      // Close dropdown
       dropdown.classList.remove("open");
       trigger.setAttribute("aria-expanded", "false");
 
-      // ✅ UPDATE CHART TYPE DAN RENDER ULANG
       chartState.type = type;
 
-      // ✅ PASTIKAN CANVAS TERLIHAT SEBELUM RENDER
       const canvas = document.getElementById("saldoChart");
       if (canvas) {
         canvas.style.display = "block";
-        // Pastikan parent memiliki ukuran yang benar
         const parent = canvas.parentElement;
         if (parent) {
           parent.style.height = "160px";
@@ -352,8 +366,9 @@ function initChartFilterDropdown() {
         }
       }
 
-      // ✅ RENDER CHART
-      renderChart();
+      requestAnimationFrame(function () {
+        renderChartWhenVisible();
+      });
 
       console.log("🔄 Chart type changed to:", type);
     });
@@ -363,6 +378,18 @@ function initChartFilterDropdown() {
     if (!dropdown.contains(e.target)) {
       dropdown.classList.remove("open");
       trigger.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    resizeChart();
+  });
+
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) {
+      requestAnimationFrame(function () {
+        renderChartWhenVisible();
+      });
     }
   });
 }

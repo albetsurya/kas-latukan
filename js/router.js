@@ -143,7 +143,7 @@ class Router {
       return;
     }
 
-    this.navigateTo(routeKey, false, params); // ✅ params sekarang ikut dikirim
+    this.navigateTo(routeKey, false, params);
   }
 
   navigateTo(routeKey, updateHistory = true, params = null) {
@@ -186,6 +186,21 @@ class Router {
       params: this.currentParams,
       isDetail: route.isDetail || false,
     });
+
+    if (routeKey === "home") {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          if (typeof renderChartWhenVisible === "function") {
+            renderChartWhenVisible();
+          } else if (typeof renderChart === "function") {
+            renderChart();
+          }
+          if (typeof resizeChart === "function") {
+            resizeChart();
+          }
+        });
+      });
+    }
   }
 
   updateNavButtons(routeKey) {
