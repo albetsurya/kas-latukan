@@ -7,6 +7,7 @@ function ensureZakatState() {
       list: [],
       currentId: null,
       isViewOpen: false,
+      activeTab: "muzaki", // ✅ tambah ini
       _loaded: false,
       _loading: false,
     };
@@ -1307,11 +1308,10 @@ async function initZakatDetailRoute(id) {
     renderZakatDetailDirect(id);
   }
 
-  // ✅ Fetch HANYA data zakat ini dari server (lebih cepat dari loadZakatData penuh)
+  // ✅ Fetch HANYA data zakat ini dari server
   var refreshed = await refreshSingleZakat(id);
 
   if (!refreshed) {
-    // fallback: fetch seluruh list kalau endpoint detail gagal/belum ada
     await loadZakatData();
   }
 
@@ -1322,15 +1322,25 @@ async function initZakatDetailRoute(id) {
     return;
   }
 
-  renderZakatDetailDirect(id);
+  // ✅ keepTab: true → jangan reset tab, hormati tab yang sedang aktif
+  renderZakatDetailDirect(id, { keepTab: true });
   updateZakatFilterVisibility();
 }
 
-function renderZakatDetailDirect(id) {
+function renderZakatDetailDirect(id, options) {
+  options = options || {};
+  var keepTab = options.keepTab === true;
+
   var zakat = getZakatById(id);
   if (!zakat) {
     showToast("Zakat tidak ditemukan.", "error");
     return;
+  }
+
+  // ✅ Kalau ini zakat yang berbeda dari yang sedang dibuka, reset tab ke muzaki
+  var isSameZakat = state.zakat.currentId === id;
+  if (!isSameZakat) {
+    state.zakat.activeTab = "muzaki";
   }
 
   state.zakat.currentId = id;
@@ -1369,38 +1379,58 @@ function renderZakatDetailDirect(id) {
     initZakatActionsDropdown();
   }, 100);
 
-  // Setup tab aktif
-  var tabs = document.querySelectorAll(".zakat-tab");
-  var panels = {
-    muzaki: document.getElementById("zakatTabMuzaki"),
-    rincian: document.getElementById("zakatTabRincian"),
-    mustahik: document.getElementById("zakatTabMustahik"),
-  };
+  // ✅ Setup tab aktif — hormati keepTab & state.zakat.activeTab
+  if (!keepTab) {
+    var tabs = document.querySelectorAll(".zakat-tab");
+    var panels = {
+      muzaki: document.getElementById("zakatTabMuzaki"),
+      rincian: document.getElementById("zakatTabRincian"),
+      mustahik: document.getElementById("zakatTabMustahik"),
+    };
 
-  tabs.forEach(function (t) {
-    t.classList.remove("active");
-    t.style.background = "var(--surface)";
-    t.style.color = "var(--ink-soft)";
-  });
+    // Tentukan target tab: pakai state.zakat.activeTab kalau ada, default "muzaki"
+    var targetTab = state.zakat.activeTab || "muzaki";
+    if (!panels[targetTab]) targetTab = "muzaki";
 
-  Object.keys(panels).forEach(function (key) {
-    var panel = panels[key];
-    if (panel) {
-      panel.classList.remove("active");
-      panel.style.display = "none";
+    // Reset semua tab & panel
+    tabs.forEach(function (t) {
+      t.classList.remove("active");
+      t.style.background = "var(--surface)";
+      t.style.color = "var(--ink-soft)";
+    });
+
+    Object.keys(panels).forEach(function (key) {
+      var panel = panels[key];
+      if (panel) {
+        panel.classList.remove("active");
+        panel.style.display = "none";
+      }
+    });
+
+    // Aktifkan tab target
+    var activeTabBtn = document.querySelector(
+      '.zakat-tab[data-zakat-tab="' + targetTab + '"]',
+    );
+    if (activeTabBtn) {
+      activeTabBtn.classList.add("active");
+      activeTabBtn.style.background = "var(--brand)";
+      activeTabBtn.style.color = "#fff";
     }
-  });
 
-  var firstTab = document.querySelector('.zakat-tab[data-zakat-tab="muzaki"]');
-  if (firstTab) {
-    firstTab.classList.add("active");
-    firstTab.style.background = "var(--brand)";
-    firstTab.style.color = "#fff";
-  }
+    var activePanel = panels[targetTab];
+    if (activePanel) {
+      activePanel.classList.add("active");
+      activePanel.style.display = "block";
+    }
 
-  if (panels.muzaki) {
-    panels.muzaki.classList.add("active");
-    panels.muzaki.style.display = "block";
+    // Re-render konten tab yang aktif (biar data fresh)
+    if (targetTab === "rincian") {
+      renderZakatRincianTab(zakat);
+    } else if (targetTab === "mustahik") {
+      renderZakatMustahikTab(zakat);
+    } else {
+      renderZakatMuzakiTab(zakat);
+    }
   }
 }
 
@@ -2208,7 +2238,6 @@ function renderZakatMustahikTab(zakat) {
 
 function initZakatTabs() {
   var tabs = document.querySelectorAll(".zakat-tab");
-
   if (!tabs || tabs.length === 0) return;
 
   var panels = {
@@ -2222,6 +2251,9 @@ function initZakatTabs() {
       var target = this.dataset.zakatTab;
       var zakat = getZakatById(state.zakat?.currentId);
       if (!zakat) return;
+
+      // ✅ Simpan tab aktif ke state
+      if (state.zakat) state.zakat.activeTab = target;
 
       tabs.forEach(function (t) {
         t.classList.remove("active");
@@ -2907,6 +2939,7 @@ document.addEventListener("DOMContentLoaded", function () {
       list: [],
       currentId: null,
       isViewOpen: false,
+      activeTab: "muzaki", // ✅ tambah ini
       _loaded: false,
       _loading: false,
     };
@@ -3897,12 +3930,8 @@ function renderZakatRincianView(zakat) {
   var amilKelompokNominal = Math.round(
     (totalZakat * amil.kelompok.persen) / 100,
   );
-  var amilDesaNominal = Math.round(
-    (totalZakat * amil.desa.persen) / 100,
-  );
-  var amilDaerahNominal = Math.round(
-    (totalZakat * amil.daerah.persen) / 100,
-  );
+  var amilDesaNominal = Math.round((totalZakat * amil.desa.persen) / 100);
+  var amilDaerahNominal = Math.round((totalZakat * amil.daerah.persen) / 100);
 
   var setDisplay = function (id, value) {
     var el = document.getElementById(id);

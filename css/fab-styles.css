@@ -1,35 +1,4 @@
-/* ============================================================
-   FAB STYLES — CONSOLIDATED & FIXED
-   ------------------------------------------------------------
-   CATATAN PENTING (baca sebelum edit lebih lanjut):
-   #fabShodaqoh TIDAK PERNAH ada di HTML/JS. Tombol "tambah" di
-   screen Shodaqoh sebenarnya adalah #fabAdd yang di-reuse
-   (lihat navigation.js: updateFabVisibility, dan komentar FIX
-   di shodaqoh-screen.css).
-
-   REVISI:
-   - #fabAdd kini memakai SATU baseline yang sama di semua screen
-     (transaksi kas / shodaqoh / zakat) yaitu --fab-bottomnav-base.
-     Override khusus screen-shodaqoh DIHAPUS.
-   - #fabPostToKas kini ditata SAMA PERSIS dengan #fabAiChat
-     (baseline --fab-bottomnav-base + create-size + stack-gap),
-     dan ikut bergeser di screen Zakat / Shodaqoh mengikuti pola
-     body.screen-*-active #fabAiChat.
-   - #fabAiChat menyesuaikan: di screen Shodaqoh ia naik ke
-     tingkat ke-3 (di atas #fabPostToKas).
-
-   Behavior show/hide (classList.toggle "hidden", aturan
-   body.screen-*-active) TIDAK disentuh — hanya ukuran & posisi.
-   ============================================================ */
-
 :root {
-  /* ------------------------------------------------------------
-     Transisi enter/exit FAB (dipakai oleh js/fab-transitions.js
-     via Web Animations API — bukan @keyframes CSS, supaya tidak
-     bentrok dengan idle animation bawaan tiap FAB seperti
-     fabZakatFloat / fabAiGradientBreathe / fabPostNudge di bawah).
-     Aman diubah di sini tanpa sentuh JS.
-     ------------------------------------------------------------ */
   --fab-enter-duration: 600ms;
   --fab-enter-easing: cubic-bezier(0.34, 1.56, 0.64, 1); /* spring/overshoot */
   --fab-exit-duration: 350ms;
@@ -48,23 +17,13 @@
 
   --fab-stack-gap: 10px;
 
-  /* Baseline offset dari bawah viewport */
-  --fab-bottomnav-base: 90px; /* baseline universal utk fabAdd (semua screen) */
+  --fab-bottomnav-base: 90px;
+  /* baseline universal utk fabAdd (semua screen) */
   --fab-nonav-base: 156px; /* disimpan utk kompatibilitas, tak dipakai fabAdd */
 
   --fab-right: max(18px, calc((100vw - 480px) / 2 + 18px));
 }
 
-/* ------------------------------------------------------------
-   BOOT-PENDING GATE — bekerja sama dengan marker script di <head>
-   index.html & js/fab-transitions.js. Selama class ini masih ada
-   di <html>, SEMUA .fab (termasuk yang punya display:flex
-   !important seperti #fabAiChat) dipaksa tak-terlihat sebelum cat
-   pertama browser, supaya animasi enter beneran mulai dari "tidak
-   ada" — bukan dari "sudah kelihatan lalu di-reset ke invisible".
-   Class ini dilepas oleh fab-transitions.js tepat saat animasi
-   enter mulai (lihat install() di file itu).
-   ------------------------------------------------------------ */
 html.fab-boot-pending .fab {
   opacity: 0 !important;
   transform: translateY(var(--fab-enter-translate, 20px)) scale(0) !important;
