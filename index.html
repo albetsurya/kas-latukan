@@ -30,6 +30,7 @@
     />
 
     <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/fab-styles.css" />
     <link rel="stylesheet" href="/css/sheets.css" />
     <link rel="stylesheet" href="/css/tx-sheet.css" />
     <link rel="stylesheet" href="/css/shodaqoh-sheet.css" />
@@ -43,6 +44,7 @@
     <link rel="stylesheet" href="/css/overrides.css" />
     <link rel="stylesheet" href="/css/button.css" />
     <link rel="stylesheet" href="/css/ai-chat.css" />
+
     <script>
       (function () {
         var theme = localStorage.getItem("kas_theme");
@@ -4540,97 +4542,153 @@
         <span class="fab-label">Post ke Kas</span>
       </button>
 
-      <button id="fabAiChat" class="fab ai-fab" aria-label="Tanya AI">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 3v2" />
-          <path d="M18 6l-2 2" />
-          <path d="M20 12h-2" />
-          <path d="M18 18l-2-2" />
-          <path d="M12 19v2" />
-          <path d="M6 18l2-2" />
-          <path d="M6 12H4" />
-          <path d="M6 6l2 2" />
-        </svg>
-        <span class="fab-label">Tanya AI</span>
+      <button id="fabAiChat" class="fab fab-action" aria-label="Tanya AI">
+        <i class="fas fa-wand-magic-sparkles"></i>
+        <span class="fab-label">AI Chat</span>
       </button>
 
-      <div id="aiChatOverlay" class="ai-chat-overlay hidden">
+      <section id="screen-ai-chat" class="screen screen-ai-chat-full">
         <div class="ai-chat-panel">
           <div class="ai-chat-header">
+            <button
+              type="button"
+              id="aiChatBackBtn"
+              class="ai-chat-back-btn"
+              aria-label="Kembali"
+            >
+              <i class="fas fa-arrow-left"></i>
+            </button>
+
             <div class="ai-chat-header-title">
               <div class="ai-chat-header-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.27A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.73-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"
-                  />
-                </svg>
+                <i class="fas fa-robot"></i>
               </div>
               <div>
                 <h2>AI Chat</h2>
                 <p id="aiChatProviderStatus" class="active-omniroute">
-                  🚀 OmniRoute
+                  OmniRoute
                 </p>
               </div>
             </div>
 
             <div class="ai-chat-provider-selector">
-              <select id="aiProviderSelect" class="ai-provider-select">
-                <option value="omniroute">🚀 OmniRoute</option>
-                <option value="gemini">🧠 Gemini</option>
-                <option value="auto">🔄 Auto</option>
-              </select>
-              <button class="ai-chat-close" id="aiChatCloseBtn">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
+              <div class="filter-dropdown" id="aiProviderDropdown">
+                <button
+                  type="button"
+                  id="aiProviderTrigger"
+                  class="filter-dropdown-trigger"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
                 >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
+                  <span id="aiProviderValue" class="filter-dropdown-value"
+                    >OmniRoute</span
+                  >
+                  <i class="fas fa-chevron-down filter-dropdown-chevron"></i>
+                </button>
+
+                <div
+                  id="aiProviderMenu"
+                  class="filter-dropdown-menu"
+                  role="listbox"
+                  aria-label="Pilih provider AI"
+                >
+                  <button
+                    type="button"
+                    class="filter-dropdown-option active"
+                    data-provider="omniroute"
+                    role="option"
+                    aria-selected="true"
+                  >
+                    <span class="ai-provider-option-icon">
+                      <i class="fas fa-route"></i>
+                    </span>
+                    <span class="filter-dropdown-option-label">OmniRoute</span>
+                    <span class="filter-dropdown-option-check">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="filter-dropdown-option"
+                    data-provider="gemini"
+                    role="option"
+                    aria-selected="false"
+                  >
+                    <span class="ai-provider-option-icon">
+                      <i class="fas fa-star"></i>
+                    </span>
+                    <span class="filter-dropdown-option-label">Gemini</span>
+                    <span class="filter-dropdown-option-check">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="filter-dropdown-option"
+                    data-provider="groq"
+                    role="option"
+                    aria-selected="false"
+                  >
+                    <span class="ai-provider-option-icon">
+                      <i class="fas fa-bolt"></i>
+                    </span>
+                    <span class="filter-dropdown-option-label">Groq</span>
+                    <span class="filter-dropdown-option-check">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="filter-dropdown-option"
+                    data-provider="auto"
+                    role="option"
+                    aria-selected="false"
+                  >
+                    <span class="ai-provider-option-icon">
+                      <i class="fas fa-arrows-rotate"></i>
+                    </span>
+                    <span class="filter-dropdown-option-label">Auto</span>
+                    <span class="filter-dropdown-option-check">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="ai-chat-messages" id="aiChatMessages">
             <div class="ai-chat-bubble assistant">
               <p>
-                Halo! 👋 Saya asisten AI untuk data Kas, Shodaqoh, dan Zakat.
-                Ada yang bisa saya bantu?
+                Halo! Saya asisten AI untuk data Kas, Shodaqoh, dan Zakat. Ada
+                yang bisa saya bantu?
               </p>
             </div>
           </div>
 
-          <div class="ai-chat-suggestions" id="aiChatSuggestions">
+          <div
+            class="ai-chat-suggestions"
+            id="aiChatSuggestions"
+            style="background: transparent !important"
+          >
             <button class="ai-chat-chip" data-q="Berapa saldo kas utama?">
-              💰 Saldo Kas
+              <i class="fas fa-wallet"></i>
+              <span>Saldo Kas</span>
             </button>
             <button class="ai-chat-chip" data-q="Rekap shodaqoh bulan ini">
-              📊 Shodaqoh
+              <i class="fas fa-hand-holding-heart"></i>
+              <span>Shodaqoh</span>
             </button>
             <button class="ai-chat-chip" data-q="Data zakat terbaru">
-              🕌 Zakat
+              <i class="fas fa-mosque"></i>
+              <span>Zakat</span>
             </button>
             <button class="ai-chat-chip" data-q="Ringkasan semua data">
-              📋 Ringkasan
+              <i class="fas fa-chart-pie"></i>
+              <span>Ringkasan</span>
             </button>
           </div>
 
@@ -4641,21 +4699,12 @@
               placeholder="Tanya tentang data..."
               autocomplete="off"
             />
-            <button type="submit" id="aiChatSendBtn">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-              </svg>
+            <button type="submit" id="aiChatSendBtn" aria-label="Kirim">
+              <i class="fas fa-paper-plane"></i>
             </button>
           </form>
         </div>
-      </div>
+      </section>
 
       <nav id="bottomnav" class="flex">
         <button class="nav-btn active" data-tab="home">

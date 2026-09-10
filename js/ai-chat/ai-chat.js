@@ -1,39 +1,160 @@
 const aiChatState = {
   history: [],
   loading: false,
-  provider: "omniroute",
+  provider: localStorage.getItem("ai_chat_provider") || "omniroute",
+  returnRoute: "home",
 };
 
-function $(id) {
-  return document.getElementById(id);
+function aiChatSetProvider(provider) {
+  const allowedProviders = ["omniroute", "gemini", "groq", "auto"];
+
+  if (!allowedProviders.includes(provider)) {
+    provider = "omniroute";
+  }
+
+  aiChatState.provider = provider;
+  localStorage.setItem("ai_chat_provider", provider);
+  updateProviderStatus(provider);
 }
 
-function openAiChat() {
-  const overlay = $("aiChatOverlay");
-  if (!overlay) {
-    console.warn("aiChatOverlay tidak ditemukan");
+function aiChatSaveHistory() {
+  try {
+    var toSave = aiChatState.history.slice(-50);
+    localStorage.setItem("ai_chat_history", JSON.stringify(toSave));
+  } catch (e) {
+    console.warn("[AI Chat] Gagal simpan history:", e);
+  }
+}
+
+function aiChatLoadHistory() {
+  try {
+    var raw = localStorage.getItem("ai_chat_history");
+    if (!raw) return [];
+
+    var parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter(function (h) {
+      return h && h.role && h.text;
+    });
+  } catch (e) {
+    console.warn("[AI Chat] Gagal load history:", e);
+    return [];
+  }
+}
+
+function aiChatClearHistory() {
+  aiChatState.history = [];
+  localStorage.removeItem("ai_chat_history");
+}
+
+function aiChatRenderHistory() {
+  var box = aiChatEl("aiChatMessages");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  if (!aiChatState.history.length) {
+    var welcome = document.createElement("div");
+    welcome.className = "ai-chat-bubble assistant";
+    var p = document.createElement("p");
+    p.textContent =
+      "Halo! Saya asisten AI untuk data Kas, Shodaqoh, dan Zakat. Ada yang bisa saya bantu?";
+    welcome.appendChild(p);
+    box.appendChild(welcome);
     return;
   }
 
-  overlay.classList.remove("hidden");
-  document.body.classList.add("ai-chat-open");
+  aiChatState.history.forEach(function (h) {
+    aiChatAppendBubble(h.role, h.text);
+  });
 
-  setTimeout(function () {
-    const input = $("aiChatInput");
-    if (input) input.focus();
-  }, 150);
+  aiChatScrollToBottom();
+}
+
+function aiChatSetLocalProvider(provider) {
+  aiChatSetProvider(provider);
+}
+
+function aiChatEl(id) {
+  return document.getElementById(id);
+}
+
+function aiChatForceTransparentSuggestions() {
+  var el = document.getElementById("aiChatSuggestions");
+  if (!el) return;
+
+  el.style.setProperty("background", "transparent", "important");
+  el.style.setProperty("background-color", "transparent", "important");
+  el.style.setProperty("backdrop-filter", "none", "important");
+  el.style.setProperty("-webkit-backdrop-filter", "none", "important");
+}
+
+function openAiChat() {
+  const screen = aiChatEl("screen-ai-chat");
+  if (!screen) {
+    console.warn("screen-ai-chat tidak ditemukan");
+    return false;
+  }
+
+  if (
+    typeof router !== "undefined" &&
+    router &&
+    typeof router.navigateTo === "function"
+  ) {
+    const current =
+      typeof router.getCurrentRoute === "function"
+        ? router.getCurrentRoute()
+        : null;
+    if (current && current !== "ai-chat") {
+      aiChatState.returnRoute = current;
+    }
+    router.navigateTo("ai-chat");
+  } else {
+    document.querySelectorAll(".screen").forEach(function (s) {
+      s.classList.remove("active");
+    });
+    screen.classList.add("active");
+    document.body.classList.add("screen-ai-chat-active");
+    const bottomNav = document.getElementById("bottomnav");
+    if (bottomNav) bottomNav.style.display = "none";
+  }
+
+  aiChatInitProviderDropdown();
+  aiChatInitControls();
+  aiChatForceTransparentSuggestions();
+
+  const input = aiChatEl("aiChatInput");
+  if (input) {
+    setTimeout(function () {
+      input.focus();
+    }, 150);
+  }
+  return true;
 }
 
 function closeAiChat() {
-  const overlay = $("aiChatOverlay");
-  if (!overlay) return;
+  if (
+    typeof router !== "undefined" &&
+    router &&
+    typeof router.navigateTo === "function"
+  ) {
+    let target = aiChatState.returnRoute || "home";
+    if (target === "ai-chat") target = "home";
+    if (target === "zakat-detail") target = "zakat";
+    router.navigateTo(target);
+    return;
+  }
 
-  overlay.classList.add("hidden");
-  document.body.classList.remove("ai-chat-open");
+  const screen = aiChatEl("screen-ai-chat");
+  if (screen) screen.classList.remove("active");
+  document.body.classList.remove("screen-ai-chat-active");
+  const bottomNav = document.getElementById("bottomnav");
+  if (bottomNav) bottomNav.style.display = "";
 }
 
 function aiChatScrollToBottom() {
-  const box = $("aiChatMessages");
+  const box = aiChatEl("aiChatMessages");
   if (box) box.scrollTop = box.scrollHeight;
 }
 
@@ -48,13 +169,11 @@ function aiChatEscapeHtml(text) {
 
 function aiChatInlineMarkdown(text) {
   let value = aiChatEscapeHtml(text);
-
   value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
   value = value.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   value = value.replace(/__([^_]+)__/g, "<strong>$1</strong>");
   value = value.replace(/(^|[^\*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
   value = value.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, "$1<em>$2</em>");
-
   return value;
 }
 
@@ -102,18 +221,44 @@ function aiChatRenderMarkdown(text) {
       return;
     }
 
-    const bullet = raw.match(/^\*\s+(.+)$/) || raw.match(/^[-•]\s+(.+)$/);
-    if (bullet) {
+    const explicitBullet = raw.match(/^[\*\-•]\s+(.+)$/);
+
+    const autoBulletPattern =
+      /^([A-Z][^–—\-:]{2,50})\s*[–—]\s*(Rp[\d\.,]+|[\d\.,]+)(.*)$/;
+    const autoBullet = !explicitBullet && raw.match(autoBulletPattern);
+
+    const ordered = raw.match(/^\d+[\.\)]\s+(.+)$/);
+
+    if (explicitBullet) {
       if (listType !== "ul") {
         closeList();
         html.push("<ul>");
         listType = "ul";
       }
-      html.push("<li>" + renderInline(bullet[1]) + "</li>");
+      html.push("<li>" + renderInline(explicitBullet[1]) + "</li>");
       return;
     }
 
-    const ordered = raw.match(/^\d+\.\s+(.+)$/);
+    if (autoBullet) {
+      if (listType !== "ul") {
+        closeList();
+        html.push("<ul>");
+        listType = "ul";
+      }
+      const name = autoBullet[1].trim();
+      const amount = autoBullet[2].trim();
+      const rest = (autoBullet[3] || "").trim();
+      html.push(
+        "<li><strong>" +
+          renderInline(name) +
+          "</strong> – " +
+          renderInline(amount) +
+          (rest ? " " + renderInline(rest) : "") +
+          "</li>",
+      );
+      return;
+    }
+
     if (ordered) {
       if (listType !== "ol") {
         closeList();
@@ -134,14 +279,11 @@ function aiChatRenderMarkdown(text) {
 
 function aiChatAppendBubble(role, text, opts) {
   opts = opts || {};
-
-  const box = $("aiChatMessages");
+  const box = aiChatEl("aiChatMessages");
   if (!box) return null;
-
   const bubble = document.createElement("div");
   bubble.className =
     "ai-chat-bubble " + role + (opts.pending ? " pending" : "");
-
   if (role === "assistant" && !opts.pending) {
     bubble.innerHTML = aiChatRenderMarkdown(text);
   } else {
@@ -149,22 +291,17 @@ function aiChatAppendBubble(role, text, opts) {
     p.textContent = text;
     bubble.appendChild(p);
   }
-
   box.appendChild(bubble);
   aiChatScrollToBottom();
-
   return bubble;
 }
 
 function aiChatSetLoading(isLoading) {
   aiChatState.loading = isLoading;
-
-  const btn = $("aiChatSendBtn");
-  const input = $("aiChatInput");
-
+  const btn = aiChatEl("aiChatSendBtn");
+  const input = aiChatEl("aiChatInput");
   if (btn) btn.disabled = isLoading;
   if (input) input.disabled = isLoading;
-
   if (isLoading) {
     document.body.classList.add("ai-chat-loading");
   } else {
@@ -174,67 +311,251 @@ function aiChatSetLoading(isLoading) {
 
 function updateProviderStatus(provider) {
   const statusEl = document.getElementById("aiChatProviderStatus");
-  if (!statusEl) return;
+  const valueEl = document.getElementById("aiProviderValue");
 
   const labels = {
-    omniroute: "🚀 OmniRoute",
-    gemini: "🧠 Gemini",
-    auto: "🔄 Auto",
+    omniroute: "OmniRoute",
+    gemini: "Gemini",
+    groq: "Groq",
+    auto: "Auto",
   };
 
-  statusEl.textContent = labels[provider] || provider;
-  statusEl.className = "active-" + provider;
+  const label = labels[provider] || provider;
+
+  if (statusEl) {
+    statusEl.textContent = label;
+    statusEl.className = "active-" + provider;
+  }
+
+  if (valueEl) {
+    valueEl.textContent = label;
+  }
+
+  document
+    .querySelectorAll("#aiProviderMenu .filter-dropdown-option")
+    .forEach(function (opt) {
+      const isActive = opt.dataset.provider === provider;
+      opt.classList.toggle("active", isActive);
+      opt.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
 }
 
 async function aiChatSwitchProvider(provider) {
+  const allowedProviders = ["omniroute", "gemini", "groq", "auto"];
+  if (!allowedProviders.includes(provider)) {
+    console.warn("[AI Chat] Provider tidak valid:", provider);
+    return false;
+  }
+
+  aiChatSetProvider(provider);
+
+  console.log(
+    "[AI Chat] Switch provider:",
+    "→",
+    provider,
+    "| LS:",
+    localStorage.getItem("ai_chat_provider"),
+    "| state:",
+    aiChatState.provider,
+  );
+
   try {
     const response = await apiPost({
       action: "setAIProvider",
       provider: provider,
     });
-
-    if (response && response.success) {
-      aiChatState.provider = provider;
-      updateProviderStatus(provider);
-      return true;
-    }
-    return false;
+    console.log("[AI Chat] Server response:", response);
   } catch (err) {
-    console.error("Switch provider error:", err);
-    return false;
+    console.warn("[AI Chat] Server sync failed:", err);
   }
+
+  return true;
 }
 
 async function aiChatGetProvider() {
+  const localProvider = localStorage.getItem("ai_chat_provider");
+  if (["omniroute", "gemini", "groq", "auto"].includes(localProvider)) {
+    aiChatSetProvider(localProvider);
+    return localProvider;
+  }
+
   try {
-    const response = await apiPost({
-      action: "getCurrentProvider",
-    });
-
-    if (response && response.success) {
-      const provider = response.data?.active || "omniroute";
-      aiChatState.provider = provider;
-      updateProviderStatus(provider);
-
-      const select = document.getElementById("aiProviderSelect");
-      if (select) select.value = provider;
+    const response = await apiPost({ action: "getCurrentProvider" });
+    if (response && response.success && response.data) {
+      const serverProvider =
+        response.data.active ||
+        response.data.provider ||
+        response.data.usedProvider;
+      if (["omniroute", "gemini", "groq", "auto"].includes(serverProvider)) {
+        aiChatSetProvider(serverProvider);
+        return serverProvider;
+      }
     }
   } catch (err) {
-    console.error("Get provider error:", err);
+    console.error("[AI Chat] Get provider error:", err);
   }
+
+  return aiChatState.provider || "omniroute";
 }
+
+function aiChatInitProviderDropdown() {
+  const dropdownEl = document.getElementById("aiProviderDropdown");
+  const triggerEl = document.getElementById("aiProviderTrigger");
+  const menuEl = document.getElementById("aiProviderMenu");
+
+  if (!dropdownEl || !triggerEl || !menuEl) {
+    console.warn("[AI Chat] Elemen provider dropdown tidak ditemukan");
+    return;
+  }
+
+  if (dropdownEl.dataset.aiChatDropdownInit === "1") {
+    return;
+  }
+  dropdownEl.dataset.aiChatDropdownInit = "1";
+
+  function closeMenu() {
+    menuEl.classList.remove("open");
+    triggerEl.setAttribute("aria-expanded", "false");
+  }
+
+  triggerEl.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const isOpen = menuEl.classList.contains("open");
+    menuEl.classList.toggle("open", !isOpen);
+    triggerEl.setAttribute("aria-expanded", String(!isOpen));
+  });
+
+  menuEl
+    .querySelectorAll(".filter-dropdown-option")
+    .forEach(function (optionEl) {
+      optionEl.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const provider = this.dataset.provider;
+        if (!provider) {
+          console.warn("[AI Chat] Provider kosong");
+          return;
+        }
+
+        closeMenu();
+
+        const labels = {
+          omniroute: "OmniRoute",
+          gemini: "Gemini",
+          groq: "Groq",
+          auto: "Auto",
+        };
+
+        aiChatSwitchProvider(provider).then(function (success) {
+          if (success) {
+            aiChatAppendBubble(
+              "assistant",
+              "Provider diganti ke **" + (labels[provider] || provider) + "**",
+            );
+          }
+        });
+      });
+    });
+
+  document.addEventListener("click", function (e) {
+    if (!dropdownEl.contains(e.target)) {
+      closeMenu();
+    }
+  });
+
+  window.addEventListener("resize", closeMenu);
+  window.addEventListener("scroll", closeMenu, true);
+}
+
+function aiChatInitControls() {
+  const screenEl = aiChatEl("screen-ai-chat");
+  if (!screenEl) return;
+  if (screenEl.dataset.aiChatControlsInit === "1") return;
+  screenEl.dataset.aiChatControlsInit = "1";
+
+  aiChatState.history = aiChatLoadHistory();
+  aiChatRenderHistory();
+
+  const localProvider = localStorage.getItem("ai_chat_provider");
+  if (["omniroute", "gemini", "groq", "auto"].includes(localProvider)) {
+    aiChatSetProvider(localProvider);
+    console.log("[AI Chat] Provider dari localStorage:", localProvider);
+  } else {
+    aiChatGetProvider().then(function (provider) {
+      console.log("[AI Chat] Provider dari server:", provider);
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    const back = e.target.closest("#aiChatBackBtn");
+    if (back) {
+      e.preventDefault();
+      closeAiChat();
+      return;
+    }
+
+    const chip = e.target.closest(".ai-chat-chip");
+    if (chip) {
+      e.preventDefault();
+      const q = chip.dataset.q || chip.textContent.trim();
+      aiChatSend(q);
+      return;
+    }
+
+    const sendBtn = e.target.closest("#aiChatSendBtn");
+    if (sendBtn) {
+      e.preventDefault();
+      const input = aiChatEl("aiChatInput");
+      if (input) aiChatSend(input.value);
+      return;
+    }
+  });
+
+  document.addEventListener("submit", function (e) {
+    const form = e.target.closest("#aiChatForm");
+    if (form) {
+      e.preventDefault();
+      const input = aiChatEl("aiChatInput");
+      if (input) aiChatSend(input.value);
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target.id === "aiChatInput" && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const form = aiChatEl("aiChatForm");
+      if (form) form.dispatchEvent(new Event("submit"));
+      return;
+    }
+
+    if (e.key === "Escape") {
+      const screenEl = aiChatEl("screen-ai-chat");
+      if (screenEl && screenEl.classList.contains("active")) {
+        closeAiChat();
+      }
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  aiChatInitProviderDropdown();
+  aiChatInitControls();
+});
 
 async function aiChatSend(question) {
   const q = (question || "").trim();
   if (!q || aiChatState.loading) return;
 
-  const suggestions = $("aiChatSuggestions");
+  const suggestions = aiChatEl("aiChatSuggestions");
   if (suggestions) suggestions.classList.add("hidden");
 
   aiChatAppendBubble("user", q);
   aiChatState.history.push({ role: "user", text: q });
+  aiChatSaveHistory();
 
-  const input = $("aiChatInput");
+  const input = aiChatEl("aiChatInput");
   if (input) input.value = "";
 
   aiChatSetLoading(true);
@@ -245,6 +566,13 @@ async function aiChatSend(question) {
     { pending: true },
   );
 
+  const providerToSend =
+    localStorage.getItem("ai_chat_provider") ||
+    aiChatState.provider ||
+    "omniroute";
+
+  console.log("[AI Chat] Sending with provider:", providerToSend);
+
   try {
     let response;
 
@@ -254,7 +582,7 @@ async function aiChatSend(question) {
         kasType: "main",
         message: q,
         history: aiChatState.history.slice(0, -1).slice(-12),
-        provider: aiChatState.provider,
+        provider: providerToSend,
       });
     } else {
       response = await aiChatFetchFallback(q);
@@ -266,14 +594,23 @@ async function aiChatSend(question) {
       const reply =
         (response.data && response.data.reply) ||
         "Maaf, saya belum menemukan jawabannya.";
+
       aiChatAppendBubble("assistant", reply);
       aiChatState.history.push({ role: "assistant", text: reply });
+      aiChatSaveHistory();
 
-      if (response.data && response.data.provider) {
-        aiChatState.provider = response.data.provider;
-        updateProviderStatus(response.data.provider);
-        const select = document.getElementById("aiProviderSelect");
-        if (select) select.value = response.data.provider;
+      const returnedProvider =
+        response.data && (response.data.provider || response.data.usedProvider);
+
+      console.log("[AI Chat] Server used provider:", returnedProvider);
+
+      if (returnedProvider && returnedProvider !== providerToSend) {
+        console.warn(
+          "[AI Chat] ⚠️ Server pakai provider lain:",
+          returnedProvider,
+          "(diminta:",
+          providerToSend + ")",
+        );
       }
     } else {
       const msg =
@@ -315,97 +652,6 @@ async function aiChatFetchFallback(message) {
     };
   }
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-  const fab = $("fabAiChat");
-  if (fab) {
-    fab.addEventListener("click", openAiChat);
-
-    fab.addEventListener("mouseenter", function () {
-      const svg = this.querySelector("svg");
-      if (svg) {
-        svg.style.transform = "rotate(180deg) scale(1.1)";
-      }
-    });
-
-    fab.addEventListener("mouseleave", function () {
-      const svg = this.querySelector("svg");
-      if (svg) {
-        svg.style.transform = "rotate(0deg) scale(1)";
-      }
-    });
-  }
-
-  const closeBtn = $("aiChatCloseBtn");
-  if (closeBtn) closeBtn.addEventListener("click", closeAiChat);
-
-  const overlay = $("aiChatOverlay");
-  if (overlay) {
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) closeAiChat();
-    });
-  }
-
-  const form = $("aiChatForm");
-  if (form) {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const input = $("aiChatInput");
-      if (input) {
-        aiChatSend(input.value);
-      }
-    });
-  }
-
-  const input = $("aiChatInput");
-  if (input) {
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        const form = $("aiChatForm");
-        if (form) form.dispatchEvent(new Event("submit"));
-      }
-    });
-  }
-
-  document.querySelectorAll(".ai-chat-chip").forEach(function (chip) {
-    chip.addEventListener("click", function () {
-      const q = this.dataset.q || this.textContent;
-      aiChatSend(q);
-    });
-  });
-
-  const providerSelect = document.getElementById("aiProviderSelect");
-  if (providerSelect) {
-    providerSelect.addEventListener("change", async function () {
-      const provider = this.value;
-      const success = await aiChatSwitchProvider(provider);
-      if (success) {
-        aiChatAppendBubble(
-          "assistant",
-          `🔄 Berpindah ke **${provider.toUpperCase()}** provider`,
-        );
-      } else {
-        this.value = aiChatState.provider;
-        aiChatAppendBubble(
-          "assistant",
-          "⚠️ Gagal berpindah provider. Coba lagi.",
-        );
-      }
-    });
-  }
-
-  aiChatGetProvider();
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      const overlayEl = $("aiChatOverlay");
-      if (overlayEl && !overlayEl.classList.contains("hidden")) {
-        closeAiChat();
-      }
-    }
-  });
-});
 
 window.openAiChat = openAiChat;
 window.closeAiChat = closeAiChat;

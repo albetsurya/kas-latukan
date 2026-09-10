@@ -72,11 +72,14 @@ function switchTab(tab) {
   document.body.classList.remove(
     "screen-shodaqoh-active",
     "screen-zakat-active",
+    "screen-ai-chat-active",
   );
   if (tab === "shodaqoh") {
     document.body.classList.add("screen-shodaqoh-active");
   } else if (tab === "zakat") {
     document.body.classList.add("screen-zakat-active");
+  } else if (tab === "ai-chat") {
+    document.body.classList.add("screen-ai-chat-active");
   }
 
   updateFabVisibility();

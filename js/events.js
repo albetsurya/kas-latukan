@@ -134,8 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
           loadShodaqohData();
         }
 
-        // Handle Fullscreen Screens (Zakat & Shodaqoh)
-        if (tab === "zakat" || tab === "shodaqoh") {
+        // Handle Fullscreen Screens (Zakat, Shodaqoh & AI Chat)
+        if (tab === "zakat" || tab === "shodaqoh" || tab === "ai-chat") {
           // Sembunyikan bottom nav karena screen full screen
           const bottomNav = document.getElementById("bottomnav");
           if (bottomNav) {
@@ -299,6 +299,19 @@ document.addEventListener("DOMContentLoaded", () => {
       renderTxAccountDropdownMenu();
 
       $("txOverlay")?.classList.remove("hidden");
+    });
+  }
+
+  if ($("fabAiChat")) {
+    $("fabAiChat").addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof openAiChat === "function") {
+        openAiChat();
+      } else {
+        console.warn("[AI Chat] openAiChat() tidak tersedia");
+        showToast("Fitur AI Chat tidak tersedia.", "error");
+      }
     });
   }
 

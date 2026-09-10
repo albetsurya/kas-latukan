@@ -51,6 +51,13 @@ class Router {
         showInNav: false,
         isDetail: true,
       },
+      "ai-chat": {
+        path: "/ai-chat",
+        title: "AI Chat",
+        screen: "screen-ai-chat",
+        tab: "ai-chat",
+        showInNav: false,
+      },
     };
 
     this.currentRoute = "home";

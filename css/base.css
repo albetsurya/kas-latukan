@@ -1,3 +1,7 @@
+/* ============================================================
+   ROOT VARIABLES
+   ============================================================ */
+
 :root {
   --bg: #f5f6f7;
   --app-bg: #ffffff;
@@ -69,6 +73,10 @@ html[data-theme="dark"] {
   --neg-soft: #321b1d;
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.16);
 }
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 
 html,
 body {
@@ -149,7 +157,7 @@ body,
 }
 
 /* ============================================================
-   AUTH SCREEN - PASTIKAN TIDAK FLASH
+   AUTH SCREEN
    ============================================================ */
 
 #authScreen {
@@ -173,7 +181,6 @@ body,
   display: flex !important;
 }
 
-/* Auth locked state - pastikan priority */
 html.auth-locked #shell {
   display: none !important;
 }
@@ -231,7 +238,6 @@ html.authenticated #shell:not(.hidden) {
   }
 }
 
-/* Dark theme untuk loader */
 [data-theme="dark"] #appLoader {
   background: var(--bg);
 }
@@ -292,6 +298,10 @@ html.authenticated #shell:not(.hidden) {
   }
 }
 
+/* ============================================================
+   SHELL / MAIN CONTAINER
+   ============================================================ */
+
 #shell {
   width: 100% !important;
   max-width: 480px !important;
@@ -340,6 +350,10 @@ html.authenticated #shell {
     box-shadow: none !important;
   }
 }
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
 
 #topbar {
   position: sticky !important;
@@ -404,11 +418,9 @@ html.authenticated #shell {
   animation: spin 0.7s linear;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
 
 #shell main {
   position: relative !important;
@@ -448,6 +460,10 @@ html.authenticated #shell {
 .screen.active {
   display: block;
 }
+
+/* ============================================================
+   HERO CARD
+   ============================================================ */
 
 .hero-card {
   border-radius: 10px;
@@ -590,6 +606,10 @@ h3 {
   white-space: nowrap;
 }
 
+/* ============================================================
+   BOTTOM NAVIGATION
+   ============================================================ */
+
 #bottomnav {
   position: sticky !important;
   bottom: 0 !important;
@@ -641,744 +661,7 @@ h3 {
 }
 
 /* ============================================================
-   FAB BASE STYLES
-   ============================================================ */
-
-.fab {
-  position: fixed;
-  border: none;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-}
-
-.fab:active {
-  transform: scale(0.92);
-}
-
-.fab.hidden {
-  display: none !important;
-}
-
-.fab svg {
-  display: block;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-.fab:hover svg {
-  transform: scale(1.05);
-}
-
-.fab:active svg {
-  transform: scale(0.85);
-}
-
-/* ============================================================
-   FAB ADD - POSISI BAWAH (DI ATAS BOTTOMNAV)
-   ============================================================ */
-
-#fabAdd {
-  position: fixed !important;
-  width: 60px !important;
-  height: 60px !important;
-  right: max(18px, calc((100vw - 480px) / 2 + 18px)) !important;
-  bottom: calc(90px + env(safe-area-inset-bottom)) !important;
-  background: var(--brand) !important;
-  color: #fff !important;
-  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4) !important;
-  z-index: 50 !important;
-  border-radius: 16px !important;
-}
-
-#fabAdd svg {
-  width: 26px !important;
-  height: 26px !important;
-}
-
-#fabAdd:hover {
-  transform: translateY(-3px) scale(1.04) !important;
-  box-shadow: 0 12px 40px rgba(22, 163, 74, 0.5) !important;
-}
-
-#fabAdd:active {
-  transform: scale(0.92) !important;
-}
-
-#fabAdd:not(:hover) {
-  animation: fabPulse 3s ease-in-out infinite;
-}
-
-#fabAdd:hover {
-  animation: none;
-}
-
-@keyframes fabPulse {
-  0% {
-    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4);
-  }
-  50% {
-    box-shadow:
-      0 8px 48px rgba(22, 163, 74, 0.55),
-      0 0 0 8px rgba(22, 163, 74, 0.08);
-  }
-  100% {
-    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4);
-  }
-}
-
-/* Label untuk FAB Add - muncul di kiri */
-#fabAdd .fab-label {
-  position: absolute;
-  right: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-#fabAdd:hover .fab-label,
-#fabAdd:focus .fab-label {
-  opacity: 1;
-  transform: translateY(-50%) translateX(-4px);
-}
-
-/* ============================================================
-   FAB POST KE KAS - POSISI ATAS (DI ATAS FAB ADD)
-   ============================================================ */
-
-#fabPostToKas {
-  position: fixed !important;
-  width: 56px !important;
-  height: 56px !important;
-  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
-  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
-  background: var(--gold) !important;
-  color: #fff !important;
-  box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35) !important;
-  z-index: 50 !important;
-  border-radius: 50% !important;
-}
-
-#fabPostToKas svg {
-  width: 24px !important;
-  height: 24px !important;
-}
-
-#fabPostToKas:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 12px 36px rgba(199, 154, 68, 0.45) !important;
-}
-
-#fabPostToKas:active {
-  transform: scale(0.92) !important;
-}
-
-#fabPostToKas:not(:hover) {
-  animation: fabGoldPulse 3s ease-in-out infinite;
-}
-
-#fabPostToKas:hover {
-  animation: none;
-}
-
-@keyframes fabGoldPulse {
-  0% {
-    box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35);
-  }
-  50% {
-    box-shadow:
-      0 8px 48px rgba(199, 154, 68, 0.55),
-      0 0 0 8px rgba(199, 154, 68, 0.08);
-  }
-  100% {
-    box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35);
-  }
-}
-
-/* Label untuk FAB Post - muncul di kiri */
-#fabPostToKas .fab-label {
-  position: absolute;
-  right: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-#fabPostToKas:hover .fab-label,
-#fabPostToKas:focus .fab-label {
-  opacity: 1;
-  transform: translateY(-50%) translateX(-4px);
-}
-
-/* ============================================================
-   FAB ZAKAT
-   ============================================================ */
-
-#fabZakat {
-  position: fixed !important;
-  z-index: 10000 !important;
-  width: 60px !important;
-  height: 60px !important;
-  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
-  bottom: calc(80px + env(safe-area-inset-bottom)) !important;
-  background: var(--brand) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 50% !important;
-  box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35) !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-  -webkit-tap-highlight-color: transparent !important;
-  touch-action: manipulation !important;
-  user-select: none !important;
-}
-
-#fabZakat svg {
-  width: 28px !important;
-  height: 28px !important;
-  display: block !important;
-  flex-shrink: 0 !important;
-  transition: transform 0.3s ease !important;
-}
-
-#fabZakat:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 12px 36px rgba(22, 163, 74, 0.45) !important;
-}
-
-#fabZakat:hover svg {
-  transform: scale(1.05) !important;
-}
-
-#fabZakat:active {
-  transform: scale(0.92) !important;
-}
-
-#fabZakat:active svg {
-  transform: scale(0.85) !important;
-}
-
-#fabZakat:not(:hover) {
-  animation: fabZakatPulse 3s ease-in-out infinite;
-}
-
-#fabZakat:hover {
-  animation: none;
-}
-
-@keyframes fabZakatPulse {
-  0% {
-    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
-  }
-  50% {
-    box-shadow:
-      0 8px 48px rgba(22, 163, 74, 0.55),
-      0 0 0 8px rgba(22, 163, 74, 0.08);
-  }
-  100% {
-    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.35);
-  }
-}
-
-#fabZakat.hidden {
-  display: none !important;
-}
-
-#fabZakat .fab-label {
-  position: absolute;
-  right: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-#fabZakat:hover .fab-label,
-#fabZakat:focus .fab-label {
-  opacity: 1;
-  transform: translateY(-50%) translateX(-4px);
-}
-
-/* ============================================================
-   FAB PRINT
-   ============================================================ */
-
-#fabPrint {
-  position: fixed !important;
-  width: 48px !important;
-  height: 48px !important;
-  right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
-  bottom: calc(150px + env(safe-area-inset-bottom)) !important;
-  background: var(--ink-soft) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 24px rgba(23, 25, 28, 0.3) !important;
-  z-index: 40 !important;
-  border-radius: 50% !important;
-}
-
-#fabPrint svg {
-  width: 19px !important;
-  height: 19px !important;
-}
-
-#fabPrint:hover {
-  transform: translateY(-2px) scale(1.04) !important;
-  box-shadow: 0 10px 32px rgba(23, 25, 28, 0.4) !important;
-}
-
-#fabPrint:active {
-  transform: scale(0.92) !important;
-}
-
-#fabPrint .fab-label {
-  position: absolute;
-  right: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-#fabPrint:hover .fab-label,
-#fabPrint:focus .fab-label {
-  opacity: 1;
-  transform: translateY(-50%) translateX(-4px);
-}
-
-/* ============================================================
-   FAB AI - MODERN & ELEGAN (DI ATAS FAB ADD)
-   ============================================================ */
-
-#fabAiChat {
-  position: fixed !important;
-  width: 48px !important;
-  height: 48px !important;
-  right: max(22px, calc((100vw - 480px) / 2 + 22px)) !important;
-  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.35) !important;
-  z-index: 55 !important;
-  border: none !important;
-  border-radius: 14px !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-  -webkit-tap-highlight-color: transparent !important;
-  touch-action: manipulation !important;
-  user-select: none !important;
-}
-
-/* HOVER & INTERACTION */
-#fabAiChat:hover {
-  transform: translateY(-3px) scale(1.05) !important;
-  box-shadow: 0 10px 32px rgba(139, 92, 246, 0.5) !important;
-}
-
-#fabAiChat:active {
-  transform: scale(0.9) !important;
-}
-
-/* SPARKLE ICON */
-#fabAiChat svg {
-  width: 20px !important;
-  height: 20px !important;
-  display: block !important;
-  flex-shrink: 0 !important;
-  transition: transform 0.4s ease !important;
-  stroke: #fff !important;
-}
-
-#fabAiChat:hover svg {
-  transform: rotate(180deg) scale(1.1) !important;
-}
-
-/* SPARKLE ANIMATION - BERKILAU */
-#fabAiChat svg path {
-  animation: sparkleTwinkle 2s ease-in-out infinite;
-}
-
-#fabAiChat svg path:nth-child(2) {
-  animation-delay: 0.6s;
-}
-
-#fabAiChat svg path:nth-child(3) {
-  animation-delay: 1.2s;
-}
-
-@keyframes sparkleTwinkle {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.4;
-    transform: scale(0.8);
-  }
-}
-
-/* PULSE RING - EFEK MODERN */
-#fabAiChat::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-  opacity: 0.3;
-  z-index: -1;
-  animation: pulseRing 2s ease-in-out infinite;
-}
-
-@keyframes pulseRing {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.1;
-  }
-}
-
-/* LABEL - MODERN */
-#fabAiChat .fab-label {
-  position: absolute;
-  right: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  padding: 5px 12px;
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-#fabAiChat:hover .fab-label,
-#fabAiChat:focus .fab-label {
-  opacity: 1;
-  transform: translateY(-50%) translateX(-4px) scale(1);
-}
-
-/* ============================================================
-   DARK THEME - FAB
-   ============================================================ */
-
-html[data-theme="dark"] .fab {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-}
-
-html[data-theme="dark"] #fabAdd {
-  box-shadow: 0 8px 32px rgba(40, 199, 111, 0.35) !important;
-}
-
-html[data-theme="dark"] #fabAdd:hover {
-  box-shadow: 0 12px 40px rgba(40, 199, 111, 0.45) !important;
-}
-
-html[data-theme="dark"] #fabPostToKas {
-  box-shadow: 0 8px 28px rgba(233, 173, 56, 0.25) !important;
-}
-
-html[data-theme="dark"] #fabPostToKas:hover {
-  box-shadow: 0 12px 36px rgba(233, 173, 56, 0.35) !important;
-}
-
-html[data-theme="dark"] #fabZakat {
-  box-shadow: 0 8px 28px rgba(40, 199, 111, 0.3) !important;
-}
-
-html[data-theme="dark"] #fabZakat:hover {
-  box-shadow: 0 12px 36px rgba(40, 199, 111, 0.4) !important;
-}
-
-html[data-theme="dark"] #fabPrint {
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45) !important;
-}
-
-html[data-theme="dark"] #fabAiChat {
-  background: linear-gradient(135deg, #a78bfa, #7c3aed) !important;
-  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4) !important;
-}
-
-html[data-theme="dark"] #fabAiChat:hover {
-  box-shadow: 0 10px 32px rgba(124, 58, 237, 0.55) !important;
-}
-
-html[data-theme="dark"] #fabAiChat::before {
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
-}
-
-body.ai-chat-open #fabAiChat {
-  display: none !important;
-}
-
-body.screen-shodaqoh-active #fabAiChat,
-body.screen-zakat-active #fabAiChat {
-  display: none !important;
-}
-
-/* ============================================================
-   RESPONSIVE - FAB
-   ============================================================ */
-
-@media (max-width: 480px) {
-  #fabAdd {
-    width: 54px !important;
-    height: 54px !important;
-    right: 16px !important;
-    bottom: calc(80px + env(safe-area-inset-bottom)) !important;
-    border-radius: 14px !important;
-  }
-  #fabAdd svg {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  #fabAdd .fab-label {
-    display: none !important;
-  }
-
-  #fabPostToKas {
-    width: 50px !important;
-    height: 50px !important;
-    right: 16px !important;
-    bottom: calc(140px + env(safe-area-inset-bottom)) !important;
-  }
-  #fabPostToKas svg {
-    width: 22px !important;
-    height: 22px !important;
-  }
-  #fabPostToKas .fab-label {
-    display: none !important;
-  }
-
-  #fabPrint {
-    width: 44px !important;
-    height: 44px !important;
-    right: 20px !important;
-    bottom: calc(144px + env(safe-area-inset-bottom)) !important;
-  }
-  #fabPrint svg {
-    width: 17px !important;
-    height: 17px !important;
-  }
-  #fabPrint .fab-label {
-    display: none !important;
-  }
-
-  #fabZakat {
-    width: 56px !important;
-    height: 56px !important;
-    right: 16px !important;
-    bottom: calc(72px + env(safe-area-inset-bottom)) !important;
-  }
-  #fabZakat svg {
-    width: 26px !important;
-    height: 26px !important;
-  }
-  #fabZakat .fab-label {
-    display: none !important;
-  }
-
-  #fabAiChat {
-    width: 42px !important;
-    height: 42px !important;
-    right: 18px !important;
-    bottom: calc(140px + env(safe-area-inset-bottom)) !important;
-    border-radius: 12px !important;
-  }
-  #fabAiChat svg {
-    width: 18px !important;
-    height: 18px !important;
-  }
-  #fabAiChat .fab-label {
-    display: none !important;
-  }
-}
-
-@media (max-width: 380px) {
-  #fabAdd {
-    width: 48px !important;
-    height: 48px !important;
-    right: 14px !important;
-    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
-    border-radius: 12px !important;
-  }
-  #fabAdd svg {
-    width: 22px !important;
-    height: 22px !important;
-  }
-
-  #fabPostToKas {
-    width: 46px !important;
-    height: 46px !important;
-    right: 14px !important;
-    bottom: calc(132px + env(safe-area-inset-bottom)) !important;
-  }
-  #fabPostToKas svg {
-    width: 20px !important;
-    height: 20px !important;
-  }
-
-  #fabPrint {
-    width: 40px !important;
-    height: 40px !important;
-    right: 18px !important;
-    bottom: calc(136px + env(safe-area-inset-bottom)) !important;
-  }
-  #fabPrint svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-
-  #fabZakat {
-    width: 52px !important;
-    height: 52px !important;
-    right: 14px !important;
-    bottom: calc(68px + env(safe-area-inset-bottom)) !important;
-  }
-  #fabZakat svg {
-    width: 24px !important;
-    height: 24px !important;
-  }
-
-  #fabAiChat {
-    width: 38px !important;
-    height: 38px !important;
-    right: 15px !important;
-    bottom: calc(132px + env(safe-area-inset-bottom)) !important;
-    border-radius: 10px !important;
-  }
-  #fabAiChat svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-
-  #shell main {
-    padding-left: 13px;
-    padding-right: 13px;
-  }
-  #topbar {
-    padding-left: 13px;
-    padding-right: 13px;
-  }
-  .hero-card .mono {
-    font-size: 24px !important;
-  }
-  .card {
-    padding: 14px !important;
-  }
-}
-
-@media (min-width: 481px) {
-  #fabAdd {
-    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
-  }
-  #fabPostToKas {
-    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
-  }
-  #fabPrint {
-    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
-  }
-  #fabZakat {
-    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
-  }
-  #fabAiChat {
-    right: max(26px, calc((100vw - 480px) / 2 + 26px)) !important;
-  }
-}
-
-/* ============================================================
-   SHEET LAYERING — FAB BEHIND TRANSACTION SHEET
-   ============================================================ */
-#fabAdd,
-#fabPostToKas,
-#fabAiChat {
-  z-index: 40 !important;
-}
-
-body:has(#txOverlay:not(.hidden)) #fabAdd,
-body:has(#txOverlay:not(.hidden)) #fabPostToKas,
-body:has(#txOverlay:not(.hidden)) #fabAiChat {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  transform: scale(0.92) !important;
-}
-
-/* ============================================================
-   CONTINUE SHEET STYLES...
+   SHEET OVERLAY
    ============================================================ */
 
 .sheet-overlay {
@@ -1530,175 +813,9 @@ body > .sheet-overlay .sheet-subtitle {
   text-align: left !important;
 }
 
-body > .sheet-overlay .sheet-header-action {
-  display: block !important;
-  text-align: center !important;
-  padding: 4px 0 12px !important;
-  margin: 0 !important;
-}
-
-body > .sheet-overlay .sheet-header-action .sheet-handle {
-  width: 32px !important;
-  height: 3px !important;
-  margin: 4px auto 8px !important;
-  border-radius: 999px !important;
-}
-
-body > .sheet-overlay .sheet-header-action .sheet-title {
-  margin: 0 !important;
-  text-align: center !important;
-  font-family: "Plus Jakarta Sans", sans-serif !important;
-  font-size: 15px !important;
-  line-height: 1.3 !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.02em !important;
-  color: var(--ink) !important;
-}
-
-body > .sheet-overlay .sheet-header-action .sheet-subtitle {
-  margin: 3px 0 0 !important;
-  text-align: center !important;
-  font-family: "Plus Jakarta Sans", sans-serif !important;
-  font-size: 11px !important;
-  line-height: 1.4 !important;
-  color: var(--ink-soft) !important;
-}
-
-body > .sheet-overlay .sheet-header-payment {
-  display: block !important;
-  text-align: center !important;
-  padding: 4px 0 14px !important;
-  margin: 0 !important;
-}
-
-body > .sheet-overlay .sheet-header-payment .sheet-handle {
-  width: 38px !important;
-  height: 4px !important;
-  margin: 6px auto 12px !important;
-  border-radius: 999px !important;
-}
-
-body > .sheet-overlay .sheet-header-payment .sheet-header-icon {
-  width: 40px !important;
-  height: 40px !important;
-  margin: 0 auto 8px !important;
-  border-radius: 12px !important;
-  background: var(--brand-soft) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: var(--brand) !important;
-}
-
-body > .sheet-overlay .sheet-header-payment .sheet-title {
-  margin: 0 !important;
-  text-align: center !important;
-  font-family: "Plus Jakarta Sans", sans-serif !important;
-  font-size: 16px !important;
-  line-height: 1.25 !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
-  color: var(--ink) !important;
-}
-
-body > .sheet-overlay .sheet-header-payment .sheet-subtitle {
-  margin: 5px 0 0 !important;
-  text-align: center !important;
-  font-family: "Plus Jakarta Sans", sans-serif !important;
-  font-size: 12px !important;
-  line-height: 1.45 !important;
-  color: var(--ink-soft) !important;
-}
-
-#bottomnav {
-  z-index: 50 !important;
-}
-
-body > #shodMemberActionOverlay > .sheet,
-body > #txActionOverlay > .sheet {
-  max-height: 58vh !important;
-  padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
-}
-
-body > #shodMemberActionOverlay .sheet-header,
-body > #txActionOverlay .sheet-header {
-  padding-top: 4px !important;
-  padding-bottom: 10px !important;
-}
-
-body > #shodMemberActionOverlay .sheet-title,
-body > #txActionOverlay .sheet-title {
-  text-align: center !important;
-  font-size: 15px !important;
-}
-
-body > #shodMemberActionOverlay .sheet-subtitle,
-body > #txActionOverlay .sheet-subtitle {
-  text-align: center !important;
-  font-size: 11px !important;
-}
-
-body > #shodMemberActionOverlay .sheet-scroll,
-body > #txActionOverlay .sheet-scroll {
-  padding-bottom: calc(34px + env(safe-area-inset-bottom)) !important;
-}
-
-body > #shodaqohPaymentOverlay > .sheet {
-  height: min(92dvh, 760px) !important;
-  max-height: 92dvh !important;
-  overflow: hidden !important;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
-}
-
-body > #shodaqohPaymentOverlay .sheet-scroll {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
-  padding-bottom: calc(36px + env(safe-area-inset-bottom)) !important;
-}
-
-#txOverlay > .sheet {
-  height: auto !important;
-  max-height: 82dvh !important;
-  overflow: hidden !important;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-}
-
-#txOverlay .sheet-scroll {
-  max-height: calc(82dvh - 100px) !important;
-  overflow-y: auto !important;
-  padding-bottom: 12px !important;
-}
-
-#txOverlay .sheet-header {
-  padding-bottom: 10px !important;
-}
-
-#txOverlay .sheet-header .sheet-handle {
-  margin-bottom: 9px !important;
-}
-
-#txOverlay .sheet-header .sheet-subtitle {
-  margin-top: 3px !important;
-}
-
-@media (max-width: 480px) {
-  body > .sheet-overlay:not(.hidden) > .sheet {
-    width: 100vw !important;
-    max-width: 100vw !important;
-  }
-  body > #shodMemberActionOverlay > .sheet,
-  body > #txActionOverlay > .sheet {
-    max-height: 60vh !important;
-  }
-}
-
-@media (max-width: 380px) {
-  body > #shodMemberActionOverlay > .sheet,
-  body > #txActionOverlay > .sheet {
-    max-height: 58vh !important;
-  }
-}
+/* ============================================================
+   SHEET ACTION
+   ============================================================ */
 
 body > .sheet-overlay.sheet-action > .sheet {
   max-height: 58vh !important;
@@ -1865,220 +982,67 @@ body > .sheet-overlay.sheet-action .btn-cancel:active {
   transform: scale(0.98) !important;
 }
 
-#txActionOverlay,
-#shodMemberActionOverlay,
-#shodPaymentDetailOverlay,
-#shodMemberDetailOverlay {
-  z-index: 500 !important;
-}
+/* ============================================================
+   SHEET PAYMENT
+   ============================================================ */
 
-#shodPaymentDetailOverlay.sheet-action > .sheet,
-#shodMemberDetailOverlay.sheet-action > .sheet {
-  max-height: 78dvh !important;
-  height: auto !important;
-  padding: 6px 16px 10px !important;
-  overflow: hidden !important;
-  border-radius: 18px 18px 0 0 !important;
-}
-
-#shodPaymentDetailOverlay.sheet-action .sheet-header,
-#shodMemberDetailOverlay.sheet-action .sheet-header {
-  padding-top: 2px !important;
-  padding-bottom: 8px !important;
-  flex-shrink: 0 !important;
-}
-
-#shodPaymentDetailOverlay.sheet-action .sheet-title,
-#shodMemberDetailOverlay.sheet-action .sheet-title {
-  font-size: 15px !important;
-  font-weight: 800 !important;
+body > .sheet-overlay .sheet-header-payment {
+  display: block !important;
   text-align: center !important;
+  padding: 4px 0 14px !important;
   margin: 0 !important;
 }
 
-#shodPaymentDetailOverlay.sheet-action .sheet-subtitle,
-#shodMemberDetailOverlay.sheet-action .sheet-subtitle {
-  font-size: 11px !important;
+body > .sheet-overlay .sheet-header-payment .sheet-handle {
+  width: 38px !important;
+  height: 4px !important;
+  margin: 6px auto 12px !important;
+  border-radius: 999px !important;
+}
+
+body > .sheet-overlay .sheet-header-payment .sheet-header-icon {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 auto 8px !important;
+  border-radius: 12px !important;
+  background: var(--brand-soft) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--brand) !important;
+}
+
+body > .sheet-overlay .sheet-header-payment .sheet-title {
+  margin: 0 !important;
   text-align: center !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  color: var(--ink) !important;
+}
+
+body > .sheet-overlay .sheet-header-payment .sheet-subtitle {
+  margin: 5px 0 0 !important;
+  text-align: center !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
   color: var(--ink-soft) !important;
-  margin-top: 2px !important;
-  margin-bottom: 0 !important;
 }
 
-#shodPaymentDetailOverlay.sheet-action .sheet-scroll,
-#shodMemberDetailOverlay.sheet-action .sheet-scroll {
-  padding-top: 2px !important;
-  padding-bottom: 4px !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+/* ============================================================
+   BOTTOMNAV Z-INDEX
+   ============================================================ */
+
+#bottomnav {
+  z-index: 50 !important;
 }
 
-@media (max-width: 480px) {
-  body > .sheet-overlay.sheet-action > .sheet {
-    max-height: 62vh !important;
-    padding: 4px 12px 8px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item {
-    padding: 8px 12px !important;
-    min-height: 38px !important;
-    font-size: 12px !important;
-    gap: 10px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item .action-icon {
-    width: 28px !important;
-    height: 28px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item .action-icon svg {
-    width: 12px !important;
-    height: 12px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item .action-label {
-    font-size: 12px !important;
-  }
-  body > .sheet-overlay.sheet-action .btn-cancel {
-    font-size: 12px !important;
-    padding: 10px 0 !important;
-    min-height: 38px !important;
-  }
-  body > .sheet-overlay.sheet-action .sheet-title {
-    font-size: 14px !important;
-  }
-  body > .sheet-overlay.sheet-action .sheet-subtitle {
-    font-size: 10px !important;
-  }
-  #shodPaymentDetailOverlay.sheet-action > .sheet,
-  #shodMemberDetailOverlay.sheet-action > .sheet {
-    max-height: 82dvh !important;
-    padding: 4px 12px 8px !important;
-  }
-}
-
-@media (max-width: 380px) {
-  body > .sheet-overlay.sheet-action > .sheet {
-    max-height: 60vh !important;
-    padding: 4px 10px 6px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item {
-    padding: 6px 10px !important;
-    min-height: 34px !important;
-    font-size: 11px !important;
-    gap: 8px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item .action-icon {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item .action-icon svg {
-    width: 10px !important;
-    height: 10px !important;
-  }
-  body > .sheet-overlay.sheet-action .action-item .action-label {
-    font-size: 11px !important;
-  }
-  body > .sheet-overlay.sheet-action .btn-cancel {
-    font-size: 11px !important;
-    padding: 8px 0 !important;
-    min-height: 34px !important;
-  }
-  #shodPaymentDetailOverlay.sheet-action > .sheet,
-  #shodMemberDetailOverlay.sheet-action > .sheet {
-    max-height: 80dvh !important;
-    padding: 4px 10px 6px !important;
-  }
-}
-
-.field-input {
-  width: 100%;
-  margin-top: 5px;
-  padding: 11px 13px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 13px;
-  outline: none;
-}
-
-.field-input:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 2px var(--brand-soft);
-}
-
-.field-label {
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 10.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  color: var(--ink-soft);
-}
-
-.seg-toggle,
-.opt-toggle {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-
-.seg-btn,
-.opt-btn {
-  flex: 1;
-  padding: 9px 0;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
-  background: var(--surface-alt);
-  color: var(--ink-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.seg-btn.active-debet {
-  background: var(--pos-soft);
-  color: var(--pos);
-}
-
-.seg-btn.active-kredit {
-  background: var(--neg-soft);
-  color: var(--neg);
-}
-
-.opt-btn.active {
-  background: var(--brand);
-  color: #fff;
-}
-
-.btn-primary {
-  background: var(--brand);
-  color: #fff;
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 11px 0;
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
-}
-
-.btn-ghost {
-  background: var(--surface-alt);
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  border-radius: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 11px 0;
-}
+/* ============================================================
+   TOAST
+   ============================================================ */
 
 #toast {
   position: fixed !important;
@@ -2183,6 +1147,10 @@ html[data-theme="dark"] #toast {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
+/* ============================================================
+   STATUS PILL
+   ============================================================ */
+
 .status-pill {
   display: inline-block;
   padding: 3px 10px;
@@ -2212,6 +1180,113 @@ html[data-theme="dark"] #toast {
   background: var(--neg-soft);
   color: var(--neg);
 }
+
+/* ============================================================
+   FIELD INPUT
+   ============================================================ */
+
+.field-input {
+  width: 100%;
+  margin-top: 5px;
+  padding: 11px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+.field-label {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+   TOGGLE BUTTONS
+   ============================================================ */
+
+.seg-toggle,
+.opt-toggle {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.seg-btn,
+.opt-btn {
+  flex: 1;
+  padding: 9px 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.seg-btn.active-debet {
+  background: var(--pos-soft);
+  color: var(--pos);
+}
+
+.seg-btn.active-kredit {
+  background: var(--neg-soft);
+  color: var(--neg);
+}
+
+.opt-btn.active {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 11px 0;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 11px 0;
+}
+
+/* ============================================================
+   KAS TYPE DROPDOWN
+   ============================================================ */
 
 .kas-type-dropdown {
   position: relative;

@@ -1,0 +1,749 @@
+/* ============================================================
+   FAB STYLES - TERPISAH
+   ============================================================ */
+
+/* ============================================================
+   FAB BASE STYLES
+   ============================================================ */
+
+.fab {
+  position: fixed;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.fab:active {
+  transform: scale(0.92);
+}
+
+.fab.hidden {
+  display: none !important;
+}
+
+.fab svg {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.fab:hover svg {
+  transform: scale(1.05);
+}
+
+.fab:active svg {
+  transform: scale(0.85);
+}
+
+/* ============================================================
+   FAB CREATE - PERSEGI DENGAN RADIUS (seperti fabAdd)
+   ============================================================ */
+
+.fab-create {
+  border-radius: 16px !important;
+}
+
+.fab-create:hover {
+  transform: translateY(-3px) scale(1.04) !important;
+}
+
+.fab-create:active {
+  transform: scale(0.92) !important;
+}
+
+/* Label untuk FAB Create - muncul di kiri */
+.fab-create .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.fab-create:hover .fab-label,
+.fab-create:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* ============================================================
+   FAB ACTION - LINGKARAN SEMPURNA (selain create)
+   ============================================================ */
+
+.fab-action {
+  border-radius: 50% !important;
+}
+
+.fab-action:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+.fab-action:active {
+  transform: scale(0.92) !important;
+}
+
+/* Label untuk FAB Action - muncul di kiri */
+.fab-action .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.fab-action:hover .fab-label,
+.fab-action:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* ============================================================
+   FAB ADD - CREATE (PERSEGI)
+   ============================================================ */
+
+#fabAdd {
+  position: fixed !important;
+  width: 60px !important;
+  height: 60px !important;
+  right: max(18px, calc((100vw - 480px) / 2 + 18px)) !important;
+  bottom: calc(90px + env(safe-area-inset-bottom)) !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4) !important;
+  z-index: 50 !important;
+  border-radius: 16px !important;
+}
+
+#fabAdd svg {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+#fabAdd:not(:hover) {
+  animation: fabPulse 3s ease-in-out infinite;
+}
+
+#fabAdd:hover {
+  animation: none;
+}
+
+@keyframes fabPulse {
+  0% {
+    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(22, 163, 74, 0.55),
+      0 0 0 8px rgba(22, 163, 74, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4);
+  }
+}
+
+/* ============================================================
+   FAB ZAKAT - CREATE (PERSEGI)
+   ============================================================ */
+
+#fabZakat {
+  position: fixed !important;
+  width: 60px !important;
+  height: 60px !important;
+  right: max(18px, calc((100vw - 480px) / 2 + 18px)) !important;
+  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4) !important;
+  z-index: 50 !important;
+  border-radius: 16px !important;
+}
+
+#fabZakat svg {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+#fabZakat:not(:hover) {
+  animation: fabZakatPulse 3s ease-in-out infinite;
+}
+
+#fabZakat:hover {
+  animation: none;
+}
+
+@keyframes fabZakatPulse {
+  0% {
+    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(22, 163, 74, 0.55),
+      0 0 0 8px rgba(22, 163, 74, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4);
+  }
+}
+
+/* ============================================================
+   FAB SHODAQOH - CREATE (PERSEGI)
+   ============================================================ */
+
+#fabShodaqoh {
+  position: fixed !important;
+  width: 60px !important;
+  height: 60px !important;
+  right: max(18px, calc((100vw - 480px) / 2 + 18px)) !important;
+  bottom: calc(222px + env(safe-area-inset-bottom)) !important;
+  background: var(--gold) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 32px rgba(230, 167, 46, 0.4) !important;
+  z-index: 50 !important;
+  border-radius: 16px !important;
+}
+
+#fabShodaqoh svg {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+#fabShodaqoh:not(:hover) {
+  animation: fabShodaqohPulse 3s ease-in-out infinite;
+}
+
+#fabShodaqoh:hover {
+  animation: none;
+}
+
+@keyframes fabShodaqohPulse {
+  0% {
+    box-shadow: 0 8px 32px rgba(230, 167, 46, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(230, 167, 46, 0.55),
+      0 0 0 8px rgba(230, 167, 46, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 32px rgba(230, 167, 46, 0.4);
+  }
+}
+
+/* ============================================================
+   FAB POST KE KAS - ACTION (LINGKARAN)
+   ============================================================ */
+
+#fabPostToKas {
+  position: fixed !important;
+  width: 56px !important;
+  height: 56px !important;
+  right: max(20px, calc((100vw - 480px) / 2 + 20px)) !important;
+  bottom: calc(222px + env(safe-area-inset-bottom)) !important;
+  background: var(--gold) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35) !important;
+  z-index: 50 !important;
+  border-radius: 50% !important;
+}
+
+#fabPostToKas svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+#fabPostToKas:not(:hover) {
+  animation: fabGoldPulse 3s ease-in-out infinite;
+}
+
+#fabPostToKas:hover {
+  animation: none;
+}
+
+@keyframes fabGoldPulse {
+  0% {
+    box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 8px 48px rgba(199, 154, 68, 0.55),
+      0 0 0 8px rgba(199, 154, 68, 0.08);
+  }
+  100% {
+    box-shadow: 0 8px 28px rgba(199, 154, 68, 0.35);
+  }
+}
+
+/* FAB AI Chat - ACTION (LINGKARAN) */
+#fabAiChat {
+  position: fixed !important;
+  width: 48px !important;
+  height: 48px !important;
+  right: max(22px, calc((100vw - 480px) / 2 + 22px)) !important;
+  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.35) !important;
+  z-index: 55 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+#fabAiChat svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: #fff !important;
+}
+
+#fabAiChat:hover {
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 10px 32px rgba(139, 92, 246, 0.5) !important;
+}
+
+#fabAiChat:active {
+  transform: scale(0.9) !important;
+}
+
+#fabAiChat:hover svg {
+  transform: rotate(180deg) scale(1.1) !important;
+}
+
+/* SPARKLE ANIMATION */
+#fabAiChat svg path {
+  animation: sparkleTwinkle 2s ease-in-out infinite;
+}
+
+#fabAiChat svg path:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+#fabAiChat svg path:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+@keyframes sparkleTwinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+/* PULSE RING */
+#fabAiChat::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  opacity: 0.3;
+  z-index: -1;
+  animation: pulseRing 2s ease-in-out infinite;
+}
+
+@keyframes pulseRing {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.1;
+  }
+}
+
+/* LABEL */
+#fabAiChat .fab-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#fabAiChat:hover .fab-label,
+#fabAiChat:focus .fab-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px) scale(1);
+}
+
+/* ============================================================
+   FAB PRINT - ACTION (LINGKARAN)
+   ============================================================ */
+
+#fabPrint {
+  position: fixed !important;
+  width: 48px !important;
+  height: 48px !important;
+  right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  bottom: calc(222px + env(safe-area-inset-bottom)) !important;
+  background: var(--ink-soft) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 24px rgba(23, 25, 28, 0.3) !important;
+  z-index: 40 !important;
+  border-radius: 50% !important;
+}
+
+#fabPrint svg {
+  width: 19px !important;
+  height: 19px !important;
+}
+
+/* ============================================================
+   SHEET OVERLAY - FAB HIDE
+   ============================================================ */
+
+#fabAdd,
+#fabZakat,
+#fabShodaqoh,
+#fabPostToKas,
+#fabAiChat {
+  z-index: 40 !important;
+}
+
+body:has(#txOverlay:not(.hidden)) #fabAdd,
+body:has(#txOverlay:not(.hidden)) #fabZakat,
+body:has(#txOverlay:not(.hidden)) #fabShodaqoh,
+body:has(#txOverlay:not(.hidden)) #fabPostToKas,
+body:has(#txOverlay:not(.hidden)) #fabAiChat {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(0.92) !important;
+}
+
+/* AI Chat must remain available on every screen, except on its own page */
+body.screen-shodaqoh-active #fabAiChat,
+body.screen-zakat-active #fabAiChat {
+  display: flex !important;
+}
+
+body.screen-ai-chat-active #fabAiChat {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(0.92) !important;
+}
+
+/* ============================================================
+   DARK THEME - FAB
+   ============================================================ */
+
+html[data-theme="dark"] .fab {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] #fabAdd {
+  box-shadow: 0 8px 32px rgba(40, 199, 111, 0.35) !important;
+}
+
+html[data-theme="dark"] #fabAdd:hover {
+  box-shadow: 0 12px 40px rgba(40, 199, 111, 0.45) !important;
+}
+
+html[data-theme="dark"] #fabZakat {
+  box-shadow: 0 8px 32px rgba(40, 199, 111, 0.35) !important;
+}
+
+html[data-theme="dark"] #fabZakat:hover {
+  box-shadow: 0 12px 40px rgba(40, 199, 111, 0.45) !important;
+}
+
+html[data-theme="dark"] #fabShodaqoh {
+  box-shadow: 0 8px 32px rgba(233, 173, 56, 0.3) !important;
+}
+
+html[data-theme="dark"] #fabShodaqoh:hover {
+  box-shadow: 0 12px 40px rgba(233, 173, 56, 0.4) !important;
+}
+
+html[data-theme="dark"] #fabPostToKas {
+  box-shadow: 0 8px 28px rgba(233, 173, 56, 0.25) !important;
+}
+
+html[data-theme="dark"] #fabPostToKas:hover {
+  box-shadow: 0 12px 36px rgba(233, 173, 56, 0.35) !important;
+}
+
+html[data-theme="dark"] #fabAiChat {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed) !important;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4) !important;
+}
+
+html[data-theme="dark"] #fabAiChat:hover {
+  box-shadow: 0 10px 32px rgba(124, 58, 237, 0.55) !important;
+}
+
+html[data-theme="dark"] #fabAiChat::before {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+}
+
+html[data-theme="dark"] #fabPrint {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* ============================================================
+   RESPONSIVE - FAB
+   ============================================================ */
+
+@media (max-width: 480px) {
+  /* CREATE FABs - PERSEGI */
+  #fabAdd {
+    width: 54px !important;
+    height: 54px !important;
+    right: 16px !important;
+    bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    border-radius: 14px !important;
+  }
+  #fabAdd svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  #fabAdd .fab-label {
+    display: none !important;
+  }
+
+  #fabZakat {
+    width: 54px !important;
+    height: 54px !important;
+    right: 16px !important;
+    bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+    border-radius: 14px !important;
+  }
+  #fabZakat svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+  #fabZakat .fab-label {
+    display: none !important;
+  }
+
+  #fabShodaqoh {
+    width: 54px !important;
+    height: 54px !important;
+    right: 16px !important;
+    bottom: calc(200px + env(safe-area-inset-bottom)) !important;
+    border-radius: 14px !important;
+  }
+  #fabShodaqoh svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  #fabShodaqoh .fab-label {
+    display: none !important;
+  }
+
+  /* ACTION FABs - LINGKARAN */
+  #fabPostToKas {
+    width: 50px !important;
+    height: 50px !important;
+    right: 16px !important;
+    bottom: calc(200px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabPostToKas svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  #fabPostToKas .fab-label {
+    display: none !important;
+  }
+
+  #fabAiChat {
+    width: 42px !important;
+    height: 42px !important;
+    right: 18px !important;
+    bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabAiChat svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  #fabAiChat .fab-label {
+    display: none !important;
+  }
+
+  #fabPrint {
+    width: 44px !important;
+    height: 44px !important;
+    right: 20px !important;
+    bottom: calc(200px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabPrint svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+  #fabPrint .fab-label {
+    display: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  /* CREATE FABs - PERSEGI */
+  #fabAdd {
+    width: 48px !important;
+    height: 48px !important;
+    right: 14px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    border-radius: 12px !important;
+  }
+  #fabAdd svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  #fabZakat {
+    width: 48px !important;
+    height: 48px !important;
+    right: 14px !important;
+    bottom: calc(132px + env(safe-area-inset-bottom)) !important;
+    border-radius: 12px !important;
+  }
+  #fabZakat svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  #fabShodaqoh {
+    width: 48px !important;
+    height: 48px !important;
+    right: 14px !important;
+    bottom: calc(188px + env(safe-area-inset-bottom)) !important;
+    border-radius: 12px !important;
+  }
+  #fabShodaqoh svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* ACTION FABs - LINGKARAN */
+  #fabPostToKas {
+    width: 46px !important;
+    height: 46px !important;
+    right: 14px !important;
+    bottom: calc(188px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabPostToKas svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  #fabAiChat {
+    width: 38px !important;
+    height: 38px !important;
+    right: 15px !important;
+    bottom: calc(132px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabAiChat svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  #fabPrint {
+    width: 40px !important;
+    height: 40px !important;
+    right: 18px !important;
+    bottom: calc(188px + env(safe-area-inset-bottom)) !important;
+  }
+  #fabPrint svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
+
+@media (min-width: 481px) {
+  #fabAdd {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabZakat {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabShodaqoh {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabPostToKas {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+  #fabAiChat {
+    right: max(26px, calc((100vw - 480px) / 2 + 26px)) !important;
+  }
+  #fabPrint {
+    right: max(24px, calc((100vw - 480px) / 2 + 24px)) !important;
+  }
+}
+
+
+/* AI CHAT FAB FIX */
+#fabAiChat {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: calc(156px + env(safe-area-inset-bottom)) !important;
+  z-index: 7000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+body.screen-ai-chat-active #fabAiChat {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(.92) !important;
+}
