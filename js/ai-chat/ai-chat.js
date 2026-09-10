@@ -5,6 +5,8 @@ const aiChatState = {
   returnRoute: "home",
 };
 
+let aiChatActivePopup = null;
+
 function aiChatSetProvider(provider) {
   const allowedProviders = ["omniroute", "gemini", "groq", "auto"];
 
@@ -134,6 +136,8 @@ function openAiChat() {
 }
 
 function closeAiChat() {
+  aiChatClosePopup();
+
   if (
     typeof router !== "undefined" &&
     router &&
@@ -182,6 +186,7 @@ function aiChatRenderMarkdown(text) {
   const lines = source.split("\n");
   const html = [];
   let listType = null;
+  let i = 0;
 
   function closeList() {
     if (listType) {
@@ -194,13 +199,65 @@ function aiChatRenderMarkdown(text) {
     return aiChatInlineMarkdown(value);
   }
 
-  lines.forEach(function (line) {
+  function isTableSeparator(line) {
+    return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(line.trim());
+  }
+
+  function parseTableRow(line) {
+    let s = line.trim();
+    if (s.startsWith("|")) s = s.slice(1);
+    if (s.endsWith("|")) s = s.slice(0, -1);
+    return s.split("|").map(function (c) {
+      return c.trim();
+    });
+  }
+
+  function renderTable(headerCells, rows) {
+    let out = '<div class="ai-chat-table-wrap"><table class="ai-chat-table">';
+    out += "<thead><tr>";
+    headerCells.forEach(function (c) {
+      out += "<th>" + renderInline(c) + "</th>";
+    });
+    out += "</tr></thead><tbody>";
+    rows.forEach(function (row) {
+      out += "<tr>";
+      row.forEach(function (c) {
+        out += "<td>" + renderInline(c) + "</td>";
+      });
+      out += "</tr>";
+    });
+    out += "</tbody></table></div>";
+    return out;
+  }
+
+  while (i < lines.length) {
+    const line = lines[i];
     const raw = line.trim();
 
     if (!raw) {
       closeList();
       html.push('<div class="ai-chat-md-spacer"></div>');
-      return;
+      i++;
+      continue;
+    }
+
+    if (
+      raw.indexOf("|") !== -1 &&
+      i + 1 < lines.length &&
+      isTableSeparator(lines[i + 1])
+    ) {
+      closeList();
+      const headerCells = parseTableRow(raw);
+      const rows = [];
+      i += 2;
+      while (i < lines.length) {
+        const rowLine = lines[i].trim();
+        if (!rowLine || rowLine.indexOf("|") === -1) break;
+        rows.push(parseTableRow(rowLine));
+        i++;
+      }
+      html.push(renderTable(headerCells, rows));
+      continue;
     }
 
     const heading = raw.match(/^(#{1,6})\s+(.+)$/);
@@ -218,47 +275,30 @@ function aiChatRenderMarkdown(text) {
           level +
           ">",
       );
-      return;
+      i++;
+      continue;
     }
 
-    const explicitBullet = raw.match(/^[\*\-•]\s+(.+)$/);
+    if (/^([-*_])\1{2,}$/.test(raw)) {
+      closeList();
+      html.push('<hr class="ai-chat-md-hr">');
+      i++;
+      continue;
+    }
 
-    const autoBulletPattern =
-      /^([A-Z][^–—\-:]{2,50})\s*[–—]\s*(Rp[\d\.,]+|[\d\.,]+)(.*)$/;
-    const autoBullet = !explicitBullet && raw.match(autoBulletPattern);
-
-    const ordered = raw.match(/^\d+[\.\)]\s+(.+)$/);
-
-    if (explicitBullet) {
+    const bullet = raw.match(/^\*\s+(.+)$/) || raw.match(/^[-•]\s+(.+)$/);
+    if (bullet) {
       if (listType !== "ul") {
         closeList();
         html.push("<ul>");
         listType = "ul";
       }
-      html.push("<li>" + renderInline(explicitBullet[1]) + "</li>");
-      return;
+      html.push("<li>" + renderInline(bullet[1]) + "</li>");
+      i++;
+      continue;
     }
 
-    if (autoBullet) {
-      if (listType !== "ul") {
-        closeList();
-        html.push("<ul>");
-        listType = "ul";
-      }
-      const name = autoBullet[1].trim();
-      const amount = autoBullet[2].trim();
-      const rest = (autoBullet[3] || "").trim();
-      html.push(
-        "<li><strong>" +
-          renderInline(name) +
-          "</strong> – " +
-          renderInline(amount) +
-          (rest ? " " + renderInline(rest) : "") +
-          "</li>",
-      );
-      return;
-    }
-
+    const ordered = raw.match(/^\d+\.\s+(.+)$/);
     if (ordered) {
       if (listType !== "ol") {
         closeList();
@@ -266,24 +306,181 @@ function aiChatRenderMarkdown(text) {
         listType = "ol";
       }
       html.push("<li>" + renderInline(ordered[1]) + "</li>");
-      return;
+      i++;
+      continue;
     }
 
     closeList();
     html.push("<p>" + renderInline(raw) + "</p>");
-  });
+    i++;
+  }
 
   closeList();
   return html.join("");
+}
+
+function aiChatCopyToClipboard(text, btn) {
+  const originalText = btn ? btn.innerHTML : "";
+
+  function onSuccess() {
+    if (!btn) return;
+    btn.classList.add("copied");
+    btn.innerHTML =
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>Copied!</span>';
+    setTimeout(function () {
+      btn.classList.remove("copied");
+      btn.innerHTML = originalText;
+    }, 1200);
+  }
+
+  function onError() {
+    if (!btn) return;
+    btn.classList.add("copy-error");
+    setTimeout(function () {
+      btn.classList.remove("copy-error");
+    }, 1200);
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard
+      .writeText(text)
+      .then(onSuccess)
+      .catch(function () {
+        aiChatCopyFallback(text) ? onSuccess() : onError();
+      });
+  } else {
+    aiChatCopyFallback(text) ? onSuccess() : onError();
+  }
+}
+
+function aiChatCopyFallback(text) {
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.top = "-9999px";
+    textarea.style.left = "-9999px";
+    textarea.setAttribute("readonly", "");
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+    const success = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return success;
+  } catch (e) {
+    console.error("[AI Chat] Copy fallback error:", e);
+    return false;
+  }
+}
+
+function aiChatClosePopup() {
+  if (aiChatActivePopup) {
+    aiChatActivePopup.remove();
+    aiChatActivePopup = null;
+  }
+}
+
+function aiChatShowPopup(bubble, text, x, y) {
+  aiChatClosePopup();
+
+  const popup = document.createElement("div");
+  popup.className = "ai-chat-action-popup";
+  popup.setAttribute("role", "menu");
+
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.className = "ai-chat-action-item";
+  copyBtn.setAttribute("role", "menuitem");
+  copyBtn.innerHTML =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>';
+
+  copyBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    aiChatCopyToClipboard(text, copyBtn);
+    setTimeout(function () {
+      aiChatClosePopup();
+    }, 700);
+  });
+
+  popup.appendChild(copyBtn);
+
+  if (typeof navigator !== "undefined" && navigator.share) {
+    const shareBtn = document.createElement("button");
+    shareBtn.type = "button";
+    shareBtn.className = "ai-chat-action-item";
+    shareBtn.setAttribute("role", "menuitem");
+    shareBtn.innerHTML =
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share</span>';
+
+    shareBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      navigator
+        .share({ text: text })
+        .then(function () {
+          aiChatClosePopup();
+        })
+        .catch(function () {});
+    });
+
+    popup.appendChild(shareBtn);
+  }
+
+  document.body.appendChild(popup);
+
+  const popupRect = popup.getBoundingClientRect();
+  const margin = 8;
+  const offset = 10;
+
+  let left = x - popupRect.width / 2;
+  let top = y - popupRect.height - offset;
+
+  if (top < margin) {
+    top = y + offset;
+  }
+
+  if (left < margin) left = margin;
+  if (left + popupRect.width > window.innerWidth - margin) {
+    left = window.innerWidth - popupRect.width - margin;
+  }
+  if (top + popupRect.height > window.innerHeight - margin) {
+    top = window.innerHeight - popupRect.height - margin;
+  }
+
+  popup.style.top = top + "px";
+  popup.style.left = left + "px";
+
+  requestAnimationFrame(function () {
+    popup.classList.add("open");
+  });
+
+  aiChatActivePopup = popup;
+}
+
+function aiChatHandleBubbleTap(bubble, x, y) {
+  const text = bubble.dataset.rawText || "";
+  if (!text) return;
+
+  bubble.classList.remove("pressed");
+  void bubble.offsetWidth;
+  bubble.classList.add("pressed");
+  setTimeout(function () {
+    bubble.classList.remove("pressed");
+  }, 180);
+
+  aiChatShowPopup(bubble, text, x, y);
 }
 
 function aiChatAppendBubble(role, text, opts) {
   opts = opts || {};
   const box = aiChatEl("aiChatMessages");
   if (!box) return null;
+
   const bubble = document.createElement("div");
   bubble.className =
     "ai-chat-bubble " + role + (opts.pending ? " pending" : "");
+
   if (role === "assistant" && !opts.pending) {
     bubble.innerHTML = aiChatRenderMarkdown(text);
   } else {
@@ -291,8 +488,38 @@ function aiChatAppendBubble(role, text, opts) {
     p.textContent = text;
     bubble.appendChild(p);
   }
+
+  if (!opts.pending && text) {
+    bubble.dataset.rawText = String(text);
+    bubble.setAttribute("role", "button");
+    bubble.setAttribute("tabindex", "0");
+    bubble.setAttribute("title", "Tekan untuk copy");
+
+    bubble.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;
+      const x =
+        e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const y =
+        e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      aiChatHandleBubbleTap(bubble, x, y);
+    });
+
+    bubble.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const rect = bubble.getBoundingClientRect();
+        aiChatHandleBubbleTap(
+          bubble,
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        );
+      }
+    });
+  }
+
   box.appendChild(bubble);
   aiChatScrollToBottom();
+
   return bubble;
 }
 
@@ -531,11 +758,39 @@ function aiChatInitControls() {
     }
 
     if (e.key === "Escape") {
+      if (aiChatActivePopup) {
+        aiChatClosePopup();
+        return;
+      }
       const screenEl = aiChatEl("screen-ai-chat");
       if (screenEl && screenEl.classList.contains("active")) {
         closeAiChat();
       }
     }
+  });
+
+  document.addEventListener(
+    "click",
+    function (e) {
+      if (aiChatActivePopup) {
+        if (!aiChatActivePopup.contains(e.target)) {
+          aiChatClosePopup();
+        }
+      }
+    },
+    true,
+  );
+
+  document.addEventListener(
+    "scroll",
+    function () {
+      if (aiChatActivePopup) aiChatClosePopup();
+    },
+    true,
+  );
+
+  window.addEventListener("resize", function () {
+    if (aiChatActivePopup) aiChatClosePopup();
   });
 }
 
@@ -547,6 +802,8 @@ document.addEventListener("DOMContentLoaded", function () {
 async function aiChatSend(question) {
   const q = (question || "").trim();
   if (!q || aiChatState.loading) return;
+
+  aiChatClosePopup();
 
   const suggestions = aiChatEl("aiChatSuggestions");
   if (suggestions) suggestions.classList.add("hidden");
@@ -658,3 +915,4 @@ window.closeAiChat = closeAiChat;
 window.aiChatSend = aiChatSend;
 window.aiChatState = aiChatState;
 window.aiChatSwitchProvider = aiChatSwitchProvider;
+window.aiChatClearHistory = aiChatClearHistory;
