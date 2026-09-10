@@ -48,6 +48,30 @@
   --fab-right: max(18px, calc((100vw - 480px) / 2 + 18px));
 }
 
+/* ------------------------------------------------------------
+   BOOT-PENDING GATE — bekerja sama dengan marker script di <head>
+   index.html & js/fab-transitions.js. Selama class ini masih ada
+   di <html>, SEMUA .fab (termasuk yang punya display:flex
+   !important seperti #fabAiChat) dipaksa tak-terlihat sebelum cat
+   pertama browser, supaya animasi enter beneran mulai dari "tidak
+   ada" — bukan dari "sudah kelihatan lalu di-reset ke invisible".
+   Class ini dilepas oleh fab-transitions.js tepat saat animasi
+   enter mulai (lihat install() di file itu).
+   ------------------------------------------------------------ */
+html.fab-boot-pending .fab {
+  opacity: 0 !important;
+  transform: translateY(var(--fab-enter-translate, 20px)) scale(0) !important;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Tetap disembunyikan sesaat (hindari flash), tapi tanpa transform
+     berlebihan karena animasi enter versi reduced-motion nyaris instan. */
+  html.fab-boot-pending .fab {
+    transform: none !important;
+  }
+}
+
 /* ============================================================
    FAB BASE
    ============================================================ */

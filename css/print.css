@@ -1,255 +1,7 @@
-/* Chart Modern Styles */
-#saldoChart {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
-
-/* Tooltip custom */
-.chart-tooltip {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.chart-tooltip .label {
-  font-size: 9px;
-  font-weight: 600;
-  color: var(--ink-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.chart-tooltip .value {
-  font-size: 13px;
-  font-weight: 700;
-  font-family: "JetBrains Mono", monospace;
-  margin-top: 2px;
-}
-
-/* Hover effect untuk chart */
-#saldoChart:hover {
-  cursor: crosshair;
-}
-
-#chartWrapper {
-  position: relative;
-  width: 100%;
-  min-height: 250px;
-}
-
-.card #chartWrapper,
-#chartWrapper.card {
-  padding: 16px !important;
-}
-
-/* Pastikan canvas tidak disembunyikan */
-#saldoChart[style*="display: none"] {
-  display: block !important;
-}
-
 /* ============================================================
-   SKELETON ANIMATIONS
+   MONITORING TABLE COMPACT
    ============================================================ */
 
-@keyframes skeletonPulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-
-@keyframes skeletonWave {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  25% {
-    transform: translateY(-4px);
-  }
-  75% {
-    transform: translateY(4px);
-  }
-}
-
-.skeleton-loading {
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-}
-
-.skeleton-line {
-  background: var(--line);
-  border-radius: 4px;
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-}
-
-/* Chart skeleton */
-.chart-skeleton {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--surface-alt);
-  padding: 8px 4px 16px 4px;
-  z-index: 5;
-}
-
-.chart-skeleton-content {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.chart-skeleton-grid {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 4px 0;
-}
-
-.chart-skeleton-grid-line {
-  width: 100%;
-  height: 1px;
-  background: var(--line);
-  opacity: 0.3;
-}
-
-.chart-skeleton-wave {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-}
-
-.chart-skeleton-wave-line {
-  width: 100%;
-  height: 3px;
-  background: var(--brand);
-  border-radius: 4px;
-  opacity: 0.4;
-  animation: skeletonWave 2s ease-in-out infinite;
-  position: relative;
-}
-
-.chart-skeleton-wave-line-before {
-  position: absolute;
-  top: 50%;
-  width: 40px;
-  height: 3px;
-  background: var(--brand);
-  border-radius: 4px;
-  opacity: 0.2;
-  animation: skeletonWave 2.5s ease-in-out infinite;
-  left: -20px;
-  transform: translateY(-8px) rotate(-5deg);
-  animation-delay: 0.3s;
-}
-
-.chart-skeleton-wave-line-after {
-  position: absolute;
-  top: 50%;
-  width: 40px;
-  height: 3px;
-  background: var(--brand);
-  border-radius: 4px;
-  opacity: 0.2;
-  animation: skeletonWave 2.5s ease-in-out infinite;
-  right: -20px;
-  transform: translateY(8px) rotate(5deg);
-  animation-delay: 0.6s;
-}
-
-.chart-skeleton-labels {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-  padding: 4px 8px 0;
-}
-
-.chart-skeleton-labels .skeleton-line {
-  background: var(--line);
-  border-radius: 2px;
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes skeletonWave {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  25% {
-    transform: translateY(-4px);
-  }
-  75% {
-    transform: translateY(4px);
-  }
-}
-
-html[data-theme="dark"] .chart-skeleton {
-  background: var(--surface-alt);
-}
-
-html[data-theme="dark"] .chart-skeleton-wave-line {
-  background: var(--brand-dark);
-  opacity: 0.5;
-}
-
-html[data-theme="dark"] .chart-skeleton-wave-line::before,
-html[data-theme="dark"] .chart-skeleton-wave-line::after {
-  background: var(--brand-dark);
-  opacity: 0.3;
-}
-
-html[data-theme="dark"] .chart-skeleton-grid-line {
-  background: var(--line);
-  opacity: 0.2;
-}
-
-@media (max-width: 480px) {
-  .chart-skeleton {
-    padding: 6px 2px 14px 2px;
-  }
-  .chart-skeleton-labels .skeleton-line {
-    width: 20px !important;
-  }
-}
-
-/* Skeleton untuk chart */
-.chart-skeleton {
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .chart-header .chart-value {
-    font-size: 15px;
-  }
-}
-/* Monitoring table compact */
 #shodMonitoringBody tr td {
   padding: 4px 6px !important;
   font-size: 10px !important;
@@ -264,19 +16,16 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   padding-right: 2px !important;
 }
 
-/* Tabular numbers for alignment */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Truncate long names */
 #shodMonitoringBody .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   #shodMonitoringBody tr td {
     padding: 5px 6px !important;
@@ -289,7 +38,10 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   }
 }
 
-/* Named Page */
+/* ============================================================
+   NAMED PAGE
+   ============================================================ */
+
 @page finance {
   size: A4 portrait;
   margin: 0.5cm 0.8cm;
@@ -300,7 +52,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   margin: 0.5cm 0.8cm;
 }
 
-/* Area print */
 #printArea {
   page: finance;
 }
@@ -313,7 +64,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
    PRINT LAPORAN KEUANGAN - PORTRAIT A4
    ============================================================ */
 
-/* 1. SEMBUNYIKAN DARI LAYAR APLIKASI */
 #printArea {
   display: none !important;
   position: fixed !important;
@@ -333,7 +83,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   print-color-adjust: exact !important;
 }
 
-/* Baseline text color for every cell */
 #printArea th,
 #printArea td {
   color: #1e293b !important;
@@ -344,7 +93,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   print-color-adjust: exact !important;
 }
 
-/* TABLE - Full width */
 #printArea table {
   width: 100%;
   border-collapse: collapse;
@@ -353,7 +101,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   line-height: 1.4;
 }
 
-/* Column widths */
 #printArea col.col-no {
   width: 5%;
 }
@@ -369,7 +116,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   width: 11.66%;
 }
 
-/* Header styles */
 #printArea thead {
   display: table-header-group;
 }
@@ -386,7 +132,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   text-align: center !important;
 }
 
-/* Body rows */
 #printArea th,
 #printArea td {
   border-bottom: 0.5px solid #cbd5e1;
@@ -399,12 +144,10 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   vertical-align: middle;
 }
 
-/* Alternating row colors */
 #printArea tbody tr:nth-child(even) {
   background: #f4f6f8 !important;
 }
 
-/* TFOOT - Styling */
 #printArea tfoot {
   display: table-row-group;
 }
@@ -425,19 +168,16 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   border-bottom: 2px solid #1e293b;
 }
 
-/* Right-align numbers */
 #printArea table td.num,
 #printArea table th.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-/* Font bold helper */
 #printArea .font-bold {
   font-weight: 800 !important;
 }
 
-/* Header */
 #printArea .print-header {
   text-align: center;
   margin-bottom: 8px;
@@ -466,9 +206,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   color: #334155;
 }
 
-/* ============================================================
-   PRINT MEDIA QUERY - KHUSUS SAAT PROSES PRINT
-   ============================================================ */
 @media print {
   body.printing-finance * {
     visibility: hidden !important;
@@ -490,27 +227,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     overflow: visible !important;
   }
 
-  /* #printArea,
-  #printArea * {
-    visibility: visible !important;
-  }
-
-  #printArea {
-    display: block !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-    z-index: 999998 !important;
-    overflow: visible !important;
-    box-sizing: border-box !important;
-  } */
-
-  /* WRAPPER */
   #printArea .print-wrapper {
     display: flex !important;
     flex-direction: column !important;
@@ -521,7 +237,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     margin: 0 !important;
   }
 
-  /* TABLE WRAPPER */
   #printArea .print-table-wrapper {
     display: block !important;
     width: 100% !important;
@@ -529,7 +244,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     overflow: visible !important;
   }
 
-  /* TABLE OVERRIDE */
   #printArea table {
     width: 100% !important;
     max-width: 100% !important;
@@ -537,7 +251,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     line-height: 1.3 !important;
   }
 
-  /* HEADER OVERRIDE */
   #printArea .print-header {
     margin-bottom: 6px !important;
     padding-bottom: 4px !important;
@@ -556,7 +269,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     margin-top: 2px !important;
   }
 
-  /* CELL OVERRIDE */
   #printArea th,
   #printArea td {
     padding: 4px 3px !important;
@@ -574,7 +286,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     font-size: 9px !important;
   }
 
-  /* PAGE BREAK */
   #printArea tbody tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
@@ -584,12 +295,10 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     display: table-footer-group !important;
   }
 
-  /* SCROLLBAR */
   ::-webkit-scrollbar {
     display: none !important;
   }
 
-  /* COLOR ADJUSTMENT - PASTIKAN WARNA TETAP */
   #printArea tbody tr:nth-child(even) {
     background: #f4f6f8 !important;
     -webkit-print-color-adjust: exact !important;
@@ -619,10 +328,9 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
 }
 
 /* ============================================================
-   PRINT SHODAQOH - LANDSCAPE A4 (ROW LEBIH TINGGI)
+   PRINT SHODAQOH - LANDSCAPE A4
    ============================================================ */
 
-/* 1. SEMBUNYIKAN DARI LAYAR APLIKASI */
 #printShodaqohArea {
   display: none !important;
   position: fixed !important;
@@ -642,7 +350,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   print-color-adjust: exact !important;
 }
 
-/* 2. ATURAN KHUSUS SAAT PROSES PRINT BERLANGSUNG */
 @media print {
   body.printing-shodaqoh * {
     visibility: hidden !important;
@@ -669,28 +376,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     overflow: visible !important;
   }
 
-  /* #printShodaqohArea,
-  #printShodaqohArea * {
-    visibility: visible !important;
-  }
-
-  #printShodaqohArea {
-    display: block !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: white !important;
-    z-index: 999999 !important;
-    overflow: visible !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  } */
-
-  /* LAYOUT WRAPPER - MARGIN ATAS TETAP KECIL */
   #printShodaqohArea .print-wrapper {
     display: flex !important;
     flex-direction: column !important;
@@ -701,7 +386,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     margin: 0 !important;
   }
 
-  /* HEADER - Margin bawah tetap kecil */
   #printShodaqohArea .print-header {
     text-align: center;
     margin-bottom: 6px;
@@ -711,43 +395,41 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   }
 
   #printShodaqohArea .print-header h1 {
-    font-size: 15px; /* Dinaikkan */
+    font-size: 15px;
     font-weight: 800;
     margin: 0;
     letter-spacing: 0.5px;
   }
 
   #printShodaqohArea .print-header h2 {
-    font-size: 13px; /* Dinaikkan */
+    font-size: 13px;
     font-weight: 800;
     margin: 2px 0 0;
     letter-spacing: 0.3px;
   }
 
   #printShodaqohArea .print-header p {
-    font-size: 11px; /* Dinaikkan */
+    font-size: 11px;
     font-weight: 600;
     margin: 3px 0 0;
     color: #334155;
   }
 
-  /* TABEL - Full width */
   #printShodaqohArea table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    font-size: 10px; /* Dinaikkan dari 9px */
-    line-height: 1.6; /* Jarak antar baris lebih lega */
+    font-size: 10px;
+    line-height: 1.6;
   }
 
-  /* HEADER TABEL - 2 BARIS */
   #printShodaqohArea thead {
     display: table-header-group;
   }
 
   #printShodaqohArea thead th {
-    padding: 6px 4px !important; /* Dinaikkan dari 3px */
-    font-size: 9px !important; /* Dinaikkan dari 7.5px */
+    padding: 6px 4px !important;
+    font-size: 9px !important;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -757,61 +439,53 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     vertical-align: middle !important;
   }
 
-  /* No dan Nama - RATA KIRI */
   #printShodaqohArea thead th:first-child,
   #printShodaqohArea thead th:nth-child(2) {
     text-align: left !important;
   }
 
-  /* Semua header lainnya - RATA KANAN */
   #printShodaqohArea thead th:not(:first-child):not(:nth-child(2)) {
     text-align: right !important;
   }
 
-  /* Kecuali header Infak IR yang di tengah */
   #printShodaqohArea thead tr:first-child th[colspan] {
     text-align: center !important;
   }
 
-  /* Kolom sub-header bulan - RATA KANAN */
   #printShodaqohArea thead tr:last-child th {
     text-align: right !important;
-    font-size: 8.5px !important; /* Dinaikkan */
+    font-size: 8.5px !important;
     padding: 4px 4px !important;
   }
 
-  /* BODY ROWS - TINGGI ROW DITINGGIKAN */
   #printShodaqohArea th,
   #printShodaqohArea td {
     border: 0.5px solid #cbd5e1;
-    padding: 6px 4px !important; /* Dinaikkan dari 3px */
+    padding: 6px 4px !important;
     text-align: left;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     page-break-inside: avoid;
     vertical-align: middle;
-    line-height: 1.5; /* Dinaikkan */
-    font-size: 9.5px; /* Dinaikkan */
+    line-height: 1.5;
+    font-size: 9.5px;
   }
 
-  /* Khusus untuk kolom No dan Nama */
   #printShodaqohArea td:first-child,
   #printShodaqohArea td:nth-child(2) {
     font-size: 9.5px;
     padding: 6px 4px !important;
   }
 
-  /* Alternating row colors */
   #printShodaqohArea tbody tr:nth-child(even) {
     background: #f4f6f8 !important;
   }
 
-  /* TFOOT */
   #printShodaqohArea tfoot td {
     font-weight: 800;
-    font-size: 9.5px !important; /* Dinaikkan */
-    padding: 6px 4px !important; /* Dinaikkan */
+    font-size: 9.5px !important;
+    padding: 6px 4px !important;
     background: #16a34a !important;
     color: #ffffff !important;
     border: 1px solid #16a34a;
@@ -826,7 +500,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     padding: 6px 4px !important;
   }
 
-  /* Grand Total IR */
   #printShodaqohArea .print-grand-total-ir td {
     background: #e8f5e9 !important;
     color: #1e293b !important;
@@ -836,19 +509,16 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
     font-size: 9.5px !important;
   }
 
-  /* Angka rata kanan */
   #printShodaqohArea table td.num,
   #printShodaqohArea table th.num {
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
 
-  /* Font bold helper */
   #printShodaqohArea .font-bold {
     font-weight: 800 !important;
   }
 
-  /* Kolom widths yang lebih proporsional */
   #printShodaqohArea col.col-no {
     width: 3%;
   }
@@ -921,7 +591,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   color: var(--brand) !important;
 }
 
-/* Dark Theme */
 [data-theme="dark"] #btnRefresh:hover {
   background: var(--surface-alt);
   border-color: var(--line);
@@ -935,7 +604,7 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
 }
 
 /* ============================================================
-   CHART FILTER DROPDOWN - UKURAN FONT BESAR
+   CHART FILTER DROPDOWN
    ============================================================ */
 
 #chartFilterDropdown {
@@ -1020,7 +689,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   margin-right: 6px;
 }
 
-/* Dark theme */
 [data-theme="dark"] #chartFilterDropdown .filter-dropdown-menu {
   background: var(--surface) !important;
   border-color: var(--line) !important;
@@ -1038,7 +706,7 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
 }
 
 /* ============================================================
-   CHART LEGEND - UKURAN FONT BESAR
+   CHART LEGEND
    ============================================================ */
 
 #chartLegendDot {
@@ -1053,8 +721,9 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   font-weight: 600 !important;
   color: var(--ink-soft) !important;
 }
+
 /* ============================================================
-   PRINT LAPORAN KAS - STYLES
+   PRINT LAPORAN KAS
    ============================================================ */
 
 #printLaporanArea {
@@ -1177,12 +846,10 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   font-variant-numeric: tabular-nums;
 }
 
-/* Row styling - alternatif warna untuk baris */
 #printLaporanTable tbody tr:nth-child(even) {
   background: #f8fafc !important;
 }
 
-/* Baris kategori (PENERIMAAN, PENGELUARAN, JUMLAH, dll) */
 #printLaporanTable .row-category {
   font-weight: 800;
   background: #f1f5f9 !important;
@@ -1204,7 +871,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   border-right: none;
 }
 
-/* Baris Saldo Awal */
 #printLaporanTable .row-saldo-awal {
   background: #e2e8f0 !important;
   font-weight: 700;
@@ -1225,7 +891,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   border-right: none;
 }
 
-/* Baris Total */
 #printLaporanTable .row-total {
   font-weight: 800;
   background: #f1f5f9 !important;
@@ -1247,7 +912,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   border-right: none;
 }
 
-/* Baris Saldo Bulan & Saldo Akhir */
 #printLaporanTable .row-saldo-bulan {
   font-weight: 800;
   background: #dcfce7 !important;
@@ -1287,7 +951,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   border-right: none;
 }
 
-/* Spacer rows - tanpa border */
 #printLaporanTable tr.spacer td {
   border-left: none !important;
   border-right: none !important;
@@ -1297,9 +960,6 @@ html[data-theme="dark"] .chart-skeleton-grid-line {
   background: transparent !important;
 }
 
-/* ============================================================
-   PRINT MEDIA QUERY - LAPORAN KAS
-   ============================================================ */
 @media print {
   body.printing-laporan * {
     visibility: hidden !important;

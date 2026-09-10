@@ -181,12 +181,14 @@ async function loadData() {
   if (loadDataPromise) {
     return loadDataPromise;
   }
+
   loadDataPromise = (async function () {
     try {
       if (!document.documentElement.classList.contains("authenticated")) {
         console.warn("loadData dipanggil tanpa authenticated");
         return;
       }
+
       if (CONFIG.WEB_APP_URL.includes("GANTI_DENGAN")) {
         if ($("configWarning")) {
           $("configWarning").classList.remove("hidden");
@@ -194,15 +196,37 @@ async function loadData() {
         renderTxList([], "txList", "txEmpty");
         return;
       }
+
+      showChartSkeleton();
+
       renderHomeSkeleton();
       renderHistorySkeleton();
       renderRecapSkeleton();
+
       await refreshAllData();
+
       updateLastSyncTime();
+
+      if (state.transactions && state.transactions.length) {
+        hideChartSkeleton();
+        requestAnimationFrame(function () {
+          if (typeof renderChartWhenVisible === "function") {
+            renderChartWhenVisible();
+          } else if (typeof renderChart === "function") {
+            renderChart();
+          }
+          if (typeof resizeChart === "function") {
+            resizeChart();
+          }
+        });
+      } else {
+        hideChartSkeleton();
+      }
     } finally {
       loadDataPromise = null;
     }
   })();
+
   return loadDataPromise;
 }
 

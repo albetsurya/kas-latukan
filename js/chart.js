@@ -232,6 +232,10 @@ function renderChartWhenVisible() {
   const canvas = document.getElementById("saldoChart");
   if (!screen || !canvas) return;
 
+  if (!state.transactions || !state.transactions.length) {
+    return;
+  }
+
   const isVisible =
     screen.classList.contains("active") &&
     screen.offsetParent !== null &&
@@ -252,6 +256,56 @@ function renderChartWhenVisible() {
   requestAnimationFrame(function () {
     resizeChart();
   });
+}
+
+function showChartSkeleton() {
+  const canvas = document.getElementById("saldoChart");
+  if (!canvas) return;
+  const parent = canvas.parentElement;
+  if (!parent) return;
+
+  if (parent.querySelector(".chart-skeleton")) return;
+
+  canvas.style.display = "none";
+
+  const sk = document.createElement("div");
+  sk.className = "chart-skeleton";
+
+  sk.innerHTML = `
+    <div class="chart-skeleton-grid">
+      <div class="chart-skeleton-grid-line"></div>
+      <div class="chart-skeleton-grid-line"></div>
+      <div class="chart-skeleton-grid-line"></div>
+      <div class="chart-skeleton-grid-line"></div>
+    </div>
+    <div class="chart-skeleton-wave">
+      <svg viewBox="0 0 300 100" preserveAspectRatio="none">
+        <g class="wave-group">
+          <path class="wave-path" d="M 5 75 Q 35 40, 65 60 T 125 50 T 185 35 T 245 55 T 295 30" />
+          <circle class="wave-dot" cx="5"   cy="75" r="3" />
+          <circle class="wave-dot" cx="65"  cy="60" r="3" />
+          <circle class="wave-dot" cx="125" cy="50" r="3" />
+          <circle class="wave-dot" cx="185" cy="35" r="3" />
+          <circle class="wave-dot" cx="245" cy="55" r="3" />
+          <circle class="wave-dot" cx="295" cy="30" r="3" />
+        </g>
+      </svg>
+    </div>
+  `;
+
+  parent.appendChild(sk);
+}
+
+function hideChartSkeleton() {
+  const canvas = document.getElementById("saldoChart");
+  if (!canvas) return;
+  const parent = canvas.parentElement;
+  if (!parent) return;
+
+  const sk = parent.querySelector(".chart-skeleton");
+  if (sk) sk.remove();
+
+  canvas.style.display = "block";
 }
 
 function getChartData(type) {

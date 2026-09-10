@@ -257,8 +257,33 @@
     if (window.updateFabVisibility.__fabTransitionsWrapped) return;
 
     const original = window.updateFabVisibility;
+    let isFirstRun = true;
     function wrapped() {
-      const before = captureVisibleFabs();
+      // Beberapa FAB (mis. #fabAiChat) punya "display: flex !important"
+      // TANPA syarat di CSS — jadi sudah tampil dari HTML/CSS pertama
+      // kali render, sebelum baris JS manapun sempat jalan. Kalau kita
+      // pakai snapshot "before" yang sesungguhnya di panggilan pertama,
+      // FAB seperti itu sudah kebaca visible duluan → tidak pernah
+      // terhitung "baru muncul" → enter animation di boot ter-skip.
+      // Maka khusus panggilan PERTAMA, anggap "before" kosong supaya
+      // semua FAB yang visible begitu app selesai load tetap animasi
+      // masuk, apa pun mekanisme visibility-nya.
+      const before = isFirstRun ? new Map() : captureVisibleFabs();
+
+      if (isFirstRun) {
+        // Lepas gate "fab-boot-pending" (lihat <head> index.html &
+        // css/fab-styles.css) TEPAT di sini — sinkron, dalam satu
+        // eksekusi JS yang sama dengan animate() di bawah, jadi
+        // browser tidak sempat mengecat frame perantara (tanpa gate,
+        // sebelum animasi WAAPI mengambil alih transform/opacity).
+        // Selama gate masih aktif, computed opacity SEMUA .fab
+        // terpaksa 0 (dipaksa CSS) — makanya harus dilepas sebelum
+        // capture "after" di bawah, kalau tidak semua FAB akan
+        // kebaca "tidak visible" dan diff jadi kosong.
+        document.documentElement.classList.remove("fab-boot-pending");
+      }
+      isFirstRun = false;
+
       const result = original.apply(this, arguments);
       const after = captureVisibleFabs();
       animateDiff(before, after);
@@ -266,6 +291,16 @@
     }
     wrapped.__fabTransitionsWrapped = true;
     window.updateFabVisibility = wrapped;
+
+    // Jaring pengaman: kalau updateFabVisibility() tidak kunjung
+    // terpanggil (mis. macet di gate login sebelum enterApp()),
+    // jangan biarkan FAB tersembunyi permanen — lepas gate tanpa
+    // animasi setelah beberapa detik.
+    setTimeout(() => {
+      if (isFirstRun) {
+        document.documentElement.classList.remove("fab-boot-pending");
+      }
+    }, 5000);
   }
 
   if (document.readyState === "loading") {

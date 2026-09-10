@@ -110,15 +110,83 @@
 }
 
 .ai-chat-header-icon {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 50% !important;
-  background: var(--brand-soft) !important;
-  color: var(--brand-dark) !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(
+    135deg,
+    rgba(52, 211, 153, 0.15) 0%,
+    rgba(34, 211, 238, 0.12) 50%,
+    rgba(129, 140, 248, 0.15) 100%
+  ) !important;
+  border: 1px solid rgba(52, 211, 153, 0.2) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 12px rgba(52, 211, 153, 0.15) !important;
+}
+
+.ai-chat-header-icon::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 50%
+  ) !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+
+.ai-chat-header-icon svg {
+  position: relative !important;
+  z-index: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(52, 211, 153, 0.4)) !important;
+}
+
+.ai-chat-title-text {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+  background: linear-gradient(
+    135deg,
+    var(--ink) 0%,
+    var(--ink) 60%,
+    var(--brand) 100%
+  ) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: var(--ink) !important;
+}
+
+html[data-theme="dark"] .ai-chat-header-icon {
+  background: linear-gradient(
+    135deg,
+    rgba(52, 211, 153, 0.2) 0%,
+    rgba(34, 211, 238, 0.15) 50%,
+    rgba(129, 140, 248, 0.2) 100%
+  ) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+  box-shadow: 0 2px 16px rgba(52, 211, 153, 0.25) !important;
+}
+
+html[data-theme="dark"] .ai-chat-title-text {
+  background: linear-gradient(
+    135deg,
+    #f1f5f9 0%,
+    #f1f5f9 50%,
+    #34d399 100%
+  ) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 .ai-chat-header-icon i {

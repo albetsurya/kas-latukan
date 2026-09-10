@@ -1,0 +1,172 @@
+.chart-skeleton {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: var(--surface-alt) !important;
+  z-index: 5 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px 16px !important;
+}
+
+.chart-skeleton-wave {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.5));
+}
+
+.chart-skeleton-wave svg {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
+.wave-group {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chartWave 2.8s ease-in-out infinite !important;
+  will-change: transform;
+}
+
+.wave-path {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.wave-dot {
+  fill: var(--brand) !important;
+  opacity: 0.7 !important;
+  transform-box: fill-box !important;
+  transform-origin: center !important;
+  animation: waveDotPulse 1.8s ease-in-out infinite !important;
+}
+
+.wave-dot:nth-child(2) {
+  animation-delay: 0.2s !important;
+}
+.wave-dot:nth-child(3) {
+  animation-delay: 0.4s !important;
+}
+.wave-dot:nth-child(4) {
+  animation-delay: 0.6s !important;
+}
+.wave-dot:nth-child(5) {
+  animation-delay: 0.8s !important;
+}
+.wave-dot:nth-child(6) {
+  animation-delay: 1s !important;
+}
+.wave-dot:nth-child(7) {
+  animation-delay: 1.2s !important;
+}
+
+@keyframes chartWave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes waveDotPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+.chart-skeleton-grid {
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 4px 0 !important;
+  pointer-events: none !important;
+}
+
+.chart-skeleton-grid-line {
+  width: 100% !important;
+  height: 1px !important;
+  background: var(--line) !important;
+  opacity: 0.25 !important;
+}
+
+.chart-skeleton::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 100%
+  ) !important;
+  animation: shimmerSweep 2.2s linear infinite !important;
+  pointer-events: none !important;
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+html[data-theme="dark"] .chart-skeleton {
+  background: var(--surface-alt) !important;
+}
+
+html[data-theme="dark"] .wave-path {
+  stroke: var(--brand) !important;
+  opacity: 0.7 !important;
+}
+
+html[data-theme="dark"] .chart-skeleton-wave {
+  filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6));
+}
+
+html[data-theme="dark"] .chart-skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.08) 55%,
+    transparent 100%
+  ) !important;
+}
+
+@media (max-width: 480px) {
+  .chart-skeleton {
+    padding: 16px 10px !important;
+  }
+  .wave-path {
+    stroke-width: 2 !important;
+  }
+}

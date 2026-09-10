@@ -817,11 +817,57 @@ async function aiChatSend(question) {
 
   aiChatSetLoading(true);
 
+  const loadingMessages = [
+    "Menganalisis data...",
+    "Menghitung sebentar...",
+    "Menyiapkan jawaban...",
+    "Memeriksa catatan...",
+    "Menyusun ringkasan...",
+    "Menelusuri transaksi...",
+    "Membaca data kas...",
+    "Mengolah informasi...",
+    "Mencari jawaban terbaik...",
+    "Merangkum data...",
+    "Memeriksa rincian...",
+    "Menyusun laporan...",
+    "Menghubungkan data...",
+    "Menyaring informasi...",
+    "Memahami pertanyaan...",
+    "Mencocokkan data...",
+    "Menelaah angka...",
+    "Mengambil data terbaru...",
+    "Memverifikasi catatan...",
+    "Menyiapkan hasil...",
+    "Menganalisis pola...",
+    "Menghitung total...",
+    "Membandingkan data...",
+    "Menyusun jawaban...",
+    "Mengumpulkan fakta...",
+    "Meninjau transaksi...",
+    "Memproses permintaan...",
+    "Menyiapkan detail...",
+    "Memeriksa saldo...",
+    "Mengolah catatan...",
+  ];
+
+  let loadingInterval = null;
+  let loadingIndex = Math.floor(Math.random() * loadingMessages.length);
+
   const pendingBubble = aiChatAppendBubble(
     "assistant",
-    "Sedang mencari data...",
+    loadingMessages[loadingIndex],
     { pending: true },
   );
+
+  if (pendingBubble) {
+    const textEl = pendingBubble.querySelector("p");
+    if (textEl) {
+      loadingInterval = setInterval(function () {
+        loadingIndex = (loadingIndex + 1) % loadingMessages.length;
+        textEl.textContent = loadingMessages[loadingIndex];
+      }, 1800);
+    }
+  }
 
   const providerToSend =
     localStorage.getItem("ai_chat_provider") ||
@@ -845,6 +891,10 @@ async function aiChatSend(question) {
       response = await aiChatFetchFallback(q);
     }
 
+    if (loadingInterval) {
+      clearInterval(loadingInterval);
+      loadingInterval = null;
+    }
     if (pendingBubble) pendingBubble.remove();
 
     if (response && response.success) {
@@ -877,7 +927,13 @@ async function aiChatSend(question) {
     }
   } catch (err) {
     console.error("AI Chat Error:", err);
+
+    if (loadingInterval) {
+      clearInterval(loadingInterval);
+      loadingInterval = null;
+    }
     if (pendingBubble) pendingBubble.remove();
+
     aiChatAppendBubble("assistant", "⚠️ Gagal terhubung ke server. Coba lagi.");
   } finally {
     aiChatSetLoading(false);
