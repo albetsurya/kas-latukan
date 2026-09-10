@@ -3046,6 +3046,7 @@ function toggleShodMethod(method) {
     uploadBtn.innerHTML = uploadIcon + " Upload Foto";
 
     form.classList.remove("hidden");
+    form.classList.remove("upload-mode");
     uploadSection.classList.add("hidden");
     if (memberField) memberField.style.display = "grid";
 
@@ -3064,7 +3065,8 @@ function toggleShodMethod(method) {
       "padding:8px 0;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;";
     manualBtn.innerHTML = manualIcon + " Manual";
 
-    form.classList.add("hidden");
+    form.classList.remove("hidden");
+    form.classList.add("upload-mode");
     uploadSection.classList.remove("hidden");
     if (memberField) memberField.style.display = "grid";
 

@@ -3949,7 +3949,45 @@
                     id="shodUploadSection"
                     class="shod-upload-section hidden"
                   >
-                    <!-- ... konten upload sama seperti sebelumnya ... -->
+                    <div class="field-group">
+                      <label class="field-label">Foto Rekap Pembayaran</label>
+                      <label
+                        for="shodUploadInput"
+                        class="shod-upload-dropzone"
+                      >
+                        <input
+                          id="shodUploadInput"
+                          type="file"
+                          accept="image/*"
+                          hidden
+                        />
+                        <span class="shod-upload-icon">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="M21 15l-5-5L5 21" />
+                          </svg>
+                        </span>
+                        <span class="shod-upload-title">Pilih foto rekap</span>
+                        <span id="shodUploadFileName" class="shod-upload-file-name">Pilih foto rekap</span>
+                        <span class="shod-upload-hint">JPG, PNG atau WEBP · maksimal 12 MB</span>
+                      </label>
+
+                      <div id="shodUploadPreview" class="upload-preview hidden">
+                        <img id="shodUploadPreviewImg" alt="Preview foto rekap" />
+                        <div class="shod-upload-preview-actions">
+                          <button type="button" id="shodUploadClear" class="btn-ghost">Ganti Foto</button>
+                          <button type="button" id="shodUploadExtract" class="btn-primary">Baca dengan AI</button>
+                        </div>
+                      </div>
+
+                      <div id="shodOcrResult" class="shod-ocr-result hidden">
+                        <div class="shod-ocr-header">
+                          <span>Hasil pembacaan AI</span>
+                        </div>
+                        <div id="shodOcrData" class="ocr-data"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

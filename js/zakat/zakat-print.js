@@ -147,6 +147,19 @@ function updateZakatPrintRincian(zakat) {
   // Hitung nominal berdasarkan persentase
   var totalMaal = maal.penerimaan || totalZakat || 0;
 
+  fitrah.amil.nominal = Math.round(
+    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.persen) / 100,
+  );
+  fitrah.amil.kelompok.nominal = Math.round(
+    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.kelompok.persen) / 100,
+  );
+  fitrah.amil.desa.nominal = Math.round(
+    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.desa.persen) / 100,
+  );
+  fitrah.amil.daerah.nominal = Math.round(
+    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.daerah.persen) / 100,
+  );
+
   // Mustahiq
   maal.mustahiq.nominal = Math.round((totalMaal * maal.mustahiq.persen) / 100);
   maal.mustahiq.kelompok.nominal = Math.round(
@@ -164,13 +177,13 @@ function updateZakatPrintRincian(zakat) {
   // Amil
   maal.amil.nominal = Math.round((totalMaal * maal.amil.persen) / 100);
   maal.amil.kelompok.nominal = Math.round(
-    (maal.amil.nominal * maal.amil.kelompok.persen) / 100,
+    (totalMaal * maal.amil.kelompok.persen) / 100,
   );
   maal.amil.desa.nominal = Math.round(
-    (maal.amil.nominal * maal.amil.desa.persen) / 100,
+    (totalMaal * maal.amil.desa.persen) / 100,
   );
   maal.amil.daerah.nominal = Math.round(
-    (maal.amil.nominal * maal.amil.daerah.persen) / 100,
+    (totalMaal * maal.amil.daerah.persen) / 100,
   );
 
   // Setor ke Desa

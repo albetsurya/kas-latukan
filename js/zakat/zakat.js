@@ -1722,9 +1722,9 @@ function renderZakatRincianTab(zakat) {
   var amilNominal = Number(r.amil?.nominal) || 0;
   var mustahikKelompokNominal = Number(r.mustahik?.kelompok?.nominal) || 0;
   var mustahikDaerahNominal = Number(r.mustahik?.daerah?.nominal) || 0;
-  var amilKelompokNominal = Number(r.amil?.kelompok?.nominal) || 0;
-  var amilDesaNominal = Number(r.amil?.desa?.nominal) || 0;
-  var amilDaerahNominal = Number(r.amil?.daerah?.nominal) || 0;
+  var amilKelompokNominal = Math.round((totalZakat * amilKelompokPersen) / 100);
+  var amilDesaNominal = Math.round((totalZakat * amilDesaPersen) / 100);
+  var amilDaerahNominal = Math.round((totalZakat * amilDaerahPersen) / 100);
 
   var setDisplay = function (id, value) {
     var el = document.getElementById(id);
@@ -3894,14 +3894,15 @@ function renderZakatRincianView(zakat) {
     mustahik.daerah?.nominal ||
     Math.round((mustahikNominal * mustahik.daerah.persen) / 100);
 
-  var amilKelompokNominal =
-    amil.kelompok?.nominal ||
-    Math.round((amilNominal * amil.kelompok.persen) / 100);
-  var amilDesaNominal =
-    amil.desa?.nominal || Math.round((amilNominal * amil.desa.persen) / 100);
-  var amilDaerahNominal =
-    amil.daerah?.nominal ||
-    Math.round((amilNominal * amil.daerah.persen) / 100);
+  var amilKelompokNominal = Math.round(
+    (totalZakat * amil.kelompok.persen) / 100,
+  );
+  var amilDesaNominal = Math.round(
+    (totalZakat * amil.desa.persen) / 100,
+  );
+  var amilDaerahNominal = Math.round(
+    (totalZakat * amil.daerah.persen) / 100,
+  );
 
   var setDisplay = function (id, value) {
     var el = document.getElementById(id);

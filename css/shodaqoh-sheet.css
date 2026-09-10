@@ -1462,3 +1462,204 @@ body > #shodMemberDetailOverlay.sheet-overlay {
     background-position: -200% 0;
   }
 }
+
+/* ============================================================
+   PAYMENT SHEET — SCROLL + UPLOAD MODE
+   ============================================================ */
+#shodaqohPaymentOverlay > .sheet {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+#shodaqohPaymentOverlay .sheet-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  touch-action: pan-y !important;
+}
+
+#shodaqohPaymentOverlay #shodaqohPaymentForm.upload-mode > .field-group:not(:first-child),
+#shodaqohPaymentOverlay #shodaqohPaymentForm.upload-mode > .shod-allocation-status,
+#shodaqohPaymentOverlay #shodaqohPaymentForm.upload-mode > .shod-payment-actions {
+  display: none !important;
+}
+
+#shodaqohPaymentOverlay #shodaqohPaymentForm.upload-mode > .shod-payment-row {
+  display: grid !important;
+}
+
+#shodaqohPaymentOverlay .shod-upload-section {
+  margin-top: 14px !important;
+  padding: 16px 0 24px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+#shodaqohPaymentOverlay .shod-upload-dropzone {
+  min-height: 130px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 18px 14px;
+  border: 1.5px dashed var(--line);
+  border-radius: 12px;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .16s ease, background-color .16s ease;
+}
+
+#shodaqohPaymentOverlay .shod-upload-dropzone:hover {
+  border-color: var(--brand);
+  background: var(--surface);
+}
+
+#shodaqohPaymentOverlay .shod-upload-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+#shodaqohPaymentOverlay .shod-upload-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+#shodaqohPaymentOverlay .shod-upload-file-name {
+  max-width: 90% !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+#shodaqohPaymentOverlay .shod-upload-hint {
+  font-size: 9.5px;
+  color: var(--ink-faint);
+}
+
+#shodaqohPaymentOverlay .shod-upload-preview-actions {
+  display: flex;
+  gap: 8px;
+  padding: 9px;
+  background: var(--surface-alt);
+}
+
+#shodaqohPaymentOverlay .shod-upload-preview-actions .btn-ghost,
+#shodaqohPaymentOverlay .shod-upload-preview-actions .btn-primary {
+  min-height: 38px;
+}
+
+#shodaqohPaymentOverlay .shod-ocr-result {
+  margin-top: 12px;
+}
+
+#shodaqohPaymentOverlay .shod-ocr-result.hidden {
+  display: none !important;
+}
+
+#shodaqohPaymentOverlay .shod-ocr-header {
+  margin-bottom: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .045em;
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+   MEMBER FORM — SAME INPUT SYSTEM AS OTHER SHEETS
+   ============================================================ */
+body > #shodMemberFormOverlay > .sheet {
+  height: auto !important;
+  max-height: min(78dvh, 620px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  padding: 0 16px calc(12px + env(safe-area-inset-bottom)) !important;
+}
+
+body > #shodMemberFormOverlay .sheet-header {
+  flex: 0 0 auto !important;
+  padding: 8px 0 12px !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 2px 0 4px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm .field-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin: 0 !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm .field-label {
+  display: block !important;
+  margin: 0 !important;
+  color: var(--ink-soft) !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .045em !important;
+  text-transform: uppercase !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm .field-input {
+  width: 100% !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 10px 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 9px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm .field-input:hover {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--line)) !important;
+  background: var(--surface-alt) !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm .field-input:focus {
+  border-color: var(--brand) !important;
+  background: var(--surface) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft) !important;
+}
+
+body > #shodMemberFormOverlay #shodMemberForm > .flex {
+  flex: 0 0 auto !important;
+  gap: 10px !important;
+  padding-top: 2px !important;
+}

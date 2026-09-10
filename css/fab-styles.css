@@ -5,14 +5,21 @@
    #fabShodaqoh TIDAK PERNAH ada di HTML/JS. Tombol "tambah" di
    screen Shodaqoh sebenarnya adalah #fabAdd yang di-reuse
    (lihat navigation.js: updateFabVisibility, dan komentar FIX
-   di shodaqoh-screen.css). Karena itu, "top layout fabZakat &
-   fabShodaqoh harus sama" diterjemahkan di sini sebagai:
-   #fabAdd, KETIKA berada di screen Shodaqoh (body.screen-
-   shodaqoh-active), harus memakai baseline yang SAMA dengan
-   #fabZakat (--fab-nonav-base), bukan baseline home (--fab-
-   bottomnav-base). Behavior show/hide (classList.toggle
-   "hidden", aturan body.screen-*-active) TIDAK disentuh sama
-   sekali di file ini — hanya ukuran & posisi.
+   di shodaqoh-screen.css).
+
+   REVISI:
+   - #fabAdd kini memakai SATU baseline yang sama di semua screen
+     (transaksi kas / shodaqoh / zakat) yaitu --fab-bottomnav-base.
+     Override khusus screen-shodaqoh DIHAPUS.
+   - #fabPostToKas kini ditata SAMA PERSIS dengan #fabAiChat
+     (baseline --fab-bottomnav-base + create-size + stack-gap),
+     dan ikut bergeser di screen Zakat / Shodaqoh mengikuti pola
+     body.screen-*-active #fabAiChat.
+   - #fabAiChat menyesuaikan: di screen Shodaqoh ia naik ke
+     tingkat ke-3 (di atas #fabPostToKas).
+
+   Behavior show/hide (classList.toggle "hidden", aturan
+   body.screen-*-active) TIDAK disentuh — hanya ukuran & posisi.
    ============================================================ */
 
 :root {
@@ -42,8 +49,8 @@
   --fab-stack-gap: 10px;
 
   /* Baseline offset dari bawah viewport */
-  --fab-bottomnav-base: 90px; /* screen DENGAN bottom nav (home/history) */
-  --fab-nonav-base: 156px; /* screen TANPA bottom nav (zakat, & shodaqoh utk fabAdd) */
+  --fab-bottomnav-base: 90px; /* baseline universal utk fabAdd (semua screen) */
+  --fab-nonav-base: 156px; /* disimpan utk kompatibilitas, tak dipakai fabAdd */
 
   --fab-right: max(18px, calc((100vw - 480px) / 2 + 18px));
 }
@@ -206,8 +213,12 @@ html.fab-boot-pending .fab {
 }
 
 /* ============================================================
-   FAB ADD — "create" (dipakai di home/history DAN direuse
-   di screen shodaqoh sebagai tombol tambah pembayaran)
+   FAB ADD — "create"
+   ------------------------------------------------------------
+   Dipakai di SEMUA screen (transaksi kas / home / history,
+   shodaqoh, dan zakat). Tata letak disamakan: baseline
+   --fab-bottomnav-base + safe-area. Tidak ada lagi override
+   posisi khusus per-screen.
    ============================================================ */
 
 #fabAdd {
@@ -219,13 +230,6 @@ html.fab-boot-pending .fab {
   color: #fff !important;
   box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4) !important;
   z-index: 50 !important;
-}
-
-/* Override HANYA posisi (bukan visibility) saat fabAdd tampil
-   di screen Shodaqoh (tanpa bottom nav) — samakan dengan
-   baseline fabZakat, sesuai permintaan "top sama". */
-body.screen-shodaqoh-active #fabAdd {
-  bottom: calc(var(--fab-nonav-base) + env(safe-area-inset-bottom)) !important;
 }
 
 #fabAdd:not(:hover) {
@@ -262,12 +266,17 @@ body.screen-shodaqoh-active #fabAdd {
 
 /* ============================================================
    FAB ZAKAT — "create" (hanya tampil di Zakat list)
-   Top SAMA dengan fabAdd-saat-di-shodaqoh: --fab-nonav-base
+   ------------------------------------------------------------
+   Ukuran & bentuk identik dengan #fabAdd. Baseline posisinya
+   kini mengikuti fabAdd (--fab-bottomnav-base), BUKAN lagi
+   --fab-nonav-base, agar tata letak konsisten.
    ============================================================ */
 
 #fabZakat {
   position: fixed !important;
-  bottom: calc(var(--fab-nonav-base) + env(safe-area-inset-bottom)) !important;
+  bottom: calc(
+    var(--fab-bottomnav-base) + env(safe-area-inset-bottom)
+  ) !important;
   background: var(--brand) !important;
   color: #fff !important;
   box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4) !important;
@@ -317,15 +326,19 @@ body.screen-shodaqoh-active #fabAdd {
 }
 
 /* ============================================================
-   FAB POST TO KAS — "action" (hanya tampil di screen Shodaqoh,
-   berdampingan dengan fabAdd). Menumpuk 10px di atas fabAdd
-   pada posisinya yang sudah di-override ke --fab-nonav-base.
+   FAB POST TO KAS — "action" (hanya tampil di screen Shodaqoh)
+   ------------------------------------------------------------
+   Tata letak DISAMAKAN dengan #fabAiChat:
+   bottom = --fab-bottomnav-base + --fab-create-size + --fab-stack-gap
+   sehingga selalu berada 10px di atas FAB "create" tingkat pertama.
+   Di screen Zakat & Shodaqoh ikut bergeser mengikuti pola
+   body.screen-*-active #fabAiChat.
    ============================================================ */
 
 #fabPostToKas {
   position: fixed !important;
   bottom: calc(
-    var(--fab-nonav-base) + var(--fab-create-size) + var(--fab-stack-gap) +
+    var(--fab-bottomnav-base) + var(--fab-create-size) + var(--fab-stack-gap) +
       env(safe-area-inset-bottom)
   ) !important;
   background: var(--gold) !important;
@@ -382,15 +395,17 @@ body.screen-shodaqoh-active #fabAdd {
 }
 
 /* ============================================================
-   FAB AI CHAT — "action". Posisinya bergantung layar aktif
-   supaya selalu 10px di atas FAB "create" tingkat pertama di
-   layar itu, dan tidak pernah tumpang tindih dengan FAB lain.
+   FAB AI CHAT — "action"
+   ------------------------------------------------------------
+   Posisi mengikuti layar aktif:
 
-   - Home/History (bottom nav ada): di atas #fabAdd (90 base)
-   - Zakat (tanpa bottom nav):      di atas #fabZakat (156 base)
-   - Shodaqoh (tanpa bottom nav):   #fabAdd & #fabPostToKas
-     sudah menumpuk di sana, jadi fabAiChat jadi tingkat ke-3,
-     menumpuk di atas #fabPostToKas.
+   - Home/History (bottom nav ada): di atas #fabAdd
+     (--fab-bottomnav-base + create-size + stack-gap)
+   - Zakat (tanpa bottom nav):      ikut bergeser mengikuti
+     pola yang sama dengan #fabPostToKas.
+   - Shodaqoh: #fabPostToKas kini menempati tingkat ke-2
+     (sama seperti fabAiChat di home), jadi fabAiChat naik ke
+     tingkat ke-3 di atas #fabPostToKas.
    ============================================================ */
 
 #fabAiChat {
@@ -421,14 +436,14 @@ body.screen-shodaqoh-active #fabAdd {
 
 body.screen-zakat-active #fabAiChat {
   bottom: calc(
-    var(--fab-nonav-base) + var(--fab-create-size) + var(--fab-stack-gap) +
+    var(--fab-bottomnav-base) + var(--fab-create-size) + var(--fab-stack-gap) +
       env(safe-area-inset-bottom)
   ) !important;
 }
 
 body.screen-shodaqoh-active #fabAiChat {
   bottom: calc(
-    var(--fab-nonav-base) + var(--fab-create-size) + var(--fab-stack-gap) +
+    var(--fab-bottomnav-base) + var(--fab-create-size) + var(--fab-stack-gap) +
       var(--fab-action-size) + var(--fab-stack-gap) +
       env(safe-area-inset-bottom)
   ) !important;

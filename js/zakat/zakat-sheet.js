@@ -1878,9 +1878,9 @@ updateRincianSheet = function (zakat) {
   var mustahikKelompokNominal = Math.round((mustahikNominal * pKelompok) / 100);
   var mustahikDaerahNominal = Math.round((mustahikNominal * pDaerah) / 100);
 
-  var amilKelompokNominal = Math.round((amilNominal * pAmilKelompok) / 100);
-  var amilDesaNominal = Math.round((amilNominal * pAmilDesa) / 100);
-  var amilDaerahNominal = Math.round((amilNominal * pAmilDaerah) / 100);
+  var amilKelompokNominal = Math.round((totalZakat * pAmilKelompok) / 100);
+  var amilDesaNominal = Math.round((totalZakat * pAmilDesa) / 100);
+  var amilDaerahNominal = Math.round((totalZakat * pAmilDaerah) / 100);
 
   setNominal("zakatNominalMustahikSheet", mustahikNominal);
   setNominal("zakatNominalSabilillahSheet", sabilillahNominal);
@@ -2040,10 +2040,10 @@ submitZakatRincianSheet = async function () {
     );
 
     var amilKelompokNominal = Math.round(
-      (amilNominal * amilKelompokPersen) / 100,
+      (totalZakat * amilKelompokPersen) / 100,
     );
-    var amilDesaNominal = Math.round((amilNominal * amilDesaPersen) / 100);
-    var amilDaerahNominal = Math.round((amilNominal * amilDaerahPersen) / 100);
+    var amilDesaNominal = Math.round((totalZakat * amilDesaPersen) / 100);
+    var amilDaerahNominal = Math.round((totalZakat * amilDaerahPersen) / 100);
 
     zakat.rincian = sanitizeZakatRincian({
       mustahik: {
