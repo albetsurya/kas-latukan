@@ -1008,6 +1008,57 @@ async function aiChatFetchFallback(message) {
   }
 }
 
+(function () {
+  function aiChatLockViewportHeight() {
+    const screen = document.getElementById("screen-ai-chat");
+    if (!screen || !screen.classList.contains("active")) return;
+
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    const panel = screen.querySelector(".ai-chat-panel");
+    if (panel) {
+      panel.style.height = h + "px";
+      panel.style.maxHeight = h + "px";
+    }
+    screen.style.height = h + "px";
+    screen.style.maxHeight = h + "px";
+
+    const box = document.getElementById("aiChatMessages");
+    if (box) {
+      box.scrollTop = box.scrollHeight;
+    }
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", aiChatLockViewportHeight);
+    window.visualViewport.addEventListener("scroll", aiChatLockViewportHeight);
+  }
+  window.addEventListener("resize", aiChatLockViewportHeight);
+  window.addEventListener("orientationchange", aiChatLockViewportHeight);
+
+  const _openAiChat = window.openAiChat;
+  if (typeof _openAiChat === "function") {
+    window.openAiChat = function () {
+      const r = _openAiChat.apply(this, arguments);
+      setTimeout(aiChatLockViewportHeight, 50);
+      return r;
+    };
+  }
+
+  document.addEventListener("focusin", function (e) {
+    if (e.target && e.target.id === "aiChatInput") {
+      setTimeout(aiChatLockViewportHeight, 150);
+      setTimeout(aiChatLockViewportHeight, 350);
+    }
+  });
+
+  document.addEventListener("focusout", function (e) {
+    if (e.target && e.target.id === "aiChatInput") {
+      setTimeout(aiChatLockViewportHeight, 150);
+    }
+  });
+})();
+
 window.openAiChat = openAiChat;
 window.closeAiChat = closeAiChat;
 window.aiChatSend = aiChatSend;

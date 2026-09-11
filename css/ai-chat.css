@@ -1,12 +1,8 @@
 #screen-ai-chat {
   position: fixed !important;
   inset: 0 !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  gap: 0 !important;
   width: 100vw !important;
+  height: 100vh !important;
   height: 100dvh !important;
   z-index: 9999 !important;
   background: var(--bg) !important;
@@ -26,8 +22,7 @@
 .ai-chat-panel {
   width: 100% !important;
   max-width: 480px !important;
-  height: 100dvh !important;
-  max-height: 100dvh !important;
+  height: 100% !important;
   margin: 0 auto !important;
   background: var(--app-bg) !important;
   border-radius: 0 !important;
@@ -48,8 +43,10 @@
   border-bottom: 1px solid var(--line) !important;
   background: var(--surface) !important;
   flex: 0 0 auto !important;
-  position: sticky !important;
+  position: absolute !important;
   top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
   z-index: 100 !important;
   overflow: visible !important;
 }
@@ -204,7 +201,7 @@ html[data-theme="dark"] .ai-chat-title-text {
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain !important;
-  padding: 16px !important;
+  padding: 82px 16px 16px !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 10px !important;
@@ -569,7 +566,10 @@ html[data-theme="dark"] .ai-chat-action-popup {
   padding: 8px 16px 12px !important;
   background: transparent !important;
   flex: 0 0 auto !important;
-  position: relative !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 66px !important;
   z-index: 20 !important;
   pointer-events: auto !important;
 }
@@ -651,7 +651,9 @@ html[data-theme="dark"] .ai-chat-action-popup {
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   flex: 0 0 auto !important;
-  position: sticky !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
   bottom: 0 !important;
   z-index: 30 !important;
 }
