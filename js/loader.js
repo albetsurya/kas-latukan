@@ -20,10 +20,6 @@ function hideLoader() {
   }
 }
 
-function showZakatLoader(message) {
-  showLoader(message || "Memuat data zakat...");
-}
-
 function hideZakatLoader() {
   hideLoader();
 }
