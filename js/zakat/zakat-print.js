@@ -111,103 +111,158 @@ function updateZakatPrintRincian(zakat) {
   var r = zakat.rincian || {};
   var totalZakat = zakat.total || 0;
 
-  // Data Zakat Fitrah
-  var fitrah = r.fitrah || {
-    penerimaan: 0,
-    mustahiq: { persen: 45, nominal: 0 },
-    sabilillah: { persen: 40, nominal: 0 },
-    amil: {
-      persen: 15,
-      nominal: 0,
-      kelompok: { persen: 12, nominal: 0 },
-      desa: { persen: 2, nominal: 0 },
-      daerah: { persen: 1, nominal: 0 },
-    },
-  };
+  // ============================================================
+  // ZAKAT FITRAH — SUMBER DATA TERPISAH
+  // ============================================================
+  var fitrah = r.fitrah || {};
+  var fitrahPenerimaan = Number(fitrah.penerimaan || 0);
 
-  // Data Zakat Maal, Tijaroh, Zuru', Ternak
-  var maal = r.maal || {
-    penerimaan: totalZakat || 0,
-    mustahiq: {
-      persen: 45,
-      nominal: 0,
-      kelompok: { persen: 80, nominal: 0 },
-      daerah: { persen: 20, nominal: 0 },
-    },
-    sabilillah: { persen: 40, nominal: 0 },
-    amil: {
-      persen: 15,
-      nominal: 0,
-      kelompok: { persen: 12, nominal: 0 },
-      desa: { persen: 2, nominal: 0 },
-      daerah: { persen: 1, nominal: 0 },
-    },
-  };
-
-  // Hitung nominal berdasarkan persentase
-  var totalMaal = maal.penerimaan || totalZakat || 0;
-
-  fitrah.amil.nominal = Math.round(
-    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.persen) / 100,
+  var fitrahMustahiqPersen = Number(
+    (fitrah.mustahiq && fitrah.mustahiq.persen) != null
+      ? fitrah.mustahiq.persen
+      : 45,
   );
-  fitrah.amil.kelompok.nominal = Math.round(
-    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.kelompok.persen) / 100,
+  var fitrahSabilillahPersen = Number(
+    (fitrah.sabilillah && fitrah.sabilillah.persen) != null
+      ? fitrah.sabilillah.persen
+      : 40,
   );
-  fitrah.amil.desa.nominal = Math.round(
-    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.desa.persen) / 100,
+  var fitrahAmilPersen = Number(
+    (fitrah.amil && fitrah.amil.persen) != null ? fitrah.amil.persen : 15,
   );
-  fitrah.amil.daerah.nominal = Math.round(
-    ((fitrah.penerimaan || totalZakat || 0) * fitrah.amil.daerah.persen) / 100,
+  var fitrahAmilKelompokPersen = Number(
+    (fitrah.amil && fitrah.amil.kelompok && fitrah.amil.kelompok.persen) != null
+      ? fitrah.amil.kelompok.persen
+      : 12,
+  );
+  var fitrahAmilDesaPersen = Number(
+    (fitrah.amil && fitrah.amil.desa && fitrah.amil.desa.persen) != null
+      ? fitrah.amil.desa.persen
+      : 2,
+  );
+  var fitrahAmilDaerahPersen = Number(
+    (fitrah.amil && fitrah.amil.daerah && fitrah.amil.daerah.persen) != null
+      ? fitrah.amil.daerah.persen
+      : 1,
   );
 
-  // Mustahiq
-  maal.mustahiq.nominal = Math.round((totalMaal * maal.mustahiq.persen) / 100);
-  maal.mustahiq.kelompok.nominal = Math.round(
-    (maal.mustahiq.nominal * maal.mustahiq.kelompok.persen) / 100,
+  var fitrahMustahiqNominal = Math.round(
+    (fitrahPenerimaan * fitrahMustahiqPersen) / 100,
   );
-  maal.mustahiq.daerah.nominal = Math.round(
-    (maal.mustahiq.nominal * maal.mustahiq.daerah.persen) / 100,
+  var fitrahSabilillahNominal = Math.round(
+    (fitrahPenerimaan * fitrahSabilillahPersen) / 100,
   );
-
-  // Sabilillah
-  maal.sabilillah.nominal = Math.round(
-    (totalMaal * maal.sabilillah.persen) / 100,
+  var fitrahAmilNominal = Math.round(
+    (fitrahPenerimaan * fitrahAmilPersen) / 100,
   );
-
-  // Amil
-  maal.amil.nominal = Math.round((totalMaal * maal.amil.persen) / 100);
-  maal.amil.kelompok.nominal = Math.round(
-    (totalMaal * maal.amil.kelompok.persen) / 100,
+  var fitrahAmilKelompokNominal = Math.round(
+    (fitrahPenerimaan * fitrahAmilKelompokPersen) / 100,
   );
-  maal.amil.desa.nominal = Math.round(
-    (totalMaal * maal.amil.desa.persen) / 100,
+  var fitrahAmilDesaNominal = Math.round(
+    (fitrahPenerimaan * fitrahAmilDesaPersen) / 100,
   );
-  maal.amil.daerah.nominal = Math.round(
-    (totalMaal * maal.amil.daerah.persen) / 100,
+  var fitrahAmilDaerahNominal = Math.round(
+    (fitrahPenerimaan * fitrahAmilDaerahPersen) / 100,
   );
 
-  // Setor ke Desa
+  // ============================================================
+  // ZAKAT MAAL, TIJAROH, ZURU', TERNAK — SUMBER DATA TERPISAH
+  // ============================================================
+  var maal = r.maal || {};
+  var maalPenerimaan = Number(
+    maal.penerimaan != null ? maal.penerimaan : totalZakat || 0,
+  );
+
+  var maalMustahiqPersen = Number(
+    (maal.mustahiq && maal.mustahiq.persen) != null ? maal.mustahiq.persen : 45,
+  );
+  var maalMustahiqKelompokPersen = Number(
+    (maal.mustahiq &&
+      maal.mustahiq.kelompok &&
+      maal.mustahiq.kelompok.persen) != null
+      ? maal.mustahiq.kelompok.persen
+      : 80,
+  );
+  var maalMustahiqDaerahPersen = Number(
+    (maal.mustahiq && maal.mustahiq.daerah && maal.mustahiq.daerah.persen) !=
+      null
+      ? maal.mustahiq.daerah.persen
+      : 20,
+  );
+  var maalSabilillahPersen = Number(
+    (maal.sabilillah && maal.sabilillah.persen) != null
+      ? maal.sabilillah.persen
+      : 40,
+  );
+  var maalAmilPersen = Number(
+    (maal.amil && maal.amil.persen) != null ? maal.amil.persen : 15,
+  );
+  var maalAmilKelompokPersen = Number(
+    (maal.amil && maal.amil.kelompok && maal.amil.kelompok.persen) != null
+      ? maal.amil.kelompok.persen
+      : 12,
+  );
+  var maalAmilDesaPersen = Number(
+    (maal.amil && maal.amil.desa && maal.amil.desa.persen) != null
+      ? maal.amil.desa.persen
+      : 2,
+  );
+  var maalAmilDaerahPersen = Number(
+    (maal.amil && maal.amil.daerah && maal.amil.daerah.persen) != null
+      ? maal.amil.daerah.persen
+      : 1,
+  );
+
+  var maalMustahiqNominal = Math.round(
+    (maalPenerimaan * maalMustahiqPersen) / 100,
+  );
+  var maalMustahiqKelompokNominal = Math.round(
+    (maalMustahiqNominal * maalMustahiqKelompokPersen) / 100,
+  );
+  var maalMustahiqDaerahNominal = Math.round(
+    (maalMustahiqNominal * maalMustahiqDaerahPersen) / 100,
+  );
+  var maalSabilillahNominal = Math.round(
+    (maalPenerimaan * maalSabilillahPersen) / 100,
+  );
+  var maalAmilNominal = Math.round((maalPenerimaan * maalAmilPersen) / 100);
+  var maalAmilKelompokNominal = Math.round(
+    (maalPenerimaan * maalAmilKelompokPersen) / 100,
+  );
+  var maalAmilDesaNominal = Math.round(
+    (maalPenerimaan * maalAmilDesaPersen) / 100,
+  );
+  var maalAmilDaerahNominal = Math.round(
+    (maalPenerimaan * maalAmilDaerahPersen) / 100,
+  );
+
+  // ============================================================
+  // SETOR KE DESA — KHUSUS AMIL DESA (FITRAH & MAAL DIPISAH)
+  // ============================================================
   var setorDesa = {
     amilDesa: {
-      fitrah: fitrah.amil?.desa?.nominal || 0,
-      maal: maal.amil?.desa?.nominal || 0,
+      fitrah: fitrahAmilDesaNominal,
+      maal: maalAmilDesaNominal,
     },
   };
-  var totalSetorDesa =
-    (setorDesa.amilDesa.fitrah || 0) + (setorDesa.amilDesa.maal || 0);
+  var totalSetorDesa = setorDesa.amilDesa.fitrah + setorDesa.amilDesa.maal;
 
-  // Setor ke Daerah
+  // ============================================================
+  // SETOR KE DAERAH — KHUSUS MAAL (MUSTAHIQ DAERAH, SABILILLAH, AMIL DAERAH)
+  // ============================================================
   var setorDaerah = {
-    mustahiqDaerah: maal.mustahiq?.daerah?.nominal || 0,
-    sabilillah: maal.sabilillah?.nominal || 0,
-    amilDaerah: maal.amil?.daerah?.nominal || 0,
+    mustahiqDaerah: maalMustahiqDaerahNominal,
+    sabilillah: maalSabilillahNominal,
+    amilDaerah: maalAmilDaerahNominal,
   };
   var totalSetorDaerah =
-    (setorDaerah.mustahiqDaerah || 0) +
-    (setorDaerah.sabilillah || 0) +
-    (setorDaerah.amilDaerah || 0);
+    setorDaerah.mustahiqDaerah +
+    setorDaerah.sabilillah +
+    setorDaerah.amilDaerah;
 
-  // Build HTML sesuai format PDF
+  // ============================================================
+  // BUILD HTML
+  // ============================================================
   var html = `
     <div class="print-rincian-wrapper">
       <!-- ZAKAT FITRAH -->
@@ -225,37 +280,37 @@ function updateZakatPrintRincian(zakat) {
             <tr class="row-penerimaan">
               <td style="text-align:center;">1</td>
               <td>JUMLAH PENERIMAAN ZAKAT FITRAH (100%)</td>
-              <td class="num">${fmtRp(fitrah.penerimaan || 0)}</td>
+              <td class="num">${fmtRp(fitrahPenerimaan)}</td>
             </tr>
             <tr class="row-utama">
               <td style="text-align:center;">2</td>
-              <td>MUSTAHIQ (${fitrah.mustahiq?.persen || 45}%)</td>
-              <td class="num">${fmtRp(fitrah.mustahiq?.nominal || 0)}</td>
+              <td>MUSTAHIQ (${fitrahMustahiqPersen}%)</td>
+              <td class="num">${fmtRp(fitrahMustahiqNominal)}</td>
             </tr>
             <tr class="row-utama">
               <td style="text-align:center;">3</td>
-              <td>SABILILLAH (${fitrah.sabilillah?.persen || 40}%)</td>
-              <td class="num">${fmtRp(fitrah.sabilillah?.nominal || 0)}</td>
+              <td>SABILILLAH (${fitrahSabilillahPersen}%)</td>
+              <td class="num">${fmtRp(fitrahSabilillahNominal)}</td>
             </tr>
             <tr class="row-utama">
               <td style="text-align:center;">4</td>
-              <td>AMIL (${fitrah.amil?.persen || 15}%)</td>
-              <td class="num">${fmtRp(fitrah.amil?.nominal || 0)}</td>
+              <td>AMIL (${fitrahAmilPersen}%)</td>
+              <td class="num">${fmtRp(fitrahAmilNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* AMIL KELOMPOK (${fitrah.amil?.kelompok?.persen || 12}%)</td>
-              <td class="num">${fmtRp(fitrah.amil?.kelompok?.nominal || 0)}</td>
+              <td style="padding-left:20px;">* AMIL KELOMPOK (${fitrahAmilKelompokPersen}%)</td>
+              <td class="num">${fmtRp(fitrahAmilKelompokNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* AMIL DESA (${fitrah.amil?.desa?.persen || 2}%)</td>
-              <td class="num">${fmtRp(fitrah.amil?.desa?.nominal || 0)}</td>
+              <td style="padding-left:20px;">* AMIL DESA (${fitrahAmilDesaPersen}%)</td>
+              <td class="num">${fmtRp(fitrahAmilDesaNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* AMIL DAERAH (${fitrah.amil?.daerah?.persen || 1}%)</td>
-              <td class="num">${fmtRp(fitrah.amil?.daerah?.nominal || 0)}</td>
+              <td style="padding-left:20px;">* AMIL DAERAH (${fitrahAmilDaerahPersen}%)</td>
+              <td class="num">${fmtRp(fitrahAmilDaerahNominal)}</td>
             </tr>
           </tbody>
         </table>
@@ -276,47 +331,47 @@ function updateZakatPrintRincian(zakat) {
             <tr class="row-penerimaan">
               <td style="text-align:center;">1</td>
               <td>JUMLAH PENERIMAAN ZAKAT MAAL & TIJAROH, ZURU' DAN TERNAK (100%)</td>
-              <td class="num">${fmtRp(totalMaal)}</td>
+              <td class="num">${fmtRp(maalPenerimaan)}</td>
             </tr>
             <tr class="row-utama">
               <td style="text-align:center;">2</td>
-              <td>MUSTAHIQ (${maal.mustahiq.persen}%)</td>
-              <td class="num">${fmtRp(maal.mustahiq.nominal)}</td>
+              <td>MUSTAHIQ (${maalMustahiqPersen}%)</td>
+              <td class="num">${fmtRp(maalMustahiqNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* MUSTAHIQ KELOMPOK (${maal.mustahiq.kelompok.persen}% dari MUSTAHIQ)</td>
-              <td class="num">${fmtRp(maal.mustahiq.kelompok.nominal)}</td>
+              <td style="padding-left:20px;">* MUSTAHIQ KELOMPOK (${maalMustahiqKelompokPersen}% dari MUSTAHIQ)</td>
+              <td class="num">${fmtRp(maalMustahiqKelompokNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* MUSTAHIQ SE-DAERAH (${maal.mustahiq.daerah.persen}% dari MUSTAHIQ)</td>
-              <td class="num">${fmtRp(maal.mustahiq.daerah.nominal)}</td>
+              <td style="padding-left:20px;">* MUSTAHIQ SE-DAERAH (${maalMustahiqDaerahPersen}% dari MUSTAHIQ)</td>
+              <td class="num">${fmtRp(maalMustahiqDaerahNominal)}</td>
             </tr>
             <tr class="row-utama">
               <td style="text-align:center;">3</td>
-              <td>SABILILLAH (${maal.sabilillah.persen}%)</td>
-              <td class="num">${fmtRp(maal.sabilillah.nominal)}</td>
+              <td>SABILILLAH (${maalSabilillahPersen}%)</td>
+              <td class="num">${fmtRp(maalSabilillahNominal)}</td>
             </tr>
             <tr class="row-utama">
               <td style="text-align:center;">4</td>
-              <td>AMIL (${maal.amil.persen}%)</td>
-              <td class="num">${fmtRp(maal.amil.nominal)}</td>
+              <td>AMIL (${maalAmilPersen}%)</td>
+              <td class="num">${fmtRp(maalAmilNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* AMIL KELOMPOK (${maal.amil.kelompok.persen}%)</td>
-              <td class="num">${fmtRp(maal.amil.kelompok.nominal)}</td>
+              <td style="padding-left:20px;">* AMIL KELOMPOK (${maalAmilKelompokPersen}%)</td>
+              <td class="num">${fmtRp(maalAmilKelompokNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* AMIL DESA (${maal.amil.desa.persen}%)</td>
-              <td class="num">${fmtRp(maal.amil.desa.nominal)}</td>
+              <td style="padding-left:20px;">* AMIL DESA (${maalAmilDesaPersen}%)</td>
+              <td class="num">${fmtRp(maalAmilDesaNominal)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* AMIL DAERAH (${maal.amil.daerah.persen}%)</td>
-              <td class="num">${fmtRp(maal.amil.daerah.nominal)}</td>
+              <td style="padding-left:20px;">* AMIL DAERAH (${maalAmilDaerahPersen}%)</td>
+              <td class="num">${fmtRp(maalAmilDaerahNominal)}</td>
             </tr>
           </tbody>
         </table>
@@ -336,18 +391,18 @@ function updateZakatPrintRincian(zakat) {
           <tbody>
             <tr class="row-setor-desa">
               <td style="text-align:center;">1</td>
-              <td>AMIL DESA (2%)</td>
+              <td>AMIL DESA</td>
               <td class="num">${fmtRp(totalSetorDesa)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* % AMIL ZAKAT FITRAH</td>
-              <td class="num">${fmtRp(setorDesa.amilDesa.fitrah || 0)}</td>
+              <td style="padding-left:20px;">* AMIL ZAKAT FITRAH (${fitrahAmilDesaPersen}%)</td>
+              <td class="num">${fmtRp(setorDesa.amilDesa.fitrah)}</td>
             </tr>
             <tr>
               <td></td>
-              <td style="padding-left:20px;">* % AMIL ZAKAT MAAL & TIJAROH, ZURU' DAN TERNAK</td>
-              <td class="num">${fmtRp(setorDesa.amilDesa.maal || 0)}</td>
+              <td style="padding-left:20px;">* AMIL ZAKAT MAAL & TIJAROH, ZURU' DAN TERNAK (${maalAmilDesaPersen}%)</td>
+              <td class="num">${fmtRp(setorDesa.amilDesa.maal)}</td>
             </tr>
             <tr class="row-setor-desa">
               <td></td>
@@ -372,17 +427,17 @@ function updateZakatPrintRincian(zakat) {
           <tbody>
             <tr class="row-setor-daerah">
               <td style="text-align:center;">1</td>
-              <td>MUSTAHIQ SE-DAERAH (20% dari MUSTAHIQ)</td>
+              <td>MUSTAHIQ SE-DAERAH (${maalMustahiqDaerahPersen}% dari MUSTAHIQ)</td>
               <td class="num">${fmtRp(setorDaerah.mustahiqDaerah)}</td>
             </tr>
             <tr class="row-setor-daerah">
               <td style="text-align:center;">2</td>
-              <td>SABILILLAH (40%)</td>
+              <td>SABILILLAH (${maalSabilillahPersen}%)</td>
               <td class="num">${fmtRp(setorDaerah.sabilillah)}</td>
             </tr>
             <tr class="row-setor-daerah">
               <td style="text-align:center;">3</td>
-              <td>AMIL DAERAH (1%)</td>
+              <td>AMIL DAERAH (${maalAmilDaerahPersen}%)</td>
               <td class="num">${fmtRp(setorDaerah.amilDaerah)}</td>
             </tr>
             <tr class="row-setor-daerah">
@@ -396,23 +451,22 @@ function updateZakatPrintRincian(zakat) {
 
       <!-- TANDA TANGAN -->
       <div class="print-rincian-signature">
-        <!-- TANGGAL - Di luar row -->
         <div class="print-signature-date-wrapper">
-            ${getFormattedDate()}
+          ${getFormattedDate()}
         </div>
         <div class="print-signature-row">
-            <div class="print-signature-item">
-              <div class="print-signature-wrapper">
-                <p class="print-signature-label">KYAI KELOMPOK</p>
-                <p class="print-signature-line">( ......................... )</p>
-              </div>
+          <div class="print-signature-item">
+            <div class="print-signature-wrapper">
+              <p class="print-signature-label">KYAI KELOMPOK</p>
+              <p class="print-signature-line">( ......................... )</p>
             </div>
-            <div class="print-signature-item">
-              <div class="print-signature-wrapper">
-                <p class="print-signature-label">KU KELOMPOK</p>
-                <p class="print-signature-line">( ......................... )</p>
-              </div>
+          </div>
+          <div class="print-signature-item">
+            <div class="print-signature-wrapper">
+              <p class="print-signature-label">KU KELOMPOK</p>
+              <p class="print-signature-line">( ......................... )</p>
             </div>
+          </div>
         </div>
       </div>
     </div>

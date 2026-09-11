@@ -159,7 +159,8 @@ function closeAiChat() {
 
 function aiChatScrollToBottom() {
   const box = aiChatEl("aiChatMessages");
-  if (box) box.scrollTop = box.scrollHeight;
+  if (!box) return;
+  box.scrollTo({ top: box.scrollHeight, behavior: "auto" });
 }
 
 function aiChatEscapeHtml(text) {
@@ -230,9 +231,39 @@ function aiChatRenderMarkdown(text) {
     return out;
   }
 
+  function renderCodeBlock(code, lang) {
+    const langClass = lang ? ' data-lang="' + aiChatEscapeHtml(lang) + '"' : "";
+    return (
+      '<div class="ai-chat-code-block"' +
+      langClass +
+      "><pre><code>" +
+      aiChatEscapeHtml(code) +
+      "</code></pre></div>"
+    );
+  }
+
   while (i < lines.length) {
     const line = lines[i];
     const raw = line.trim();
+
+    const fenceMatch = raw.match(/^```\s*([\w-]*)\s*$/);
+    if (fenceMatch) {
+      closeList();
+      const lang = fenceMatch[1] || "";
+      const codeLines = [];
+      i++;
+      while (i < lines.length) {
+        const cur = lines[i];
+        if (/^```\s*$/.test(cur.trim())) {
+          i++;
+          break;
+        }
+        codeLines.push(cur);
+        i++;
+      }
+      html.push(renderCodeBlock(codeLines.join("\n"), lang));
+      continue;
+    }
 
     if (!raw) {
       closeList();
@@ -380,6 +411,50 @@ function aiChatClosePopup() {
   }
 }
 
+function aiChatGetLastUserQuestion() {
+  for (let i = aiChatState.history.length - 1; i >= 0; i--) {
+    const h = aiChatState.history[i];
+    if (h && h.role === "user" && h.text) return h.text;
+  }
+  return null;
+}
+
+function aiChatRegenerate() {
+  const question = aiChatGetLastUserQuestion();
+  if (!question) return;
+  if (aiChatState.loading) return;
+
+  aiChatClosePopup();
+
+  const box = aiChatEl("aiChatMessages");
+  if (box && box.lastElementChild) {
+    const last = box.lastElementChild;
+    if (
+      last.classList &&
+      last.classList.contains("assistant") &&
+      !last.classList.contains("pending")
+    ) {
+      last.remove();
+    }
+  }
+
+  if (aiChatState.history.length) {
+    const last = aiChatState.history[aiChatState.history.length - 1];
+    if (last && last.role === "assistant") {
+      aiChatState.history.pop();
+    }
+  }
+  if (aiChatState.history.length) {
+    const last = aiChatState.history[aiChatState.history.length - 1];
+    if (last && last.role === "user") {
+      aiChatState.history.pop();
+    }
+  }
+  aiChatSaveHistory();
+
+  aiChatSend(question, { skipUserBubble: true });
+}
+
 function aiChatShowPopup(bubble, text, x, y) {
   aiChatClosePopup();
 
@@ -404,6 +479,26 @@ function aiChatShowPopup(bubble, text, x, y) {
   });
 
   popup.appendChild(copyBtn);
+
+  const isAssistant =
+    bubble && bubble.classList && bubble.classList.contains("assistant");
+
+  if (isAssistant) {
+    const regenBtn = document.createElement("button");
+    regenBtn.type = "button";
+    regenBtn.className = "ai-chat-action-item";
+    regenBtn.setAttribute("role", "menuitem");
+    regenBtn.innerHTML =
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg><span>Regenerate</span>';
+
+    regenBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      aiChatRegenerate();
+    });
+
+    popup.appendChild(regenBtn);
+  }
 
   if (typeof navigator !== "undefined" && navigator.share) {
     const shareBtn = document.createElement("button");
@@ -799,7 +894,8 @@ document.addEventListener("DOMContentLoaded", function () {
   aiChatInitControls();
 });
 
-async function aiChatSend(question) {
+async function aiChatSend(question, opts) {
+  opts = opts || {};
   const q = (question || "").trim();
   if (!q || aiChatState.loading) return;
 
@@ -808,66 +904,20 @@ async function aiChatSend(question) {
   const suggestions = aiChatEl("aiChatSuggestions");
   if (suggestions) suggestions.classList.add("hidden");
 
-  aiChatAppendBubble("user", q);
-  aiChatState.history.push({ role: "user", text: q });
-  aiChatSaveHistory();
+  if (!opts.skipUserBubble) {
+    aiChatAppendBubble("user", q);
+    aiChatState.history.push({ role: "user", text: q });
+    aiChatSaveHistory();
+  }
 
   const input = aiChatEl("aiChatInput");
   if (input) input.value = "";
 
   aiChatSetLoading(true);
 
-  const loadingMessages = [
-    "Menganalisis data...",
-    "Menghitung sebentar...",
-    "Menyiapkan jawaban...",
-    "Memeriksa catatan...",
-    "Menyusun ringkasan...",
-    "Menelusuri transaksi...",
-    "Membaca data kas...",
-    "Mengolah informasi...",
-    "Mencari jawaban terbaik...",
-    "Merangkum data...",
-    "Memeriksa rincian...",
-    "Menyusun laporan...",
-    "Menghubungkan data...",
-    "Menyaring informasi...",
-    "Memahami pertanyaan...",
-    "Mencocokkan data...",
-    "Menelaah angka...",
-    "Mengambil data terbaru...",
-    "Memverifikasi catatan...",
-    "Menyiapkan hasil...",
-    "Menganalisis pola...",
-    "Menghitung total...",
-    "Membandingkan data...",
-    "Menyusun jawaban...",
-    "Mengumpulkan fakta...",
-    "Meninjau transaksi...",
-    "Memproses permintaan...",
-    "Menyiapkan detail...",
-    "Memeriksa saldo...",
-    "Mengolah catatan...",
-  ];
-
-  let loadingInterval = null;
-  let loadingIndex = Math.floor(Math.random() * loadingMessages.length);
-
-  const pendingBubble = aiChatAppendBubble(
-    "assistant",
-    loadingMessages[loadingIndex],
-    { pending: true },
-  );
-
-  if (pendingBubble) {
-    const textEl = pendingBubble.querySelector("p");
-    if (textEl) {
-      loadingInterval = setInterval(function () {
-        loadingIndex = (loadingIndex + 1) % loadingMessages.length;
-        textEl.textContent = loadingMessages[loadingIndex];
-      }, 1800);
-    }
-  }
+  const pendingBubble = aiChatAppendBubble("assistant", "Sedang berpikir...", {
+    pending: true,
+  });
 
   const providerToSend =
     localStorage.getItem("ai_chat_provider") ||
@@ -891,10 +941,6 @@ async function aiChatSend(question) {
       response = await aiChatFetchFallback(q);
     }
 
-    if (loadingInterval) {
-      clearInterval(loadingInterval);
-      loadingInterval = null;
-    }
     if (pendingBubble) pendingBubble.remove();
 
     if (response && response.success) {
@@ -928,10 +974,6 @@ async function aiChatSend(question) {
   } catch (err) {
     console.error("AI Chat Error:", err);
 
-    if (loadingInterval) {
-      clearInterval(loadingInterval);
-      loadingInterval = null;
-    }
     if (pendingBubble) pendingBubble.remove();
 
     aiChatAppendBubble("assistant", "⚠️ Gagal terhubung ke server. Coba lagi.");
@@ -972,3 +1014,4 @@ window.aiChatSend = aiChatSend;
 window.aiChatState = aiChatState;
 window.aiChatSwitchProvider = aiChatSwitchProvider;
 window.aiChatClearHistory = aiChatClearHistory;
+window.aiChatRegenerate = aiChatRegenerate;
