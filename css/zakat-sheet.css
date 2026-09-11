@@ -1,11 +1,3 @@
-/* ============================================================
-   ZAKAT SHEET - CLASS YANG HILANG
-   ============================================================ */
-
-/* ============================================================
-   SHEET OVERLAY - OVERRIDE UNTUK ZAKAT
-   ============================================================ */
-
 #zakatMuzakiSheet,
 #zakatRincianSheet,
 #zakatMustahikSheet,
@@ -38,7 +30,16 @@
    ZAKAT - MUZAKI/MUSTAHIK LIST
    ============================================================ */
 
-#zakatMuzakiSheet .zakat-muzaki-list,
+#zakatMuzakiSheet .zakat-muzaki-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin: 6px 0 4px 0 !important;
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  padding: 2px 0 !important;
+}
+
 #zakatMustahikSheet .zakat-mustahik-list {
   display: flex !important;
   flex-direction: column !important;

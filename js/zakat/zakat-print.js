@@ -109,135 +109,127 @@ function updateZakatPrintRincian(zakat) {
   if (!container) return;
 
   var r = zakat.rincian || {};
-  var totalZakat = zakat.total || 0;
 
-  // ============================================================
-  // ZAKAT FITRAH — SUMBER DATA TERPISAH
-  // ============================================================
+  var toNum = function (v, def) {
+    var n = Number(v);
+    return isNaN(n) ? def || 0 : n;
+  };
+
   var fitrah = r.fitrah || {};
-  var fitrahPenerimaan = Number(fitrah.penerimaan || 0);
+  var fitrahPenerimaan = toNum(fitrah.total, 0);
 
-  var fitrahMustahiqPersen = Number(
-    (fitrah.mustahiq && fitrah.mustahiq.persen) != null
-      ? fitrah.mustahiq.persen
-      : 45,
+  var fitrahMustahiqPersen = toNum(
+    fitrah.mustahik && fitrah.mustahik.persen,
+    45,
   );
-  var fitrahSabilillahPersen = Number(
-    (fitrah.sabilillah && fitrah.sabilillah.persen) != null
-      ? fitrah.sabilillah.persen
-      : 40,
+  var fitrahSabilillahPersen = toNum(
+    fitrah.sabilillah && fitrah.sabilillah.persen,
+    40,
   );
-  var fitrahAmilPersen = Number(
-    (fitrah.amil && fitrah.amil.persen) != null ? fitrah.amil.persen : 15,
+  var fitrahAmilPersen = toNum(fitrah.amil && fitrah.amil.persen, 15);
+  var fitrahAmilKelompokPersen = toNum(
+    fitrah.amil && fitrah.amil.kelompok && fitrah.amil.kelompok.persen,
+    12,
   );
-  var fitrahAmilKelompokPersen = Number(
-    (fitrah.amil && fitrah.amil.kelompok && fitrah.amil.kelompok.persen) != null
-      ? fitrah.amil.kelompok.persen
-      : 12,
+  var fitrahAmilDesaPersen = toNum(
+    fitrah.amil && fitrah.amil.desa && fitrah.amil.desa.persen,
+    2,
   );
-  var fitrahAmilDesaPersen = Number(
-    (fitrah.amil && fitrah.amil.desa && fitrah.amil.desa.persen) != null
-      ? fitrah.amil.desa.persen
-      : 2,
-  );
-  var fitrahAmilDaerahPersen = Number(
-    (fitrah.amil && fitrah.amil.daerah && fitrah.amil.daerah.persen) != null
-      ? fitrah.amil.daerah.persen
-      : 1,
+  var fitrahAmilDaerahPersen = toNum(
+    fitrah.amil && fitrah.amil.daerah && fitrah.amil.daerah.persen,
+    1,
   );
 
-  var fitrahMustahiqNominal = Math.round(
-    (fitrahPenerimaan * fitrahMustahiqPersen) / 100,
+  var fitrahMustahiqNominal = toNum(
+    fitrah.mustahik && fitrah.mustahik.nominal,
+    Math.round((fitrahPenerimaan * fitrahMustahiqPersen) / 100),
   );
-  var fitrahSabilillahNominal = Math.round(
-    (fitrahPenerimaan * fitrahSabilillahPersen) / 100,
+  var fitrahSabilillahNominal = toNum(
+    fitrah.sabilillah && fitrah.sabilillah.nominal,
+    Math.round((fitrahPenerimaan * fitrahSabilillahPersen) / 100),
   );
-  var fitrahAmilNominal = Math.round(
-    (fitrahPenerimaan * fitrahAmilPersen) / 100,
+  var fitrahAmilNominal = toNum(
+    fitrah.amil && fitrah.amil.nominal,
+    Math.round((fitrahPenerimaan * fitrahAmilPersen) / 100),
   );
-  var fitrahAmilKelompokNominal = Math.round(
-    (fitrahPenerimaan * fitrahAmilKelompokPersen) / 100,
+  var fitrahAmilKelompokNominal = toNum(
+    fitrah.amil && fitrah.amil.kelompok && fitrah.amil.kelompok.nominal,
+    Math.round((fitrahPenerimaan * fitrahAmilKelompokPersen) / 100),
   );
-  var fitrahAmilDesaNominal = Math.round(
-    (fitrahPenerimaan * fitrahAmilDesaPersen) / 100,
+  var fitrahAmilDesaNominal = toNum(
+    fitrah.amil && fitrah.amil.desa && fitrah.amil.desa.nominal,
+    Math.round((fitrahPenerimaan * fitrahAmilDesaPersen) / 100),
   );
-  var fitrahAmilDaerahNominal = Math.round(
-    (fitrahPenerimaan * fitrahAmilDaerahPersen) / 100,
+  var fitrahAmilDaerahNominal = toNum(
+    fitrah.amil && fitrah.amil.daerah && fitrah.amil.daerah.nominal,
+    Math.round((fitrahPenerimaan * fitrahAmilDaerahPersen) / 100),
   );
 
-  // ============================================================
-  // ZAKAT MAAL, TIJAROH, ZURU', TERNAK — SUMBER DATA TERPISAH
-  // ============================================================
   var maal = r.maal || {};
-  var maalPenerimaan = Number(
-    maal.penerimaan != null ? maal.penerimaan : totalZakat || 0,
+  var maalPenerimaan = toNum(maal.total, 0);
+
+  var maalMustahiqPersen = toNum(maal.mustahik && maal.mustahik.persen, 45);
+  var maalMustahiqKelompokPersen = toNum(
+    maal.mustahik && maal.mustahik.kelompok && maal.mustahik.kelompok.persen,
+    80,
+  );
+  var maalMustahiqDaerahPersen = toNum(
+    maal.mustahik && maal.mustahik.daerah && maal.mustahik.daerah.persen,
+    20,
+  );
+  var maalSabilillahPersen = toNum(
+    maal.sabilillah && maal.sabilillah.persen,
+    40,
+  );
+  var maalAmilPersen = toNum(maal.amil && maal.amil.persen, 15);
+  var maalAmilKelompokPersen = toNum(
+    maal.amil && maal.amil.kelompok && maal.amil.kelompok.persen,
+    12,
+  );
+  var maalAmilDesaPersen = toNum(
+    maal.amil && maal.amil.desa && maal.amil.desa.persen,
+    2,
+  );
+  var maalAmilDaerahPersen = toNum(
+    maal.amil && maal.amil.daerah && maal.amil.daerah.persen,
+    1,
   );
 
-  var maalMustahiqPersen = Number(
-    (maal.mustahiq && maal.mustahiq.persen) != null ? maal.mustahiq.persen : 45,
+  var maalMustahiqNominal = toNum(
+    maal.mustahik && maal.mustahik.nominal,
+    Math.round((maalPenerimaan * maalMustahiqPersen) / 100),
   );
-  var maalMustahiqKelompokPersen = Number(
-    (maal.mustahiq &&
-      maal.mustahiq.kelompok &&
-      maal.mustahiq.kelompok.persen) != null
-      ? maal.mustahiq.kelompok.persen
-      : 80,
+  var maalMustahiqKelompokNominal = toNum(
+    maal.mustahik && maal.mustahik.kelompok && maal.mustahik.kelompok.nominal,
+    Math.round((maalMustahiqNominal * maalMustahiqKelompokPersen) / 100),
   );
-  var maalMustahiqDaerahPersen = Number(
-    (maal.mustahiq && maal.mustahiq.daerah && maal.mustahiq.daerah.persen) !=
-      null
-      ? maal.mustahiq.daerah.persen
-      : 20,
+  var maalMustahiqDaerahNominal = toNum(
+    maal.mustahik && maal.mustahik.daerah && maal.mustahik.daerah.nominal,
+    Math.round((maalMustahiqNominal * maalMustahiqDaerahPersen) / 100),
   );
-  var maalSabilillahPersen = Number(
-    (maal.sabilillah && maal.sabilillah.persen) != null
-      ? maal.sabilillah.persen
-      : 40,
+  var maalSabilillahNominal = toNum(
+    maal.sabilillah && maal.sabilillah.nominal,
+    Math.round((maalPenerimaan * maalSabilillahPersen) / 100),
   );
-  var maalAmilPersen = Number(
-    (maal.amil && maal.amil.persen) != null ? maal.amil.persen : 15,
+  var maalAmilNominal = toNum(
+    maal.amil && maal.amil.nominal,
+    Math.round((maalPenerimaan * maalAmilPersen) / 100),
   );
-  var maalAmilKelompokPersen = Number(
-    (maal.amil && maal.amil.kelompok && maal.amil.kelompok.persen) != null
-      ? maal.amil.kelompok.persen
-      : 12,
+  var maalAmilKelompokNominal = toNum(
+    maal.amil && maal.amil.kelompok && maal.amil.kelompok.nominal,
+    Math.round((maalPenerimaan * maalAmilKelompokPersen) / 100),
   );
-  var maalAmilDesaPersen = Number(
-    (maal.amil && maal.amil.desa && maal.amil.desa.persen) != null
-      ? maal.amil.desa.persen
-      : 2,
+  var maalAmilDesaNominal = toNum(
+    maal.amil && maal.amil.desa && maal.amil.desa.nominal,
+    Math.round((maalPenerimaan * maalAmilDesaPersen) / 100),
   );
-  var maalAmilDaerahPersen = Number(
-    (maal.amil && maal.amil.daerah && maal.amil.daerah.persen) != null
-      ? maal.amil.daerah.persen
-      : 1,
-  );
-
-  var maalMustahiqNominal = Math.round(
-    (maalPenerimaan * maalMustahiqPersen) / 100,
-  );
-  var maalMustahiqKelompokNominal = Math.round(
-    (maalMustahiqNominal * maalMustahiqKelompokPersen) / 100,
-  );
-  var maalMustahiqDaerahNominal = Math.round(
-    (maalMustahiqNominal * maalMustahiqDaerahPersen) / 100,
-  );
-  var maalSabilillahNominal = Math.round(
-    (maalPenerimaan * maalSabilillahPersen) / 100,
-  );
-  var maalAmilNominal = Math.round((maalPenerimaan * maalAmilPersen) / 100);
-  var maalAmilKelompokNominal = Math.round(
-    (maalPenerimaan * maalAmilKelompokPersen) / 100,
-  );
-  var maalAmilDesaNominal = Math.round(
-    (maalPenerimaan * maalAmilDesaPersen) / 100,
-  );
-  var maalAmilDaerahNominal = Math.round(
-    (maalPenerimaan * maalAmilDaerahPersen) / 100,
+  var maalAmilDaerahNominal = toNum(
+    maal.amil && maal.amil.daerah && maal.amil.daerah.nominal,
+    Math.round((maalPenerimaan * maalAmilDaerahPersen) / 100),
   );
 
   // ============================================================
-  // SETOR KE DESA — KHUSUS AMIL DESA (FITRAH & MAAL DIPISAH)
+  // SETOR KE DESA — AMIL DESA (Fitrah + Maal)
   // ============================================================
   var setorDesa = {
     amilDesa: {
@@ -248,7 +240,7 @@ function updateZakatPrintRincian(zakat) {
   var totalSetorDesa = setorDesa.amilDesa.fitrah + setorDesa.amilDesa.maal;
 
   // ============================================================
-  // SETOR KE DAERAH — KHUSUS MAAL (MUSTAHIQ DAERAH, SABILILLAH, AMIL DAERAH)
+  // SETOR KE DAERAH — KHUSUS MAAL
   // ============================================================
   var setorDaerah = {
     mustahiqDaerah: maalMustahiqDaerahNominal,
