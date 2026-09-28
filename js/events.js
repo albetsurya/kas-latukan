@@ -238,10 +238,9 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const session = getSession();
         if (session && session.token) {
-          await apiPost({
-            action: "logout",
-            token: session.token,
-          }).catch(() => {});
+          const isAmil = state.kasType === "kas_amil";
+          const endpoint = isAmil ? "api/kas-amil/logout" : "api/auth/logout";
+          await apiRest("POST", endpoint, {}).catch(() => {});
         }
       } catch (e) {}
 
@@ -398,19 +397,21 @@ document.addEventListener("DOMContentLoaded", () => {
       $("btnSubmitTx").textContent = isEditing ? "Memperbarui…" : "Menyimpan…";
 
       try {
-        const payload = {
-          action: isEditing ? "editTransaction" : "addTransaction",
-          token: session.token,
+        const isAmil = state.kasType === "kas_amil";
+        const endpoint = isAmil
+          ? (isEditing ? "api/kas-amil/transactions/edit" : "api/kas-amil/transactions/add")
+          : (isEditing ? "api/kas/transactions/edit" : "api/kas/transactions/add");
+
+        const txData = {
           tanggal: tanggal,
           account: account,
           keterangan: $("txKeterangan").value.trim(),
           jenis: state.txJenis,
           jumlah,
+          ...(isEditing ? { no: state.editingNo } : {}),
         };
 
-        if (isEditing) payload.no = state.editingNo;
-
-        const res = await apiPost(payload);
+        const res = await apiRest("POST", endpoint, txData);
 
         if (!res.success) {
           $("txError").textContent =
@@ -618,11 +619,8 @@ document.addEventListener("DOMContentLoaded", () => {
       $("btnCarryForwardConfirm").textContent = "Memproses…";
 
       try {
-        const res = await apiPost({
-          action: "carryForwardSaldo",
-          token: session.token,
-          monthKey,
-        });
+        const endpoint = state.kasType === "kas_amil" ? "api/kas-amil/transactions/carry-forward" : "api/kas/transactions/carry-forward";
+        const res = await apiRest("POST", endpoint, { monthKey });
 
         if (!res.success) {
           showToast(res.message || "Gagal membuat saldo awal.", "error");
@@ -976,9 +974,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const r = await apiPost({
-        action: "reverseShodaqohPayment",
-        token: session.token,
+      const r = await apiRest("POST", "api/shodaqoh/payments/reverse", {
         paymentId: paymentId,
       });
       if (!r.success) throw new Error(r.message);
@@ -1063,17 +1059,13 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         let res;
         if (memberId) {
-          res = await apiPost({
-            action: "updateShodaqohMember",
-            token: session.token,
+          res = await apiRest("POST", "api/shodaqoh/members/update", {
             memberId: memberId,
             nama: nama,
             nominalBulanan: nominal,
           });
         } else {
-          res = await apiPost({
-            action: "addShodaqohMember",
-            token: session.token,
+          res = await apiRest("POST", "api/shodaqoh/members/add", {
             nama: nama,
             nominalBulanan: nominal,
           });
@@ -1138,9 +1130,7 @@ document.addEventListener("DOMContentLoaded", () => {
       $("btnDeleteMemberConfirm").textContent = "Menghapus…";
 
       try {
-        const res = await apiPost({
-          action: "deleteShodaqohMember",
-          token: session.token,
+        const res = await apiRest("POST", "api/shodaqoh/members/delete", {
           memberId: memberId,
         });
 
@@ -1222,11 +1212,8 @@ document.addEventListener("DOMContentLoaded", () => {
       $("btnDeleteConfirm").disabled = true;
       $("btnDeleteConfirm").textContent = "Menghapus…";
 
-      apiPost({
-        action: "deleteTransaction",
-        token: session.token,
-        no,
-      })
+      const endpoint = state.kasType === "kas_amil" ? "api/kas-amil/transactions/delete" : "api/kas/transactions/delete";
+      apiRest("POST", endpoint, { no })
         .then((res) => {
           if (!res.success) {
             showToast(res.message || "Gagal menghapus transaksi.", "error");
@@ -1271,8 +1258,9 @@ document.addEventListener("DOMContentLoaded", () => {
       $("btnAuthSubmit").textContent = "Memeriksa…";
 
       try {
-        const res = await apiPost({
-          action: "login",
+        const isAmil = state.kasType === "kas_amil";
+        const endpoint = isAmil ? "api/kas-amil/login" : "api/auth/login";
+        const res = await apiRest("POST", endpoint, {
           username,
           password,
         });
@@ -1375,13 +1363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function apiGetShodaqohPaymentDetail(paymentId) {
-  const session = getSession();
-  const payload = {
-    action: "getShodaqohPaymentDetail",
-    token: session?.token || "",
-    paymentId: paymentId,
-  };
-  return apiPost(payload);
+  return apiRest("GET", "api/shodaqoh/payments/detail", { paymentId: paymentId });
 }
 
 async function openShodaqohPaymentDetail(paymentId) {

@@ -118,85 +118,56 @@ async function apiGetZakatList() {
 }
 
 async function apiGetZakatDetail(id) {
-  const session = getSession();
-  const payload = {
-    action: "getZakatDetail",
-    id: id,
-  };
-  if (session && session.token) {
-    payload.token = session.token;
-  }
-  return apiPost(payload);
+  return apiRest("GET", "api/zakat/detail", { id: id });
 }
 
 async function apiCreateZakat(data) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "createZakat",
-    token: session?.token || "",
     ...data,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiUpdateZakat(data) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "updateZakat",
-    token: session?.token || "",
     ...data,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiDeleteZakat(id) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "deleteZakat",
-    token: session?.token || "",
     id: id,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiUpdateZakatHeader(data) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatHeader",
-    token: session?.token || "",
     ...data,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiUpdateZakatMuzaki(data) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatMuzaki",
-    token: session?.token || "",
     ...data,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiUpdateZakatRincian(data) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatRincian",
-    token: session?.token || "",
     ...data,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiUpdateZakatMustahik(data) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatMustahik",
-    token: session?.token || "",
     ...data,
-  };
-  return apiPost(payload);
+  });
 }
 
 function generateZakatId() {
@@ -386,13 +357,10 @@ function escapeHtml(text) {
 
 async function apiCompleteZakat(data) {
   try {
-    const session = getSession();
-    const payload = {
+    return await apiRest("POST", "api/zakat/manage", {
       action: "completeZakat",
-      token: session?.token || "",
       id: data.id,
-    };
-    return await apiPost(payload);
+    });
   } catch (err) {
     return { success: false, message: err.message };
   }
@@ -400,13 +368,10 @@ async function apiCompleteZakat(data) {
 
 async function apiCancelCompleteZakat(data) {
   try {
-    const session = getSession();
-    const payload = {
+    return await apiRest("POST", "api/zakat/manage", {
       action: "cancelCompleteZakat",
-      token: session?.token || "",
       id: data.id,
-    };
-    return await apiPost(payload);
+    });
   } catch (err) {
     return { success: false, message: err.message };
   }
@@ -414,14 +379,11 @@ async function apiCancelCompleteZakat(data) {
 
 async function apiDeleteZakatMuzaki(data) {
   try {
-    const session = getSession();
-    const payload = {
+    return await apiRest("POST", "api/zakat/manage", {
       action: "deleteZakatMuzaki",
-      token: session?.token || "",
       zakatId: data.zakatId,
       muzakiId: data.muzakiId,
-    };
-    return await apiPost(payload);
+    });
   } catch (err) {
     return { success: false, message: err.message };
   }
@@ -429,14 +391,11 @@ async function apiDeleteZakatMuzaki(data) {
 
 async function apiDeleteZakatMustahik(data) {
   try {
-    const session = getSession();
-    const payload = {
+    return await apiRest("POST", "api/zakat/manage", {
       action: "deleteZakatMustahik",
-      token: session?.token || "",
       zakatId: data.zakatId,
       mustahikId: data.mustahikId,
-    };
-    return await apiPost(payload);
+    });
   } catch (err) {
     return { success: false, message: err.message };
   }
@@ -465,43 +424,31 @@ async function apiGetMasters() {
 }
 
 async function apiAddMasterMuzaki(nama) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "addMasterMuzaki",
-    token: session?.token || "",
     nama: nama,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiAddMasterMustahik(nama) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "addMasterMustahik",
-    token: session?.token || "",
     nama: nama,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiDeleteMasterMuzaki(id) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "deleteMasterMuzaki",
-    token: session?.token || "",
     id: id,
-  };
-  return apiPost(payload);
+  });
 }
 
 async function apiDeleteMasterMustahik(id) {
-  const session = getSession();
-  const payload = {
+  return apiRest("POST", "api/zakat/manage", {
     action: "deleteMasterMustahik",
-    token: session?.token || "",
     id: id,
-  };
-  return apiPost(payload);
+  });
 }
 
 var masterMuzakiCache = {};

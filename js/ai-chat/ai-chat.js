@@ -682,8 +682,7 @@ async function aiChatSwitchProvider(provider) {
   );
 
   try {
-    const response = await apiPost({
-      action: "setAIProvider",
+    const response = await apiRest("POST", "api/ai/provider/set", {
       provider: provider,
     });
     console.log("[AI Chat] Server response:", response);
@@ -702,7 +701,7 @@ async function aiChatGetProvider() {
   }
 
   try {
-    const response = await apiPost({ action: "getCurrentProvider" });
+    const response = await apiRest("GET", "api/ai/provider/current");
     if (response && response.success && response.data) {
       const serverProvider =
         response.data.active ||
@@ -929,9 +928,8 @@ async function aiChatSend(question, opts) {
   try {
     let response;
 
-    if (typeof apiPost === "function") {
-      response = await apiPost({
-        action: "aiChatQuery",
+    if (typeof apiRest === "function") {
+      response = await apiRest("POST", "api/ai/chat", {
         kasType: "main",
         message: q,
         history: aiChatState.history.slice(0, -1).slice(-12),

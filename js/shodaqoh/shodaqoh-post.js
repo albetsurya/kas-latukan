@@ -182,9 +182,7 @@ async function executePostToKas(monthKey) {
     setButtonLoading(btn, true);
   }
   try {
-    const res = await apiPost({
-      action: "postShodaqohToKas",
-      token: session.token,
+    const res = await apiRest("POST", "api/shodaqoh/post-to-kas", {
       monthKey: monthKey,
     });
     if (!res.success) {
@@ -482,9 +480,7 @@ async function executeCancelPostToKas(monthKey) {
   }
 
   try {
-    const res = await apiPost({
-      action: "cancelPostShodaqohToKas",
-      token: session.token,
+    const res = await apiRest("POST", "api/shodaqoh/cancel-post-to-kas", {
       monthKey: monthKey,
     });
 

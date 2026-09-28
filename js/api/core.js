@@ -299,15 +299,37 @@ async function apiRest(method, endpoint, paramsOrBody = {}) {
   }
 }
 
+function getKasTransactionEndpoint(subpath = "") {
+  const isAmil = state.kasType === "kas_amil";
+  const base = isAmil ? "api/kas-amil/transactions" : "api/kas/transactions";
+  return subpath ? `${base}/${subpath}` : base;
+}
+
 async function apiPost(payload) {
-  const session = getSession();
-  if (session && !payload.token) {
-    payload.token = session.token;
+  const body = { ...payload };
+  const action = body.action;
+
+  const isZakatManage = action && [
+    "getZakatDetail", "createZakat", "updateZakat", "deleteZakat",
+    "updateZakatHeader", "updateZakatMuzaki", "updateZakatRincian", "updateZakatMustahik",
+    "completeZakat", "cancelCompleteZakat", "deleteZakatMuzaki", "deleteZakatMustahik",
+    "addMasterMuzaki", "addMasterMustahik", "deleteMasterMuzaki", "deleteMasterMustahik"
+  ].includes(action);
+
+  if (!isZakatManage) {
+    delete body.action;
   }
 
-  if (!payload.kasType) {
-    payload.kasType = state.kasType || "main";
-  }
+  const isAmil = state.kasType === "kas_amil";
+  const amilActionMap = {
+    addTransaction: "api/kas-amil/transactions/add",
+    editTransaction: "api/kas-amil/transactions/edit",
+    duplicateTransaction: "api/kas-amil/transactions/duplicate",
+    deleteTransaction: "api/kas-amil/transactions/delete",
+    carryForwardSaldo: "api/kas-amil/transactions/carry-forward",
+    login: "api/kas-amil/login",
+    logout: "api/kas-amil/logout",
+  };
 
   const actionMap = {
     addTransaction: "api/kas/transactions/add",
@@ -321,6 +343,8 @@ async function apiPost(payload) {
     addShodaqohMember: "api/shodaqoh/members/add",
     updateShodaqohMember: "api/shodaqoh/members/update",
     deleteShodaqohMember: "api/shodaqoh/members/delete",
+    getShodaqohLastNominals: "api/shodaqoh/payments/last-nominals",
+    getShodaqohMemberDetail: "api/shodaqoh/members/detail",
     postShodaqohToKas: "api/shodaqoh/post-to-kas",
     cancelPostShodaqohToKas: "api/shodaqoh/cancel-post-to-kas",
     login: "api/auth/login",
@@ -330,8 +354,16 @@ async function apiPost(payload) {
     getCurrentProvider: "api/ai/provider/current",
   };
 
-  const endpoint = actionMap[payload.action] || "";
-  return apiRest("POST", endpoint, payload);
+  let endpoint = "";
+  if (isZakatManage) {
+    endpoint = "api/zakat/manage";
+  } else if (isAmil && amilActionMap[action]) {
+    endpoint = amilActionMap[action];
+  } else if (actionMap[action]) {
+    endpoint = actionMap[action];
+  }
+
+  return apiRest("POST", endpoint, body);
 }
 
 async function apiGet() {
@@ -453,11 +485,11 @@ function restoreKasType() {
 }
 
 async function handleLogin(username, password) {
-  const result = await apiPost({
-    action: "login",
+  const isAmil = state.kasType === "kas_amil";
+  const endpoint = isAmil ? "api/kas-amil/login" : "api/auth/login";
+  const result = await apiRest("POST", endpoint, {
     username: username,
     password: password,
-    kasType: state.kasType || "main",
   });
 
   if (result.success) {
@@ -480,11 +512,9 @@ async function handleLogin(username, password) {
 }
 
 async function logout() {
-  const result = await apiPost({
-    action: "logout",
-    token: getSession()?.token,
-    kasType: state.kasType || "main",
-  });
+  const isAmil = state.kasType === "kas_amil";
+  const endpoint = isAmil ? "api/kas-amil/logout" : "api/auth/logout";
+  const result = await apiRest("POST", endpoint, {});
 
   clearSession();
   state.isAdmin = false;
@@ -501,10 +531,7 @@ async function logout() {
 }
 
 async function addTransaction(data) {
-  const result = await apiPost({
-    action: "addTransaction",
-    ...data,
-  });
+  const result = await apiRest("POST", getKasTransactionEndpoint("add"), data);
   if (result.success) {
     showToastWithIcon(
       result.message || "Transaksi berhasil ditambahkan",
@@ -518,10 +545,7 @@ async function addTransaction(data) {
 }
 
 async function editTransaction(data) {
-  const result = await apiPost({
-    action: "editTransaction",
-    ...data,
-  });
+  const result = await apiRest("POST", getKasTransactionEndpoint("edit"), data);
   if (result.success) {
     showToastWithIcon(
       result.message || "Transaksi berhasil diupdate",
@@ -535,10 +559,7 @@ async function editTransaction(data) {
 }
 
 async function duplicateTransaction(data) {
-  const result = await apiPost({
-    action: "duplicateTransaction",
-    ...data,
-  });
+  const result = await apiRest("POST", getKasTransactionEndpoint("duplicate"), data);
   if (result.success) {
     showToastWithIcon(
       result.message || "Transaksi berhasil diduplikasi",
@@ -557,10 +578,7 @@ async function duplicateTransaction(data) {
 async function deleteTransaction(data) {
   if (!confirm("Yakin ingin menghapus transaksi ini?")) return;
 
-  const result = await apiPost({
-    action: "deleteTransaction",
-    ...data,
-  });
+  const result = await apiRest("POST", getKasTransactionEndpoint("delete"), data);
   if (result.success) {
     showToastWithIcon(
       result.message || "Transaksi berhasil dihapus",
@@ -574,10 +592,7 @@ async function deleteTransaction(data) {
 }
 
 async function carryForwardSaldo(data) {
-  const result = await apiPost({
-    action: "carryForwardSaldo",
-    ...data,
-  });
+  const result = await apiRest("POST", getKasTransactionEndpoint("carry-forward"), data);
   if (result.success) {
     showToastWithIcon(
       result.message || "Saldo berhasil dibawa ke bulan berikutnya",

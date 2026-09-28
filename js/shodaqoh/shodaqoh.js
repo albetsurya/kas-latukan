@@ -865,9 +865,7 @@ async function addShodaqohMember(nama, nominalBulanan = 200000) {
   }
 
   try {
-    const res = await apiPost({
-      action: "addShodaqohMember",
-      token: session.token,
+    const res = await apiRest("POST", "api/shodaqoh/members/add", {
       nama: nama,
       nominalBulanan: nominalBulanan,
     });
@@ -891,9 +889,7 @@ async function deleteShodaqohMember(memberId) {
   }
 
   try {
-    const res = await apiPost({
-      action: "deleteShodaqohMember",
-      token: session.token,
+    const res = await apiRest("POST", "api/shodaqoh/members/delete", {
       memberId: memberId,
     });
 
@@ -916,9 +912,7 @@ async function editShodaqohMember(memberId, nama, nominalBulanan) {
   }
 
   try {
-    const res = await apiPost({
-      action: "updateShodaqohMember",
-      token: session.token,
+    const res = await apiRest("POST", "api/shodaqoh/members/update", {
       memberId: memberId,
       nama: nama,
       nominalBulanan: nominalBulanan,
@@ -1064,9 +1058,7 @@ async function loadLastNominals() {
   try {
     const selectedMonth = state.shodaqoh.selectedMonth || getCurrentMonthKey();
 
-    const res = await apiPost({
-      action: "getShodaqohLastNominals",
-      token: session.token,
+    const res = await apiRest("GET", "api/shodaqoh/payments/last-nominals", {
       memberId: memberId,
       beforeMonth: selectedMonth,
     });
@@ -2558,7 +2550,12 @@ async function submitShodaqohAI() {
   try {
     showToast("Mengirim data...", "info");
 
-    const r = await apiPost(payload);
+    const isEditAi = Boolean(state.shodaqoh.selectedPaymentId);
+    const endpointAi = isEditAi ? "api/shodaqoh/payments/update" : "api/shodaqoh/payments/create";
+    delete payload.action;
+    delete payload.token;
+
+    const r = await apiRest("POST", endpointAi, payload);
 
     if (!r || r.success !== true) {
       throw new Error(r?.message || "Gagal menyimpan data shodaqoh.");
@@ -2684,7 +2681,12 @@ async function handleShodaqohSubmit(e) {
   btn.disabled = true;
 
   try {
-    const r = await apiPost(payload);
+    const isEditForm = Boolean(state.shodaqoh.selectedPaymentId);
+    const endpointForm = isEditForm ? "api/shodaqoh/payments/update" : "api/shodaqoh/payments/create";
+    delete payload.action;
+    delete payload.token;
+
+    const r = await apiRest("POST", endpointForm, payload);
     if (!r.success) throw new Error(r.message);
     showToast(r.message);
     closeShodaqohPaymentForm();
@@ -3084,10 +3086,7 @@ async function openShodaqohMemberDetail(memberId) {
       $("shodMemberDetailTitle").textContent = "Memuat...";
     }
 
-    const session = getSession();
-    const d = await apiPost({
-      action: "getShodaqohMemberDetail",
-      token: session?.token || "",
+    const d = await apiRest("GET", "api/shodaqoh/members/detail", {
       memberId: memberId,
     });
 

@@ -2327,7 +2327,6 @@ function applyShodaqohAIResult(data) {
 
 async function callShodaqohAI(dataUrl) {
   const result = await apiRest("POST", "api/shodaqoh/extract", {
-    action: "extractShodaqoh",
     dataUrl: dataUrl,
   });
 
