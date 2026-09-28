@@ -250,6 +250,55 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
+async function apiRest(method, endpoint, paramsOrBody = {}) {
+  const session = getSession();
+  const token = session ? session.token : "";
+  const kasType = state.kasType || "main";
+
+  let url = CONFIG.WEB_APP_URL;
+  if (endpoint) {
+    url += "/" + endpoint.replace(/^\/+/, "");
+  }
+
+  if (method.toUpperCase() === "GET") {
+    const searchParams = new URLSearchParams();
+    if (kasType) searchParams.append("kasType", kasType);
+    if (token) searchParams.append("token", token);
+
+    for (const [key, val] of Object.entries(paramsOrBody)) {
+      if (val !== undefined && val !== null) {
+        searchParams.append(key, val);
+      }
+    }
+
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += (url.includes("?") ? "&" : "?") + queryString;
+    }
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Gagal mengambil data (" + res.status + ")");
+    return res.json();
+  } else {
+    const payload = {
+      kasType: kasType,
+      ...(token ? { token } : {}),
+      ...paramsOrBody,
+    };
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Gagal mengirim data (" + res.status + ")");
+    return res.json();
+  }
+}
+
 async function apiPost(payload) {
   const session = getSession();
   if (session && !payload.token) {
@@ -260,37 +309,39 @@ async function apiPost(payload) {
     payload.kasType = state.kasType || "main";
   }
 
-  const res = await fetch(CONFIG.WEB_APP_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8",
-    },
-    body: JSON.stringify(payload),
-  });
+  const actionMap = {
+    addTransaction: "api/kas/transactions/add",
+    editTransaction: "api/kas/transactions/edit",
+    duplicateTransaction: "api/kas/transactions/duplicate",
+    deleteTransaction: "api/kas/transactions/delete",
+    carryForwardSaldo: "api/kas/transactions/carry-forward",
+    createShodaqohPayment: "api/shodaqoh/payments/create",
+    updateShodaqohPayment: "api/shodaqoh/payments/update",
+    reverseShodaqohPayment: "api/shodaqoh/payments/reverse",
+    addShodaqohMember: "api/shodaqoh/members/add",
+    updateShodaqohMember: "api/shodaqoh/members/update",
+    deleteShodaqohMember: "api/shodaqoh/members/delete",
+    postShodaqohToKas: "api/shodaqoh/post-to-kas",
+    cancelPostShodaqohToKas: "api/shodaqoh/cancel-post-to-kas",
+    login: "api/auth/login",
+    logout: "api/auth/logout",
+    aiChatQuery: "api/ai/chat",
+    setAIProvider: "api/ai/provider/set",
+    getCurrentProvider: "api/ai/provider/current",
+  };
 
-  if (!res.ok) throw new Error("Gagal mengirim data (" + res.status + ")");
-  return res.json();
+  const endpoint = actionMap[payload.action] || "";
+  return apiRest("POST", endpoint, payload);
 }
 
 async function apiGet() {
   const kasType = state.kasType || "main";
-  const url = `${CONFIG.WEB_APP_URL}?action=getData&kasType=${kasType}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Gagal mengambil data (" + res.status + ")");
-  return res.json();
+  const endpoint = kasType === "kas_amil" ? "api/kas-amil/transactions" : "api/kas/transactions";
+  return apiRest("GET", endpoint);
 }
 
 async function apiGetShodaqoh(monthKey) {
-  const url =
-    `${CONFIG.WEB_APP_URL}?action=getShodaqohData` +
-    (monthKey ? `&month=${encodeURIComponent(monthKey)}` : "");
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Gagal mengambil data (" + res.status + ")");
-
-  const data = await res.json();
-
-  return data;
+  return apiRest("GET", "api/shodaqoh/data", monthKey ? { month: monthKey } : {});
 }
 
 function switchKasType(kasType) {

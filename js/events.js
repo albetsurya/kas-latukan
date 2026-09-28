@@ -142,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
             bottomNav.style.display = "none";
           }
 
-          // Tampilkan screen terkait
           const screen = document.getElementById("screen-" + tab);
           if (screen) {
             screen.classList.add("active");
@@ -824,7 +823,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (membersList) {
     // Gunakan MutationObserver untuk mendeteksi perubahan pada members list
     const observer = new MutationObserver(function () {
-      // Cek apakah header sudah sticky
       const header = membersList.querySelector(".shod-members-header");
       if (header) {
         header.style.position = "sticky";
@@ -1389,9 +1387,7 @@ async function apiGetShodaqohPaymentDetail(paymentId) {
 async function openShodaqohPaymentDetail(paymentId) {
   const body = $("shodPaymentDetailBody");
   try {
-    // ============================================================
     // PERBAIKAN: Ambil role dari session atau state
-    // ============================================================
     const session = getSession();
     const role = session?.role || state?.role || state?.user?.role || "";
     const isAdmin =
@@ -1485,7 +1481,6 @@ async function openShodaqohPaymentDetail(paymentId) {
     let isLunas = false;
     let statusLabel = "Belum";
 
-    // Cek dari berbagai kemungkinan
     if (p.status) {
       // Jika status berupa string teks
       if (typeof p.status === "string") {
@@ -1536,9 +1531,7 @@ async function openShodaqohPaymentDetail(paymentId) {
     console.log("Status di detail:", p.status);
     console.log("isLunas:", isLunas);
 
-    // ============================================================
     // PERBAIKAN: Nama dan badge menjadi 2 baris - tetap di CENTER
-    // ============================================================
     if ($("shodPaymentDetailMeta")) {
       $("shodPaymentDetailMeta").innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;text-align:center;">
@@ -1563,12 +1556,8 @@ async function openShodaqohPaymentDetail(paymentId) {
     }
 
     if (body) {
-      // ============================================================
-      // TAMPILKAN RINCIAN DENGAN SUSULAN BULAN
-      // ============================================================
       const allocationItems = [];
 
-      // 1. Infak IR dengan rincian susulan
       const susulanIR = Number(p.susulan_ir) || 0;
       const susulanBulan = p.susulan_bulan || "";
       const susulanRincian = p.susulan_rincian || "";
@@ -1655,7 +1644,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      // 2. Uang Sambung
       const uangSambung = Number(p.uang_sambung) || 0;
       if (uangSambung > 0) {
         allocationItems.push({
@@ -1666,7 +1654,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      // 3. Jimpitan
       const jimpitan = Number(p.jimpitan) || 0;
       if (jimpitan > 0) {
         allocationItems.push({
@@ -1677,7 +1664,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      // 4. Siar-siar
       const siarSiar = Number(p.siar_siar) || 0;
       if (siarSiar > 0) {
         allocationItems.push({
@@ -1688,7 +1674,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      // 5. Seribuan
       const seribuan = Number(p.seribuan) || 0;
       if (seribuan > 0) {
         allocationItems.push({
@@ -1699,7 +1684,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      // 6. Kafan
       const kafan = Number(p.kafan) || 0;
       if (kafan > 0) {
         allocationItems.push({
@@ -1710,7 +1694,6 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      // 7. Ukhro MT
       const ukhroMt = Number(p.ukhro_mt) || 0;
       if (ukhroMt > 0) {
         allocationItems.push({

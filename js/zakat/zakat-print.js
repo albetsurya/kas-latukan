@@ -1,6 +1,4 @@
-// ============================================================
 // ZAKAT PRINT - CETAK LAPORAN DETAIL ZAKAT (REVISI)
-// ============================================================
 
 /**
  * Cetak laporan detail zakat berdasarkan ID zakat
@@ -228,9 +226,7 @@ function updateZakatPrintRincian(zakat) {
     Math.round((maalPenerimaan * maalAmilDaerahPersen) / 100),
   );
 
-  // ============================================================
   // SETOR KE DESA — AMIL DESA (Fitrah + Maal)
-  // ============================================================
   var setorDesa = {
     amilDesa: {
       fitrah: fitrahAmilDesaNominal,
@@ -239,9 +235,7 @@ function updateZakatPrintRincian(zakat) {
   };
   var totalSetorDesa = setorDesa.amilDesa.fitrah + setorDesa.amilDesa.maal;
 
-  // ============================================================
   // SETOR KE DAERAH — KHUSUS MAAL
-  // ============================================================
   var setorDaerah = {
     mustahiqDaerah: maalMustahiqDaerahNominal,
     sabilillah: maalSabilillahNominal,
@@ -252,9 +246,6 @@ function updateZakatPrintRincian(zakat) {
     setorDaerah.sabilillah +
     setorDaerah.amilDaerah;
 
-  // ============================================================
-  // BUILD HTML
-  // ============================================================
   var html = `
     <div class="print-rincian-wrapper">
       <!-- ZAKAT FITRAH -->
@@ -571,9 +562,6 @@ function ensureZakatPrintArea() {
   document.body.appendChild(area);
 }
 
-// ============================================================
-// INISIALISASI
-// ============================================================
 
 // Pastikan area print tersedia saat DOM siap
 document.addEventListener("DOMContentLoaded", function () {

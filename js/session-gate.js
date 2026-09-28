@@ -28,17 +28,14 @@
     const session = readValidSession();
     const authenticated = !!session;
 
-    // Update state global
     if (window.state) {
       window.state.isAdmin = session?.role === "admin";
       window.state.adminName = session?.nama || "";
     }
 
-    // Update HTML classes
     document.documentElement.classList.toggle("authenticated", authenticated);
     document.documentElement.classList.toggle("auth-locked", !authenticated);
 
-    // Tampilkan screen yang sesuai
     if (authScreen) {
       authScreen.classList.toggle("hidden", authenticated);
     }
@@ -61,7 +58,6 @@
 
     // Jika authenticated, load data
     if (authenticated && window.loadData) {
-      // Load data setelah shell muncul
       setTimeout(function () {
         window.loadData();
       }, 50);

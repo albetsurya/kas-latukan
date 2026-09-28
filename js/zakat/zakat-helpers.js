@@ -77,12 +77,7 @@ function sanitizeZakatRincian(rincian) {
 
 async function apiGetZakatList() {
   try {
-    var url = CONFIG.WEB_APP_URL + "?action=getZakatList";
-    var res = await fetch(url);
-    if (!res.ok) {
-      return { success: false, data: [], message: "HTTP " + res.status };
-    }
-    var data = await res.json();
+    var data = await apiRest("GET", "api/zakat/list");
 
     var rawList = null;
     if (Array.isArray(data)) {
@@ -449,10 +444,7 @@ async function apiDeleteZakatMustahik(data) {
 
 async function apiGetMasters() {
   try {
-    const url = CONFIG.WEB_APP_URL + "?action=getMasters";
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
+    const data = await apiRest("GET", "api/zakat/masters");
 
     // Jika backend mengembalikan langsung { muzaki, mustahik } tanpa wrapper
     if (data && data.success === undefined && (data.muzaki || data.mustahik)) {

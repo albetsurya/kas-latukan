@@ -329,9 +329,7 @@ function printShodaqohReport() {
   }
   headerHTML += `</tr>`;
 
-  // ============================================================
   // HITUNG TOTAL PER BARIS UNTUK SORTING
-  // ============================================================
   let rowsWithTotal = resolvedRows.map(function (r, idx) {
     const p = r.payment;
 
@@ -389,16 +387,11 @@ function printShodaqohReport() {
     };
   });
 
-  // ============================================================
   // URUTKAN DARI TOTAL TERBESAR KE TERKECIL
-  // ============================================================
   rowsWithTotal.sort(function (a, b) {
     return b.total - a.total;
   });
 
-  // ============================================================
-  // RENDER BODY DENGAN DATA YANG SUDAH DIURUTKAN
-  // ============================================================
   let bodyHTML = rowsWithTotal
     .map(function (r, idx) {
       const no = idx + 1;
@@ -595,9 +588,7 @@ function printInfakIrReport() {
   }
   headerHTML += `</tr>`;
 
-  // ============================================================
   // HITUNG TOTAL IR PER BARIS UNTUK SORTING
-  // ============================================================
   let rowsWithTotal = resolvedRows.map(function (r) {
     const p = r.payment;
     let irData = {};
@@ -628,16 +619,11 @@ function printInfakIrReport() {
     return { ...r, irData: irData, rowTotal: rowTotal };
   });
 
-  // ============================================================
   // URUTKAN DARI TOTAL TERBESAR KE TERKECIL
-  // ============================================================
   rowsWithTotal.sort(function (a, b) {
     return b.rowTotal - a.rowTotal;
   });
 
-  // ============================================================
-  // RENDER BODY DENGAN DATA YANG SUDAH DIURUTKAN
-  // ============================================================
   let bodyHTML = rowsWithTotal
     .map(function (r, idx) {
       const no = idx + 1;

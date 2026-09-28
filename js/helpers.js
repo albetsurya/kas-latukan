@@ -1,6 +1,4 @@
-// ============================================================
 // HELPER FUNCTIONS UNTUK LABEL BULAN
-// ============================================================
 
 function getShortMonthLabel(monthKey) {
   if (!monthKey || monthKey.length !== 7) return monthKey;
@@ -362,7 +360,6 @@ function setButtonLoading(btn, isLoading) {
     btn.disabled = false;
     btn.style.opacity = "1";
     btn.classList.remove("loading");
-    // Hapus _originalContent setelah restore agar tidak menumpuk
     delete btn._originalContent;
   }
 }
@@ -1670,7 +1667,6 @@ function renderHomeSkeleton() {
   }
 
   if (chartWrapper) {
-    // Hapus skeleton lama jika ada
     const oldSkeleton = chartWrapper.querySelector(".chart-skeleton");
     if (oldSkeleton) oldSkeleton.remove();
 
@@ -1678,7 +1674,6 @@ function renderHomeSkeleton() {
     const canvas = chartWrapper.querySelector("#saldoChart");
     if (canvas) canvas.style.display = "none";
 
-    // Buat skeleton baru dengan style inline
     const skeleton = document.createElement("div");
     skeleton.className = "chart-skeleton";
     skeleton.style.cssText = `
@@ -2331,22 +2326,10 @@ function applyShodaqohAIResult(data) {
 }
 
 async function callShodaqohAI(dataUrl) {
-  const response = await fetch(CONFIG.WEB_APP_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8",
-    },
-    body: JSON.stringify({
-      action: "extractShodaqoh",
-      dataUrl: dataUrl,
-    }),
+  const result = await apiRest("POST", "api/shodaqoh/extract", {
+    action: "extractShodaqoh",
+    dataUrl: dataUrl,
   });
-
-  if (!response.ok) {
-    throw new Error(`Server error: HTTP ${response.status}`);
-  }
-
-  const result = await response.json();
 
   if (!result.success) {
     throw new Error(result.message || "Gagal mengekstrak data dari foto.");

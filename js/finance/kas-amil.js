@@ -1,13 +1,10 @@
-// ============================================================
 // SWITCH KAS TYPE - DENGAN UPDATE UI YANG LEBIH BAIK
-// ============================================================
 
 function switchKasType(kasType) {
   if (state.kasType === kasType) return;
 
   state.kasType = kasType;
 
-  // Reset data
   state.saldoAwal = 0;
   state.totalDebet = 0;
   state.totalKredit = 0;
@@ -19,10 +16,8 @@ function switchKasType(kasType) {
   state.carryForwardMonth = null;
   state.carryForwardNextMonth = null;
 
-  // Update UI
   updateKasTypeUI(kasType);
 
-  // Update title
   const titleEl = document.getElementById("screenTitle");
   if (titleEl) {
     const titleMap = {
@@ -36,7 +31,6 @@ function switchKasType(kasType) {
     titleEl.textContent = titleMap[currentTab] || "Beranda";
   }
 
-  // Load data
   if (getSession()) {
     loadData();
 
@@ -49,16 +43,13 @@ function switchKasType(kasType) {
 }
 
 function updateKasTypeUI(kasType) {
-  // Update switcher buttons
   document.querySelectorAll(".kas-type-btn").forEach((btn) => {
     const isActive = btn.dataset.kasType === kasType;
     btn.classList.toggle("active", isActive);
 
-    // Update aria
     btn.setAttribute("aria-selected", isActive ? "true" : "false");
   });
 
-  // Update hero title
   const heroTitle = document.getElementById("heroTitle");
   if (heroTitle) {
     heroTitle.textContent =

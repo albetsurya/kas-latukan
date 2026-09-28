@@ -49,11 +49,9 @@
 (function () {
   "use strict";
 
-  // ------------------------------------------------------------
   // Konfigurasi — dibaca dari CSS custom properties di :root
   // (lihat css/fab-styles.css), supaya bisa dikustomisasi tanpa
   // sentuh file ini.
-  // ------------------------------------------------------------
   function readMs(varName, fallbackMs) {
     const raw = getComputedStyle(document.documentElement)
       .getPropertyValue(varName)
@@ -100,14 +98,12 @@
     );
   }
 
-  // ------------------------------------------------------------
   // Deteksi visibilitas FAB yang sesungguhnya (computed style),
   // supaya cocok untuk SEMUA mekanisme hide yang dipakai di project
   // ini: class .hidden (display:none), FAB di dalam .screen yang
   // tidak .active (display:none via ancestor), body.screen-*-active
   // selector (display override), maupun aturan txOverlay
   // (opacity:0 + visibility:hidden + pointer-events:none).
-  // ------------------------------------------------------------
   function isVisible(el) {
     if (!el || !el.isConnected) return false;
     const cs = getComputedStyle(el);
@@ -135,13 +131,11 @@
       .map((x) => x.el);
   }
 
-  // ------------------------------------------------------------
   // ENTER — animasikan elemen asli in-place. Idle animation CSS
   // bawaan (fabZakatFloat, dll) dipause sementara ("animation: none
   // !important" inline) supaya tidak rebutan properti `transform`
   // dengan animasi WAAPI, lalu dilepas lagi setelah selesai supaya
   // idle animation lanjut normal.
-  // ------------------------------------------------------------
   function playEnter(el, index, cfg, reduced) {
     const duration = reduced ? 1 : cfg.enterDuration;
     const delay = reduced ? 0 : index * cfg.stagger;
@@ -167,12 +161,10 @@
     };
   }
 
-  // ------------------------------------------------------------
   // EXIT — dibuat dari CLONE fixed-position di posisi asli elemen
   // (lihat catatan arsitektur di atas). Elemen asli sudah
   // disembunyikan secara instan oleh kode aslinya; clone inilah
   // yang tampil "terbang keluar" lalu dibuang dari DOM.
-  // ------------------------------------------------------------
   function playExitClone(el, index, cfg, reduced) {
     const rect = el.getBoundingClientRect();
     if (rect.width === 0 && rect.height === 0) return; // sudah tak terlihat, skip
@@ -217,9 +209,7 @@
     setTimeout(cleanup, duration + delay + 500);
   }
 
-  // ------------------------------------------------------------
   // Diff & jalankan animasi
-  // ------------------------------------------------------------
   function animateDiff(before, after) {
     const cfg = config();
     const reduced = prefersReducedMotion();
@@ -241,11 +231,9 @@
     );
   }
 
-  // ------------------------------------------------------------
   // Pasang wrapper di sekitar window.updateFabVisibility.
   // Ditunda sampai DOMContentLoaded + fungsi aslinya benar-benar
   // ada (navigation.js harus sudah di-load sebelum script ini).
-  // ------------------------------------------------------------
   function install() {
     if (typeof window.updateFabVisibility !== "function") {
       console.warn(

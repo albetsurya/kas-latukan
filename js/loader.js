@@ -1,6 +1,4 @@
-// ============================================================
 // LOADER - REUSABLE FUNCTIONS
-// ============================================================
 
 function showLoader(message) {
   var loader = document.getElementById("appLoader");

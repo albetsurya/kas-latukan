@@ -1063,3 +1063,26 @@ body > #txActionOverlay > .sheet {
     font-size: 13px !important;
   }
 }
+
+/* =========================================================
+   SHEET KEYBOARD & VISUAL VIEWPORT OVERRIDES
+   ========================================================= */
+body > .sheet-overlay.sheet-keyboard-active {
+  top: var(--sheet-vv-top, 0px) !important;
+  height: var(--sheet-vv-height, 100vh) !important;
+  bottom: auto !important;
+  align-items: flex-end !important;
+  transition: height 0.1s ease-out, top 0.1s ease-out !important;
+}
+
+body > .sheet-overlay.sheet-keyboard-active > .sheet {
+  margin-bottom: 0 !important;
+}
+
+body > .sheet-overlay.sheet-keyboard-active .sheet-scroll {
+  overflow-y: auto !important;
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-bottom: 160px !important;
+  scroll-padding-bottom: 160px !important;
+}

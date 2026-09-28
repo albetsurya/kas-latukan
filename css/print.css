@@ -98,7 +98,7 @@
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 10px;
-  line-height: 1.4;
+  line-height: 1.6;
 }
 
 #printArea col.col-no {
@@ -142,6 +142,7 @@
   text-overflow: ellipsis;
   page-break-inside: avoid;
   vertical-align: middle;
+  line-height: 1.6;
 }
 
 #printArea tbody tr:nth-child(even) {
@@ -248,7 +249,7 @@
     width: 100% !important;
     max-width: 100% !important;
     font-size: 9.5px !important;
-    line-height: 1.3 !important;
+    line-height: 1.7 !important;
   }
 
   #printArea .print-header {
@@ -273,17 +274,19 @@
   #printArea td {
     padding: 4px 3px !important;
     font-size: 9px !important;
-    line-height: 1.3 !important;
+    line-height: 1.7 !important;
   }
 
   #printArea thead th {
     padding: 3.5px 3px !important;
     font-size: 8px !important;
+    line-height: 1.7 !important;
   }
 
   #printArea tfoot td {
     padding: 4px 3px !important;
     font-size: 9px !important;
+    line-height: 1.7 !important;
   }
 
   #printArea tbody tr {

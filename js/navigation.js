@@ -1,6 +1,3 @@
-// ============================================================
-// EVENT LISTENER - SATU KALI SAJA
-// ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
   // Tombol Print Laporan Keuangan

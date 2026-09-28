@@ -137,7 +137,6 @@ function showRincianSheetSkeleton() {
   // Beri posisi relative pada container
   container.style.position = "relative";
 
-  // Buat overlay skeleton
   var skeletonOverlay = document.createElement("div");
   skeletonOverlay.className = "skeleton-rincian-overlay";
   skeletonOverlay.style.cssText = `
@@ -206,13 +205,11 @@ function removeRincianSheetSkeleton() {
   var container = document.querySelector(".zakat-rincian-container");
   if (!container) return;
 
-  // Hapus overlay skeleton
   var overlay = container.querySelector(".skeleton-rincian-overlay");
   if (overlay) {
     overlay.remove();
   }
 
-  // Tampilkan kembali semua section
   var sections = container.querySelectorAll(".zakat-rincian-section");
   sections.forEach(function (section) {
     section.style.opacity = "1";

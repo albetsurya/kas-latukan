@@ -1,6 +1,4 @@
-// ============================================================
 // PRINT LAPORAN KEUANGAN
-// ============================================================
 
 function buildPrintTable(rows) {
   const body = document.getElementById("printTableBody");
