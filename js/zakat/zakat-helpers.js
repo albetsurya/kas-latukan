@@ -1,5 +1,112 @@
-function toSafeNumber(value, fallback) {
-  fallback = fallback || 0;
+/**
+ * Helper kanonis zakat (definisi tunggal — dipakai zakat.js & zakat-sheet.js).
+ * Atribut: snake_case English; input lama tetap dibaca via fallback.
+ */
+function normalizeZakatType(jenis) {
+  var s = String(jenis || "").trim().toUpperCase();
+  if (!s) return "";
+  var map = {
+    FITRAH: "ZAKAT FITRAH",
+    MAAL: "ZAKAT MAAL",
+    TIJAROH: "ZAKAT TIJAROH",
+    "ZAKAT FITRAH": "ZAKAT FITRAH",
+    "ZAKAT MAAL": "ZAKAT MAAL",
+    "ZAKAT TIJAROH": "ZAKAT TIJAROH",
+    "ZAKAT ZURU'": "ZAKAT ZURU'",
+    "ZAKAT TERNAK": "ZAKAT TERNAK",
+    ZURU: "ZAKAT ZURU'",
+    TERNAK: "ZAKAT TERNAK",
+  };
+  return map[s] || s;
+}
+
+function getZakatTypeLabel(jenis) {
+  var n = normalizeZakatType(jenis);
+  return n ? n.replace(/^ZAKAT\s+/, "") : "-";
+}
+
+/** Normalisasi kode jenis untuk grouping UI (FITRAH/MAAL/.../LAINNYA). */
+function normalizeJenisZakat(jenis) {
+  var j = String(jenis || "").toUpperCase().trim();
+  if (typeof ZAKAT_JENIS_ORDER !== "undefined" && ZAKAT_JENIS_ORDER.indexOf(j) !== -1 && j !== "LAINNYA") return j;
+  return "LAINNYA";
+}
+
+function getJenisZakatLabel(jenis) {
+  if (typeof ZAKAT_JENIS_LABEL !== "undefined") return ZAKAT_JENIS_LABEL[jenis] || jenis;
+  return jenis;
+}
+
+/** Parse nominal Rupiah Indonesia ("Rp1.500.000", "2.500.000,50", 1500000). */
+function parseRupiah(value) {
+  if (value === null || value === undefined || value === "") return 0;
+  if (typeof value === "number") return isNaN(value) ? 0 : value;
+  var s = String(value).replace(/ /g, " ").trim();
+  if (!s || s === "-" || /^Rp\s*-?$/.test(s)) return 0;
+  s = s.replace(/^Rp\s*/i, "").trim();
+  if (s.indexOf(",") !== -1) {
+    s = s.replace(/\./g, "").replace(/ /g, "").replace(",", ".");
+    s = s.replace(/[^0-9.\-]/g, "");
+  } else {
+    s = s.replace(/[.,\s]/g, "").replace(/[^0-9\-]/g, "");
+  }
+  var num = parseFloat(s);
+  return isNaN(num) ? 0 : num;
+}
+
+/** Format angka ke "1.500.000" untuk tampil di input saat ketik. */
+function formatRupiahInput(value) {
+  var n = Math.floor(Math.abs(parseRupiah(value)));
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+/** Separator ribuan live untuk input nominal (sekali bind, delegated). */
+function bindRupiahInputs_() {
+  if (window.__zakatRupiahBound) return;
+  window.__zakatRupiahBound = true;
+  document.addEventListener("input", function (e) {
+    var t = e.target;
+    if (!t || !t.classList || !t.classList.contains("zakat-rupiah-input")) return;
+    var digits = String(t.value || "").replace(/[^0-9]/g, "").replace(/^0+(?=\d)/, "");
+    if (!digits) {
+      t.value = "";
+      return;
+    }
+    t.value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bindRupiahInputs_);
+} else {
+  bindRupiahInputs_();
+}
+
+/** Normalisasi satu baris muzakki (kanonis + alias baca). */
+function canonMuzakki(m) {
+  m = m || {};
+  return {
+    muzakki_id: m.muzakki_id || m.muzakiId || m.id || "",
+    muzakki_name: m.muzakki_name || m.nama || "",
+    amount: parseRupiah(m.amount !== undefined ? m.amount : m.nominal),
+    zakat_type: normalizeZakatType(m.zakat_type || m.jenis_zakat),
+    soul_count: Math.max(0, Math.floor(Number(m.soul_count !== undefined ? m.soul_count : m.jumlah_anggota_keluarga) || 0)),
+  };
+}
+
+function canonMustahik(m) {
+  m = m || {};
+  return {
+    mustahik_id: m.mustahik_id || m.mustahikId || m.id || "",
+    mustahik_name: m.mustahik_name || m.nama || "",
+    amount: parseRupiah(m.amount !== undefined ? m.amount : m.nominal),
+    zakat_type: normalizeZakatType(m.zakat_type || m.jenis_zakat),
+    category: m.category || m.kategori || "",
+    sub_category: m.sub_category || m.sub_kategori || "",
+  };
+}
+
+function toSafeNumber(value, fallback) {  fallback = fallback || 0;
 
   // Kosong / null / undefined
   if (value === null || value === undefined || value === "") {
@@ -122,51 +229,78 @@ async function apiGetZakatDetail(id) {
 }
 
 async function apiCreateZakat(data) {
+  var d = data || {};
   return apiRest("POST", "api/zakat/manage", {
     action: "createZakat",
-    ...data,
+    title: d.title,
+    notes: d.notes !== undefined ? d.notes : d.keterangan,
+    transaction_date: d.transaction_date || d.tanggal,
+    location: d.location !== undefined ? d.location : d.tempat,
+    zakat_category: d.zakat_category || "FITRAH", // Add default category
+    muzakki: (d.muzakki || d.muzaki || []).map(canonMuzakki),
+    mustahik: (d.mustahik || []).map(canonMustahik),
   });
 }
 
 async function apiUpdateZakat(data) {
-  return apiRest("POST", "api/zakat/manage", {
+  var d = data || {};
+  var payload = {
     action: "updateZakat",
-    ...data,
-  });
+    zakat_id: d.zakat_id || d.id,
+    title: d.title,
+    notes: d.notes !== undefined ? d.notes : d.keterangan,
+    transaction_date: d.transaction_date || d.tanggal,
+    location: d.location !== undefined ? d.location : d.tempat,
+  };
+  var muz = d.muzakki !== undefined ? d.muzakki : d.muzaki;
+  if (muz !== undefined) payload.muzakki = muz.map(canonMuzakki);
+  if (d.mustahik !== undefined) payload.mustahik = d.mustahik.map(canonMustahik);
+  return apiRest("POST", "api/zakat/manage", payload);
 }
 
 async function apiDeleteZakat(id) {
   return apiRest("POST", "api/zakat/manage", {
     action: "deleteZakat",
-    id: id,
+    zakat_id: id && typeof id === "object" ? id.zakat_id || id.id : id,
   });
 }
 
 async function apiUpdateZakatHeader(data) {
+  var d = data || {};
   return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatHeader",
-    ...data,
+    zakat_id: d.zakat_id || d.id,
+    title: d.title,
+    notes: d.notes !== undefined ? d.notes : d.keterangan,
+    transaction_date: d.transaction_date || d.tanggal,
+    location: d.location !== undefined ? d.location : d.tempat,
   });
 }
 
 async function apiUpdateZakatMuzaki(data) {
+  var d = data || {};
+  var muz = d.muzakki !== undefined ? d.muzakki : d.muzaki;
   return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatMuzaki",
-    ...data,
+    zakat_id: d.zakat_id || d.id,
+    muzakki: (muz || []).map(canonMuzakki),
   });
 }
 
 async function apiUpdateZakatRincian(data) {
+  var d = data || {};
   return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatRincian",
-    ...data,
+    zakat_id: d.zakat_id || d.id,
   });
 }
 
 async function apiUpdateZakatMustahik(data) {
+  var d = data || {};
   return apiRest("POST", "api/zakat/manage", {
     action: "updateZakatMustahik",
-    ...data,
+    zakat_id: d.zakat_id || d.id,
+    mustahik: (d.mustahik || []).map(canonMustahik),
   });
 }
 
@@ -229,21 +363,30 @@ function getZakatById(id) {
 }
 
 function createZakatItem(data) {
+  data = data || {};
+  var newId = generateZakatId();
+  var todayIso = new Date().toISOString();
   return {
-    id: generateZakatId(),
+    zakat_id: newId,
+    id: newId,
     title: data.title || "Zakat Baru",
-    keterangan: data.keterangan || "",
-    tanggal: data.tanggal || new Date().toISOString().slice(0, 10),
-    tempat: data.tempat || "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    notes: data.notes !== undefined ? data.notes : data.keterangan || "",
+    transaction_date:
+      data.transaction_date || data.tanggal || new Date().toISOString().slice(0, 10),
+    tanggal: data.transaction_date || data.tanggal || new Date().toISOString().slice(0, 10),
+    location: data.location !== undefined ? data.location : data.tempat || "",
+    created_at: todayIso,
+    createdAt: todayIso,
+    updated_at: todayIso,
+    updatedAt: todayIso,
+    muzakki: [],
     muzaki: [],
     mustahik: [],
+    total_amount: 0,
     total: 0,
     rincian: {
-      mustahik: { total: 45, kelompok: 80, daerah: 20 },
-      sabilillah: 40,
-      amil: { total: 15, kelompok: 12, desa: 2, daerah: 1 },
+      fitrah: { total: 0, mustahik: { persen: 45, nominal: 0 }, sabilillah: { persen: 40, nominal: 0 }, amil: { persen: 15, nominal: 0 } },
+      maal: { total: 0, mustahik: { persen: 45, nominal: 0 }, sabilillah: { persen: 40, nominal: 0 }, amil: { persen: 15, nominal: 0 } },
     },
   };
 }
@@ -294,35 +437,11 @@ function getAllMustahikNames() {
 }
 
 function getExistingMuzakiNames() {
-  const names = new Set();
-  if (state.zakat && state.zakat.list) {
-    state.zakat.list.forEach(function (z) {
-      if (z.muzaki && Array.isArray(z.muzaki)) {
-        z.muzaki.forEach(function (m) {
-          if (m.nama) {
-            names.add(m.nama.trim());
-          }
-        });
-      }
-    });
-  }
-  return Array.from(names).sort();
+  return getAllMuzakiNames();
 }
 
 function getExistingMustahikNames() {
-  const names = new Set();
-  if (state.zakat && state.zakat.list) {
-    state.zakat.list.forEach(function (z) {
-      if (z.mustahik && Array.isArray(z.mustahik)) {
-        z.mustahik.forEach(function (m) {
-          if (m.nama) {
-            names.add(m.nama.trim());
-          }
-        });
-      }
-    });
-  }
-  return Array.from(names).sort();
+  return getAllMustahikNames();
 }
 
 function getZakatStatusBadge(status) {

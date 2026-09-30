@@ -1540,9 +1540,9 @@ async function openShodaqohPaymentDetail(paymentId) {
     if (body) {
       const allocationItems = [];
 
-      const susulanIR = Number(p.susulan_ir) || 0;
-      const susulanBulan = p.susulan_bulan || "";
-      const susulanRincian = p.susulan_rincian || "";
+      const susulanIR = Number((p.carryover_ir ?? p.susulan_ir)) || 0;
+      const susulanBulan = (p.carryover_months ?? p.susulan_bulan) || "";
+      const susulanRincian = (p.carryover_breakdown ?? p.susulan_rincian) || "";
 
       if (susulanIR > 0) {
         let rincianText = "";
@@ -1626,7 +1626,7 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      const uangSambung = Number(p.uang_sambung) || 0;
+      const uangSambung = Number((p.connecting_fund ?? p.uang_sambung)) || 0;
       if (uangSambung > 0) {
         allocationItems.push({
           label: "Uang Sambung",
@@ -1636,7 +1636,7 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      const jimpitan = Number(p.jimpitan) || 0;
+      const jimpitan = Number((p.community_dues ?? p.jimpitan)) || 0;
       if (jimpitan > 0) {
         allocationItems.push({
           label: "Jimpitan",
@@ -1646,7 +1646,7 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      const siarSiar = Number(p.siar_siar) || 0;
+      const siarSiar = Number((p.outreach_fund ?? p.siar_siar)) || 0;
       if (siarSiar > 0) {
         allocationItems.push({
           label: "Siar-siar",
@@ -1656,7 +1656,7 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      const seribuan = Number(p.seribuan) || 0;
+      const seribuan = Number((p.thousand_fund ?? p.seribuan)) || 0;
       if (seribuan > 0) {
         allocationItems.push({
           label: "Seribuan",
@@ -1666,7 +1666,7 @@ async function openShodaqohPaymentDetail(paymentId) {
         });
       }
 
-      const kafan = Number(p.kafan) || 0;
+      const kafan = Number((p.funeral_fund ?? p.kafan)) || 0;
       if (kafan > 0) {
         allocationItems.push({
           label: "Kafan",

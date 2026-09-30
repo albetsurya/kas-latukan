@@ -19,17 +19,7 @@ const ZAKAT_JENIS_LABEL = {
   LAINNYA: "Lainnya",
 };
 
-function normalizeJenisZakat(jenis) {
-  var j = String(jenis || "")
-    .toUpperCase()
-    .trim();
-  if (ZAKAT_JENIS_ORDER.indexOf(j) !== -1 && j !== "LAINNYA") return j;
-  return "LAINNYA";
-}
-
-function getJenisZakatLabel(jenis) {
-  return ZAKAT_JENIS_LABEL[jenis] || jenis;
-}
+// normalizeJenisZakat/getJenisZakatLabel: definisi tunggal di zakat-helpers.js.
 
 function getMaxSheetIndex(list) {
   var maxIndex = 0;
@@ -136,7 +126,7 @@ function captureMuzakiSheetInputs(zakat) {
     var nominalInput = row.querySelector(".zakat-muzaki-sheet-nominal");
     var jenisSelect = row.querySelector(".zakat-row-jenis");
     if (nameInput) target.nama = nameInput.value.trim();
-    if (nominalInput) target.nominal = Number(nominalInput.value) || 0;
+    if (nominalInput) { target.nominal = Math.max(0, parseRupiah(nominalInput.value)); target.amount = target.nominal; }
     if (jenisSelect) target.jenis_zakat = jenisSelect.value;
   });
   var extraRows = container.querySelectorAll(".zakat-row-extra");
@@ -167,7 +157,7 @@ function captureMustahikSheetInputs(zakat) {
     var nameInput = row.querySelector(".zakat-mustahik-sheet-name");
     var nominalInput = row.querySelector(".zakat-mustahik-sheet-nominal");
     if (nameInput) target.nama = nameInput.value.trim();
-    if (nominalInput) target.nominal = Number(nominalInput.value) || 0;
+    if (nominalInput) { target.nominal = Math.max(0, parseRupiah(nominalInput.value)); target.amount = target.nominal; }
   });
 }
 
@@ -740,10 +730,10 @@ renderMuzakiSheetRows = async function (zakat) {
             "</div>" +
             '<div class="zakat-nominal-wrapper" style="flex-shrink:0;">' +
             '<span class="zakat-nominal-label">Rp</span>' +
-            '<input type="number" class="field-input zakat-muzaki-sheet-nominal" ' +
+            '<input type="text" inputmode="numeric" class="field-input zakat-muzaki-sheet-nominal zakat-rupiah-input" ' +
             'placeholder="0" ' +
             'value="' +
-            (existing.nominal || "") +
+            (existing.amount || existing.nominal ? formatRupiahInput(existing.amount || existing.nominal) : "") +
             '" ' +
             'data-index="' +
             existing._sheetIndex +
@@ -1202,17 +1192,16 @@ submitZakatMuzakiSheet = async function () {
     showZakatLoader("Menyimpan data muzaki...");
     var cleanMuzaki = zakat.muzaki.map(function (m) {
       return {
-        id: m.id || "",
-        nama: m.nama || "",
-        nominal: m.nominal || 0,
-        jenis_zakat: m.jenis_zakat || "",
-        jumlah_anggota_keluarga: Number(m.jumlah_anggota_keluarga) || 0,
+        muzakki_id: m.muzakki_id || m.id || "",
+        muzakki_name: m.muzakki_name || m.nama || "",
+        amount: parseRupiah(m.amount !== undefined ? m.amount : m.nominal),
+        zakat_type: normalizeZakatType(m.zakat_type || m.jenis_zakat),
+        soul_count: Math.max(0, Math.floor(Number(m.soul_count !== undefined ? m.soul_count : m.jumlah_anggota_keluarga) || 0)),
       };
     });
     var result = await apiUpdateZakatMuzaki({
-      id: zakat.id,
-      muzaki: cleanMuzaki,
-      total: zakat.total,
+      zakat_id: zakat.zakat_id || zakat.id,
+      muzakki: cleanMuzaki,
     });
     if (result && result.success) {
       showToast("Muzaki berhasil disimpan!", "success");
@@ -1434,10 +1423,10 @@ renderMustahikSheetRows = async function (zakat) {
         "</div>" +
         '<div class="zakat-nominal-wrapper" style="flex-shrink:0;">' +
         '<span class="zakat-nominal-label">Rp</span>' +
-        '<input type="number" class="field-input zakat-mustahik-sheet-nominal" ' +
+        '<input type="text" inputmode="numeric" class="field-input zakat-mustahik-sheet-nominal zakat-rupiah-input" ' +
         'placeholder="0" ' +
         'value="' +
-        (existing.nominal || "") +
+        (existing.amount || existing.nominal ? formatRupiahInput(existing.amount || existing.nominal) : "") +
         '" ' +
         'data-index="' +
         existing._sheetIndex +
@@ -1939,14 +1928,16 @@ submitZakatMustahikSheet = async function () {
     showZakatLoader("Menyimpan data mustahik...");
     var cleanMustahik = zakat.mustahik.map(function (m) {
       return {
-        id: m.id || "",
-        nama: m.nama || "",
-        nominal: m.nominal || 0,
-        jenis_zakat: m.jenis_zakat || "",
+        mustahik_id: m.mustahik_id || m.id || "",
+        mustahik_name: m.mustahik_name || m.nama || "",
+        amount: parseRupiah(m.amount !== undefined ? m.amount : m.nominal),
+        zakat_type: normalizeZakatType(m.zakat_type || m.jenis_zakat),
+        category: m.category || m.kategori || "",
+        sub_category: m.sub_category || m.sub_kategori || "",
       };
     });
     var result = await apiUpdateZakatMustahik({
-      id: zakat.id,
+      zakat_id: zakat.zakat_id || zakat.id,
       mustahik: cleanMustahik,
     });
     if (result.success) {

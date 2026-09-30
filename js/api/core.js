@@ -2,6 +2,8 @@ const CONFIG = {
   WEB_APP_URL:
     "https://script.google.com/macros/s/AKfycbwqCvr9HQvij6g1q3r0tlxfCu3Slb8xhTCdIZ80jYNXdJIVTOtHHSwmEauU3CLt-yd2/exec",
 };
+// TODO: Ganti "GANTI_DENGAN" dengan URL yang benar saat deploy
+// Jika WEB_APP_URL masih berisi "GANTI_DENGAN", app akan menampilkan peringatan konfigurasi
 
 let state = {
   kasType: "main",
@@ -255,18 +257,33 @@ async function apiRest(method, endpoint, paramsOrBody = {}) {
   const token = session ? session.token : "";
   const kasType = state.kasType || "main";
 
+  // Selalu gunakan base URL untuk kompatibilitas GAS
   let url = CONFIG.WEB_APP_URL;
-  if (endpoint) {
-    url += "/" + endpoint.replace(/^\/+/, "");
+
+  // Map endpoint back to action if needed, or use explicit action from paramsOrBody
+  let action = paramsOrBody.action;
+  
+  if (!action && endpoint) {
+    // Infer action from endpoint if not provided (mapping inverse)
+    if (endpoint.includes("login")) action = "login";
+    else if (endpoint.includes("logout")) action = "logout";
+    else if (endpoint.includes("transactions/add")) action = "addTransaction";
+    else if (endpoint.includes("transactions/edit")) action = "editTransaction";
+    else if (endpoint.includes("transactions/delete")) action = "deleteTransaction";
+    else if (endpoint.includes("shodaqoh/data")) action = "getShodaqohData";
+    else if (endpoint.includes("zakat/list")) action = "getZakatList";
+    else if (endpoint.includes("zakat/detail")) action = "getZakatDetail";
+    else if (endpoint.includes("zakat/manage")) action = paramsOrBody.action;
   }
 
   if (method.toUpperCase() === "GET") {
     const searchParams = new URLSearchParams();
     if (kasType) searchParams.append("kasType", kasType);
     if (token) searchParams.append("token", token);
+    if (action) searchParams.append("action", action);
 
     for (const [key, val] of Object.entries(paramsOrBody)) {
-      if (val !== undefined && val !== null) {
+      if (val !== undefined && val !== null && key !== "action") {
         searchParams.append(key, val);
       }
     }
@@ -283,6 +300,7 @@ async function apiRest(method, endpoint, paramsOrBody = {}) {
     const payload = {
       kasType: kasType,
       ...(token ? { token } : {}),
+      action: action,
       ...paramsOrBody,
     };
 
@@ -309,16 +327,13 @@ async function apiPost(payload) {
   const body = { ...payload };
   const action = body.action;
 
+  // JANGAN hapus action, karena backend Router.js membutuhkannya jika pathInfo kosong
   const isZakatManage = action && [
     "getZakatDetail", "createZakat", "updateZakat", "deleteZakat",
     "updateZakatHeader", "updateZakatMuzaki", "updateZakatRincian", "updateZakatMustahik",
     "completeZakat", "cancelCompleteZakat", "deleteZakatMuzaki", "deleteZakatMustahik",
     "addMasterMuzaki", "addMasterMustahik", "deleteMasterMuzaki", "deleteMasterMustahik"
   ].includes(action);
-
-  if (!isZakatManage) {
-    delete body.action;
-  }
 
   const isAmil = state.kasType === "kas_amil";
   const amilActionMap = {

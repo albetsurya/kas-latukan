@@ -26,12 +26,13 @@ function initZakatDatePicker() {
       };
     }
 
-    var today = new Date();
-    valueDisplay.textContent = formatDateDisplay(today);
-    hiddenInput.value = formatDateInput(today);
-    zakatDatePickerState.selectedDate = today;
-    zakatDatePickerState.currentMonth = today.getMonth();
-    zakatDatePickerState.currentYear = today.getFullYear();
+    // Hormati tanggal yang sudah ada (mode edit); default hari ini.
+    var initial = zakatParseIsoDate_(hiddenInput.value) || new Date();
+    valueDisplay.textContent = formatDateDisplay(initial);
+    hiddenInput.value = formatDateInput(initial);
+    zakatDatePickerState.selectedDate = initial;
+    zakatDatePickerState.currentMonth = initial.getMonth();
+    zakatDatePickerState.currentYear = initial.getFullYear();
 
     renderZakatDatePickerMenu(
       dropdown,
@@ -74,12 +75,13 @@ function initZakatDatePicker() {
       };
     }
 
-    var today = new Date();
-    editValueDisplay.textContent = formatDateDisplay(today);
-    editHiddenInput.value = formatDateInput(today);
-    zakatEditDatePickerState.selectedDate = today;
-    zakatEditDatePickerState.currentMonth = today.getMonth();
-    zakatEditDatePickerState.currentYear = today.getFullYear();
+    // Hormati tanggal yang sudah ada (mode edit); default hari ini.
+    var editInitial = zakatParseIsoDate_(editHiddenInput.value) || new Date();
+    editValueDisplay.textContent = formatDateDisplay(editInitial);
+    editHiddenInput.value = formatDateInput(editInitial);
+    zakatEditDatePickerState.selectedDate = editInitial;
+    zakatEditDatePickerState.currentMonth = editInitial.getMonth();
+    zakatEditDatePickerState.currentYear = editInitial.getFullYear();
 
     renderZakatDatePickerMenu(
       editDropdown,
@@ -102,16 +104,34 @@ function initZakatDatePicker() {
       });
     }
 
-    document.addEventListener("click", function (e) {
-      var dd = document.getElementById("zakatEditDateDropdown");
-      if (dd && !dd.contains(e.target)) {
-        dd.classList.remove("open");
-        var trig = document.getElementById("zakatEditDateDropdownTrigger");
-        if (trig) trig.setAttribute("aria-expanded", "false");
-        removeZakatDatePickerBackdrop();
-      }
-    });
+    if (!window.__zakatEditDdBound) {
+      window.__zakatEditDdBound = true;
+      document.addEventListener("click", function (e) {
+        var dd = document.getElementById("zakatEditDateDropdown");
+        if (dd && !dd.contains(e.target)) {
+          dd.classList.remove("open");
+          var trig = document.getElementById("zakatEditDateDropdownTrigger");
+          if (trig) trig.setAttribute("aria-expanded", "false");
+          removeZakatDatePickerBackdrop();
+        }
+      });
+    }
   }
+}
+
+/** Parse "YYYY-MM-DD" -> Date lokal (null bila invalid). */
+function zakatParseIsoDate_(iso) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "").trim());
+  if (!m) return null;
+  var d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  if (
+    d.getFullYear() !== Number(m[1]) ||
+    d.getMonth() !== Number(m[2]) - 1 ||
+    d.getDate() !== Number(m[3])
+  ) {
+    return null;
+  }
+  return d;
 }
 
 function renderZakatDatePickerMenu(

@@ -1,17 +1,7 @@
 let zakatDataLoading = false;
 let zakatDataLoaded = false;
 
-function normalizeJenisZakat(jenis) {
-  var j = String(jenis || "")
-    .toUpperCase()
-    .trim();
-  if (ZAKAT_JENIS_ORDER.indexOf(j) !== -1 && j !== "LAINNYA") return j;
-  return "LAINNYA";
-}
-
-function getJenisZakatLabel(jenis) {
-  return ZAKAT_JENIS_LABEL[jenis] || jenis;
-}
+// normalizeJenisZakat/getJenisZakatLabel: definisi tunggal di zakat-helpers.js.
 
 function groupMuzakiByJenis(muzakiList) {
   var groups = {};
@@ -21,10 +11,12 @@ function groupMuzakiByJenis(muzakiList) {
 
   (muzakiList || []).forEach(function (m) {
     if (m._deleted === true) return;
-    if (!m.id || !String(m.id).startsWith("MZ")) return;
-    if (!m.nama || m.nama.trim() === "") return;
+    var id = m.muzakki_id || m.muzaki_id || m.id;
+    var name = m.muzakki_name || m.nama || "";
+    if (!id || !String(id).startsWith("MZ")) return;
+    if (!name || name.trim() === "") return;
 
-    var j = normalizeJenisZakat(m.jenis_zakat);
+    var j = normalizeJenisZakat(m.zakat_type || m.jenis_zakat);
     if (!groups[j]) j = "LAINNYA";
     groups[j].push(m);
   });
@@ -40,10 +32,12 @@ function groupMustahikByJenis(mustahikList) {
 
   (mustahikList || []).forEach(function (m) {
     if (m._deleted === true) return;
-    if (!m.id || !String(m.id).startsWith("MS")) return;
-    if (!m.nama || m.nama === "Unknown" || m.nama.trim() === "") return;
+    var id = m.mustahik_id || m.id;
+    var name = m.mustahik_name || m.nama || "";
+    if (!id || !String(id).startsWith("MS")) return;
+    if (!name || name === "Unknown" || name.trim() === "") return;
 
-    var j = normalizeJenisZakat(m.jenis_zakat);
+    var j = normalizeJenisZakat(m.zakat_type || m.jenis_zakat);
     if (!groups[j]) j = "LAINNYA";
     groups[j].push(m);
   });
@@ -53,7 +47,7 @@ function groupMustahikByJenis(mustahikList) {
 
 function sumNominal(list) {
   return (list || []).reduce(function (s, m) {
-    return s + (Number(m.nominal) || 0);
+    return s + (Number(m.amount !== undefined ? m.amount : m.nominal) || 0);
   }, 0);
 }
 
@@ -681,13 +675,27 @@ async function submitZakatForm() {
   var tanggal = document.getElementById("zakatFormTanggal").value;
   var tempat = document.getElementById("zakatFormTempat").value.trim();
 
-  if (!title) {
-    showToast("Judul zakat wajib diisi.", "error");
+  if (title.length < 3 || title.length > 120) {
+    showToast("Judul wajib 3–120 karakter.", "error");
     return;
   }
 
-  if (!tanggal) {
-    showToast("Tanggal pelaksanaan wajib diisi.", "error");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal || "")) {
+    showToast("Tanggal tidak valid (format: YYYY-MM-DD).", "error");
+    return;
+  }
+  var parts = tanggal.split("-");
+  var check = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  if (
+    check.getFullYear() !== Number(parts[0]) ||
+    check.getMonth() !== Number(parts[1]) - 1 ||
+    check.getDate() !== Number(parts[2])
+  ) {
+    showToast("Tanggal tidak valid (mis. 30 Februari).", "error");
+    return;
+  }
+  if (tempat.length > 120) {
+    showToast("Tempat maksimal 120 karakter.", "error");
     return;
   }
 
@@ -709,18 +717,19 @@ async function submitZakatForm() {
       isEdit = true;
       zakatData = {
         ...existing,
+        zakat_id: existing.zakat_id || existing.id,
         title: title,
-        keterangan: keterangan,
-        tanggal: tanggal,
-        tempat: tempat,
-        updatedAt: new Date().toISOString(),
+        notes: keterangan,
+        transaction_date: tanggal,
+        location: tempat,
+        updated_at: new Date().toISOString(),
       };
     } else {
       zakatData = createZakatItem({
         title: title,
-        keterangan: keterangan,
-        tanggal: tanggal,
-        tempat: tempat,
+        notes: keterangan,
+        transaction_date: tanggal,
+        location: tempat,
       });
     }
 
@@ -774,9 +783,11 @@ function openEditZakatHeader() {
 
   document.getElementById("zakatEditHeaderTitle").value = zakat.title || "";
   document.getElementById("zakatEditHeaderKeterangan").value =
-    zakat.keterangan || "";
-  document.getElementById("zakatEditHeaderTanggal").value = zakat.tanggal || "";
-  document.getElementById("zakatEditHeaderTempat").value = zakat.tempat || "";
+    zakat.notes || zakat.keterangan || "";
+  document.getElementById("zakatEditHeaderTanggal").value =
+    zakat.transaction_date || zakat.tanggal || "";
+  document.getElementById("zakatEditHeaderTempat").value =
+    zakat.location || zakat.tempat || "";
 
   overlay.classList.remove("hidden");
 }
@@ -800,13 +811,13 @@ async function submitEditZakatHeader() {
   var tanggal = document.getElementById("zakatEditHeaderTanggal").value;
   var tempat = document.getElementById("zakatEditHeaderTempat").value.trim();
 
-  if (!title) {
-    showToast("Judul zakat wajib diisi.", "error");
+  if (title.length < 3 || title.length > 120) {
+    showToast("Judul wajib 3–120 karakter.", "error");
     return;
   }
 
-  if (!tanggal) {
-    showToast("Tanggal pelaksanaan wajib diisi.", "error");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal || "")) {
+    showToast("Tanggal tidak valid (format: YYYY-MM-DD).", "error");
     return;
   }
 
@@ -815,13 +826,17 @@ async function submitEditZakatHeader() {
 
   try {
     zakat.title = title;
+    zakat.notes = keterangan;
     zakat.keterangan = keterangan;
+    zakat.transaction_date = tanggal;
     zakat.tanggal = tanggal;
+    zakat.location = tempat;
     zakat.tempat = tempat;
-    zakat.updatedAt = new Date().toISOString();
+    zakat.updated_at = new Date().toISOString();
+    zakat.updatedAt = zakat.updated_at;
 
     var idx = state.zakat.list.findIndex(function (z) {
-      return z.id === zakat.id;
+      return (z.zakat_id || z.id) === (zakat.zakat_id || zakat.id);
     });
     if (idx !== -1) {
       state.zakat.list[idx] = zakat;
@@ -830,11 +845,11 @@ async function submitEditZakatHeader() {
 
     showZakatLoader("Menyimpan data header...");
     var result = await apiUpdateZakatHeader({
-      id: zakat.id,
+      zakat_id: zakat.zakat_id || zakat.id,
       title: zakat.title,
-      keterangan: zakat.keterangan,
-      tanggal: zakat.tanggal,
-      tempat: zakat.tempat,
+      notes: keterangan,
+      transaction_date: tanggal,
+      location: tempat,
     });
 
     if (result.success) {
@@ -2364,8 +2379,8 @@ function renderZakatList(data) {
 
     // ✅ Sort dengan safe date parsing
     list = list.slice().sort(function (a, b) {
-      var dateA = safeParseDate(a.tanggal);
-      var dateB = safeParseDate(b.tanggal);
+      var dateA = safeParseDate(a.transaction_date || a.tanggal);
+      var dateB = safeParseDate(b.transaction_date || b.tanggal);
       return dateB - dateA;
     });
 
@@ -2484,16 +2499,17 @@ function zakatGetDanaMustahik(z) {
 
 // ✅ Build HTML untuk satu item zakat
 function buildZakatListItemHtml(z) {
-  if (!z || !z.id) {
+  var zid = z.zakat_id || z.id;
+  if (!z || !zid) {
     throw new Error("Item zakat tidak valid (missing id)");
   }
 
   var safeTitle = escapeHtml(z.title || "Tanpa Judul");
-  var safeTempat = escapeHtml(z.tempat || "Tempat tidak ditentukan");
-  var safeTotal = fmtRp(z.total || 0);
-  var safeTanggal = z.tanggal ? fmtDateShort(z.tanggal) : "-";
+  var safeTempat = escapeHtml(z.location || z.tempat || "Tempat tidak ditentukan");
+  var safeTotal = fmtRp(z.total_amount !== undefined ? z.total_amount : z.total || 0);
+  var safeTanggal = (z.transaction_date || z.tanggal) ? fmtDateShort(z.transaction_date || z.tanggal) : "-";
 
-  var muzakiList = Array.isArray(z.muzaki) ? z.muzaki : [];
+  var muzakiList = Array.isArray(z.muzakki) ? z.muzakki : (Array.isArray(z.muzaki) ? z.muzaki : []);
   var mustahikList = Array.isArray(z.mustahik) ? z.mustahik : [];
 
   var muzakiLength = muzakiList.length;
@@ -2521,7 +2537,7 @@ function buildZakatListItemHtml(z) {
   );
 
   var totalMustahikTerisi = mustahikList.reduce(function (sum, m) {
-    return sum + (Number(m.nominal) || 0);
+    return sum + (Number(m.amount !== undefined ? m.amount : m.nominal) || 0);
   }, 0);
 
   var danaMustahik = zakatGetDanaMustahik(z);
@@ -2539,7 +2555,8 @@ function buildZakatListItemHtml(z) {
   var paidCount = 0;
   var allMuzakiPaid = muzakiLength > 0;
   muzakiList.forEach(function (m) {
-    if (Number(m.nominal) > 0) {
+    var amt = Number(m.amount !== undefined ? m.amount : m.nominal) || 0;
+    if (amt > 0) {
       paidCount++;
     } else {
       allMuzakiPaid = false;
@@ -2560,10 +2577,10 @@ function buildZakatListItemHtml(z) {
 
   return (
     '<div class="zakat-item" data-zakat-id="' +
-    z.id +
+    zid +
     '">' +
     '<div class="zakat-item-content" data-zakat-id="' +
-    z.id +
+    zid +
     '">' +
     '<div class="zakat-item-status"><span class="zakat-badge ' +
     statusBadgeClass +
@@ -3546,10 +3563,10 @@ function renderZakatMuzakiView(zakat) {
           (idx + 1) +
           "</td>" +
           '<td style="font-weight:500;">' +
-          escapeHtml(m.nama || "-") +
+          escapeHtml(m.muzakki_name || m.nama || "-") +
           "</td>" +
           '<td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
-          fmtRp(m.nominal || 0) +
+          fmtRp(m.amount !== undefined ? m.amount : (m.nominal || 0)) +
           "</td>" +
           "</tr>";
       });
@@ -3582,9 +3599,9 @@ function renderZakatMuzakiView(zakat) {
             '<tr><td style="text-align:center;font-weight:600;color:var(--ink-faint);font-size:13px;">' +
             (i + 1) +
             '</td><td style="font-weight:500;">' +
-            escapeHtml(m.nama || "-") +
+            escapeHtml(m.muzakki_name || m.nama || "-") +
             '</td><td style="text-align:right;font-weight:600;">' +
-            fmtRp(m.nominal || 0) +
+            fmtRp(m.amount !== undefined ? m.amount : (m.nominal || 0)) +
             "</td></tr>"
           );
         })
@@ -3724,10 +3741,10 @@ function renderZakatMustahikView(zakat) {
           (idx + 1) +
           "</td>" +
           '<td style="text-align:left;padding:8px 10px;">' +
-          escapeHtml(m.nama || "-") +
+          escapeHtml(m.mustahik_name || m.nama || "-") +
           "</td>" +
           '<td style="text-align:right;padding:8px 10px;">' +
-          fmtRp(m.nominal || 0) +
+          fmtRp(m.amount !== undefined ? m.amount : (m.nominal || 0)) +
           "</td>" +
           "</tr>";
       });
@@ -3760,9 +3777,9 @@ function renderZakatMustahikView(zakat) {
             '<tr><td style="text-align:center;padding:8px 10px;">' +
             (i + 1) +
             '</td><td style="text-align:left;padding:8px 10px;">' +
-            escapeHtml(m.nama || "-") +
+            escapeHtml(m.mustahik_name || m.nama || "-") +
             '</td><td style="text-align:right;padding:8px 10px;">' +
-            fmtRp(m.nominal || 0) +
+            fmtRp(m.amount !== undefined ? m.amount : (m.nominal || 0)) +
             "</td></tr>"
           );
         })

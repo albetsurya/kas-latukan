@@ -1976,12 +1976,12 @@ function shodParseTable(text) {
 
   if (!result.total) {
     result.total =
-      Number(result.susulan_ir || 0) +
-      Number(result.uang_sambung || 0) +
-      Number(result.jimpitan || 0) +
-      Number(result.siar_siar || 0) +
-      Number(result.seribuan || 0) +
-      Number(result.kafan || 0) +
+      Number((result.carryover_ir ?? result.susulan_ir) || 0) +
+      Number((result.connecting_fund ?? result.uang_sambung) || 0) +
+      Number((result.community_dues ?? result.jimpitan) || 0) +
+      Number((result.outreach_fund ?? result.siar_siar) || 0) +
+      Number((result.thousand_fund ?? result.seribuan) || 0) +
+      Number((result.funeral_fund ?? result.kafan) || 0) +
       Number(result.ukhro_mt || 0);
   }
 

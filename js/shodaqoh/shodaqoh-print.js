@@ -219,12 +219,12 @@ function printShodaqohReport() {
   let allSusulanMonths = new Set();
   resolvedRows.forEach(function (r) {
     const p = r.payment;
-    if (p && p.susulan_bulan) {
+    if (p && (p.carryover_months ?? p.susulan_bulan)) {
       let bulanArray = [];
-      if (typeof p.susulan_bulan === "string") {
-        bulanArray = p.susulan_bulan.split(",").filter(Boolean);
-      } else if (Array.isArray(p.susulan_bulan)) {
-        bulanArray = p.susulan_bulan;
+      if (typeof (p.carryover_months ?? p.susulan_bulan) === "string") {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan).split(",").filter(Boolean);
+      } else if (Array.isArray((p.carryover_months ?? p.susulan_bulan))) {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan);
       }
       bulanArray.forEach(function (key) {
         if (key.length === 7) allSusulanMonths.add(key);
@@ -333,26 +333,26 @@ function printShodaqohReport() {
   let rowsWithTotal = resolvedRows.map(function (r, idx) {
     const p = r.payment;
 
-    const sambung = p ? Number(p.uang_sambung || 0) : 0;
-    const jimpitan = p ? Number(p.jimpitan || 0) : 0;
-    const siar = p ? Number(p.siar_siar || 0) : 0;
-    const seribuan = p ? Number(p.seribuan || 0) : 0;
-    const kafan = p ? Number(p.kafan || 0) : 0;
+    const sambung = p ? Number((p.connecting_fund ?? p.uang_sambung) || 0) : 0;
+    const jimpitan = p ? Number((p.community_dues ?? p.jimpitan) || 0) : 0;
+    const siar = p ? Number((p.outreach_fund ?? p.siar_siar) || 0) : 0;
+    const seribuan = p ? Number((p.thousand_fund ?? p.seribuan) || 0) : 0;
+    const kafan = p ? Number((p.funeral_fund ?? p.kafan) || 0) : 0;
     const ukhro = p ? Number(p.ukhro_mt || 0) : 0;
 
     let irData = {};
     let totalIR = 0;
 
-    if (p && p.susulan_bulan) {
+    if (p && (p.carryover_months ?? p.susulan_bulan)) {
       let bulanArray = [];
-      if (typeof p.susulan_bulan === "string") {
-        bulanArray = p.susulan_bulan.split(",").filter(Boolean);
-      } else if (Array.isArray(p.susulan_bulan)) {
-        bulanArray = p.susulan_bulan;
+      if (typeof (p.carryover_months ?? p.susulan_bulan) === "string") {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan).split(",").filter(Boolean);
+      } else if (Array.isArray((p.carryover_months ?? p.susulan_bulan))) {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan);
       }
 
       if (bulanArray.length > 0) {
-        const totalIRValue = Number(p.susulan_ir || 0);
+        const totalIRValue = Number((p.carryover_ir ?? p.susulan_ir) || 0);
         let irPerBulan = Math.round(totalIRValue / bulanArray.length);
 
         bulanArray.forEach(function (key) {
@@ -408,19 +408,19 @@ function printShodaqohReport() {
 
       rowHTML += `
         <td class="num" style="text-align:right;">${r.sambung > 0 ? fmtRp(r.sambung) : "—"}</td>
-        <td class="num" style="text-align:right;">${r.jimpitan > 0 ? fmtRp(r.jimpitan) : "—"}</td>
+        <td class="num" style="text-align:right;">${(r.community_dues ?? r.jimpitan) > 0 ? fmtRp((r.community_dues ?? r.jimpitan)) : "—"}</td>
         <td class="num" style="text-align:right;">${r.siar > 0 ? fmtRp(r.siar) : "—"}</td>
-        <td class="num" style="text-align:right;">${r.seribuan > 0 ? fmtRp(r.seribuan) : "—"}</td>
-        <td class="num" style="text-align:right;">${r.kafan > 0 ? fmtRp(r.kafan) : "—"}</td>
+        <td class="num" style="text-align:right;">${(r.thousand_fund ?? r.seribuan) > 0 ? fmtRp((r.thousand_fund ?? r.seribuan)) : "—"}</td>
+        <td class="num" style="text-align:right;">${(r.funeral_fund ?? r.kafan) > 0 ? fmtRp((r.funeral_fund ?? r.kafan)) : "—"}</td>
         <td class="num" style="text-align:right;">${r.ukhro > 0 ? fmtRp(r.ukhro) : "—"}</td>
         <td class="num font-bold" style="text-align:right;">${r.total > 0 ? fmtRp(r.total) : "—"}</td>
       </tr>`;
 
       totalSambung += r.sambung;
-      totalJimpitan += r.jimpitan;
+      totalJimpitan += (r.community_dues ?? r.jimpitan);
       totalSiar += r.siar;
-      totalSeribuan += r.seribuan;
-      totalKafan += r.kafan;
+      totalSeribuan += (r.thousand_fund ?? r.seribuan);
+      totalKafan += (r.funeral_fund ?? r.kafan);
       totalUkhro += r.ukhro;
       grandTotal += r.total;
 
@@ -512,12 +512,12 @@ function printInfakIrReport() {
   let allSusulanMonths = new Set();
   resolvedRows.forEach(function (r) {
     const p = r.payment;
-    if (p && p.susulan_bulan) {
+    if (p && (p.carryover_months ?? p.susulan_bulan)) {
       let bulanArray = [];
-      if (typeof p.susulan_bulan === "string") {
-        bulanArray = p.susulan_bulan.split(",").filter(Boolean);
-      } else if (Array.isArray(p.susulan_bulan)) {
-        bulanArray = p.susulan_bulan;
+      if (typeof (p.carryover_months ?? p.susulan_bulan) === "string") {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan).split(",").filter(Boolean);
+      } else if (Array.isArray((p.carryover_months ?? p.susulan_bulan))) {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan);
       }
       bulanArray.forEach(function (key) {
         if (key.length === 7) allSusulanMonths.add(key);
@@ -594,15 +594,15 @@ function printInfakIrReport() {
     let irData = {};
     let rowTotal = 0;
 
-    if (p && p.susulan_bulan) {
+    if (p && (p.carryover_months ?? p.susulan_bulan)) {
       let bulanArray = [];
-      if (typeof p.susulan_bulan === "string") {
-        bulanArray = p.susulan_bulan.split(",").filter(Boolean);
-      } else if (Array.isArray(p.susulan_bulan)) {
-        bulanArray = p.susulan_bulan;
+      if (typeof (p.carryover_months ?? p.susulan_bulan) === "string") {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan).split(",").filter(Boolean);
+      } else if (Array.isArray((p.carryover_months ?? p.susulan_bulan))) {
+        bulanArray = (p.carryover_months ?? p.susulan_bulan);
       }
       if (bulanArray.length > 0) {
-        const totalIR = Number(p.susulan_ir || 0);
+        const totalIR = Number((p.carryover_ir ?? p.susulan_ir) || 0);
         const irPerBulan = Math.round(totalIR / bulanArray.length);
         bulanArray.forEach(function (key) {
           if (key.length === 7 && displaySusulanMonths.includes(key)) {

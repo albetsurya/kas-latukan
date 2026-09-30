@@ -250,13 +250,13 @@ function renderShodaqohAllocation() {
   let totalUkhroMt = 0;
 
   payments.forEach(function (p) {
-    const uangSambung = p.uang_sambung || p.uang || 0;
-    totalSusulanIr += Number(p.susulan_ir || 0);
+    const uangSambung = (p.connecting_fund ?? p.uang_sambung) || p.uang || 0;
+    totalSusulanIr += Number((p.carryover_ir ?? p.susulan_ir) || 0);
     totalUangSambung += Number(uangSambung);
-    totalJimpitan += Number(p.jimpitan || 0);
-    totalSiarSiar += Number(p.siar_siar || 0);
-    totalSeribuan += Number(p.seribuan || 0);
-    totalKafan += Number(p.kafan || 0);
+    totalJimpitan += Number((p.community_dues ?? p.jimpitan) || 0);
+    totalSiarSiar += Number((p.outreach_fund ?? p.siar_siar) || 0);
+    totalSeribuan += Number((p.thousand_fund ?? p.seribuan) || 0);
+    totalKafan += Number((p.funeral_fund ?? p.kafan) || 0);
     totalUkhroMt += Number(p.ukhro_mt || 0);
   });
 
@@ -1352,13 +1352,13 @@ function fillShodaqohPaymentForm(payment) {
   let selectedMonths = {};
   if (payment?.susulan_rincian) {
     try {
-      selectedMonths = JSON.parse(payment.susulan_rincian);
+      selectedMonths = JSON.parse((payment.carryover_breakdown ?? payment.susulan_rincian));
     } catch (e) {
-      if (payment.susulan_bulan) {
-        const bulanArray = String(payment.susulan_bulan)
+      if ((payment.carryover_months ?? payment.susulan_bulan)) {
+        const bulanArray = String((payment.carryover_months ?? payment.susulan_bulan))
           .split(",")
           .filter(Boolean);
-        const totalIR = Number(payment.susulan_ir) || 0;
+        const totalIR = Number((payment.carryover_ir ?? payment.susulan_ir)) || 0;
         const perBulan =
           bulanArray.length > 0 ? Math.round(totalIR / bulanArray.length) : 0;
         let sisa = totalIR;
@@ -1370,8 +1370,8 @@ function fillShodaqohPaymentForm(payment) {
       }
     }
   } else if (payment?.susulan_bulan) {
-    const bulanArray = String(payment.susulan_bulan).split(",").filter(Boolean);
-    const totalIR = Number(payment.susulan_ir) || 0;
+    const bulanArray = String((payment.carryover_months ?? payment.susulan_bulan)).split(",").filter(Boolean);
+    const totalIR = Number((payment.carryover_ir ?? payment.susulan_ir)) || 0;
     const perBulan =
       bulanArray.length > 0 ? Math.round(totalIR / bulanArray.length) : 0;
     let sisa = totalIR;
@@ -1932,15 +1932,15 @@ async function extractDataFromImage() {
 
     const aiData = {
       total: Number(parsed.total) || 0,
-      susulan_ir: Number(parsed.susulan_ir) || 0,
-      susulan_bulan: Array.isArray(parsed.susulan_bulan)
-        ? parsed.susulan_bulan
+      susulan_ir: Number((parsed.carryover_ir ?? parsed.susulan_ir)) || 0,
+      susulan_bulan: Array.isArray((parsed.carryover_months ?? parsed.susulan_bulan))
+        ? (parsed.carryover_months ?? parsed.susulan_bulan)
         : [],
-      uang_sambung: Number(parsed.uang_sambung) || 0,
-      jimpitan: Number(parsed.jimpitan) || 0,
-      siar_siar: Number(parsed.siar_siar) || 0,
-      seribuan: Number(parsed.seribuan) || 0,
-      kafan: Number(parsed.kafan) || 0,
+      uang_sambung: Number((parsed.connecting_fund ?? parsed.uang_sambung)) || 0,
+      jimpitan: Number((parsed.community_dues ?? parsed.jimpitan)) || 0,
+      siar_siar: Number((parsed.outreach_fund ?? parsed.siar_siar)) || 0,
+      seribuan: Number((parsed.thousand_fund ?? parsed.seribuan)) || 0,
+      kafan: Number((parsed.funeral_fund ?? parsed.kafan)) || 0,
       ukhro_mt: Number(parsed.ukhro_mt) || 0,
       keterangan: parsed.keterangan || "",
       rawText: parsed.rawText || aiResult.rawText || "",
@@ -1948,15 +1948,15 @@ async function extractDataFromImage() {
 
     window.shodAiExtractedData = aiData;
 
-    renderShodaqohAiSusulanBulan(aiData.susulan_bulan);
+    renderShodaqohAiSusulanBulan((aiData.carryover_months ?? aiData.susulan_bulan));
 
     const total = aiData.total;
-    const susulanIr = aiData.susulan_ir;
-    const uangSambung = aiData.uang_sambung;
-    const jimpitan = aiData.jimpitan;
-    const siarSiar = aiData.siar_siar;
-    const seribuan = aiData.seribuan;
-    const kafan = aiData.kafan;
+    const susulanIr = (aiData.carryover_ir ?? aiData.susulan_ir);
+    const uangSambung = (aiData.connecting_fund ?? aiData.uang_sambung);
+    const jimpitan = (aiData.community_dues ?? aiData.jimpitan);
+    const siarSiar = (aiData.outreach_fund ?? aiData.siar_siar);
+    const seribuan = (aiData.thousand_fund ?? aiData.seribuan);
+    const kafan = (aiData.funeral_fund ?? aiData.kafan);
     const ukhroMt = aiData.ukhro_mt;
     const text = aiData.rawText;
 
@@ -2282,7 +2282,7 @@ async function extractDataFromImage() {
 
       if (susulanIr > 0) {
         renderShodaqohAiSusulanBulan(
-          Array.isArray(aiData.susulan_bulan) ? aiData.susulan_bulan : [],
+          Array.isArray((aiData.carryover_months ?? aiData.susulan_bulan)) ? (aiData.carryover_months ?? aiData.susulan_bulan) : [],
         );
       }
 
@@ -2482,7 +2482,7 @@ async function submitShodaqohAI() {
     ),
   ].map((el) => el.value);
 
-  if (Number(data.susulan_ir || 0) > 0 && susulanBulan.length === 0) {
+  if (Number((data.carryover_ir ?? data.susulan_ir) || 0) > 0 && susulanBulan.length === 0) {
     showToast("Pilih minimal satu bulan untuk Susulan IR.", "error");
     return;
   }
@@ -2502,19 +2502,19 @@ async function submitShodaqohAI() {
 
     total: Number(data.total) || 0,
 
-    susulan_ir: Number(data.susulan_ir) || 0,
+    susulan_ir: Number((data.carryover_ir ?? data.susulan_ir)) || 0,
 
     susulan_bulan: susulanBulan,
 
-    uang_sambung: Number(data.uang_sambung) || 0,
+    uang_sambung: Number((data.connecting_fund ?? data.uang_sambung)) || 0,
 
-    jimpitan: Number(data.jimpitan) || 0,
+    jimpitan: Number((data.community_dues ?? data.jimpitan)) || 0,
 
-    siar_siar: Number(data.siar_siar) || 0,
+    siar_siar: Number((data.outreach_fund ?? data.siar_siar)) || 0,
 
-    seribuan: Number(data.seribuan) || 0,
+    seribuan: Number((data.thousand_fund ?? data.seribuan)) || 0,
 
-    kafan: Number(data.kafan) || 0,
+    kafan: Number((data.funeral_fund ?? data.kafan)) || 0,
 
     ukhro_mt: Number(data.ukhro_mt) || 0,
 
@@ -3131,9 +3131,9 @@ async function openShodaqohMemberDetail(memberId) {
         payments.forEach(function (p) {
           paymentMap[p.payment_id] = p;
 
-          if (p.susulan_rincian) {
+          if ((p.carryover_breakdown ?? p.susulan_rincian)) {
             try {
-              p.susulan_rincian_parsed = JSON.parse(p.susulan_rincian);
+              p.susulan_rincian_parsed = JSON.parse((p.carryover_breakdown ?? p.susulan_rincian));
             } catch (e) {
               p.susulan_rincian_parsed = {};
             }
@@ -3141,8 +3141,8 @@ async function openShodaqohMemberDetail(memberId) {
             p.susulan_rincian_parsed = {};
           }
 
-          p.susulan_bulan_array = p.susulan_bulan
-            ? String(p.susulan_bulan)
+          p.susulan_bulan_array = (p.carryover_months ?? p.susulan_bulan)
+            ? String((p.carryover_months ?? p.susulan_bulan))
                 .split(",")
                 .filter(function (b) {
                   return b.trim();
@@ -3216,7 +3216,7 @@ async function openShodaqohMemberDetail(memberId) {
                 }
               } else {
                 const susulanBulan = p.susulan_bulan_array || [];
-                const totalIR = Number(p.susulan_ir) || 0;
+                const totalIR = Number((p.carryover_ir ?? p.susulan_ir)) || 0;
 
                 const isPaymentMonth = paymentDate === o.periode;
                 const isInSusulan = susulanBulan.some(function (b) {
@@ -3239,11 +3239,11 @@ async function openShodaqohMemberDetail(memberId) {
                 }
               }
 
-              uangSambung = p.uang_sambung || 0;
-              jimpitan = p.jimpitan || 0;
-              siarSiar = p.siar_siar || 0;
-              seribuan = p.seribuan || 0;
-              kafan = p.kafan || 0;
+              uangSambung = (p.connecting_fund ?? p.uang_sambung) || 0;
+              jimpitan = (p.community_dues ?? p.jimpitan) || 0;
+              siarSiar = (p.outreach_fund ?? p.siar_siar) || 0;
+              seribuan = (p.thousand_fund ?? p.seribuan) || 0;
+              kafan = (p.funeral_fund ?? p.kafan) || 0;
               ukhroMt = p.ukhro_mt || 0;
             }
 

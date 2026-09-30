@@ -13,12 +13,12 @@ function generateShodaqohRekapText() {
   let totalUkhroMt = 0;
 
   payments.forEach(function (p) {
-    totalSusulanIr += Number(p.susulan_ir || 0);
-    totalUangSambung += Number(p.uang_sambung || 0);
-    totalJimpitan += Number(p.jimpitan || 0);
-    totalSiarSiar += Number(p.siar_siar || 0);
-    totalSeribuan += Number(p.seribuan || 0);
-    totalKafan += Number(p.kafan || 0);
+    totalSusulanIr += Number((p.carryover_ir ?? p.susulan_ir) || 0);
+    totalUangSambung += Number((p.connecting_fund ?? p.uang_sambung) || 0);
+    totalJimpitan += Number((p.community_dues ?? p.jimpitan) || 0);
+    totalSiarSiar += Number((p.outreach_fund ?? p.siar_siar) || 0);
+    totalSeribuan += Number((p.thousand_fund ?? p.seribuan) || 0);
+    totalKafan += Number((p.funeral_fund ?? p.kafan) || 0);
     totalUkhroMt += Number(p.ukhro_mt || 0);
   });
 
@@ -58,12 +58,12 @@ async function copyShodaqohRekap() {
   const payments = state.shodaqoh.payments || [];
   const hasData = payments.some((p) => {
     return (
-      Number(p.susulan_ir || 0) > 0 ||
-      Number(p.uang_sambung || 0) > 0 ||
-      Number(p.jimpitan || 0) > 0 ||
-      Number(p.siar_siar || 0) > 0 ||
-      Number(p.seribuan || 0) > 0 ||
-      Number(p.kafan || 0) > 0 ||
+      Number((p.carryover_ir ?? p.susulan_ir) || 0) > 0 ||
+      Number((p.connecting_fund ?? p.uang_sambung) || 0) > 0 ||
+      Number((p.community_dues ?? p.jimpitan) || 0) > 0 ||
+      Number((p.outreach_fund ?? p.siar_siar) || 0) > 0 ||
+      Number((p.thousand_fund ?? p.seribuan) || 0) > 0 ||
+      Number((p.funeral_fund ?? p.kafan) || 0) > 0 ||
       Number(p.ukhro_mt || 0) > 0
     );
   });
